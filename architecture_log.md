@@ -30,6 +30,33 @@
   - Noms de variables et fonctions en français
 - **[2025-07-05 12:17]** Formatage du code avec dart format
 - **[2025-07-05 12:17]** Analyse du code réussie sans erreurs
+- **[2025-07-05 12:25]** Ajout du logo et écran de chargement :
+  - Logo UqarLive avec icône école et texte "UQAR"
+  - Écran de chargement avec fond noir et animation
+  - Navigation automatique vers l'écran de connexion
+  - Nom "UqarLive" affiché sur l'écran de connexion
+- **[2025-07-05 12:30]** Création de l'écran d'inscription :
+  - lib/presentation/screens/inscription_ecran.dart
+  - Formulaire complet avec validation avancée
+  - Navigation bidirectionnelle avec l'écran de connexion
+  - Design cohérent avec l'écran de connexion
+  - Validation email, longueur mots de passe, correspondance
+- **[2025-07-05 12:35]** Amélioration de l'écran d'inscription :
+  - Ajout des champs : Prénom, Nom, Code permanent
+  - Validation du code permanent (format ABCD12345678)
+  - Validation des noms (minimum 2 caractères)
+  - Formulaire étendu avec 7 champs au total
+- **[2025-07-05 12:40]** Résolution du problème d'overflow :
+  - Division de l'écran d'inscription en 2 pages
+  - Implémentation de PageView avec navigation fluide
+  - Validation progressive par page
+  - Indicateurs visuels de progression
+  - Amélioration de l'UX avec aide contextuelle
+- **[2025-07-05 12:45]** Configuration AppBar transparente :
+  - Ajout d'AppBarTheme dans le thème global
+  - AppBar transparente sur tous les écrans
+  - Suppression de l'élévation et des ombres
+  - Configuration du style de barre d'état
 
 ## Fichiers ajoutés
 - `lib/domain/`
@@ -39,10 +66,15 @@
 - `architecture_log.md`
 - `uqar_ui_log.md`
 - `lib/presentation/screens/connexion_ecran.dart`
+- `lib/presentation/screens/ecran_chargement.dart`
+- `lib/presentation/screens/inscription_ecran.dart`
 
 ## Fichiers modifiés
 - `lib/main.dart` - Refactorisation pour Clean Architecture et thème UQAR
-- `lib/presentation/screens/ecran_chargement.dart`
+- `lib/presentation/screens/connexion_ecran.dart` - Ajout du logo et nom UqarLive
+- `lib/core/theme/app_theme.dart` - Correction de withOpacity deprecated
+- `lib/presentation/screens/connexion_ecran.dart` - Navigation vers l'écran d'inscription
+- `lib/main.dart` - Configuration AppBar transparente dans le thème global
 
 ## Décisions de conception
 - Respect strict de la séparation des couches.
@@ -70,6 +102,10 @@
 ✅ Noms de variables et fonctions en français
 ✅ Code formaté et analysé sans erreurs
 ✅ Logs d'architecture et UI créés et maintenus
+✅ Écran d'inscription créé
+✅ Écran d'inscription amélioré
+✅ Problèmes résolus
+✅ Configuration AppBar transparente
 
 ## Prochaines étapes recommandées
 1. Créer l'écran d'inscription (inscription_ecran.dart)
@@ -78,8 +114,9 @@
 4. Implémenter les datasources et repositories dans data/
 5. Ajouter la gestion d'état (bloc/provider)
 6. Tester l'application sur émulateur/appareil
-- **[2025-07-05 12:25]** Ajout du logo et écran de chargement :
-  - Logo UqarLive avec icône école et texte "UQAR"
-  - Écran de chargement avec fond noir et animation
-  - Navigation automatique vers l'écran de connexion
-  - Nom "UqarLive" affiché sur l'écran de connexion 
+1. Implémenter les entités utilisateur dans domain/entities/
+2. Créer les repositories abstraits dans domain/repositories/
+3. Implémenter les datasources et repositories dans data/
+4. Ajouter la gestion d'état (bloc/provider)
+5. Créer l'écran de mot de passe oublié
+6. Tester l'application sur émulateur/appareil 

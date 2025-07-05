@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'core/theme/app_theme.dart';
 import 'presentation/screens/ecran_chargement.dart';
 
@@ -22,6 +23,12 @@ class UqarLiveApp extends StatelessWidget {
           seedColor: CouleursApp.principal,
           primary: CouleursApp.principal,
           secondary: CouleursApp.accent,
+        ),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          systemOverlayStyle: SystemUiOverlayStyle.light,
         ),
         useMaterial3: true,
       ),
