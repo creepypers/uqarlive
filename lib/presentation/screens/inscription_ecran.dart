@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
 
-// UI Design: Écran d'inscription avec design UQAR et fond dégradé violet/bleu
+// UI Design: Écran d'inscription avec design UQAR et fond dégradé bleu UQAR
 class InscriptionEcran extends StatefulWidget {
   const InscriptionEcran({Key? key}) : super(key: key);
 
@@ -135,9 +135,9 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Color(0xFFB794F6), // Violet clair
-                        Color(0xFF9F7AEA), // Violet moyen
-                        CouleursApp.accent, // Bleu UQAR
+                        CouleursApp.accent.withValues(alpha: 0.7), // Bleu ciel UQAR transparent
+                        CouleursApp.accent, // Bleu ciel UQAR
+                        CouleursApp.principal, // Bleu foncé UQAR
                       ],
                     ),
                   ),

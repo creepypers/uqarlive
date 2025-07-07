@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
 import 'inscription_ecran.dart';
+import 'accueil_ecran.dart';
 
 // UI Design: Écran de connexion avec design UQAR et fond dégradé violet/bleu
 class ConnexionEcran extends StatefulWidget {
@@ -25,8 +26,13 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
 
   void _gererConnexion() {
     if (_cleFormulaire.currentState!.validate()) {
-      // TODO: Implémenter la logique de connexion
+      // TODO: Implémenter la logique de connexion réelle
       print('Connexion avec: ${_controleurNomUtilisateur.text}');
+      
+      // Navigation vers la page d'accueil après connexion réussie
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const AccueilEcran()),
+      );
     }
   }
 
@@ -60,9 +66,9 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Color(0xFFB794F6), // Violet clair
-                        Color(0xFF9F7AEA), // Violet moyen
-                        CouleursApp.accent, // Bleu UQAR
+                        CouleursApp.accent.withValues(alpha: 0.7), // Bleu ciel UQAR transparent
+                        CouleursApp.accent, // Bleu ciel UQAR
+                        CouleursApp.principal, // Bleu foncé UQAR
                       ],
                     ),
                   ),

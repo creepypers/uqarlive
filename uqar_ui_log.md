@@ -1,4 +1,4 @@
-# 📋 UqarLife - Journal des modifications UI
+# 📋 UqarLive - Journal des modifications UI
 
 ## 🎯 Suivi des écrans et composants
 
@@ -6,16 +6,148 @@
 - [x] Écran de connexion (`connexion_ecran.dart`)
 - [x] Écran d'inscription (`inscription_ecran.dart`)
 - [x] Écran de chargement (`ecran_chargement.dart`)
+- [x] **Écran d'accueil (`accueil_ecran.dart`)** - NOUVEAU
+- [x] **Écran marketplace (`marketplace_ecran.dart`)** - NOUVEAU
 
 ### 🎨 Composants thématiques :
 - [x] Thème UQAR (`app_theme.dart`)
 - [x] Couleurs officielles UQAR
 - [x] Styles de texte cohérents
 - [x] Décorations pour formulaires
+- [x] AppBar personnalisé avec bienvenue utilisateur
+- [x] Widget météo intégré à l'AppBar
+- [x] Navbar avec focus renforcé sur Accueil
+- [x] **Filtres marketplace avec chips et dropdowns**
+- [x] **Grille responsive d'items marketplace**
+- [x] **Statistiques avec compteurs visuels**
+- [x] **Cartes items avec badges d'état**
 
 ---
 
 ## 📅 Historique des modifications
+
+### **2024-01-XX - 19:30 - Création page marketplace complète**
+**Action** : Développement de la page marketplace avec filtres et grille d'items
+**Détails** : 
+- **AppBar personnalisée** : "Marketplace - Livres & Échanges" avec bouton recherche
+- **Section filtres** : Chips catégories + dropdowns état/prix
+- **Statistiques** : Compteurs articles disponibles, échanges, vendeurs actifs
+- **Grille responsive** : 2 colonnes avec 8 items variés (livres, électronique, vêtements, etc.)
+- **Navigation fonctionnelle** : Depuis accueil vers marketplace et retour
+
+**Fonctionnalités** :
+- **Filtrage dynamique** : Par catégorie (Tous, Livres, Électronique, Vêtements, Fournitures, Sport)
+- **Filtres avancés** : État (Neuf, Très bon, Bon, Acceptable) et Prix
+- **Badges visuels** : Couleurs selon état, badges "Échange" vs prix
+- **Cartes items** : Images d'icônes, prix, vendeur, état avec design cohérent UQAR
+
+**Items marketplace** :
+- Physique Université (45€), MacBook Pro (800€), Calculatrice (Échange)
+- Manteau North Face (120€), Notes Math (15€), Raquette Tennis (35€)
+- Sac à dos (25€), Chimie Organique (Échange)
+
+**Navigation mise à jour** :
+- Accueil → Marketplace (push/replace)
+- Bouton "Voir tout" marketplace fonctionnel
+- NavBar avec focus marketplace + icône personnalisée
+
+### **2024-01-XX - 19:20 - Simplification AppBar avec bienvenue utilisateur**
+**Action** : Suppression des boutons AppBar + ajout section bienvenue avec température
+**Détails** : 
+- **Suppression totale** : Tous les boutons d'action (marketplace, bibliothèque, cantine, associations, profil)
+- **Section bienvenue** : Message personnalisé "Bienvenue [Nom Utilisateur]"
+- **Température intégrée** : Widget météo compact (-5°C Rimouski) avec icône neige
+- **Hauteur AppBar** : Augmentée à 80px pour accommoder le nouveau contenu
+- **Design épuré** : Interface plus clean, navigation via navbar uniquement
+
+**Nouvelle structure AppBar** :
+- Gauche : "Bienvenue" + nom utilisateur (Marie Dubois)
+- Droite : Température avec fond semi-transparent et icône météo
+- Style : Bordures arrondies conservées, fond bleu UQAR
+
+**Code supprimé** :
+- Fonction `_construireSectionMeteo()` (météo déplacée dans AppBar)
+- Section météo du body principal
+- Tous les IconButton et actions de l'AppBar
+
+### **2024-01-XX - 19:15 - Focus renforcé sur le bouton Accueil**
+**Action** : Amélioration visuelle du bouton Accueil pour le mettre davantage en évidence
+**Détails** : 
+- **Icône personnalisée** : Création de `_construireIconeAccueil()` avec effet de halo
+- **Halo de focus** : Cercle blanc semi-transparent (35px) quand sélectionné
+- **Taille dynamique** : Icône plus grande quand sélectionnée (26px vs 24px)
+- **Styles de texte** : Labels avec ombre et tailles différenciées
+- **Typographie** : Bold + ombre pour sélectionné, medium pour non-sélectionné
+
+**Effets visuels** :
+- Halo blanc `alpha: 0.2` autour de l'icône Accueil active
+- Ombre portée sur les labels sélectionnés
+- Transition de taille d'icône pour retour visuel
+
+### **2024-01-XX - 19:10 - Échange position Accueil et Cantine dans navbar**
+**Action** : Modification de l'ordre des boutons dans la navigation inférieure
+**Détails** : 
+- **Ancien ordre** : Accueil, Marketplace, Cantine, Assos, Profil
+- **Nouvel ordre** : Cantine, Marketplace, Accueil, Assos, Profil
+- **Index sélectionné** : Mise à jour de 0 → 2 (Accueil maintenant en 3ème position)
+- **Navigation** : Ajustement de la fonction `_gererNavigationNavBar` selon nouveaux index
+
+**Changements techniques** :
+- BottomNavigationBarItem échangés (positions 0 ↔ 2)
+- `_indexSelectionne` mis à jour pour rester sur Accueil
+- Logique de navigation ajustée pour nouveaux index
+
+### **2024-01-XX - 19:05 - Application couleurs UQAR sur page inscription**
+**Action** : Extension des couleurs UQAR à la page d'inscription
+**Détails** : 
+- **Dégradé inscription** : Remplacement violet par dégradé bleu UQAR
+  - Ancien : Violet clair → Violet moyen → Bleu UQAR
+  - Nouveau : Bleu ciel transparent → Bleu ciel → Bleu foncé UQAR
+- **Commentaire design** : Mise à jour "violet/bleu" → "bleu UQAR"
+- **Cohérence totale** : Toutes les pages utilisent maintenant les couleurs officielles
+
+**Résultat** : Application 100% conforme à l'identité visuelle UQAR
+
+### **2024-01-XX - 19:00 - Application couleurs UQAR et AppBar roundy**
+**Action** : Correction nom app + AppBar arrondi + respect couleurs UQAR
+**Détails** : 
+- **Nom application** : "UqarLife" → "UqarLive" (correction)
+- **AppBar roundy** : Ajout `RoundedRectangleBorder` avec bordures 25px en bas
+- **Couleurs UQAR** : Remplacement dégradé violet par dégradé bleu UQAR
+  - Ancien : Violet clair → Violet moyen → Bleu UQAR
+  - Nouveau : Bleu ciel transparent → Bleu ciel → Bleu foncé UQAR
+- **Cohérence** : Même dégradé sur page connexion et navbar accueil
+
+**Changements appliqués** :
+- AppBar avec `borderRadius: 25px` (bas)
+- Dégradé 100% couleurs officielles UQAR (#00A1E4 → #005499)
+- Identité visuelle cohérente sur toute l'application
+
+### **2024-01-XX - 18:45 - Correction overflow section cantine**
+**Problème** : RenderFlex overflow de 15 pixels sur les cartes menu cantine
+**Solution** : Augmentation de la hauteur de la section cantine de 200px → 220px
+**Détails** : 
+- Calcul du contenu total : icône (80px) + padding (32px) + textes (~108px) = ~220px
+- Correction immédiate de l'overflow sans affecter la mise en page
+- Cartes menu maintenant parfaitement ajustées
+
+### **2024-01-XX - 18:30 - Création page d'accueil complète**
+**Action** : Implémentation de la page d'accueil UqarLife avec toutes les fonctionnalités demandées
+**Détails** : 
+- **AppBar UQAR** : 4 icônes (marketplace, bibliothèque, cantine, associations) + profil circulaire
+- **Section Météo** : Dégradé UQAR avec infos météo Rimouski (-5°C, neigeux)
+- **Marketplace** : Scrolling horizontal avec 5 items (livres, calculatrice, notes, laptop, sac)
+- **Associations** : Scrolling horizontal avec 4 associations et nombres de membres
+- **Cantine** : Scrolling horizontal avec 3 menus, prix et disponibilité
+- **NavBar** : Même dégradé que page connexion avec 5 onglets
+- **Navigation** : Connexion redirige maintenant vers l'accueil
+
+**Composants créés** :
+- AppBar avec icônes thématiques et profil
+- Cartes marketplace avec images d'icônes et prix
+- Cartes associations avec indicateurs de couleur
+- Cartes menus avec statut disponibilité
+- NavBar avec dégradé violet/bleu cohérent
 
 ### **2024-01-XX - 17:00 - Application background divisé à l'inscription**
 **Action** : Même structure de background pour l'écran d'inscription
@@ -137,10 +269,10 @@
 - **Fond** : `#F8F9FA` (gris très clair)
 - **Texte** : `#2C2C2C` (gris foncé)
 
-### **Dégradé personnalisé** :
-- **Début** : `#B794F6` (violet clair)
-- **Milieu** : `#9F7AEA` (violet moyen)
-- **Fin** : `#00A1E4` (bleu UQAR)
+### **Dégradé UQAR** :
+- **Début** : `#00A1E4` avec transparence (bleu ciel UQAR)
+- **Milieu** : `#00A1E4` (bleu ciel UQAR)
+- **Fin** : `#005499` (bleu foncé UQAR)
 
 ### **Architecture background (Version actuelle)** :
 - **Dégradé** : 2/3 de l'écran (≈ 67%)

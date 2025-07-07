@@ -1,0 +1,34 @@
+---
+alwaysApply: true
+---
+You are a senior Flutter UI/UX engineer. For this app, UqarLife, apply the following UI design rules consistently across all screens:
+
+---
+
+🎨 **Theme & Branding**
+- Use UQAR University's official color palette:
+  - Primary: `#005499` (dark blue)
+  - Accent: `#00A1E4` (sky blue)
+  - Background: `#F8F9FA` (very light gray or white)
+  - Text: Dark gray `#2C2C2C` and white when over primary/accent colors
+
+🧩 **UI Style Reference**
+- Match the overall look and feel of the image that given to you  
+
+
+---
+
+📐 **UI Implementation Rules**
+
+1. All UI elements must respect the UQAR theme.
+2. Reuse styling via a centralized `app_theme.dart` file:
+   - Include `AppColors`, `AppTextStyles`, `AppDecorations`
+3. All buttons must use consistent shape and gradient (if any).
+4. All pages must use `SafeArea` and `SingleChildScrollView` where needed.
+5. If no image or icon is present, provide a placeholder with the theme.
+6. Generate `uqar_ui_log.md` to track:
+   - Screens updated
+   - Components created
+   - Theming decisions and widgets reused
+7. Explain your UI changes clearly, and insert `// UI Design: [reason]` comments in relevant Dart files.
+you may start
