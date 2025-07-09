@@ -66,7 +66,7 @@ class WidgetCarte extends StatelessWidget {
       piedDePage: _construirePiedPageLivre(livre, modeListe),
       onTap: onTap ?? () => _naviguerVersDetailsLivre(livre),
       largeur: largeur ?? (modeListe ? 150 : null),
-      hauteur: hauteur,
+      hauteur: hauteur ?? (modeListe ? 185 : null),
       modeListe: modeListe,
       tailleIcone: modeListe ? 40 : 50,
     );
@@ -96,17 +96,20 @@ class WidgetCarte extends StatelessWidget {
       ));
     }
 
+    Color couleurCategorie = _obtenirCouleurCategorie(menu.categorie);
+    IconData iconeCategorie = _obtenirIconeCategorie(menu.categorie);
+
     return WidgetCarte(
       titre: menu.nom,
       sousTitre: menu.description,
-      icone: _obtenirIconeCategorie(menu.categorie),
-      couleurIcone: _obtenirCouleurCategorie(menu.categorie),
-      couleurFond: _obtenirCouleurCategorie(menu.categorie).withValues(alpha: 0.1),
+      icone: iconeCategorie,
+      couleurIcone: couleurCategorie,
+      couleurFond: couleurCategorie.withValues(alpha: 0.1),
       badges: badges,
-      piedDePage: modeListe ? null : _construirePiedPageMenu(menu),
+      piedDePage: _construirePiedPageMenu(menu),
       onTap: onTap,
-      largeur: largeur ?? (modeListe ? 200 : null),
-      hauteur: hauteur,
+      largeur: largeur ?? (modeListe ? 180 : null),
+      hauteur: hauteur ?? (modeListe ? 185 : null), // UI Design: Hauteur par défaut cohérente avec les livres
       modeListe: modeListe,
       tailleIcone: modeListe ? 40 : 50,
     );
@@ -129,10 +132,10 @@ class WidgetCarte extends StatelessWidget {
       couleurIcone: couleurIcone ?? CouleursApp.principal,
       couleurFond: (couleurIcone ?? CouleursApp.principal).withValues(alpha: 0.1),
       onTap: onTap,
-      largeur: largeur ?? 150,
-      hauteur: hauteur ?? 120,
+      largeur: largeur ?? 140,
+      hauteur: hauteur ?? 115,
       modeListe: true,
-      tailleIcone: 24,
+      tailleIcone: 22,
     );
   }
 
@@ -147,7 +150,7 @@ class WidgetCarte extends StatelessWidget {
         decoration: BoxDecoration(
           color: CouleursApp.blanc,
           borderRadius: BorderRadius.circular(16),
-          border: modeListe && hauteur != null && hauteur! <= 120
+          border: modeListe && hauteur != null && hauteur! <= 115
               ? Border.all(color: CouleursApp.principal.withValues(alpha: 0.2))
               : null,
           boxShadow: [
@@ -165,14 +168,15 @@ class WidgetCarte extends StatelessWidget {
 
   Widget _construireContenu() {
     // Pour les cartes d'associations (format carré)
-    if (modeListe && hauteur != null && hauteur! <= 120) {
+    if (modeListe && hauteur != null && hauteur! <= 115) {
       return Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: couleurFond,
                 borderRadius: BorderRadius.circular(12),
@@ -183,43 +187,46 @@ class WidgetCarte extends StatelessWidget {
                 size: tailleIcone,
               ),
             ),
-            const SizedBox(height: 12),
-            Text(
-              titre,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: CouleursApp.texteFonce,
+            const SizedBox(height: 8),
+            Flexible(
+              child: Text(
+                titre,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: CouleursApp.texteFonce,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 4),
-            Text(
-              sousTitre,
-              style: TextStyle(
-                fontSize: 10,
-                color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+            const SizedBox(height: 2),
+            Flexible(
+              child: Text(
+                sousTitre,
+                style: TextStyle(
+                  fontSize: 9,
+                  color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
       );
     }
 
-    // Pour les cartes standards (livres, menus)
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Section icône avec badges
-        Expanded(
-          flex: modeListe ? 0 : 3,
-          child: Container(
-            height: modeListe ? 100 : null,
+    // Pour les cartes standards (livres, menus) en mode liste
+    if (modeListe) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Section icône avec badges - hauteur fixe en mode liste
+          Container(
+            height: 100,
             decoration: BoxDecoration(
               color: couleurFond,
               borderRadius: const BorderRadius.only(
@@ -232,7 +239,90 @@ class WidgetCarte extends StatelessWidget {
                 Center(
                   child: Icon(
                     icone,
-                    size: tailleIcone ?? (modeListe ? 40 : 50),
+                    size: tailleIcone ?? 40,
+                    color: couleurIcone,
+                  ),
+                ),
+                // Badges positionnés
+                ...badges.asMap().entries.map((entry) {
+                  int index = entry.key;
+                  WidgetBadge badge = entry.value;
+                  
+                  return Positioned(
+                    top: 8,
+                    right: index == 0 ? 8 : null,
+                    left: index == 1 ? 8 : null,
+                    child: badge,
+                  );
+                }).toList(),
+              ],
+            ),
+          ),
+          // Section informations - hauteur flexible restante
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    titre,
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: CouleursApp.texteFonce,
+                      height: 1.1,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    sousTitre,
+                    style: TextStyle(
+                      fontSize: 9,
+                      color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                      height: 1.1,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const Spacer(),
+                  if (piedDePage != null) 
+                    SizedBox(
+                      height: 16,
+                      child: piedDePage!,
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    // Pour les cartes standards (livres, menus) en mode grille
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Section icône avec badges
+        Expanded(
+          flex: 5,
+          child: Container(
+            decoration: BoxDecoration(
+              color: couleurFond,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
+              ),
+            ),
+            child: Stack(
+              children: [
+                Center(
+                  child: Icon(
+                    icone,
+                    size: tailleIcone ?? 45,
                     color: couleurIcone,
                   ),
                 ),
@@ -254,9 +344,9 @@ class WidgetCarte extends StatelessWidget {
         ),
         // Section informations
         Expanded(
-          flex: modeListe ? 0 : 2,
+          flex: 4,
           child: Padding(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -264,31 +354,34 @@ class WidgetCarte extends StatelessWidget {
                 Text(
                   titre,
                   style: TextStyle(
-                    fontSize: modeListe ? 12 : 13,
+                    fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: CouleursApp.texteFonce,
+                    height: 1.1,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 3),
+                const SizedBox(height: 2),
                 Text(
                   sousTitre,
                   style: TextStyle(
-                    fontSize: 10,
+                    fontSize: 9,
                     color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                    height: 1.1,
                   ),
-                  maxLines: modeListe ? 2 : (texteSupplementaire != null ? 1 : 3),
+                  maxLines: texteSupplementaire != null ? 1 : 2,
                   overflow: TextOverflow.ellipsis,
                 ),
-                if (texteSupplementaire != null && !modeListe) ...[
-                  const SizedBox(height: 3),
+                if (texteSupplementaire != null) ...[
+                  const SizedBox(height: 2),
                   Text(
                     texteSupplementaire!,
                     style: TextStyle(
-                      fontSize: 10,
+                      fontSize: 9,
                       color: CouleursApp.principal,
                       fontWeight: FontWeight.w500,
+                      height: 1.1,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -306,71 +399,92 @@ class WidgetCarte extends StatelessWidget {
 
   // Méthodes statiques pour construire les pieds de page
   static Widget _construirePiedPageLivre(Livre livre, bool modeListe) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Flexible(
-          child: Text(
-            modeListe ? livre.matiere : livre.proprietaire,
-            style: TextStyle(
-              fontSize: 10,
-              color: modeListe 
-                  ? CouleursApp.principal 
-                  : CouleursApp.texteFonce.withValues(alpha: 0.6),
-              fontWeight: modeListe ? FontWeight.w500 : FontWeight.normal,
+    return SizedBox(
+      height: modeListe ? 14 : 16, // UI Design: Hauteur contrôlée pour éviter l'overflow
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center, // UI Design: Centre verticalement
+        children: [
+          Flexible(
+            child: Text(
+              modeListe ? livre.matiere : livre.proprietaire,
+              style: TextStyle(
+                fontSize: modeListe ? 9 : 9, // UI Design: Uniformise à 9 pour économiser l'espace
+                color: modeListe 
+                    ? CouleursApp.principal 
+                    : CouleursApp.texteFonce.withValues(alpha: 0.6),
+                fontWeight: modeListe ? FontWeight.w500 : FontWeight.normal,
+                height: 1.0, // UI Design: Hauteur de ligne très compacte
+              ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1, // UI Design: Force 1 ligne
             ),
+          ),
+          const SizedBox(width: 4), // UI Design: Espacement minimal entre les textes
+          Text(
+            modeListe 
+                ? livre.anneeEtude.split(' ')[0]
+                : livre.anneeEtude,
+            style: TextStyle(
+              fontSize: modeListe ? 8 : 8, // UI Design: Uniformise à 8
+              color: CouleursApp.accent,
+              fontWeight: FontWeight.w600,
+              height: 1.0, // UI Design: Hauteur de ligne très compacte
+            ),
+            maxLines: 1, // UI Design: Force 1 ligne
             overflow: TextOverflow.ellipsis,
           ),
-        ),
-        Text(
-          modeListe 
-              ? livre.anneeEtude.split(' ')[0]
-              : livre.anneeEtude,
-          style: TextStyle(
-            fontSize: 9,
-            color: CouleursApp.accent,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
   static Widget _construirePiedPageMenu(Menu menu) {
-    return Row(
-      children: [
-        Icon(
-          Icons.restaurant_outlined,
-          size: 12,
-          color: CouleursApp.accent,
-        ),
-        const SizedBox(width: 4),
-        Text(
-          menu.categorie.toUpperCase(),
-          style: TextStyle(
-            fontSize: 10,
-            color: CouleursApp.accent,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const Spacer(),
-        if (menu.note != null) ...[
+    return SizedBox(
+      height: 14, // UI Design: Hauteur contrôlée similaire aux livres
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center, // UI Design: Centre verticalement
+        children: [
           Icon(
-            Icons.star,
-            size: 12,
-            color: Colors.orange,
+            Icons.restaurant_outlined,
+            size: 11, // UI Design: Réduit de 12 à 11
+            color: CouleursApp.accent,
           ),
-          const SizedBox(width: 2),
-          Text(
-            menu.note!.toStringAsFixed(1),
-            style: TextStyle(
-              fontSize: 10,
-              color: CouleursApp.texteFonce.withValues(alpha: 0.7),
-              fontWeight: FontWeight.w500,
+          const SizedBox(width: 3), // UI Design: Réduit de 4 à 3
+          Flexible(
+            child: Text(
+              menu.categorie.toUpperCase(),
+              style: TextStyle(
+                fontSize: 9, // UI Design: Réduit de 10 à 9
+                color: CouleursApp.accent,
+                fontWeight: FontWeight.w500,
+                height: 1.0, // UI Design: Hauteur de ligne compacte
+              ),
+              maxLines: 1, // UI Design: Force 1 ligne
+              overflow: TextOverflow.ellipsis,
             ),
           ),
+          const Spacer(),
+          if (menu.note != null) ...[
+            Icon(
+              Icons.star,
+              size: 11, // UI Design: Réduit de 12 à 11
+              color: Colors.orange,
+            ),
+            const SizedBox(width: 2),
+            Text(
+              menu.note!.toStringAsFixed(1),
+              style: TextStyle(
+                fontSize: 9, // UI Design: Réduit de 10 à 9
+                color: CouleursApp.texteFonce.withValues(alpha: 0.7),
+                fontWeight: FontWeight.w500,
+                height: 1.0, // UI Design: Hauteur de ligne compacte
+              ),
+              maxLines: 1, // UI Design: Force 1 ligne
+            ),
+          ],
         ],
-      ],
+      ),
     );
   }
 

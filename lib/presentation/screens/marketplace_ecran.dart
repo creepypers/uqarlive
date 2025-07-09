@@ -365,7 +365,7 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
     );
   }
 
-  // UI Design: Grille de livres disponibles pour l'échange
+  // UI Design: Grille de livres disponibles pour l'échange avec WidgetCarte optimisé
   Widget _construireGrilleLivres() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -391,153 +391,27 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
         WidgetCollection<Livre>.grille(
           elements: _livresDisponibles,
           enChargement: _chargementLivres,
-          ratioAspect: 1.05, // UI Design: Ratio optimisé pour éliminer l'overflow bottom
+          ratioAspect: 0.75, // UI Design: Ajuste de 1.05 à 0.75 pour éviter l'overflow (hauteur plus grande que largeur)
+          nombreColonnes: 2,
+          espacementColonnes: 16,
+          espacementLignes: 16,
           constructeurElement: (context, livre, index) {
-            return _construireCarteLivre(livre);
+            return WidgetCarte.livre(
+              livre: livre,
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => DetailsLivreEcran(livre: livre),
+                  ),
+                );
+              },
+            );
           },
-          etatVide: WidgetCollection.etatVideAucunLivre(),
+          messageEtatVide: 'Aucun livre disponible pour l\'échange',
+          iconeEtatVide: Icons.menu_book_outlined,
+          padding: const EdgeInsets.symmetric(horizontal: 16), // UI Design: Padding pour éviter les débordements
         ),
       ],
-    );
-  }
-
-  // UI Design: Carte de livre pour échange avec navigation vers détails
-  Widget _construireCarteLivre(Livre livre) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => DetailsLivreEcran(livre: livre),
-          ),
-        );
-      },
-      child: Container(
-      decoration: BoxDecoration(
-        color: CouleursApp.blanc,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: CouleursApp.principal.withValues(alpha: 0.1),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-            // Image du livre
-          Expanded(
-            flex: 3,
-            child: Container(
-              decoration: BoxDecoration(
-                color: CouleursApp.accent.withValues(alpha: 0.1),
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(16),
-                  topRight: Radius.circular(16),
-                ),
-              ),
-              child: Stack(
-                children: [
-                  Center(
-                    child: Icon(
-                        Icons.menu_book,
-                      size: 50,
-                      color: CouleursApp.accent,
-                    ),
-                  ),
-                  // Badge état
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: WidgetBadge.etatLivre(texte: livre.etatLivre),
-                  ),
-                    // Badge échange
-                    Positioned(
-                      top: 8,
-                      left: 8,
-                      child: const WidgetBadge.echange(),
-                  ),
-                ],
-              ),
-            ),
-          ),
-            // Informations du livre
-          Expanded(
-            flex: 2,
-            child: Padding(
-                padding: const EdgeInsets.all(8), // UI Design: Réduit à 8 pour plus d'espace
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min, // Évite l'overflow vertical
-                children: [
-                  Text(
-                      livre.titre,
-                    style: TextStyle(
-                        fontSize: 12, // Optimisé pour le contenu
-                      fontWeight: FontWeight.w600,
-                      color: CouleursApp.texteFonce,
-                      height: 1.1, // UI Design: Hauteur de ligne compacte
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                    const SizedBox(height: 2), // UI Design: Espacement minimal
-                  Text(
-                      livre.auteur,
-                    style: TextStyle(
-                        fontSize: 10,
-                      color: CouleursApp.texteFonce.withValues(alpha: 0.6),
-                      height: 1.1, // UI Design: Hauteur de ligne compacte
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 2), // UI Design: Espacement minimal
-                    Text(
-                      livre.matiere,
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: CouleursApp.principal,
-                        fontWeight: FontWeight.w500,
-                        height: 1.1, // UI Design: Hauteur de ligne compacte
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                  ),
-                  const Spacer(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                        Flexible( // Évite l'overflow horizontal
-                          child: Text(
-                            livre.proprietaire,
-                            style: TextStyle(
-                              fontSize: 9, // UI Design: Légèrement réduit
-                              color: CouleursApp.texteFonce.withValues(alpha: 0.6),
-                              height: 1.1, // UI Design: Hauteur de ligne compacte
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        Text(
-                          livre.anneeEtude,
-                          style: TextStyle(
-                            fontSize: 9,
-                            color: CouleursApp.accent,
-                            fontWeight: FontWeight.w600,
-                            height: 1.1, // UI Design: Hauteur de ligne compacte
-                          ),
-                        ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-      ),
     );
   }
 } 
