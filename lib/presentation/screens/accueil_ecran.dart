@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
+import '../../domain/entities/livre.dart';
+import '../../domain/repositories/livres_repository.dart';
+import '../../data/repositories/livres_repository_impl.dart';
+import '../../data/datasources/livres_datasource_local.dart';
 import 'marketplace_ecran.dart';
+import 'details_livre_ecran.dart';
+import 'cantine_ecran.dart';
+import '../widgets/navbar_widget.dart';
+import '../widgets/navigation_service.dart';
 
-// UI Design: Page d'accueil UqarLife avec AppBar, sections météo/marketplace/assos/cantine et navbar
+// UI Design: Page d'accueil UqarLive avec AppBar, sections échange de livres/assos/cantine et navbar
 class AccueilEcran extends StatefulWidget {
   const AccueilEcran({Key? key}) : super(key: key);
 
@@ -11,7 +19,41 @@ class AccueilEcran extends StatefulWidget {
 }
 
 class _AccueilEcranState extends State<AccueilEcran> {
-  int _indexSelectionne = 2; // Index 2 car Accueil est maintenant en 3ème position
+  // Repository pour accéder aux données des livres
+  late final LivresRepository _livresRepository;
+  List<Livre> _livresRecents = [];
+  bool _chargementLivres = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initialiserRepository();
+    _chargerLivresRecents();
+  }
+
+  void _initialiserRepository() {
+    final datasourceLocal = LivresDatasourceLocal();
+    _livresRepository = LivresRepositoryImpl(datasourceLocal);
+  }
+
+  Future<void> _chargerLivresRecents() async {
+    setState(() {
+      _chargementLivres = true;
+    });
+
+    try {
+      final livres = await _livresRepository.obtenirLivresDisponibles();
+      setState(() {
+        _livresRecents = livres.take(5).toList(); // Prendre les 5 premiers
+        _chargementLivres = false;
+      });
+    } catch (e) {
+      print('Erreur lors du chargement des livres récents: $e');
+      setState(() {
+        _chargementLivres = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,8 +67,8 @@ class _AccueilEcranState extends State<AccueilEcran> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Section marketplace
-                _construireSectionMarketplace(),
+                // Section échange de livres
+                _construireSectionEchangeLivres(),
                 const SizedBox(height: 24),
                 
                 // Section associations
@@ -41,7 +83,10 @@ class _AccueilEcranState extends State<AccueilEcran> {
           ),
         ),
       ),
-      bottomNavigationBar: _construireNavBar(),
+      bottomNavigationBar: NavBarWidget(
+        indexSelectionne: 2, // Accueil
+        onTap: (index) => NavigationService.gererNavigationNavBar(context, index),
+      ),
     );
   }
 
@@ -133,19 +178,29 @@ class _AccueilEcranState extends State<AccueilEcran> {
     );
   }
 
-
-
-  // UI Design: Section marketplace avec scrolling horizontal
-  Widget _construireSectionMarketplace() {
+  // UI Design: Section échange de livres avec Clean Architecture
+  Widget _construireSectionEchangeLivres() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
             Text(
-              'Marketplace',
+                  'Échange de Livres',
               style: StylesTexteApp.titre.copyWith(fontSize: 22),
+                ),
+                Text(
+                  'Livres universitaires récents',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                  ),
+                ),
+              ],
             ),
             TextButton(
               onPressed: () => _naviguerVers('marketplace'),
@@ -158,12 +213,27 @@ class _AccueilEcranState extends State<AccueilEcran> {
         ),
         const SizedBox(height: 12),
         SizedBox(
-          height: 180,
-          child: ListView.builder(
+          height: 190, // Augmenté pour éviter l'overflow
+          child: _chargementLivres
+              ? Center(
+                  child: CircularProgressIndicator(
+                    color: CouleursApp.principal,
+                  ),
+                )
+              : _livresRecents.isEmpty
+                  ? Center(
+                      child: Text(
+                        'Aucun livre disponible',
+                        style: TextStyle(
+                          color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                        ),
+                      ),
+                    )
+                  : ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: 5,
+                      itemCount: _livresRecents.length,
             itemBuilder: (context, index) {
-              return _construireCarteMarketplace(index);
+                        return _construireCarteLivre(_livresRecents[index]);
             },
           ),
         ),
@@ -171,20 +241,18 @@ class _AccueilEcranState extends State<AccueilEcran> {
     );
   }
 
-  // UI Design: Carte pour les items marketplace
-  Widget _construireCarteMarketplace(int index) {
-    final items = [
-      {'nom': 'Livre Physique', 'prix': '25€', 'image': Icons.book},
-      {'nom': 'Calculatrice', 'prix': '15€', 'image': Icons.calculate},
-      {'nom': 'Notes de cours', 'prix': '10€', 'image': Icons.description},
-      {'nom': 'Laptop', 'prix': '300€', 'image': Icons.laptop},
-      {'nom': 'Sac à dos', 'prix': '20€', 'image': Icons.backpack},
-    ];
-    
-    final item = items[index];
-    
-    return Container(
-      width: 140,
+  // UI Design: Carte pour les livres - utilise l'entité Livre avec navigation
+  Widget _construireCarteLivre(Livre livre) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => DetailsLivreEcran(livre: livre),
+          ),
+        );
+      },
+      child: Container(
+        width: 150, // Augmenté pour plus d'espace
       margin: const EdgeInsets.only(right: 16),
       decoration: BoxDecoration(
         color: CouleursApp.blanc,
@@ -209,42 +277,96 @@ class _AccueilEcranState extends State<AccueilEcran> {
                 topRight: Radius.circular(16),
               ),
             ),
-            child: Center(
+              child: Stack(
+                children: [
+                  Center(
               child: Icon(
-                item['image'] as IconData,
+                      Icons.menu_book,
                 size: 40,
                 color: CouleursApp.accent,
+                    ),
+                  ),
+                  // Badge échange
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        'ÉCHANGE',
+                        style: TextStyle(
+                          fontSize: 8,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(12),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  item['nom'] as String,
+                      livre.titre,
                   style: TextStyle(
-                    fontSize: 14,
+                        fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: CouleursApp.texteFonce,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
+                    const SizedBox(height: 3),
                 Text(
-                  item['prix'] as String,
+                      livre.auteur,
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const Spacer(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            livre.matiere,
                   style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                              fontSize: 10,
                     color: CouleursApp.principal,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        Text(
+                          livre.anneeEtude.split(' ')[0], // "1ère" au lieu de "1ère année"
+                          style: TextStyle(
+                            fontSize: 9,
+                            color: CouleursApp.accent,
+                            fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
+                    ),
+                  ],
+                ),
             ),
           ),
         ],
+        ),
       ),
     );
   }
@@ -356,7 +478,7 @@ class _AccueilEcranState extends State<AccueilEcran> {
     );
   }
 
-  // UI Design: Section cantine avec menus et prix
+  // UI Design: Section cantine avec scrolling horizontal
   Widget _construireSectionCantine() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -365,7 +487,7 @@ class _AccueilEcranState extends State<AccueilEcran> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Menus Cantine',
+              'Cantine',
               style: StylesTexteApp.titre.copyWith(fontSize: 22),
             ),
             TextButton(
@@ -379,7 +501,7 @@ class _AccueilEcranState extends State<AccueilEcran> {
         ),
         const SizedBox(height: 12),
         SizedBox(
-          height: 220,
+          height: 200, // Augmenté de 180 à 200 pour éviter l'overflow
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: 3,
@@ -392,25 +514,25 @@ class _AccueilEcranState extends State<AccueilEcran> {
     );
   }
 
-  // UI Design: Carte pour les menus de cantine
+  // UI Design: Carte pour les menus cantine - optimisée contre l'overflow
   Widget _construireCarteMenu(int index) {
     final menus = [
       {
-        'nom': 'Menu du Jour',
-        'description': 'Poutine + Salade + Dessert',
-        'prix': '12.50€',
+        'nom': 'Menu Étudiant',
+        'description': 'Plat principal + accompagnement + dessert',
+        'prix': '8.50€',
         'disponible': true,
       },
       {
-        'nom': 'Menu Santé',
-        'description': 'Salade quinoa + Jus + Fruit',
-        'prix': '9.75€',
+        'nom': 'Menu Sandwich',
+        'description': 'Sandwich fait maison + chips + boisson',
+        'prix': '6.00€',
         'disponible': true,
       },
       {
-        'nom': 'Menu Végé',
-        'description': 'Burger végé + Frites + Boisson',
-        'prix': '11.25€',
+        'nom': 'Menu Végétarien',
+        'description': 'Plat végé + salade + fruit bio',
+        'prix': '7.50€',
         'disponible': false,
       },
     ];
@@ -418,8 +540,9 @@ class _AccueilEcranState extends State<AccueilEcran> {
     final menu = menus[index];
     
     return Container(
-      width: 180,
+      width: 180, // Augmenté pour plus d'espace
       margin: const EdgeInsets.only(right: 16),
+      padding: const EdgeInsets.all(14), // Réduit de 16 à 14
       decoration: BoxDecoration(
         color: CouleursApp.blanc,
         borderRadius: BorderRadius.circular(16),
@@ -433,44 +556,25 @@ class _AccueilEcranState extends State<AccueilEcran> {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            height: 80,
-            decoration: BoxDecoration(
-              color: CouleursApp.principal.withValues(alpha: 0.1),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
-              ),
-            ),
-            child: Center(
-              child: Icon(
-                Icons.restaurant_menu,
-                size: 40,
-                color: CouleursApp.principal,
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min, // Ajouté pour éviter l'overflow
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(
+              Expanded( // Ajouté Expanded pour éviter l'overflow horizontal
                       child: Text(
                         menu['nom'] as String,
                         style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                    fontSize: 14, // Réduit de 16 à 14
+                    fontWeight: FontWeight.w600,
                           color: CouleursApp.texteFonce,
                         ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3), // Réduit
                       decoration: BoxDecoration(
                         color: (menu['disponible'] as bool) 
                             ? Colors.green.withValues(alpha: 0.1)
@@ -480,7 +584,7 @@ class _AccueilEcranState extends State<AccueilEcran> {
                       child: Text(
                         (menu['disponible'] as bool) ? 'Dispo' : 'Épuisé',
                         style: TextStyle(
-                          fontSize: 10,
+                    fontSize: 9, // Réduit de 10 à 9
                           color: (menu['disponible'] as bool) ? Colors.green : Colors.red,
                           fontWeight: FontWeight.w600,
                         ),
@@ -488,138 +592,27 @@ class _AccueilEcranState extends State<AccueilEcran> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+          const SizedBox(height: 6), // Réduit de 8 à 6
                 Text(
                   menu['description'] as String,
                   style: TextStyle(
-                    fontSize: 12,
+              fontSize: 11, // Réduit de 12 à 11
                     color: CouleursApp.texteFonce.withValues(alpha: 0.7),
                   ),
-                  maxLines: 2,
+            maxLines: 3, // Augmenté de 2 à 3 pour plus de flexibilité
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 12),
+          const Spacer(),
                 Text(
                   menu['prix'] as String,
                   style: TextStyle(
-                    fontSize: 18,
+              fontSize: 16, // Réduit de 18 à 16
                     fontWeight: FontWeight.bold,
                     color: CouleursApp.principal,
-                  ),
-                ),
-              ],
             ),
           ),
         ],
       ),
-    );
-  }
-
-  // UI Design: NavBar avec le même thème que la page de connexion
-  Widget _construireNavBar() {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            CouleursApp.accent.withValues(alpha: 0.7), // Bleu ciel UQAR transparent
-            CouleursApp.accent, // Bleu ciel UQAR
-            CouleursApp.principal, // Bleu foncé UQAR
-          ],
-        ),
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(30),
-          topRight: Radius.circular(30),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: CouleursApp.principal.withValues(alpha: 0.2),
-            blurRadius: 20,
-            offset: const Offset(0, -5),
-          ),
-        ],
-      ),
-      child: BottomNavigationBar(
-        currentIndex: _indexSelectionne,
-        onTap: (index) {
-          setState(() {
-            _indexSelectionne = index;
-          });
-          _gererNavigationNavBar(index);
-        },
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: CouleursApp.blanc,
-        unselectedItemColor: CouleursApp.blanc.withValues(alpha: 0.6),
-        selectedLabelStyle: const TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 13,
-          shadows: [
-            Shadow(
-              offset: Offset(0, 1),
-              blurRadius: 2,
-              color: Colors.black26,
-            ),
-          ],
-        ),
-        unselectedLabelStyle: const TextStyle(
-          fontWeight: FontWeight.w500,
-          fontSize: 12,
-        ),
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.restaurant),
-            label: 'Cantine',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.storefront),
-            label: 'Marketplace',
-          ),
-          BottomNavigationBarItem(
-            icon: _construireIconeAccueil(),
-            label: 'Accueil',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.groups),
-            label: 'Assos',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profil',
-          ),
-        ],
-      ),
-    );
-  }
-
-  // UI Design: Icône Accueil avec mise en évidence spéciale
-  Widget _construireIconeAccueil() {
-    final estSelectionne = _indexSelectionne == 2;
-    
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        // Halo de focus pour le bouton Accueil sélectionné
-        if (estSelectionne)
-          Container(
-            width: 35,
-            height: 35,
-            decoration: BoxDecoration(
-              color: CouleursApp.blanc.withValues(alpha: 0.2),
-              shape: BoxShape.circle,
-            ),
-          ),
-        // Icône principale
-        Icon(
-          Icons.home,
-          size: estSelectionne ? 26 : 24,
-          color: estSelectionne 
-              ? CouleursApp.blanc 
-              : CouleursApp.blanc.withValues(alpha: 0.6),
-        ),
-      ],
     );
   }
 
@@ -630,31 +623,26 @@ class _AccueilEcranState extends State<AccueilEcran> {
           MaterialPageRoute(builder: (context) => const MarketplaceEcran()),
         );
         break;
+      case 'livres':
+        // TODO: Implémenter la navigation vers la section échange de livres
+        print('Navigation vers: $destination');
+        break;
+      case 'cantine':
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) => const CantineEcran()),
+        );
+        break;
+      case 'associations':
+        // TODO: Implémenter la navigation vers la section associations
+        print('Navigation vers: $destination');
+        break;
+      case 'profil':
+        // TODO: Implémenter la navigation vers le profil
+        print('Navigation vers: $destination');
+        break;
       default:
         // TODO: Implémenter la navigation vers les autres sections
         print('Navigation vers: $destination');
-    }
-  }
-
-  void _gererNavigationNavBar(int index) {
-    switch (index) {
-      case 0:
-        _naviguerVers('cantine');
-        break;
-      case 1:
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const MarketplaceEcran()),
-        );
-        break;
-      case 2:
-        // Déjà sur l'accueil
-        break;
-      case 3:
-        _naviguerVers('associations');
-        break;
-      case 4:
-        _naviguerVers('profil');
-        break;
     }
   }
 } 

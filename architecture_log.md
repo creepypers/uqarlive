@@ -57,6 +57,22 @@
   - AppBar transparente sur tous les écrans
   - Suppression de l'élévation et des ombres
   - Configuration du style de barre d'état
+- **[2025-01-XX 20:00]** Création de l'entité Livre pour l'échange universitaire :
+  - lib/domain/entities/livre.dart
+  - Propriétés spécifiques aux livres universitaires
+  - Métadonnées pour cours, ISBN, édition
+  - Gestion disponibilité et date d'ajout
+  - Méthodes copyWith, toString, equals, hashCode
+  - Respect des principes Clean Architecture (couche domain)
+- **[2025-01-XX 20:30]** Migration complète vers Clean Architecture pour les livres :
+  - lib/data/datasources/livres_datasource_local.dart
+  - lib/data/models/livre_model.dart
+  - lib/domain/repositories/livres_repository.dart
+  - lib/data/repositories/livres_repository_impl.dart
+  - Migration du marketplace vers l'architecture Clean
+  - Suppression des données hardcodées de la couche présentation
+  - Ajout de la gestion d'état et du chargement
+  - Filtrage dynamique via repository
 
 ## Fichiers ajoutés
 - `lib/domain/`
@@ -68,6 +84,13 @@
 - `lib/presentation/screens/connexion_ecran.dart`
 - `lib/presentation/screens/ecran_chargement.dart`
 - `lib/presentation/screens/inscription_ecran.dart`
+- `lib/presentation/screens/accueil_ecran.dart`
+- `lib/presentation/screens/marketplace_ecran.dart`
+- `lib/domain/entities/livre.dart`
+- `lib/data/datasources/livres_datasource_local.dart`
+- `lib/data/models/livre_model.dart`
+- `lib/domain/repositories/livres_repository.dart`
+- `lib/data/repositories/livres_repository_impl.dart`
 
 ## Fichiers modifiés
 - `lib/main.dart` - Refactorisation pour Clean Architecture et thème UQAR
@@ -75,6 +98,7 @@
 - `lib/core/theme/app_theme.dart` - Correction de withOpacity deprecated
 - `lib/presentation/screens/connexion_ecran.dart` - Navigation vers l'écran d'inscription
 - `lib/main.dart` - Configuration AppBar transparente dans le thème global
+- `lib/presentation/screens/marketplace_ecran.dart` - Spécialisation vers échange de livres
 
 ## Décisions de conception
 - Respect strict de la séparation des couches.
@@ -83,17 +107,29 @@
 - L'écran de connexion est défini comme page d'accueil de l'application.
 - Utilisation d'un dégradé violet/bleu pour correspondre au design fourni.
 - Validation des champs avec messages d'erreur en français.
+- **Spécialisation marketplace** : L'application se concentre uniquement sur l'échange de livres universitaires entre étudiants de l'UQAR.
+- **Entité Livre** : Contient toutes les propriétés nécessaires pour gérer les livres universitaires (cours, matière, année, état, etc.).
 
 ## TODOs
 - [ ] Compléter les entités et repositories du domaine.
 - [ ] Implémenter les datasources et modèles.
 - [ ] Créer les écrans de connexion et d'inscription.
 - [ ] Ajouter la gestion d'état (bloc/provider).
+- [x] Créer le repository abstrait pour les livres
+- [x] Implémenter le datasource pour les livres
+- [x] Ajouter la gestion d'état pour les livres (bloc/provider)
+- [ ] Créer l'écran de détail d'un livre
+- [ ] Implémenter la fonctionnalité de recherche de livres
+- [ ] Ajouter la gestion des profils utilisateurs
+- [ ] Créer l'écran de publication d'un livre
+- [ ] Implémenter la persistance des données (base de données locale)
+- [ ] Ajouter la synchronisation avec un backend
 
 ## Hypothèses
 - L'application cible la charte graphique UQAR.
 - Les noms de variables et fonctions seront en français.
 - L'application s'appelle "UqarLive" (pas "UqarLife").
+- **L'application est spécialisée uniquement dans l'échange de livres universitaires** (pas de vente, pas d'autres produits).
 
 ## Résumé des actions accomplies
 ✅ Structure Clean Architecture créée
@@ -106,17 +142,19 @@
 ✅ Écran d'inscription amélioré
 ✅ Problèmes résolus
 ✅ Configuration AppBar transparente
+✅ Écran d'accueil créé avec navigation complète
+✅ Marketplace créé puis spécialisé pour l'échange de livres
+✅ Entité Livre créée dans la couche domain
+✅ Migration complète vers Clean Architecture pour les livres
 
 ## Prochaines étapes recommandées
-1. Créer l'écran d'inscription (inscription_ecran.dart)
-2. Implémenter les entités utilisateur dans domain/entities/
-3. Créer les repositories abstraits dans domain/repositories/
-4. Implémenter les datasources et repositories dans data/
-5. Ajouter la gestion d'état (bloc/provider)
-6. Tester l'application sur émulateur/appareil
-1. Implémenter les entités utilisateur dans domain/entities/
-2. Créer les repositories abstraits dans domain/repositories/
-3. Implémenter les datasources et repositories dans data/
-4. Ajouter la gestion d'état (bloc/provider)
-5. Créer l'écran de mot de passe oublié
-6. Tester l'application sur émulateur/appareil 
+1. Créer le repository abstrait pour les livres dans domain/repositories/
+2. Implémenter le datasource pour les livres dans data/datasources/
+3. Créer le modèle Livre dans data/models/
+4. Implémenter le repository des livres dans data/repositories/
+5. Ajouter la gestion d'état (bloc/provider) pour les livres
+6. Créer l'écran de détail d'un livre
+7. Implémenter la fonctionnalité de recherche de livres
+8. Ajouter la gestion des profils utilisateurs
+9. Créer l'écran de publication d'un livre
+10. Tester l'application sur émulateur/appareil 

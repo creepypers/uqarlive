@@ -8,6 +8,7 @@
 - [x] Écran de chargement (`ecran_chargement.dart`)
 - [x] **Écran d'accueil (`accueil_ecran.dart`)** - NOUVEAU
 - [x] **Écran marketplace (`marketplace_ecran.dart`)** - NOUVEAU
+- [x] **Écran échange de livres (`marketplace_ecran.dart`)** - SPÉCIALISÉ
 
 ### 🎨 Composants thématiques :
 - [x] Thème UQAR (`app_theme.dart`)
@@ -21,10 +22,108 @@
 - [x] **Grille responsive d'items marketplace**
 - [x] **Statistiques avec compteurs visuels**
 - [x] **Cartes items avec badges d'état**
+- [x] **Entité Livre pour échange universitaire**
+- [x] **Filtres spécialisés : matière, année, état du livre**
+- [x] **Cartes livres avec auteur, cours, badge échange**
 
 ---
 
 ## 📅 Historique des modifications
+
+### **2024-01-XX - 20:45 - Correction overflow cartes de livres**
+**Action** : Résolution du problème d'overflow de 17 pixels dans l'affichage des livres de mathématiques
+**Détails** : 
+- **Ratio d'aspect** : Augmenté de 0.75 à 0.8 pour plus de hauteur dans les cartes
+- **Paddings optimisés** : Réduit de 12px à 10px pour économiser l'espace
+- **Tailles de police** : Légèrement réduites (13→12px, 11→10px, 10→9px)
+- **Espacements** : Réduit entre textes de 4px à 3px
+- **MainAxisSize** : Ajouté `MainAxisSize.min` pour éviter l'overflow vertical
+- **Overflow protection** : Ajouté `maxLines` et `overflow` sur tous les textes
+- **Layout horizontal** : Ajouté `Flexible` sur le nom du propriétaire
+
+**Problème résolu** :
+- **Bottom overflow** de 17 pixels dans les cartes de livres
+- **Titres longs** de mathématiques ("Calcul Différentiel et Intégral") s'affichent correctement
+- **Affichage responsive** pour tous les types de livres
+
+**Optimisations UI** :
+- **Meilleure utilisation de l'espace** avec ratio d'aspect optimisé
+- **Textes adaptés** aux contraintes de taille des cartes
+- **Protection overflow** complète (vertical et horizontal)
+
+### **2024-01-XX - 20:30 - Migration vers Clean Architecture pour les livres**
+**Action** : Déplacement des données des livres vers la couche data selon Clean Architecture
+**Détails** : 
+- **Datasource local** : Création `livres_datasource_local.dart` avec 10 livres universitaires
+- **Modèle Livre** : Création `livre_model.dart` avec conversions Map/Entity
+- **Repository abstrait** : Création `livres_repository.dart` avec toutes les méthodes nécessaires
+- **Repository implémenté** : Création `livres_repository_impl.dart` avec logique métier
+- **Marketplace migré** : Suppression des données hardcodées de la couche présentation
+- **Gestion d'état** : Ajout du chargement et de la gestion d'erreurs
+
+**Architecture Clean** :
+- **Domain** : Entité Livre + Repository abstrait (pas de dépendances externes)
+- **Data** : Datasource + Modèle + Repository implémenté (dépend de domain)
+- **Presentation** : Marketplace utilise le repository (dépend de domain)
+
+**Fonctionnalités ajoutées** :
+- **Chargement async** : Indicateur de chargement pendant récupération des données
+- **Gestion d'erreurs** : Try/catch avec messages d'erreur
+- **État vide** : Affichage "Aucun livre trouvé" quand filtres ne retournent rien
+- **Filtrage dynamique** : Recharge automatique des données à chaque changement de filtre
+
+**Données enrichies** :
+- **Métadonnées complètes** : ISBN, édition, description pour chaque livre
+- **Dates d'ajout** : Suivi temporel des livres ajoutés
+- **Mots-clés** : Système de tags pour recherche avancée
+- **Cours associés** : Codes de cours universitaires (MAT-1000, PHY-1001, etc.)
+
+**Suppression** :
+- Méthodes `_obtenirTousLesLivres()`, `_obtenirLivresFiltres()` du marketplace
+- Données hardcodées dans la couche présentation
+- Logique de filtrage dans l'UI (déplacée vers repository)
+
+### **2024-01-XX - 20:00 - Spécialisation marketplace → échange de livres universitaires**
+**Action** : Transformation complète du marketplace générique en plateforme d'échange de livres
+**Détails** : 
+- **Entité Livre** : Création `lib/domain/entities/livre.dart` avec propriétés universitaires
+- **AppBar spécialisée** : "Échange de Livres - Livres Universitaires" 
+- **Filtres adaptés** : Matières (Math, Physique, Chimie, etc.) + Année d'étude + État livre
+- **Statistiques ciblées** : 127 livres disponibles, 68 échanges, 45 étudiants actifs
+- **Navigation** : "Marketplace" → "Livres" avec icône `menu_book`
+
+**Entité Livre** :
+- Propriétés : `titre`, `auteur`, `matiere`, `anneeEtude`, `etatLivre`, `proprietaire`
+- Métadonnées : `isbn`, `edition`, `coursAssocies`, `description`, `motsClefs`
+- Gestion : `dateAjout`, `estDisponible`, `imageUrl`
+
+**Filtres spécialisés** :
+- **Matières** : 11 matières universitaires (Math, Physique, Chimie, Bio, Info, Génie, Éco, Droit, Lettres, Histoire)
+- **Années d'étude** : 1ère, 2ème, 3ème année, Maîtrise, Doctorat
+- **État du livre** : Excellent, Très bon, Bon, Acceptable
+
+**Cartes livres** :
+- **Design** : Badge "ÉCHANGE" vert permanent, badge d'état coloré
+- **Contenu** : Titre, auteur, matière, propriétaire, année d'étude
+- **Cours** : Code de cours associé (ex: MAT-1000, PHY-1001)
+- **Icône** : `menu_book` uniforme pour tous les livres
+
+**Livres disponibles** :
+- Calcul Différentiel (Stewart) - Math 1ère
+- Physique Générale (Serway) - Physique 1ère
+- Chimie Organique (Clayden) - Chimie 2ème
+- Programmation Java (Deitel) - Info 2ème
+- Économie (Varian) - Éco 2ème
+- Biologie Moléculaire (Watson) - Bio 3ème
+- Résistance Matériaux (Beer) - Génie 2ème
+- Histoire Québec (Lacoursière) - Histoire 1ère
+- Droit Constitutionnel (Brun) - Droit 1ère
+- Littérature Française (Lagarde) - Lettres 1ère
+
+**Suppression** :
+- Toutes les catégories non-livres (Électronique, Vêtements, Sport, etc.)
+- Système de prix/vente (100% échange)
+- Badges prix remplacés par badges échange
 
 ### **2024-01-XX - 19:30 - Création page marketplace complète**
 **Action** : Développement de la page marketplace avec filtres et grille d'items
@@ -300,3 +399,216 @@
 - [ ] Ajouter gestion d'erreurs
 - [ ] Tests d'accessibilité
 - [ ] Optimisation des performances 
+
+## 📅 15 Janvier 2025 - Session 4: Refactorisation NavBar
+
+### ✅ Refactorisation architecture
+- **NavBar Widget Réutilisable** (`navbar_widget.dart`)
+- **Service Navigation Centralisé** (`navigation_service.dart`)
+
+### 🏗️ Architecture améliorée
+- **Composant NavBar réutilisable**: Extraction du code dupliqué en widget séparé
+- **Service navigation centralisé**: Logique de navigation unifiée pour toute l'app
+- **Suppression duplication**: Élimination de +150 lignes de code dupliqué
+- **Maintenabilité améliorée**: Un seul endroit pour modifier la NavBar
+
+### 🎨 Composants créés/mis à jour
+
+#### NavBar Widget (`navbar_widget.dart`)
+- **Widget réutilisable**: Accepte `indexSelectionne` et `onTap` callback
+- **Design UQAR cohérent**: Gradient, couleurs et styles uniformes
+- **Icône Accueil spéciale**: Halo de focus conservé pour l'accueil
+- **5 onglets**: Cantine, Livres, Accueil, Assos, Profil
+
+#### Service Navigation (`navigation_service.dart`)
+- **Navigation centralisée**: Méthode `gererNavigationNavBar()` unique
+- **Gestion intelligente**: Évite navigation vers page courante
+- **Feedback utilisateur**: SnackBar pour pages non implémentées (Assos, Profil)
+- **Navigation cohérente**: `pushReplacement` pour éviter accumulation de routes
+- **Index automatique**: Détection automatique de la page courante
+
+#### Pages mises à jour
+- **Page d'Accueil**: Suppression de 80+ lignes de code NavBar dupliqué
+- **Marketplace**: Suppression de 80+ lignes de code NavBar dupliqué  
+- **Cantine**: Suppression de 80+ lignes de code NavBar dupliqué
+- **Variables obsolètes**: Suppression `_indexSelectionne` dans toutes les pages
+
+### 🔧 Améliorations techniques
+- ✅ **DRY Principle**: Don't Repeat Yourself - code NavBar centralisé
+- ✅ **Single Responsibility**: Chaque widget a une responsabilité claire
+- ✅ **Maintenabilité**: Modifications NavBar à un seul endroit
+- ✅ **Consistance**: Design et comportement identiques partout
+- ✅ **Performance**: Moins de code dupliqué = app plus légère
+- ✅ **Extensibilité**: Ajout facile de nouvelles pages
+
+### 📊 Métriques d'amélioration
+- **-240 lignes** : Code dupliqué supprimé
+- **+1 widget** : Composant réutilisable NavBar
+- **+1 service** : Navigation centralisée
+- **100%** : Couverture navigation entre pages principales
+- **0** : Duplication de logique NavBar
+
+---
+
+## 📅 15 Janvier 2025 - Session 3: Page Cantine Complète
+
+### ✅ Nouveaux écrans créés
+- **Page Cantine** (`cantine_ecran.dart`)
+
+### 🏗️ Architecture ajoutée
+- **Entité Menu** (`menu.dart`): Entité complète pour les menus de cantine
+- **Repository Menus** (`menus_repository.dart`): Interface pour gestion des menus
+- **Datasource Menus** (`menus_datasource_local.dart`): 12 menus réalistes avec données complètes
+- **Modèle Menu** (`menu_model.dart`): Conversion Map/entité
+- **Repository Implementation** (`menus_repository_impl.dart`): Implémentation Clean Architecture
+
+### 🎨 Composants créés/mis à jour
+
+#### Page Cantine (`cantine_ecran.dart`)
+- **AppBar**: Avec titre, retour et actions (filtre végétarien, recherche)
+- **Section Infos**: Horaires, places, paiement, WiFi avec design moderne
+- **Menus du Jour**: Scroll horizontal avec cartes spéciales gradient
+- **Menus Populaires**: Section avec notes et badges spéciaux
+- **Filtres Catégories**: Chips sélectionnables (menus, plats, snacks, desserts, boissons)
+- **Grille Menus**: GridView responsive avec cartes détaillées
+- **Navigation**: NavBar cohérent et retour vers accueil
+
+#### Navigation mise à jour
+- **Page d'Accueil**: Import et navigation vers `CantineEcran`
+- **Bouton cantine**: Navigation fonctionnelle depuis l'accueil
+
+### 🎯 Features cantine
+- **12 menus réalistes**: Menus étudiant, végétarien, express, plats, snacks, desserts, boissons
+- **Données complètes**: Prix, ingrédients, allergènes, calories, notes, badges
+- **Filtrage intelligent**: Par catégorie, végétarien/vegan, disponibilité
+- **Badges dynamiques**: VEGAN, VÉGÉ, ÉPUISÉ, POPULAIRE avec couleurs appropriées
+- **Design responsive**: GridView adaptable et protection overflow
+- **Clean Architecture**: Repository pattern avec datasource local
+
+### 🎨 Design Patterns utilisés
+- **Cards sectionnées**: Infos, menus du jour, populaires, grille standard
+- **Gradient containers**: Section infos et menus du jour avec dégradés UQAR
+- **Badges intelligents**: Système automatique selon propriétés du menu
+- **Icônes catégories**: Mapping icônes spécifiques par type de menu
+- **Scroll horizontal**: Pour menus du jour et populaires
+- **Filtres visuels**: Toggle végétarien avec feedback visuel
+
+### 🔧 Fonctionnalités implémentées
+- ✅ **Navigation complète**: Depuis accueil vers cantine fonctionnelle
+- ✅ **Filtrage avancé**: Catégories + filtre végétarien
+- ✅ **Données riches**: 12 menus avec infos nutritionnelles
+- ✅ **UI responsive**: GridView + protection overflow
+- ✅ **Clean Architecture**: Séparation couches et testabilité
+- ✅ **Design cohérent**: 100% UQAR theme et navigation
+
+---
+
+## 📅 15 Janvier 2025 - Session 2: Page Détails Livre
+
+### ✅ Nouveaux écrans créés
+- **Page Détails Livre** (`details_livre_ecran.dart`)
+
+### 🏗️ Architecture améliorée
+- **Entité Livre** (`livre.dart`): Ajout du getter `codeCours` (alias pour `coursAssocies`)
+
+### 🎨 Composants créés/mis à jour
+
+#### Page Détails Livre (`details_livre_ecran.dart`)
+- **SliverAppBar**: Avec image livre placeholder et actions (retour, favoris)
+- **Informations Principales**: Titre, auteur, matière et année avec chips stylisés
+- **Informations Académiques**: Matière, année d'études, état du livre, code de cours
+- **Informations Propriétaire**: Avatar, nom, rating et bouton message
+- **Description**: Section conditionnelle pour description détaillée
+- **Informations Techniques**: ISBN et édition si disponibles
+- **Bouton Échange**: Bouton principal vert pour proposer un échange
+- **Navigation**: GestureDetector sur cartes de livre (marketplace + accueil)
+
+#### Marketplace & Accueil (mise à jour)
+- **Navigation ajoutée**: Tap sur carte → Détails livre
+- **Import**: Ajout de `details_livre_ecran.dart`
+- **GestureDetector**: Enveloppe les cartes pour la navigation
+
+### 🎯 Design Patterns utilisés
+- **SliverAppBar**: Pour scroll naturel avec header image
+- **Chips**: Badges matière/année avec couleurs UQAR
+- **Cards sectionnées**: Informations groupées logiquement
+- **Avatar circulaire**: Propriétaire avec initiales
+- **Boutons d'action**: Message et échange bien visibles
+- **Consistent theming**: Réutilisation complète theme UQAR
+
+### 🔧 Fonctionnalités implémentées
+- ✅ **Navigation fluide**: Tap carte → Détails complets
+- ✅ **Affichage conditionnel**: Description et ISBN si disponibles
+- ✅ **Actions utilisateur**: Favoris, message, proposer échange
+- ✅ **Feedback visuel**: SnackBar pour confirmations actions
+- ✅ **Protection overflow**: Layout responsive et ellipsis
+- ✅ **Getter codeCours**: Accès simplifié aux codes de cours (MAT-1000, PHY-1001, etc.)
+
+---
+
+## 📅 15 Janvier 2025 - Session 1: Configuration Clean Architecture et Marketplace
+
+### ✅ Écrans mis à jour
+- **Marketplace** → **Échange de Livres**
+- **Page d'Accueil** → **Intégration Clean Architecture**
+
+### 🏗️ Architecture créée
+- `lib/domain/entities/livre.dart` - Entité Livre
+- `lib/domain/repositories/livres_repository.dart` - Repository abstrait
+- `lib/data/models/livre_model.dart` - Modèle de données
+- `lib/data/datasources/livres_datasource_local.dart` - Source de données (avec codes cours universitaires)
+- `lib/data/repositories/livres_repository_impl.dart` - Implémentation repository
+
+### 🎨 Composants créés/réutilisés
+
+#### Page d'Accueil (`accueil_ecran.dart`)
+- **Section Échange de Livres**: Remplace la section marketplace générique
+  - Utilise Clean Architecture avec repository
+  - Affiche les livres réels avec métadonnées universitaires
+  - Cards optimisées avec badges "ÉCHANGE"
+  - Navigation cohérente vers marketplace
+- **Section Associations**: Conservée avec styles UQAR
+- **Section Cantine**: Optimisée contre l'overflow
+  - Taille augmentée à 200px de hauteur
+  - Textes réduits et Expanded widgets ajoutés
+  - Maxlines adapté pour flexibilité
+- **Navigation Bar**: 
+  - Icône changée de `storefront` à `menu_book`
+  - Label changé de "Marketplace" à "Livres"
+  - Design gradient conservé
+
+#### Marketplace (`marketplace_ecran.dart`)
+- **Spécialisation Livres**: Transformation complète d'un marketplace générique
+- **Données universitaires**: 10 livres avec métadonnées (ISBN, cours, éditions)
+- **Filtres académiques**: 11 matières + années d'étude + états
+- **Statistics**: 127 livres, 68 échanges, 45 étudiants actifs
+- **Cards livres**: Badges permanents "ÉCHANGE", overflow fix
+
+### 🎯 Décisions de thème
+- **Couleurs UQAR**: Bleu principal `#005499`, accent `#00A1E4`, fond `#F8F9FA`
+- **Typographie**: Réutilisation `StylesTexteApp` et `CouleursApp`
+- **Composants**: Shadows, borders radius, gradient navbar conservés
+- **Overflow protection**: Expanded, Flexible, maxLines systématiques
+
+### 🔧 Problèmes résolus
+- ✅ **Overflow 17px Math books**: Fix avec layout optimisé
+- ✅ **Données hardcodées**: Migration vers Clean Architecture
+- ✅ **Navigation incohérente**: Mise à jour Marketplace → Livres
+- ✅ **Manque badges échange**: Ajout systematic "ÉCHANGE"
+
+### 📋 TODOs Architecture
+- [ ] Créer les cas d'usage (use cases) dans `domain/usecases/`
+- [ ] Ajouter injection de dépendances (GetIt/Provider)
+- [ ] Implémenter la persistence locale (Hive/SQLite)
+- [ ] Ajouter API REST pour synchronisation serveur
+- [ ] Tests unitaires pour chaque couche
+
+### 📋 TODOs UI
+- [x] **Créer écrans détail livre** ✅ Complété
+- [x] **Ajouter getter codeCours** ✅ Complété
+- [x] **Créer page cantine complète** ✅ Complété
+- [x] **Refactoriser NavBar réutilisable** ✅ Complété
+- [ ] Implémenter filtres avancés
+- [ ] Ajouter système notifications échanges
+- [ ] Créer profil utilisateur
+- [ ] Page associations et cantine dédiées 
