@@ -5,7 +5,7 @@ import '../../domain/repositories/menus_repository.dart';
 import '../../data/repositories/menus_repository_impl.dart';
 import '../../data/datasources/menus_datasource_local.dart';
 import '../widgets/navbar_widget.dart';
-import '../widgets/navigation_service.dart';
+import '../services/navigation_service.dart';
 
 // UI Design: Page cantine UQAR avec menus, horaires et design moderne
 class CantineEcran extends StatefulWidget {

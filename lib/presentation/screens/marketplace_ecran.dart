@@ -7,11 +7,14 @@ import '../../data/datasources/livres_datasource_local.dart';
 import 'accueil_ecran.dart';
 import 'details_livre_ecran.dart';
 import '../widgets/navbar_widget.dart';
-import '../widgets/navigation_service.dart';
+import '../services/navigation_service.dart';
+import '../widgets/widget_barre_app_personnalisee.dart';
+import '../widgets/widget_collection.dart';
+import '../widgets/widget_carte.dart';
 
-// UI Design: Plateforme d'échange de livres universitaires UqarLive
+// UI Design: Écran marketplace avec widgets ultra-minimalistes
 class MarketplaceEcran extends StatefulWidget {
-  const MarketplaceEcran({Key? key}) : super(key: key);
+  const MarketplaceEcran({super.key});
 
   @override
   State<MarketplaceEcran> createState() => _MarketplaceEcranState();
@@ -110,63 +113,12 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
 
   // UI Design: AppBar spécialisée pour l'échange de livres
   PreferredSizeWidget _construireAppBar() {
-    return AppBar(
-      backgroundColor: CouleursApp.principal,
-      elevation: 0,
-      automaticallyImplyLeading: false,
-      toolbarHeight: 80,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(25),
-          bottomRight: Radius.circular(25),
-        ),
-      ),
-      title: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            // Section titre échange de livres
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Échange de Livres',
-                    style: TextStyle(
-                      color: CouleursApp.blanc.withValues(alpha: 0.8),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    'Livres Universitaires',
-                    style: TextStyle(
-                      color: CouleursApp.blanc,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // Bouton recherche
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: CouleursApp.blanc.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Icon(
-                Icons.search,
-                color: CouleursApp.blanc,
-                size: 24,
-              ),
-            ),
-          ],
-        ),
-      ),
+    return WidgetBarreAppPersonnalisee(
+      titre: 'Échange de Livres',
+      sousTitre: 'Livres Universitaires',
+      onTapFin: () {
+        // TODO: Implémenter la recherche
+      },
     );
   }
 
@@ -194,14 +146,16 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
               return Container(
                 margin: const EdgeInsets.only(right: 12),
                 child: FilterChip(
-                  selected: estSelectionne,
                   label: Text(
                     matiere,
                     style: TextStyle(
-                      color: estSelectionne ? CouleursApp.blanc : CouleursApp.principal,
+                      color: estSelectionne 
+                          ? CouleursApp.blanc 
+                          : CouleursApp.principal,
                       fontWeight: estSelectionne ? FontWeight.bold : FontWeight.w500,
                     ),
                   ),
+                  selected: estSelectionne,
                   backgroundColor: CouleursApp.blanc,
                   selectedColor: CouleursApp.principal,
                   shape: RoundedRectangleBorder(
@@ -210,7 +164,7 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
                       color: CouleursApp.principal.withValues(alpha: 0.3),
                     ),
                   ),
-                  onSelected: (selected) {
+                  onSelected: (value) {
                     setState(() {
                       _matiereSelectionnee = matiere;
                     });
@@ -224,46 +178,57 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
         
         const SizedBox(height: 16),
         
-        // Filtres état et année
+        // Filtres état et année avec DropdownButton natifs stylisés
         Row(
           children: [
             Expanded(
-              child: _construireDropdownFiltre(
-                'État du Livre',
-                _filtreEtat,
-                _etatsLivre,
-                (valeur) {
-                  setState(() => _filtreEtat = valeur!);
-                  _chargerLivres();
-                },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: CouleursApp.blanc,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: CouleursApp.principal.withValues(alpha: 0.3),
+                  ),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: _filtreEtat,
+                    isExpanded: true,
+                    hint: Text(
+                      'État du Livre',
+                      style: TextStyle(
+                        color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                        fontSize: 14,
+                      ),
+                    ),
+                    icon: Icon(
+                      Icons.arrow_drop_down,
+                      color: CouleursApp.principal,
+                    ),
+                    onChanged: (String? newValue) {
+                      setState(() => _filtreEtat = newValue!);
+                      _chargerLivres();
+                    },
+                    items: _etatsLivre.map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(
+                          value,
+                          style: TextStyle(
+                            color: CouleursApp.texteFonce,
+                            fontSize: 14,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
               ),
             ),
             const SizedBox(width: 16),
             Expanded(
-              child: _construireDropdownFiltre(
-                'Année d\'Étude',
-                _filtreAnnee,
-                _anneesEtude,
-                (valeur) {
-                  setState(() => _filtreAnnee = valeur!);
-                  _chargerLivres();
-                },
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  // UI Design: Dropdown personnalisé pour filtres
-  Widget _construireDropdownFiltre(
-    String label,
-    String valeurActuelle,
-    List<String> options,
-    Function(String?) onChanged,
-  ) {
-    return Container(
+              child: Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: CouleursApp.blanc,
@@ -274,15 +239,28 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
-          value: valeurActuelle,
+                    value: _filtreAnnee,
           isExpanded: true,
-          hint: Text(label),
-          icon: Icon(Icons.arrow_drop_down, color: CouleursApp.principal),
-          items: options.map((String valeur) {
+                    hint: Text(
+                      'Année d\'Étude',
+                      style: TextStyle(
+                        color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                        fontSize: 14,
+                      ),
+                    ),
+                    icon: Icon(
+                      Icons.arrow_drop_down,
+                      color: CouleursApp.principal,
+                    ),
+                    onChanged: (String? newValue) {
+                      setState(() => _filtreAnnee = newValue!);
+                      _chargerLivres();
+                    },
+                    items: _anneesEtude.map<DropdownMenuItem<String>>((String value) {
             return DropdownMenuItem<String>(
-              value: valeur,
+                        value: value,
               child: Text(
-                valeur,
+                          value,
                 style: TextStyle(
                   color: CouleursApp.texteFonce,
                   fontSize: 14,
@@ -290,13 +268,17 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
               ),
             );
           }).toList(),
-          onChanged: onChanged,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
-      ),
+      ],
     );
   }
 
-  // UI Design: Statistiques spécialisées pour l'échange de livres
+  // UI Design: Statistiques spécialisées pour l'échange de livres avec Container natif
   Widget _construireStatistiquesEchangeLivres() {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -317,27 +299,44 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _construireStatItem('127', 'Livres\ndisponibles', Icons.menu_book),
+          _construireElementStatistique(
+            icone: Icons.menu_book,
+            valeur: '127',
+            label: 'Livres\ndisponibles',
+          ),
           Container(
             height: 40,
             width: 1,
             color: CouleursApp.principal.withValues(alpha: 0.3),
           ),
-          _construireStatItem('68', 'Échanges\nce mois', Icons.swap_horiz),
+          _construireElementStatistique(
+            icone: Icons.swap_horiz,
+            valeur: '68',
+            label: 'Échanges\nce mois',
+          ),
           Container(
             height: 40,
             width: 1,
             color: CouleursApp.principal.withValues(alpha: 0.3),
           ),
-          _construireStatItem('45', 'Étudiants\nactifs', Icons.school),
+          _construireElementStatistique(
+            icone: Icons.school,
+            valeur: '45',
+            label: 'Étudiants\nactifs',
+          ),
         ],
       ),
     );
   }
 
-  // UI Design: Item de statistique
-  Widget _construireStatItem(String nombre, String label, IconData icone) {
+  // UI Design: Élément de statistique natif
+  Widget _construireElementStatistique({
+    required IconData icone,
+    required String valeur,
+    required String label,
+  }) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Icon(
           icone,
@@ -346,7 +345,7 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
         ),
         const SizedBox(height: 8),
         Text(
-          nombre,
+          valeur,
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -372,62 +371,31 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               'Livres Disponibles',
               style: StylesTexteApp.titre.copyWith(fontSize: 22),
             ),
+            const SizedBox(width: 16),
             Text(
-              '${_livresDisponibles.length} livres',
+              '(${_livresDisponibles.length})',
               style: TextStyle(
-                color: CouleursApp.texteFonce.withValues(alpha: 0.6),
-                fontSize: 14,
+                fontSize: 18,
+                color: CouleursApp.principal.withValues(alpha: 0.7),
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],
         ),
         const SizedBox(height: 16),
-        if (_chargementLivres)
-          Center(
-            child: CircularProgressIndicator(
-              color: CouleursApp.principal,
-            ),
-          )
-        else if (_livresDisponibles.isEmpty)
-          Center(
-            child: Column(
-              children: [
-                Icon(
-                  Icons.book_outlined,
-                  size: 64,
-                  color: CouleursApp.texteFonce.withValues(alpha: 0.3),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Aucun livre trouvé',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: CouleursApp.texteFonce.withValues(alpha: 0.6),
-                  ),
-                ),
-              ],
-            ),
-          )
-        else
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-              childAspectRatio: 0.8, // Augmenté de 0.75 à 0.8 pour plus de hauteur
-          ),
-            itemCount: _livresDisponibles.length,
-          itemBuilder: (context, index) {
-              return _construireCarteLivre(_livresDisponibles[index]);
+        WidgetCollection<Livre>.grille(
+          elements: _livresDisponibles,
+          enChargement: _chargementLivres,
+          ratioAspect: 1.05, // UI Design: Ratio optimisé pour éliminer l'overflow bottom
+          constructeurElement: (context, livre, index) {
+            return _construireCarteLivre(livre);
           },
+          etatVide: WidgetCollection.etatVideAucunLivre(),
         ),
       ],
     );
@@ -482,41 +450,13 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
                   Positioned(
                     top: 8,
                     right: 8,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                          color: _getCouleurEtatLivre(livre.etatLivre),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                          livre.etatLivre,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
+                    child: WidgetBadge.etatLivre(texte: livre.etatLivre),
                   ),
                     // Badge échange
                     Positioned(
                       top: 8,
                       left: 8,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.green,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          'ÉCHANGE',
-                          style: TextStyle(
-                            fontSize: 8,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
+                      child: const WidgetBadge.echange(),
                   ),
                 ],
               ),
@@ -526,52 +466,56 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
           Expanded(
             flex: 2,
             child: Padding(
-                padding: const EdgeInsets.all(10), // Réduit de 12 à 10
+                padding: const EdgeInsets.all(8), // UI Design: Réduit à 8 pour plus d'espace
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min, // Ajouté pour éviter l'overflow
+                  mainAxisSize: MainAxisSize.min, // Évite l'overflow vertical
                 children: [
                   Text(
                       livre.titre,
                     style: TextStyle(
-                        fontSize: 12, // Réduit de 13 à 12
+                        fontSize: 12, // Optimisé pour le contenu
                       fontWeight: FontWeight.w600,
                       color: CouleursApp.texteFonce,
+                      height: 1.1, // UI Design: Hauteur de ligne compacte
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                    const SizedBox(height: 3), // Réduit de 4 à 3
+                    const SizedBox(height: 2), // UI Design: Espacement minimal
                   Text(
                       livre.auteur,
                     style: TextStyle(
-                        fontSize: 10, // Réduit de 11 à 10
+                        fontSize: 10,
                       color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                      height: 1.1, // UI Design: Hauteur de ligne compacte
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 3), // Réduit de 4 à 3
+                    const SizedBox(height: 2), // UI Design: Espacement minimal
                     Text(
                       livre.matiere,
                       style: TextStyle(
-                        fontSize: 10, // Réduit de 11 à 10
+                        fontSize: 10,
                         color: CouleursApp.principal,
                         fontWeight: FontWeight.w500,
+                        height: 1.1, // UI Design: Hauteur de ligne compacte
                       ),
-                      maxLines: 1, // Ajouté pour éviter l'overflow
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                   ),
                   const Spacer(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                        Flexible( // Ajouté Flexible pour éviter l'overflow horizontal
+                        Flexible( // Évite l'overflow horizontal
                           child: Text(
                             livre.proprietaire,
                             style: TextStyle(
-                              fontSize: 10, // Réduit de 11 à 10
+                              fontSize: 9, // UI Design: Légèrement réduit
                               color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                              height: 1.1, // UI Design: Hauteur de ligne compacte
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -579,9 +523,10 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
                         Text(
                           livre.anneeEtude,
                           style: TextStyle(
-                            fontSize: 9, // Réduit de 10 à 9
+                            fontSize: 9,
                             color: CouleursApp.accent,
                             fontWeight: FontWeight.w600,
+                            height: 1.1, // UI Design: Hauteur de ligne compacte
                           ),
                         ),
                     ],
@@ -594,21 +539,5 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
       ),
       ),
     );
-  }
-
-  // Couleur selon l'état du livre
-  Color _getCouleurEtatLivre(String etat) {
-    switch (etat) {
-      case 'Excellent':
-        return Colors.green;
-      case 'Très bon':
-        return Colors.blue;
-      case 'Bon':
-        return Colors.orange;
-      case 'Acceptable':
-        return Colors.red.shade300;
-      default:
-        return Colors.grey;
-    }
   }
 } 

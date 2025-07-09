@@ -8,7 +8,7 @@ import 'marketplace_ecran.dart';
 import 'details_livre_ecran.dart';
 import 'cantine_ecran.dart';
 import '../widgets/navbar_widget.dart';
-import '../widgets/navigation_service.dart';
+import '../services/navigation_service.dart';
 
 // UI Design: Page d'accueil UqarLive avec AppBar, sections échange de livres/assos/cantine et navbar
 class AccueilEcran extends StatefulWidget {
@@ -284,7 +284,7 @@ class _AccueilEcranState extends State<AccueilEcran> {
                       Icons.menu_book,
                 size: 40,
                 color: CouleursApp.accent,
-                    ),
+              ),
                   ),
                   // Badge échange
                   Positioned(
@@ -304,8 +304,8 @@ class _AccueilEcranState extends State<AccueilEcran> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ),
-                  ),
+            ),
+          ),
                 ],
               ),
             ),
