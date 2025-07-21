@@ -119,6 +119,7 @@ class WidgetCollection<T> extends StatelessWidget {
     bool enChargement = false,
     double espacementVertical = 12,
     bool separerElements = false,
+    bool reduireHauteur = false, // Par défaut false pour permettre le défilement
     Widget? etatVide,
     String? messageEtatVide,
     IconData? iconeEtatVide,
@@ -131,6 +132,7 @@ class WidgetCollection<T> extends StatelessWidget {
       enChargement: enChargement,
       espacementVertical: espacementVertical,
       separerElements: separerElements,
+      reduireHauteur: reduireHauteur,
       etatVide: etatVide,
       messageEtatVide: messageEtatVide,
       iconeEtatVide: iconeEtatVide,
@@ -222,8 +224,10 @@ class WidgetCollection<T> extends StatelessWidget {
   Widget _construireListeVerticale() {
     if (separerElements) {
       return ListView.separated(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: reduireHauteur,
+        physics: reduireHauteur 
+            ? const NeverScrollableScrollPhysics() 
+            : const AlwaysScrollableScrollPhysics(),
         itemCount: elements.length,
         separatorBuilder: (context, index) => SizedBox(height: espacementVertical),
         itemBuilder: (context, index) {
@@ -231,20 +235,19 @@ class WidgetCollection<T> extends StatelessWidget {
         },
       );
     } else {
-      return Builder(
-        builder: (context) {
+      // Utiliser ListView.builder au lieu de Column pour éviter les débordements
+      return ListView.builder(
+        shrinkWrap: reduireHauteur,
+        physics: reduireHauteur 
+            ? const NeverScrollableScrollPhysics() 
+            : const AlwaysScrollableScrollPhysics(),
+        itemCount: elements.length,
+        itemBuilder: (context, index) {
           return Column(
-            children: elements.asMap().entries.map((entry) {
-              int index = entry.key;
-              T element = entry.value;
-              
-              return Column(
-                children: [
-                  constructeurElement(context, element, index),
-                  if (index < elements.length - 1) SizedBox(height: espacementVertical),
-                ],
-              );
-            }).toList(),
+            children: [
+              constructeurElement(context, elements[index], index),
+              if (index < elements.length - 1) SizedBox(height: espacementVertical),
+            ],
           );
         },
       );

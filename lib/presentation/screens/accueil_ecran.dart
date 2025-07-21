@@ -1,17 +1,24 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
 import '../../domain/entities/livre.dart';
+import '../../domain/entities/association.dart';
 import '../../domain/repositories/livres_repository.dart';
+import '../../domain/repositories/associations_repository.dart';
 import '../../data/repositories/livres_repository_impl.dart';
+import '../../data/repositories/associations_repository_impl.dart';
 import '../../data/datasources/livres_datasource_local.dart';
+import '../../data/datasources/associations_datasource_local.dart';
 import 'marketplace_ecran.dart';
 import 'details_livre_ecran.dart';
 import 'cantine_ecran.dart';
+import 'associations_ecran.dart';
+import 'details_association_ecran.dart';
 import '../widgets/navbar_widget.dart';
 import '../widgets/widget_barre_app_personnalisee.dart';
 import '../widgets/widget_carte.dart';
 import '../widgets/widget_collection.dart';
 import '../services/navigation_service.dart';
+import '../utils/associations_utils.dart';
 
 // UI Design: Page d'accueil UqarLive avec AppBar, sections échange de livres/assos/cantine et navbar
 class AccueilEcran extends StatefulWidget {
@@ -22,21 +29,28 @@ class AccueilEcran extends StatefulWidget {
 }
 
 class _AccueilEcranState extends State<AccueilEcran> {
-  // Repository pour accéder aux données des livres
+  // Repositories
   late final LivresRepository _livresRepository;
+  late final AssociationsRepository _associationsRepository;
+  
+  // États des données
   List<Livre> _livresRecents = [];
+  List<Association> _associationsPopulaires = [];
   bool _chargementLivres = false;
+  bool _chargementAssociations = false;
 
   @override
   void initState() {
     super.initState();
-    _initialiserRepository();
+    _initialiserRepositories();
     _chargerLivresRecents();
+    _chargerAssociationsPopulaires();
   }
 
-  void _initialiserRepository() {
+  void _initialiserRepositories() {
     final datasourceLocal = LivresDatasourceLocal();
     _livresRepository = LivresRepositoryImpl(datasourceLocal);
+    _associationsRepository = AssociationsRepositoryImpl(AssociationsDatasourceLocal());
   }
 
   Future<void> _chargerLivresRecents() async {
@@ -45,16 +59,35 @@ class _AccueilEcranState extends State<AccueilEcran> {
     });
 
     try {
-      final livres = await _livresRepository.obtenirLivresDisponibles();
+      final livres = await _livresRepository.obtenirTousLesLivres();
       setState(() {
         _livresRecents = livres.take(5).toList(); // Prendre les 5 premiers
         _chargementLivres = false;
       });
     } catch (e) {
-      print('❌ Erreur lors du chargement des livres récents: $e');
       setState(() {
         _chargementLivres = false;
       });
+      print('Erreur lors du chargement des livres: $e');
+    }
+  }
+
+  Future<void> _chargerAssociationsPopulaires() async {
+    setState(() {
+      _chargementAssociations = true;
+    });
+
+    try {
+      final associations = await _associationsRepository.obtenirAssociationsPopulaires(limite: 4);
+      setState(() {
+        _associationsPopulaires = associations;
+        _chargementAssociations = false;
+      });
+    } catch (e) {
+      setState(() {
+        _chargementAssociations = false;
+      });
+      print('Erreur lors du chargement des associations: $e');
     }
   }
 
@@ -66,43 +99,43 @@ class _AccueilEcranState extends State<AccueilEcran> {
         titre: 'Bienvenue',
         sousTitre: 'Marie Dubois', // TODO: Récupérer le nom de l'utilisateur connecté
         widgetFin: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          decoration: BoxDecoration(
-            color: CouleursApp.blanc.withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.ac_unit,
-                color: CouleursApp.blanc,
-                size: 20,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: CouleursApp.blanc.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(20),
               ),
-              const SizedBox(width: 8),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    '-5°C',
-                    style: TextStyle(
-                      color: CouleursApp.blanc,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Icon(
+                    Icons.ac_unit,
+                    color: CouleursApp.blanc,
+                    size: 20,
                   ),
-                  Text(
-                    'Rimouski',
-                    style: TextStyle(
-                      color: CouleursApp.blanc.withValues(alpha: 0.8),
-                      fontSize: 12,
-                    ),
+                  const SizedBox(width: 8),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        '-5°C',
+                        style: TextStyle(
+                          color: CouleursApp.blanc,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        'Rimouski',
+                        style: TextStyle(
+                          color: CouleursApp.blanc.withValues(alpha: 0.8),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
-        ),
+            ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -160,11 +193,7 @@ class _AccueilEcranState extends State<AccueilEcran> {
             ),
             GestureDetector(
               onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const MarketplaceEcran(),
-                  ),
-                );
+                NavigationService.gererNavigationNavBar(context, 1); // Index 1 = Livres/Marketplace
               },
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -173,8 +202,8 @@ class _AccueilEcranState extends State<AccueilEcran> {
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: CouleursApp.accent.withValues(alpha: 0.3)),
                 ),
-                child: Text(
-                  'Voir tout',
+              child: Text(
+                'Voir tout',
                   style: TextStyle(
                     color: CouleursApp.accent,
                     fontWeight: FontWeight.w500,
@@ -197,6 +226,13 @@ class _AccueilEcranState extends State<AccueilEcran> {
               modeListe: true,
               largeur: 160, // UI Design: Légèrement plus large pour plus de lisibilité
               hauteur: 190, // UI Design: Augmente de 180 à 190 pour plus d'espace et éviter l'overflow
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => DetailsLivreEcran(livre: livre),
+                  ),
+                );
+              },
             );
           },
           messageEtatVide: 'Aucun livre récent disponible',
@@ -209,14 +245,6 @@ class _AccueilEcranState extends State<AccueilEcran> {
 
   // UI Design: Section associations avec WidgetCollection
   Widget _construireSectionAssociations() {
-    // Données mock des associations
-    final associations = [
-      {'nom': 'AÉUQAR', 'description': 'Association étudiante', 'icone': Icons.groups},
-      {'nom': 'Radio UQAR', 'description': 'Radio étudiante', 'icone': Icons.radio},
-      {'nom': 'Sport UQAR', 'description': 'Sports étudiants', 'icone': Icons.sports_soccer},
-      {'nom': 'Culture UQAR', 'description': 'Activités culturelles', 'icone': Icons.palette},
-    ];
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -233,21 +261,32 @@ class _AccueilEcranState extends State<AccueilEcran> {
           ),
         ),
         const SizedBox(height: 16),
-        WidgetCollection<Map<String, dynamic>>.listeHorizontale(
-          elements: associations,
+        WidgetCollection<Association>.listeHorizontale(
+          elements: _associationsPopulaires,
+          enChargement: _chargementAssociations,
           hauteur: 130, // UI Design: Augmente légèrement la hauteur de 120 à 130 pour éviter l'overflow
           espacementHorizontal: 12, // UI Design: Espacement entre les cartes
           constructeurElement: (context, association, index) {
             return WidgetCarte.association(
-              nom: association['nom'],
-              description: association['description'],
-              icone: association['icone'],
-              couleurIcone: CouleursApp.principal,
+              nom: association.nom,
+              description: association.description,
+              icone: AssociationsUtils.obtenirIconeType(association.typeAssociation),
+              couleurIcone: AssociationsUtils.obtenirCouleurType(association.typeAssociation),
               largeur: 140, // UI Design: Réduit légèrement la largeur de 150 à 140
               hauteur: 115, // UI Design: Réduit la hauteur de 120 à 115 pour plus de marge
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DetailsAssociationEcran(association: association),
+                  ),
+                );
+              },
             );
           },
           padding: const EdgeInsets.symmetric(horizontal: 16), // UI Design: Padding pour éviter les débordements
+          messageEtatVide: 'Aucune association disponible',
+          iconeEtatVide: Icons.groups_outlined,
         ),
       ],
     );
@@ -257,10 +296,10 @@ class _AccueilEcranState extends State<AccueilEcran> {
   Widget _construireSectionCantine() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
+          children: [
+            Text(
           'Cantine UQAR',
-          style: StylesTexteApp.titre.copyWith(fontSize: 22),
+              style: StylesTexteApp.titre.copyWith(fontSize: 22),
         ),
         const SizedBox(height: 4),
         Text(
@@ -273,37 +312,33 @@ class _AccueilEcranState extends State<AccueilEcran> {
         const SizedBox(height: 16),
         GestureDetector(
           onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => const CantineEcran(),
-              ),
-            );
+            NavigationService.gererNavigationNavBar(context, 0); // Index 0 = Cantine
           },
           child: Container(
             padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
+      decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [CouleursApp.accent, CouleursApp.accent.withValues(alpha: 0.8)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
                   color: CouleursApp.accent.withValues(alpha: 0.3),
                   blurRadius: 12,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
             child: Row(
-              children: [
+        children: [
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
                           Icon(
                             Icons.restaurant_menu,
                             color: CouleursApp.blanc,
@@ -343,27 +378,27 @@ class _AccueilEcranState extends State<AccueilEcran> {
                                 color: CouleursApp.blanc,
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
+                        ),
+                      ),
+                    ),
                           const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
                               color: Colors.green.withValues(alpha: 0.8),
                               borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              'VÉG',
-                              style: TextStyle(
-                                color: CouleursApp.blanc,
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
                       ),
+                      child: Text(
+                              'VÉG',
+                        style: TextStyle(
+                                color: CouleursApp.blanc,
+                          fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
                     ],
                   ),
                 ),
@@ -378,35 +413,5 @@ class _AccueilEcranState extends State<AccueilEcran> {
         ),
       ],
     );
-  }
-
-  void _naviguerVers(String destination) {
-    switch (destination) {
-      case 'marketplace':
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => const MarketplaceEcran()),
-        );
-        break;
-      case 'livres':
-        // TODO: Implémenter la navigation vers la section échange de livres
-        print('Navigation vers: $destination');
-        break;
-      case 'cantine':
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => const CantineEcran()),
-        );
-        break;
-      case 'associations':
-        // TODO: Implémenter la navigation vers la section associations
-        print('Navigation vers: $destination');
-        break;
-      case 'profil':
-        // TODO: Implémenter la navigation vers le profil
-        print('Navigation vers: $destination');
-        break;
-      default:
-        // TODO: Implémenter la navigation vers les autres sections
-        print('Navigation vers: $destination');
-    }
   }
 } 

@@ -11,6 +11,7 @@ import '../services/navigation_service.dart';
 import '../widgets/widget_barre_app_personnalisee.dart';
 import '../widgets/widget_collection.dart';
 import '../widgets/widget_carte.dart';
+import '../widgets/widget_section_statistiques.dart';
 
 // UI Design: Écran marketplace avec widgets ultra-minimalistes
 class MarketplaceEcran extends StatefulWidget {
@@ -278,88 +279,27 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
     );
   }
 
-  // UI Design: Statistiques spécialisées pour l'échange de livres avec Container natif
+  // UI Design: Statistiques spécialisées pour l'échange de livres - NOUVEAU WIDGET RÉUTILISABLE
   Widget _construireStatistiquesEchangeLivres() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            CouleursApp.accent.withValues(alpha: 0.1),
-            CouleursApp.principal.withValues(alpha: 0.1),
-          ],
+    return WidgetSectionStatistiques.marketplace(
+      statistiques: [
+        ElementStatistique(
+          valeur: '127',
+          label: 'Livres\ndisponibles',
+          icone: Icons.menu_book,
+          couleurIcone: CouleursApp.principal,
         ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: CouleursApp.accent.withValues(alpha: 0.3),
+        ElementStatistique(
+          valeur: '68',
+          label: 'Échanges\nce mois',
+          icone: Icons.swap_horiz,
+          couleurIcone: CouleursApp.principal,
         ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _construireElementStatistique(
-            icone: Icons.menu_book,
-            valeur: '127',
-            label: 'Livres\ndisponibles',
-          ),
-          Container(
-            height: 40,
-            width: 1,
-            color: CouleursApp.principal.withValues(alpha: 0.3),
-          ),
-          _construireElementStatistique(
-            icone: Icons.swap_horiz,
-            valeur: '68',
-            label: 'Échanges\nce mois',
-          ),
-          Container(
-            height: 40,
-            width: 1,
-            color: CouleursApp.principal.withValues(alpha: 0.3),
-          ),
-          _construireElementStatistique(
-            icone: Icons.school,
-            valeur: '45',
-            label: 'Étudiants\nactifs',
-          ),
-        ],
-      ),
-    );
-  }
-
-  // UI Design: Élément de statistique natif
-  Widget _construireElementStatistique({
-    required IconData icone,
-    required String valeur,
-    required String label,
-  }) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(
-          icone,
-          color: CouleursApp.principal,
-          size: 24,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          valeur,
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: CouleursApp.principal,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 12,
-            color: CouleursApp.texteFonce.withValues(alpha: 0.7),
-          ),
+        ElementStatistique(
+          valeur: '45',
+          label: 'Étudiants\nactifs',
+          icone: Icons.school,
+          couleurIcone: CouleursApp.principal,
         ),
       ],
     );

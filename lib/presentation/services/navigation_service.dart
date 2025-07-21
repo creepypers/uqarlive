@@ -3,6 +3,9 @@ import '../../core/theme/app_theme.dart';
 import '../screens/accueil_ecran.dart';
 import '../screens/marketplace_ecran.dart';
 import '../screens/cantine_ecran.dart';
+import '../screens/associations_ecran.dart';
+import '../screens/profil_ecran.dart';
+import '../screens/salles_ecran.dart';
 
 // UI Design: Service de navigation centralisé pour éviter la duplication
 class NavigationService {
@@ -20,10 +23,10 @@ class NavigationService {
         _naviguerVersAccueil(context);
         break;
       case 3: // Associations
-        _naviguerVersAssociations(context);
+        _naviguerVers(context, const AssociationsEcran());
         break;
-      case 4: // Profil
-        _naviguerVersProfil(context);
+      case 4: // Salles
+        _naviguerVers(context, const SallesEcran());
         break;
     }
   }
@@ -56,34 +59,14 @@ class NavigationService {
     );
   }
 
-  /// Navigation vers les associations (à implémenter)
+  /// Navigation vers les associations
   static void _naviguerVersAssociations(BuildContext context) {
-    // TODO: Implémenter la page associations
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Page Associations - À venir'),
-        backgroundColor: CouleursApp.accent,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-    );
+    _naviguerVers(context, const AssociationsEcran());
   }
 
-  /// Navigation vers le profil (à implémenter)
+  /// Navigation vers le profil
   static void _naviguerVersProfil(BuildContext context) {
-    // TODO: Implémenter la page profil
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Page Profil - À venir'),
-        backgroundColor: CouleursApp.accent,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-    );
+    _naviguerVers(context, const ProfilEcran());
   }
 
   /// Obtenir l'index de la NavBar selon la page courante
@@ -98,7 +81,10 @@ class NavigationService {
         return 1;
       case 'AccueilEcran':
         return 2;
-      // Pour les pages associations et profil quand elles existeront
+      case 'AssociationsEcran':
+        return 3;
+      case 'SallesEcran':
+        return 4;
       default:
         return 2; // Par défaut, accueil
     }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
+import '../screens/profil_ecran.dart';
 
 // UI Design: Barre d'application personnalisée réutilisable avec design UQAR
 class WidgetBarreAppPersonnalisee extends StatelessWidget implements PreferredSizeWidget {
@@ -9,6 +10,7 @@ class WidgetBarreAppPersonnalisee extends StatelessWidget implements PreferredSi
   final VoidCallback? onTapFin;
   final IconData? iconeFin;
   final double hauteurBarre;
+  final bool afficherProfil;
 
   const WidgetBarreAppPersonnalisee({
     super.key,
@@ -18,6 +20,7 @@ class WidgetBarreAppPersonnalisee extends StatelessWidget implements PreferredSi
     this.onTapFin,
     this.iconeFin = Icons.search,
     this.hauteurBarre = 80,
+    this.afficherProfil = true,
   });
 
   @override
@@ -33,6 +36,25 @@ class WidgetBarreAppPersonnalisee extends StatelessWidget implements PreferredSi
           bottomRight: Radius.circular(25),
         ),
       ),
+      // UI Design: Bouton profil placé le plus à gauche possible
+      leading: afficherProfil ? Padding(
+        padding: const EdgeInsets.only(left: 16.0, top: 8.0, bottom: 8.0),
+        child: GestureDetector(
+          onTap: () => _ouvrirProfil(context),
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: CouleursApp.blanc.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Icon(
+              Icons.person,
+              color: CouleursApp.blanc,
+              size: 24,
+            ),
+          ),
+        ),
+      ) : null,
       title: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: Row(
@@ -63,25 +85,31 @@ class WidgetBarreAppPersonnalisee extends StatelessWidget implements PreferredSi
                 ],
               ),
             ),
-            // Widget ou bouton de fin
-            if (widgetFin != null)
-              widgetFin!
-            else if (onTapFin != null)
-              GestureDetector(
-                onTap: onTapFin,
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: CouleursApp.blanc.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(20),
+            // Section boutons droite
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Widget ou bouton de fin
+                if (widgetFin != null)
+                  widgetFin!
+                else if (onTapFin != null)
+                  GestureDetector(
+                    onTap: onTapFin,
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: CouleursApp.blanc.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Icon(
+                        iconeFin,
+                        color: CouleursApp.blanc,
+                        size: 24,
+                      ),
+                    ),
                   ),
-                  child: Icon(
-                    iconeFin,
-                    color: CouleursApp.blanc,
-                    size: 24,
-                  ),
-                ),
-              ),
+              ],
+            ),
           ],
         ),
       ),
@@ -90,4 +118,12 @@ class WidgetBarreAppPersonnalisee extends StatelessWidget implements PreferredSi
 
   @override
   Size get preferredSize => Size.fromHeight(hauteurBarre);
+
+  // Navigation vers le profil
+  void _ouvrirProfil(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ProfilEcran()),
+    );
+  }
 } 

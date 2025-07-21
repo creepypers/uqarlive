@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+
 import '../../core/theme/app_theme.dart';
 import '../../domain/entities/livre.dart';
 import '../../domain/entities/menu.dart';
-import '../screens/details_livre_ecran.dart';
 
 // UI Design: Widget Carte unifié avec système de badges intégré
 class WidgetCarte extends StatelessWidget {
@@ -19,6 +19,7 @@ class WidgetCarte extends StatelessWidget {
   final double? hauteur;
   final bool modeListe;
   final double? tailleIcone;
+  final bool modeHorizontal;
 
   const WidgetCarte({
     super.key,
@@ -35,6 +36,7 @@ class WidgetCarte extends StatelessWidget {
     this.hauteur,
     this.modeListe = false,
     this.tailleIcone,
+    this.modeHorizontal = false,
   });
 
   // Factory constructor pour les livres
@@ -69,6 +71,7 @@ class WidgetCarte extends StatelessWidget {
       hauteur: hauteur ?? (modeListe ? 185 : null),
       modeListe: modeListe,
       tailleIcone: modeListe ? 40 : 50,
+      modeHorizontal: false,
     );
   }
 
@@ -87,13 +90,15 @@ class WidgetCarte extends StatelessWidget {
         tailleFonte: 10,
       ),
     ];
-    
+
     if (menu.estVegetarien) {
-      badges.add(WidgetBadge(
-        texte: 'VÉG',
-        couleurFond: Colors.green.shade600,
-        tailleFonte: 8,
-      ));
+      badges.add(
+        WidgetBadge(
+          texte: 'VÉG',
+          couleurFond: Colors.green.shade600,
+          tailleFonte: 8,
+        ),
+      );
     }
 
     Color couleurCategorie = _obtenirCouleurCategorie(menu.categorie);
@@ -109,9 +114,14 @@ class WidgetCarte extends StatelessWidget {
       piedDePage: _construirePiedPageMenu(menu),
       onTap: onTap,
       largeur: largeur ?? (modeListe ? 180 : null),
-      hauteur: hauteur ?? (modeListe ? 185 : null), // UI Design: Hauteur par défaut cohérente avec les livres
+      hauteur:
+          hauteur ??
+          (modeListe
+              ? 185
+              : null), // UI Design: Hauteur par défaut cohérente avec les livres
       modeListe: modeListe,
       tailleIcone: modeListe ? 40 : 50,
+      modeHorizontal: false,
     );
   }
 
@@ -124,18 +134,22 @@ class WidgetCarte extends StatelessWidget {
     VoidCallback? onTap,
     double? largeur,
     double? hauteur,
+    bool modeHorizontal = false,
   }) {
     return WidgetCarte(
       titre: nom,
       sousTitre: description,
       icone: icone,
       couleurIcone: couleurIcone ?? CouleursApp.principal,
-      couleurFond: (couleurIcone ?? CouleursApp.principal).withValues(alpha: 0.1),
+      couleurFond: (couleurIcone ?? CouleursApp.principal).withValues(
+        alpha: 0.1,
+      ),
       onTap: onTap,
-      largeur: largeur ?? 140,
-      hauteur: hauteur ?? 115,
+      largeur: largeur ?? (modeHorizontal ? 280 : 140),
+      hauteur: hauteur ?? (modeHorizontal ? 80 : 115),
       modeListe: true,
-      tailleIcone: 22,
+      tailleIcone: modeHorizontal ? 28 : 22,
+      modeHorizontal: modeHorizontal,
     );
   }
 
@@ -150,12 +164,17 @@ class WidgetCarte extends StatelessWidget {
         decoration: BoxDecoration(
           color: CouleursApp.blanc,
           borderRadius: BorderRadius.circular(16),
-          border: modeListe && hauteur != null && hauteur! <= 115
-              ? Border.all(color: CouleursApp.principal.withValues(alpha: 0.2))
-              : null,
+          border:
+              modeListe && hauteur != null && hauteur! <= 115
+                  ? Border.all(
+                    color: CouleursApp.principal.withValues(alpha: 0.2),
+                  )
+                  : null,
           boxShadow: [
             BoxShadow(
-              color: CouleursApp.principal.withValues(alpha: modeListe ? 0.08 : 0.1),
+              color: CouleursApp.principal.withValues(
+                alpha: modeListe ? 0.08 : 0.1,
+              ),
               blurRadius: modeListe ? 8 : 12,
               offset: Offset(0, modeListe ? 2 : 4),
             ),
@@ -167,7 +186,58 @@ class WidgetCarte extends StatelessWidget {
   }
 
   Widget _construireContenu() {
-    // Pour les cartes d'associations (format carré)
+    // Pour les cartes d'associations en mode HORIZONTAL (rectangulaires)
+    if (modeListe && modeHorizontal) {
+      return Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: <Widget>[
+            // Icône à gauche
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: couleurFond,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icone, color: couleurIcone, size: tailleIcone),
+            ),
+            const SizedBox(width: 12),
+            // Informations à droite
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    titre,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: CouleursApp.texteFonce,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    sousTitre,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Pour les cartes d'associations en mode VERTICAL (format carré)
     if (modeListe && hauteur != null && hauteur! <= 115) {
       return Padding(
         padding: const EdgeInsets.all(12),
@@ -181,11 +251,7 @@ class WidgetCarte extends StatelessWidget {
                 color: couleurFond,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(
-                icone,
-                color: couleurIcone,
-                size: tailleIcone,
-              ),
+              child: Icon(icone, color: couleurIcone, size: tailleIcone),
             ),
             const SizedBox(height: 8),
             Flexible(
@@ -247,7 +313,7 @@ class WidgetCarte extends StatelessWidget {
                 ...badges.asMap().entries.map((entry) {
                   int index = entry.key;
                   WidgetBadge badge = entry.value;
-                  
+
                   return Positioned(
                     top: 8,
                     right: index == 0 ? 8 : null,
@@ -285,15 +351,13 @@ class WidgetCarte extends StatelessWidget {
                       color: CouleursApp.texteFonce.withValues(alpha: 0.6),
                       height: 1.1,
                     ),
+                    textAlign: TextAlign.center,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const Spacer(),
-                  if (piedDePage != null) 
-                    SizedBox(
-                      height: 16,
-                      child: piedDePage!,
-                    ),
+                  if (piedDePage != null)
+                    SizedBox(height: 16, child: piedDePage!),
                 ],
               ),
             ),
@@ -330,7 +394,7 @@ class WidgetCarte extends StatelessWidget {
                 ...badges.asMap().entries.map((entry) {
                   int index = entry.key;
                   WidgetBadge badge = entry.value;
-                  
+
                   return Positioned(
                     top: 8,
                     right: index == 0 ? 8 : null,
@@ -400,19 +464,27 @@ class WidgetCarte extends StatelessWidget {
   // Méthodes statiques pour construire les pieds de page
   static Widget _construirePiedPageLivre(Livre livre, bool modeListe) {
     return SizedBox(
-      height: modeListe ? 14 : 16, // UI Design: Hauteur contrôlée pour éviter l'overflow
+      height:
+          modeListe
+              ? 14
+              : 16, // UI Design: Hauteur contrôlée pour éviter l'overflow
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center, // UI Design: Centre verticalement
+        crossAxisAlignment:
+            CrossAxisAlignment.center, // UI Design: Centre verticalement
         children: [
           Flexible(
             child: Text(
               modeListe ? livre.matiere : livre.proprietaire,
               style: TextStyle(
-                fontSize: modeListe ? 9 : 9, // UI Design: Uniformise à 9 pour économiser l'espace
-                color: modeListe 
-                    ? CouleursApp.principal 
-                    : CouleursApp.texteFonce.withValues(alpha: 0.6),
+                fontSize:
+                    modeListe
+                        ? 9
+                        : 9, // UI Design: Uniformise à 9 pour économiser l'espace
+                color:
+                    modeListe
+                        ? CouleursApp.principal
+                        : CouleursApp.texteFonce.withValues(alpha: 0.6),
                 fontWeight: modeListe ? FontWeight.w500 : FontWeight.normal,
                 height: 1.0, // UI Design: Hauteur de ligne très compacte
               ),
@@ -420,11 +492,11 @@ class WidgetCarte extends StatelessWidget {
               maxLines: 1, // UI Design: Force 1 ligne
             ),
           ),
-          const SizedBox(width: 4), // UI Design: Espacement minimal entre les textes
+          const SizedBox(
+            width: 4,
+          ), // UI Design: Espacement minimal entre les textes
           Text(
-            modeListe 
-                ? livre.anneeEtude.split(' ')[0]
-                : livre.anneeEtude,
+            modeListe ? livre.anneeEtude.split(' ')[0] : livre.anneeEtude,
             style: TextStyle(
               fontSize: modeListe ? 8 : 8, // UI Design: Uniformise à 8
               color: CouleursApp.accent,
@@ -443,7 +515,8 @@ class WidgetCarte extends StatelessWidget {
     return SizedBox(
       height: 14, // UI Design: Hauteur contrôlée similaire aux livres
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center, // UI Design: Centre verticalement
+        crossAxisAlignment:
+            CrossAxisAlignment.center, // UI Design: Centre verticalement
         children: [
           Icon(
             Icons.restaurant_outlined,
@@ -586,7 +659,7 @@ class WidgetBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Color couleurFondFinale = couleurFond ?? _obtenirCouleurEtatLivre(texte);
-    
+
     return Container(
       padding: rembourrage,
       decoration: BoxDecoration(
@@ -619,4 +692,4 @@ class WidgetBadge extends StatelessWidget {
         return Colors.grey;
     }
   }
-} 
+}

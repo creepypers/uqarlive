@@ -78,8 +78,8 @@ class NavBarWidget extends StatelessWidget {
             label: 'Assos',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profil',
+            icon: Icon(Icons.meeting_room),
+            label: 'Salles',
           ),
         ],
       ),

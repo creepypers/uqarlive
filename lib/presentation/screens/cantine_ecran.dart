@@ -8,6 +8,7 @@ import '../widgets/navbar_widget.dart';
 import '../widgets/widget_barre_app_personnalisee.dart';
 import '../widgets/widget_carte.dart';
 import '../widgets/widget_collection.dart';
+import '../widgets/widget_section_statistiques.dart';
 import '../services/navigation_service.dart';
 
 // UI Design: Page cantine UQAR avec menus, horaires et design moderne
@@ -196,114 +197,35 @@ class _CantineEcranState extends State<CantineEcran> {
     );
   }
 
-  // UI Design: Section avec infos et horaires de la cantine
+  // UI Design: Section avec infos et horaires de la cantine - NOUVEAU WIDGET RÉUTILISABLE
   Widget _construireSectionInfos() {
-    return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            CouleursApp.accent.withValues(alpha: 0.1),
-            CouleursApp.principal.withValues(alpha: 0.1),
-          ],
+    return WidgetSectionStatistiques.cantine(
+      titre: 'Horaires & Infos',
+      iconeTitre: Icons.restaurant,
+      statistiques: [
+        ElementStatistique(
+          valeur: '11h30 - 14h00',
+          label: 'Ouverture',
+          icone: Icons.access_time,
+          couleurIcone: CouleursApp.accent,
         ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: CouleursApp.accent.withValues(alpha: 0.3),
-          width: 1,
+        ElementStatistique(
+          valeur: '150 places',
+          label: 'Places',
+          icone: Icons.people,
+          couleurIcone: CouleursApp.accent,
         ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.restaurant,
-                color: CouleursApp.principal,
-                size: 28,
-              ),
-              const SizedBox(width: 12),
-              Text(
-                'Horaires & Infos',
-                style: StylesTexteApp.titre.copyWith(fontSize: 18),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _construireInfoItem(
-                  icone: Icons.access_time,
-                  titre: 'Ouverture',
-                  valeur: '11h30 - 14h00',
-                ),
-              ),
-              Expanded(
-                child: _construireInfoItem(
-                  icone: Icons.people,
-                  titre: 'Places',
-                  valeur: '150 places',
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _construireInfoItem(
-                  icone: Icons.payment,
-                  titre: 'Paiement',
-                  valeur: 'Carte & Espèces',
-                ),
-              ),
-              Expanded(
-                child: _construireInfoItem(
-                  icone: Icons.wifi,
-                  titre: 'WiFi',
-                  valeur: 'Gratuit',
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _construireInfoItem({
-    required IconData icone,
-    required String titre,
-    required String valeur,
-  }) {
-    return Row(
-      children: [
-        Icon(icone, color: CouleursApp.accent, size: 16),
-        const SizedBox(width: 8),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              titre,
-              style: TextStyle(
-                fontSize: 12,
-                color: CouleursApp.texteFonce.withValues(alpha: 0.6),
-              ),
-            ),
-            Text(
-              valeur,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: CouleursApp.texteFonce,
-              ),
-            ),
-          ],
+        ElementStatistique(
+          valeur: 'Carte & Espèces',
+          label: 'Paiement',
+          icone: Icons.payment,
+          couleurIcone: CouleursApp.accent,
+        ),
+        ElementStatistique(
+          valeur: 'Gratuit',
+          label: 'WiFi',
+          icone: Icons.wifi,
+          couleurIcone: CouleursApp.accent,
         ),
       ],
     );
