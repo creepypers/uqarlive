@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/di/service_locator.dart';
 import '../../domain/entities/livre.dart';
 import '../../domain/entities/association.dart';
 import '../../domain/repositories/livres_repository.dart';
 import '../../domain/repositories/associations_repository.dart';
-import '../../data/repositories/livres_repository_impl.dart';
-import '../../data/repositories/associations_repository_impl.dart';
-import '../../data/datasources/livres_datasource_local.dart';
-import '../../data/datasources/associations_datasource_local.dart';
 import 'marketplace_ecran.dart';
 import 'details_livre_ecran.dart';
 import 'cantine_ecran.dart';
@@ -22,7 +19,7 @@ import '../utils/associations_utils.dart';
 
 // UI Design: Page d'accueil UqarLive avec AppBar, sections échange de livres/assos/cantine et navbar
 class AccueilEcran extends StatefulWidget {
-  const AccueilEcran({Key? key}) : super(key: key);
+  const AccueilEcran({super.key});
 
   @override
   State<AccueilEcran> createState() => _AccueilEcranState();
@@ -48,9 +45,9 @@ class _AccueilEcranState extends State<AccueilEcran> {
   }
 
   void _initialiserRepositories() {
-    final datasourceLocal = LivresDatasourceLocal();
-    _livresRepository = LivresRepositoryImpl(datasourceLocal);
-    _associationsRepository = AssociationsRepositoryImpl(AssociationsDatasourceLocal());
+    // UI Design: Injection de dépendances via ServiceLocator - Clean Architecture
+    _livresRepository = ServiceLocator.obtenirService<LivresRepository>();
+    _associationsRepository = ServiceLocator.obtenirService<AssociationsRepository>();
   }
 
   Future<void> _chargerLivresRecents() async {

@@ -15,7 +15,7 @@ import 'details_association_ecran.dart';
 
 // UI Design: Page associations étudiantes UQAR avec filtres et design moderne
 class AssociationsEcran extends StatefulWidget {
-  const AssociationsEcran({Key? key}) : super(key: key);
+  const AssociationsEcran({super.key});
 
   @override
   State<AssociationsEcran> createState() => _AssociationsEcranState();
@@ -156,6 +156,10 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
                 _construireSectionPopulaires(),
                 const SizedBox(height: 24),
               ],
+              
+              // Section actualités récentes
+              _construireSectionActualitesRecentes(),
+              const SizedBox(height: 24),
               
               // Filtres
               _construireFiltres(),
@@ -416,6 +420,219 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
     // UI Design: Filtrer après basculement pour rafraîchir la liste
     if (!_modeRecherche) {
       _filtrerAssociations();
+    }
+  }
+
+  // UI Design: Section actualités récentes de toutes les associations
+  Widget _construireSectionActualitesRecentes() {
+    final actualitesRecentes = _obtenirActualitesRecentes();
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            children: [
+              Icon(
+                Icons.newspaper,
+                color: CouleursApp.accent,
+                size: 24,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Actualités Récentes',
+                style: StylesTexteApp.titre.copyWith(fontSize: 18),
+              ),
+              const Spacer(),
+              TextButton(
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Toutes les actualités - À venir'),
+                      backgroundColor: CouleursApp.accent,
+                    ),
+                  );
+                },
+                child: Text(
+                  'Voir tout',
+                  style: TextStyle(color: CouleursApp.accent),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 180,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: actualitesRecentes.length,
+            itemBuilder: (context, index) {
+              final actualite = actualitesRecentes[index];
+              return Container(
+                width: 300,
+                margin: const EdgeInsets.only(right: 16),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: CouleursApp.blanc,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: CouleursApp.principal.withValues(alpha: 0.08),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // En-tête avec association et date
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: _obtenirCouleurAssociation(actualite['associationId']!).withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            actualite['association']!,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: _obtenirCouleurAssociation(actualite['associationId']!),
+                            ),
+                          ),
+                        ),
+                        const Spacer(),
+                        Text(
+                          actualite['date']!,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    
+                    // Titre
+                    Text(
+                      actualite['titre']!,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: CouleursApp.texteFonce,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 8),
+                    
+                    // Description
+                    Expanded(
+                      child: Text(
+                        actualite['description']!,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: CouleursApp.texteFonce.withValues(alpha: 0.8),
+                          height: 1.4,
+                        ),
+                        maxLines: 4,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    
+                    // Bouton voir plus
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                                                 onPressed: () {
+                           // Navigation vers l'association concernée
+                           try {
+                             final association = _toutesLesAssociations.firstWhere(
+                               (a) => a.id == actualite['associationId'],
+                             );
+                             _ouvrirDetailsAssociation(association);
+                           } catch (e) {
+                             // Association non trouvée, afficher un message
+                             ScaffoldMessenger.of(context).showSnackBar(
+                               SnackBar(
+                                 content: Text('Association non trouvée'),
+                                 backgroundColor: Colors.red,
+                               ),
+                             );
+                           }
+                         },
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                        ),
+                        child: Text(
+                          'Voir plus',
+                          style: TextStyle(
+                            color: _obtenirCouleurAssociation(actualite['associationId']!),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Obtenir les actualités récentes de toutes les associations
+  List<Map<String, String>> _obtenirActualitesRecentes() {
+    return [
+      {
+        'associationId': '1',
+        'association': 'AÉUQAR',
+        'date': '15 jan',
+        'titre': 'Nouvelle assurance dentaire étendue',
+        'description': 'Couverture dentaire améliorée pour tous les membres avec nouveaux avantages orthodontiques et remboursements élargis.'
+      },
+      {
+        'associationId': '2',
+        'association': 'Radio UQAR',
+        'date': '12 jan',
+        'titre': 'Nouveau studio d\'enregistrement',
+        'description': 'Équipement professionnel installé pour améliorer la qualité des émissions étudiantes et podcasts.'
+      },
+      {
+        'associationId': '3',
+        'association': 'Sport UQAR',
+        'date': '14 jan',
+        'titre': 'Tournoi inter-universitaire',
+        'description': 'Inscription ouverte pour le championnat provincial de volleyball en mars. Places limitées.'
+      },
+      {
+        'associationId': '4',
+        'association': 'Génie UQAR',
+        'date': '13 jan',
+        'titre': 'Génie Olympiques 2025',
+        'description': 'Compétition annuelle d\'ingénierie avec défis techniques et prix pour les meilleures équipes.'
+      },
+    ];
+  }
+
+  // Obtenir couleur selon ID association
+  Color _obtenirCouleurAssociation(String associationId) {
+    try {
+      final association = _toutesLesAssociations.firstWhere(
+        (a) => a.id == associationId,
+      );
+      return AssociationsUtils.obtenirCouleurType(association.typeAssociation);
+    } catch (e) {
+      return CouleursApp.principal;
     }
   }
 

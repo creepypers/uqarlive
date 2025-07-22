@@ -5,7 +5,7 @@ import 'accueil_ecran.dart';
 
 // UI Design: Écran de connexion avec design UQAR et fond dégradé violet/bleu
 class ConnexionEcran extends StatefulWidget {
-  const ConnexionEcran({Key? key}) : super(key: key);
+  const ConnexionEcran({super.key});
 
   @override
   State<ConnexionEcran> createState() => _ConnexionEcranState();
@@ -37,8 +37,68 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
   }
 
   void _gererMotDePasseOublie() {
-    // TODO: Implémenter la logique de mot de passe oublié
-    print('Mot de passe oublié');
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Mot de passe oublié'),
+        content: Text('Un email de réinitialisation sera envoyé à votre adresse.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Annuler'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Email de réinitialisation envoyé'),
+                  backgroundColor: Colors.green,
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: CouleursApp.accent),
+            child: Text('Envoyer', style: TextStyle(color: CouleursApp.blanc)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _gererDeconnexion() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Déconnexion'),
+        content: Text('Êtes-vous sûr de vouloir vous déconnecter ?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Annuler'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              // Retour à l'écran de connexion
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const ConnexionEcran()),
+                (route) => false,
+              );
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Déconnexion réussie'),
+                  backgroundColor: Colors.green,
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: Text('Se déconnecter', style: TextStyle(color: CouleursApp.blanc)),
+          ),
+        ],
+      ),
+    );
   }
 
   void _gererCreerCompte() {
@@ -87,84 +147,89 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
           
           // Contenu par-dessus le background
           SafeArea(
-            child: Column(
-              children: [
-                // Section supérieure avec logo et illustrations
-                Expanded(
-                  flex: 2,
-                  child: Stack(
-                    children: [
-                      // Logo et nom de l'application au centre
-                      Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            // Logo UqarLive
-                            _construireLogoUqarLive(),
-                            const SizedBox(height: 16),
-                            // Nom de l'application
-                            Text(
-                              'UqarLive',
-                              style: StylesTexteApp.titre.copyWith(
-                                fontSize: 40,
-                                color: CouleursApp.blanc,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      // Illustration de feuilles stylisées
-                      Positioned(
-                        top: 80,
-                        left: 20,
-                        child: _construireIllustrationFeuille(60, 40),
-                      ),
-                      Positioned(
-                        top: 120,
-                        right: 30,
-                        child: _construireIllustrationFeuille(80, 60),
-                      ),
-                      Positioned(
-                        bottom: 20,
-                        left: 40,
-                        child: _construireIllustrationFeuille(100, 80),
-                      ),
-                      Positioned(
-                        bottom: 60,
-                        right: 20,
-                        child: _construireIllustrationFeuille(120, 100),
-                      ),
-                    ],
-                  ),
+            child: SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height - 
+                            MediaQuery.of(context).padding.top - 
+                            MediaQuery.of(context).padding.bottom,
                 ),
-
-                // Section inférieure avec formulaire
-                Expanded(
-                  flex: 5,
-                  child: Container(
-                    width: double.infinity,
-                    margin: const EdgeInsets.only(top: 30),
-                    padding: const EdgeInsets.fromLTRB(32, 32, 32, 0),
-                    decoration: BoxDecoration(
-                      color: CouleursApp.blanc,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(50),
-                        topRight: Radius.circular(50),
+                child: Column(
+                  children: [
+                    // Section supérieure avec logo et illustrations
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.35,
+                      child: Stack(
+                        children: [
+                          // Logo et nom de l'application au centre
+                          Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                // Logo UqarLive
+                                _construireLogoUqarLive(),
+                                const SizedBox(height: 16),
+                                // Nom de l'application
+                                Text(
+                                  'UqarLive',
+                                  style: StylesTexteApp.titre.copyWith(
+                                    fontSize: 40,
+                                    color: CouleursApp.blanc,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          // Illustration de feuilles stylisées
+                          Positioned(
+                            top: 80,
+                            left: 20,
+                            child: _construireIllustrationFeuille(60, 40),
+                          ),
+                          Positioned(
+                            top: 120,
+                            right: 30,
+                            child: _construireIllustrationFeuille(80, 60),
+                          ),
+                          Positioned(
+                            bottom: 20,
+                            left: 40,
+                            child: _construireIllustrationFeuille(100, 80),
+                          ),
+                          Positioned(
+                            bottom: 60,
+                            right: 20,
+                            child: _construireIllustrationFeuille(120, 100),
+                          ),
+                        ],
                       ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: CouleursApp.principal.withValues(alpha: 0.1),
-                          blurRadius: 20,
-                          offset: Offset(0, -10),
-                        ),
-                      ],
                     ),
-                    child: SingleChildScrollView(
+
+                    // Section inférieure avec formulaire
+                    Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.only(top: 30),
+                      padding: const EdgeInsets.fromLTRB(32, 32, 32, 24),
+                      decoration: BoxDecoration(
+                        color: CouleursApp.blanc,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(50),
+                          topRight: Radius.circular(50),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: CouleursApp.principal.withValues(alpha: 0.1),
+                            blurRadius: 20,
+                            offset: const Offset(0, -10),
+                          ),
+                        ],
+                      ),
                       child: Form(
                         key: _cleFormulaire,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             // Titre "Connexion"
                             Text(
@@ -198,43 +263,29 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
                                 onPressed: _gererMotDePasseOublie,
                                 child: Text(
                                   'Mot de passe oublié?',
-                                  style: StylesTexteApp.lien,
+                                  style: TextStyle(
+                                    color: CouleursApp.accent,
+                                    fontSize: 14,
+                                  ),
                                 ),
                               ),
                             ),
                             const SizedBox(height: 32),
 
-                            // Bouton de connexion
-                            ElevatedButton(
-                              onPressed: _gererConnexion,
-                              style: DecorationsApp.boutonPrincipal,
-                              child: Text(
-                                'Se connecter',
-                                style: StylesTexteApp.bouton,
-                              ),
-                            ),
-                            const SizedBox(height: 24),
+                            // Bouton Connexion
+                            _construireBoutonConnexion(),
+                            const SizedBox(height: 32),
 
-                            // Lien "Créer un compte"
-                            Center(
-                              child: TextButton(
-                                onPressed: _gererCreerCompte,
-                                child: Text(
-                                  'Créer un compte',
-                                  style: StylesTexteApp.lien.copyWith(
-                                    color: CouleursApp.texteFonce,
-                                    decoration: TextDecoration.none,
-                                  ),
-                                ),
-                              ),
-                            ),
+                            // Lien vers inscription
+                            _construireLienInscription(),
+                            const SizedBox(height: 20),
                           ],
                         ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ],
@@ -336,4 +387,47 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
       ),
     );
   }
+
+  Widget _construireBoutonConnexion() {
+    return ElevatedButton(
+      onPressed: _gererConnexion,
+      style: DecorationsApp.boutonPrincipal,
+      child: Text(
+        'Se connecter',
+        style: StylesTexteApp.bouton,
+      ),
+    );
+  }
+
+  
+
+     Widget _construireLienInscription() {
+     return Center(
+       child: RichText(
+         text: TextSpan(
+           text: 'Pas encore de compte? ',
+           style: TextStyle(
+             color: CouleursApp.texteFonce.withValues(alpha: 0.7),
+             fontSize: 14,
+           ),
+           children: [
+             WidgetSpan(
+               child: GestureDetector(
+                 onTap: _gererCreerCompte,
+                 child: Text(
+                   'S\'inscrire',
+                   style: TextStyle(
+                     color: CouleursApp.accent,
+                     fontSize: 14,
+                     fontWeight: FontWeight.w600,
+                     decoration: TextDecoration.underline,
+                   ),
+                 ),
+               ),
+             ),
+           ],
+         ),
+       ),
+     );
+   }
 }

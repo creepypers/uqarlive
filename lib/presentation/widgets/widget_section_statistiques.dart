@@ -26,14 +26,14 @@ class WidgetSectionStatistiques extends StatelessWidget {
   final EdgeInsets? padding;
 
   const WidgetSectionStatistiques({
-    Key? key,
+    super.key,
     this.titre,
     this.iconeTitre,
     required this.statistiques,
     this.typeStyling = TypeSectionStatistiques.associationsStyle,
     this.margin,
     this.padding,
-  }) : super(key: key);
+  });
 
   // Factory constructor pour le style Associations (gradient bleu foncé)
   const WidgetSectionStatistiques.associations({

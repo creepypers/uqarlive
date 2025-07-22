@@ -323,7 +323,7 @@ class _WidgetEtatVide extends StatelessWidget {
     required this.titre,
     this.sousTitre,
     this.couleurIcone,
-    this.couleurTitre,
+    this.couleurTitre,  
   });
 
   @override

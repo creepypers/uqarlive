@@ -62,8 +62,8 @@ class WidgetCarte extends StatelessWidget {
       sousTitre: livre.auteur,
       texteSupplementaire: modeListe ? null : livre.matiere,
       icone: Icons.menu_book,
-      couleurIcone: CouleursApp.accent,
-      couleurFond: CouleursApp.accent.withValues(alpha: 0.1),
+      couleurIcone: CouleursApp.principal,
+      couleurFond: CouleursApp.principal.withValues(alpha: 0.07),
       badges: badges,
       piedDePage: _construirePiedPageLivre(livre, modeListe),
       onTap: onTap ?? () => _naviguerVersDetailsLivre(livre),
@@ -150,6 +150,49 @@ class WidgetCarte extends StatelessWidget {
       modeListe: true,
       tailleIcone: modeHorizontal ? 28 : 22,
       modeHorizontal: modeHorizontal,
+    );
+  }
+
+  // Factory constructor pour les salles de révision
+  factory WidgetCarte.salle({
+    required String nom,
+    required String description,
+    required String localisation,
+    required int capacite,
+    required double tarif,
+    required bool estDisponible,
+    required List<String> equipements,
+    VoidCallback? onTapDetails,
+    VoidCallback? onTapReserver,
+    String? heureLibre,
+    double? largeur,
+    double? hauteur,
+  }) {
+    List<WidgetBadge> badges = [
+      WidgetBadge(
+        texte: estDisponible ? 'Disponible' : 'Réservée',
+        couleurFond: estDisponible ? Colors.green : Colors.grey,
+        tailleFonte: 10,
+      ),
+    ];
+
+    return WidgetCarte(
+      titre: nom,
+      sousTitre: description,
+      texteSupplementaire: localisation,
+      icone: Icons.meeting_room,
+      couleurIcone: estDisponible ? CouleursApp.principal : Colors.grey,
+      couleurFond: estDisponible 
+          ? CouleursApp.principal.withValues(alpha: 0.1)
+          : Colors.grey.withValues(alpha: 0.1),
+      badges: badges,
+      piedDePage: _construirePiedPageSalle(capacite, equipements, heureLibre, onTapDetails, onTapReserver),
+      onTap: onTapDetails,
+      largeur: largeur,
+      hauteur: hauteur ?? 185, // UI Design: Réduit de 220 à 185 pour éviter overflow
+      modeListe: false,
+      tailleIcone: 45,
+      modeHorizontal: false,
     );
   }
 
@@ -320,7 +363,7 @@ class WidgetCarte extends StatelessWidget {
                     left: index == 1 ? 8 : null,
                     child: badge,
                   );
-                }).toList(),
+                }),
               ],
             ),
           ),
@@ -401,7 +444,7 @@ class WidgetCarte extends StatelessWidget {
                     left: index == 1 ? 8 : null,
                     child: badge,
                   );
-                }).toList(),
+                }),
               ],
             ),
           ),
@@ -463,48 +506,19 @@ class WidgetCarte extends StatelessWidget {
 
   // Méthodes statiques pour construire les pieds de page
   static Widget _construirePiedPageLivre(Livre livre, bool modeListe) {
+    if (livre.prix == null) return const SizedBox.shrink();
     return SizedBox(
-      height:
-          modeListe
-              ? 14
-              : 16, // UI Design: Hauteur contrôlée pour éviter l'overflow
+      height: 18,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment:
-            CrossAxisAlignment.center, // UI Design: Centre verticalement
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          Flexible(
-            child: Text(
-              modeListe ? livre.matiere : livre.proprietaire,
-              style: TextStyle(
-                fontSize:
-                    modeListe
-                        ? 9
-                        : 9, // UI Design: Uniformise à 9 pour économiser l'espace
-                color:
-                    modeListe
-                        ? CouleursApp.principal
-                        : CouleursApp.texteFonce.withValues(alpha: 0.6),
-                fontWeight: modeListe ? FontWeight.w500 : FontWeight.normal,
-                height: 1.0, // UI Design: Hauteur de ligne très compacte
-              ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1, // UI Design: Force 1 ligne
-            ),
-          ),
-          const SizedBox(
-            width: 4,
-          ), // UI Design: Espacement minimal entre les textes
           Text(
-            modeListe ? livre.anneeEtude.split(' ')[0] : livre.anneeEtude,
+            '${livre.prix!.toStringAsFixed(2).replaceAll('.', ',')} €',
             style: TextStyle(
-              fontSize: modeListe ? 8 : 8, // UI Design: Uniformise à 8
+              fontSize: 14,
               color: CouleursApp.accent,
-              fontWeight: FontWeight.w600,
-              height: 1.0, // UI Design: Hauteur de ligne très compacte
+              fontWeight: FontWeight.bold,
             ),
-            maxLines: 1, // UI Design: Force 1 ligne
-            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -556,6 +570,43 @@ class WidgetCarte extends StatelessWidget {
               maxLines: 1, // UI Design: Force 1 ligne
             ),
           ],
+        ],
+      ),
+    );
+  }
+
+  static Widget _construirePiedPageSalle(int capacite, List<String> equipements, String? heureLibre, VoidCallback? onTapDetails, VoidCallback? onTapReserver) {
+    return SizedBox(
+      height: 14, // UI Design: Hauteur contrôlée similaire aux autres cartes
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Capacité
+          Icon(Icons.people_outline, size: 11, color: CouleursApp.accent),
+          const SizedBox(width: 4),
+          Text(
+            '$capacite places',
+            style: TextStyle(
+              fontSize: 9,
+              color: CouleursApp.texteFonce.withValues(alpha: 0.7),
+              fontWeight: FontWeight.w500,
+              height: 1.0,
+            ),
+            maxLines: 1,
+          ),
+          const Spacer(),
+          // Indication équipements (juste le nombre)
+          if (equipements.isNotEmpty) 
+            Text(
+              '${equipements.length} équip.',
+              style: TextStyle(
+                fontSize: 8,
+                color: CouleursApp.principal,
+                fontWeight: FontWeight.w500,
+                height: 1.0,
+              ),
+              maxLines: 1,
+            ),
         ],
       ),
     );

@@ -148,6 +148,7 @@ class AssociationModel extends Association {
   }
 
   // Méthode copyWith pour AssociationModel
+  @override
   AssociationModel copyWith({
     String? id,
     String? nom,

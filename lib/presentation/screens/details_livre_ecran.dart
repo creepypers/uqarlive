@@ -7,9 +7,9 @@ class DetailsLivreEcran extends StatefulWidget {
   final Livre livre;
 
   const DetailsLivreEcran({
-    Key? key,
+    super.key,
     required this.livre,
-  }) : super(key: key);
+  });
 
   @override
   State<DetailsLivreEcran> createState() => _DetailsLivreEcranState();
@@ -41,11 +41,15 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
                     _construireDescription(),
                     const SizedBox(height: 24),
                   ],
-                  if (widget.livre.isbn != null) ...[
+                  if (widget.livre.edition != null) ...[
                     _construireInformationsTechniques(),
                     const SizedBox(height: 32),
                   ],
                   _construireBoutonEchange(),
+                  if (widget.livre.prix != null) ...[
+                    const SizedBox(height: 16),
+                    _construireBoutonAcheter(),
+                  ],
                   const SizedBox(height: 20),
                 ],
               ),
@@ -460,8 +464,6 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
             ],
           ),
           const SizedBox(height: 16),
-          if (widget.livre.isbn != null)
-            _construireLigneInfo('ISBN', widget.livre.isbn!),
           if (widget.livre.edition != null)
             _construireLigneInfo('Édition', widget.livre.edition!),
         ],
@@ -588,6 +590,46 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Message envoyé à ${widget.livre.proprietaire}'),
+        backgroundColor: CouleursApp.accent,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
+  }
+
+  Widget _construireBoutonAcheter() {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: () => _acheterLivre(),
+        icon: Icon(Icons.shopping_cart, size: 22),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: CouleursApp.accent,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          elevation: 4,
+        ),
+        label: Text(
+          'Acheter - ${widget.livre.prix?.toStringAsFixed(2) ?? ''} €',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _acheterLivre() {
+    // UI Design: Message de confirmation d'achat
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Achat de "${widget.livre.titre}" pour ${widget.livre.prix?.toStringAsFixed(2) ?? ''} € effectué !'),
         backgroundColor: CouleursApp.accent,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(

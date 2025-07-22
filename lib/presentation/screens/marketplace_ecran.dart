@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/di/service_locator.dart';
 import '../../domain/entities/livre.dart';
 import '../../domain/repositories/livres_repository.dart';
-import '../../data/repositories/livres_repository_impl.dart';
-import '../../data/datasources/livres_datasource_local.dart';
-import 'accueil_ecran.dart';
 import 'details_livre_ecran.dart';
 import '../widgets/navbar_widget.dart';
 import '../services/navigation_service.dart';
@@ -49,8 +47,8 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
   }
 
   void _initialiserRepository() {
-    final datasourceLocal = LivresDatasourceLocal();
-    _livresRepository = LivresRepositoryImpl(datasourceLocal);
+    // UI Design: Injection de dépendances via ServiceLocator - Clean Architecture
+    _livresRepository = ServiceLocator.obtenirService<LivresRepository>();
   }
 
   Future<void> _chargerLivres() async {

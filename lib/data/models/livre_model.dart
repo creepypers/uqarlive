@@ -11,13 +11,13 @@ class LivreModel extends Livre {
     required super.etatLivre,
     required super.proprietaire,
     super.description,
-    super.isbn,
     super.edition,
     super.coursAssocies,
     required super.dateAjout,
     super.estDisponible = true,
     super.imageUrl,
     super.motsClefs,
+    super.prix,
   });
 
   // Conversion depuis Map vers LivreModel
@@ -31,7 +31,6 @@ class LivreModel extends Livre {
       etatLivre: map['etatLivre'] ?? '',
       proprietaire: map['proprietaire'] ?? '',
       description: map['description'],
-      isbn: map['isbn'],
       edition: map['edition'],
       coursAssocies: map['coursAssocies'],
       dateAjout: map['dateAjout'] != null 
@@ -42,6 +41,7 @@ class LivreModel extends Livre {
       motsClefs: map['motsClefs'] != null 
           ? List<String>.from(map['motsClefs'])
           : null,
+      prix: map['prix'] != null ? (map['prix'] as num).toDouble() : null,
     );
   }
 
@@ -56,13 +56,13 @@ class LivreModel extends Livre {
       'etatLivre': etatLivre,
       'proprietaire': proprietaire,
       'description': description,
-      'isbn': isbn,
       'edition': edition,
       'coursAssocies': coursAssocies,
       'dateAjout': dateAjout.toIso8601String(),
       'estDisponible': estDisponible,
       'imageUrl': imageUrl,
       'motsClefs': motsClefs,
+      'prix': prix,
     };
   }
 
@@ -77,13 +77,13 @@ class LivreModel extends Livre {
       etatLivre: livre.etatLivre,
       proprietaire: livre.proprietaire,
       description: livre.description,
-      isbn: livre.isbn,
       edition: livre.edition,
       coursAssocies: livre.coursAssocies,
       dateAjout: livre.dateAjout,
       estDisponible: livre.estDisponible,
       imageUrl: livre.imageUrl,
       motsClefs: livre.motsClefs,
+      prix: livre.prix,
     );
   }
 
@@ -98,17 +98,18 @@ class LivreModel extends Livre {
       etatLivre: etatLivre,
       proprietaire: proprietaire,
       description: description,
-      isbn: isbn,
       edition: edition,
       coursAssocies: coursAssocies,
       dateAjout: dateAjout,
       estDisponible: estDisponible,
       imageUrl: imageUrl,
       motsClefs: motsClefs,
+      prix: prix,
     );
   }
 
   // Méthode copyWith pour LivreModel
+  @override
   LivreModel copyWith({
     String? id,
     String? titre,
@@ -118,13 +119,13 @@ class LivreModel extends Livre {
     String? etatLivre,
     String? proprietaire,
     String? description,
-    String? isbn,
     String? edition,
     String? coursAssocies,
     DateTime? dateAjout,
     bool? estDisponible,
     String? imageUrl,
     List<String>? motsClefs,
+    double? prix,
   }) {
     return LivreModel(
       id: id ?? this.id,
@@ -135,13 +136,13 @@ class LivreModel extends Livre {
       etatLivre: etatLivre ?? this.etatLivre,
       proprietaire: proprietaire ?? this.proprietaire,
       description: description ?? this.description,
-      isbn: isbn ?? this.isbn,
       edition: edition ?? this.edition,
       coursAssocies: coursAssocies ?? this.coursAssocies,
       dateAjout: dateAjout ?? this.dateAjout,
       estDisponible: estDisponible ?? this.estDisponible,
       imageUrl: imageUrl ?? this.imageUrl,
       motsClefs: motsClefs ?? this.motsClefs,
+      prix: prix ?? this.prix,
     );
   }
 } 

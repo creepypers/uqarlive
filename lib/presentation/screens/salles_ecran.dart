@@ -5,20 +5,20 @@ import '../widgets/widget_barre_app_personnalisee.dart';
 import '../widgets/widget_carte.dart';
 import '../widgets/widget_collection.dart';
 import '../services/navigation_service.dart';
-import '../../data/datasources/salles_datasource_local.dart';
-import '../../data/repositories/salles_repository_impl.dart';
+import '../../core/di/service_locator.dart';
+import '../../domain/repositories/salles_repository.dart';
 import '../../domain/entities/salle.dart';
 
 // UI Design: Page de gestion et réservation des salles de révision
 class SallesEcran extends StatefulWidget {
-  const SallesEcran({Key? key}) : super(key: key);
+  const SallesEcran({super.key});
 
   @override
   State<SallesEcran> createState() => _SallesEcranState();
 }
 
 class _SallesEcranState extends State<SallesEcran> {
-  late SallesRepositoryImpl _sallesRepository;
+  late SallesRepository _sallesRepository;
   List<Salle> _salles = [];
   List<Salle> _sallesFiltrees = [];
   bool _isLoading = true;
@@ -28,7 +28,8 @@ class _SallesEcranState extends State<SallesEcran> {
   @override
   void initState() {
     super.initState();
-    _sallesRepository = SallesRepositoryImpl(SallesDatasourceLocal());
+    // UI Design: Injection de dépendances via ServiceLocator - Clean Architecture
+    _sallesRepository = ServiceLocator.obtenirService<SallesRepository>();
     _chargerSalles();
   }
 
@@ -93,16 +94,27 @@ class _SallesEcranState extends State<SallesEcran> {
             _construireFiltresRapides(),
             const SizedBox(height: 16),
             
-            // Liste des salles avec gestion de l'état de chargement
+            // Liste des salles avec gestion de l'état de chargement - SCROLLABLE
             Expanded(
               child: WidgetCollection<Salle>.listeVerticale(
                 elements: _sallesFiltrees,
                 enChargement: _isLoading,
-                constructeurElement: (context, salle, index) => _construireCarteSalle(salle),
-                espacementVertical: 8, // Réduit pour les cartes compactes
+                constructeurElement: (context, salle, index) => WidgetCarte.salle(
+                  nom: salle.nom,
+                  description: salle.description,
+                  localisation: '${salle.batiment} • ${salle.etage}',
+                  capacite: salle.capaciteMax,
+                  tarif: salle.tarifParHeure,
+                  estDisponible: salle.estDisponible,
+                  equipements: salle.equipements,
+                  heureLibre: salle.estDisponible ? null : '14h30',
+                  onTapDetails: () => _voirDetailsSalle(salle),
+                  onTapReserver: () => _reserverSalle(salle),
+                ),
+                espacementVertical: 8,
                 messageEtatVide: 'Aucune salle trouvée\nEssayez de modifier vos filtres',
                 iconeEtatVide: Icons.meeting_room_outlined,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               ),
             ),
           ],
@@ -212,227 +224,17 @@ class _SallesEcranState extends State<SallesEcran> {
     );
   }
 
-  // UI Design: Carte de salle avec ancien design et créneaux horaires
-  Widget _construireCarteSalle(Salle salle) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: CouleursApp.blanc,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: CouleursApp.principal.withValues(alpha: 0.08),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // En-tête avec statut
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: salle.estDisponible ? CouleursApp.principal : Colors.grey,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
-              ),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.meeting_room,
-                  color: CouleursApp.blanc,
-                  size: 24,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        salle.nom,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: CouleursApp.blanc,
-                        ),
-                      ),
-                      Text(
-                        '${salle.batiment} • ${salle.etage}',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: CouleursApp.blanc.withValues(alpha: 0.9),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: CouleursApp.blanc.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    salle.estDisponible ? 'Disponible' : 'Réservée',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: CouleursApp.blanc,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          
-          // Contenu
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  salle.description,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: CouleursApp.texteFonce.withValues(alpha: 0.8),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                
-                // Informations
-                Row(
-                  children: [
-                    Icon(Icons.people, size: 16, color: CouleursApp.principal),
-                    const SizedBox(width: 4),
-                    Text('${salle.capaciteMax} places', style: TextStyle(fontSize: 12, color: CouleursApp.principal)),
-                    const SizedBox(width: 16),
-                    Icon(Icons.schedule, size: 16, color: CouleursApp.accent),
-                    const SizedBox(width: 4),
-                    Text('Gratuit', style: TextStyle(fontSize: 12, color: CouleursApp.accent, fontWeight: FontWeight.w600)),
-                  ],
-                ),
-                const SizedBox(height: 12),
-
-                // Créneaux horaires disponibles
-                if (salle.estDisponible) ...[
-                  Text(
-                    'Heures disponibles aujourd\'hui :',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: CouleursApp.texteFonce,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  _construireGrilleHeures(salle),
-                  const SizedBox(height: 12),
-                ],
-                
-                // Boutons
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => _voirDetailsSalle(salle),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: CouleursApp.principal,
-                          side: BorderSide(color: CouleursApp.principal),
-                        ),
-                        child: const Text('Détails'),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: salle.estDisponible ? () => _choisirCreneauEtReserver(salle) : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: salle.estDisponible ? CouleursApp.accent : Colors.grey,
-                          foregroundColor: CouleursApp.blanc,
-                        ),
-                        child: Text(salle.estDisponible ? 'Réserver' : 'Indisponible'),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // UI Design: Grille d'heures disponibles
-  Widget _construireGrilleHeures(Salle salle) {
-    final heuresDisponibles = _genererHeuresDisponibles();
-    
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 6, // 6 carrés par ligne
-        crossAxisSpacing: 4,
-        mainAxisSpacing: 4,
-        childAspectRatio: 1.2,
-      ),
-      itemCount: heuresDisponibles.length,
-      itemBuilder: (context, index) {
-        final heure = heuresDisponibles[index];
-        final estDisponible = heure['disponible'] as bool;
-        
-        return Container(
-          decoration: BoxDecoration(
-            color: estDisponible 
-              ? CouleursApp.principal.withValues(alpha: 0.1) 
-              : Colors.grey.withValues(alpha: 0.3),
-            borderRadius: BorderRadius.circular(6),
-            border: Border.all(
-              color: estDisponible 
-                ? CouleursApp.principal.withValues(alpha: 0.4)
-                : Colors.grey.withValues(alpha: 0.5),
-            ),
-          ),
-          child: Center(
-            child: Text(
-              heure['heure'] as String,
-              style: TextStyle(
-                fontSize: 9,
-                fontWeight: FontWeight.w600,
-                color: estDisponible 
-                  ? CouleursApp.principal 
-                  : Colors.grey,
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  // Générer la liste des heures disponibles
+  // UI Design: Génère les heures disponibles pour la réservation
   List<Map<String, dynamic>> _genererHeuresDisponibles() {
-    final now = DateTime.now();
-    final heureActuelle = now.hour;
-    List<Map<String, dynamic>> heures = [];
-    
-    // Heures de 8h à 19h (12 heures au total)
-    for (int heure = 8; heure < 20; heure++) {
-      heures.add({
+    return List.generate(12, (index) {
+      final heure = 8 + index; // 8h à 19h
+      return {
         'heure': '${heure}h',
         'valeur': heure,
-        'disponible': heure > heureActuelle, // Disponible si dans le futur
+        'disponible': heure != 12 && heure != 16, // 12h et 16h occupées
+      };
       });
     }
-    
-    return heures;
-  }
-
-
 
   // Actions
   void _ouvrirFiltres() {
@@ -593,15 +395,20 @@ class _SallesEcranState extends State<SallesEcran> {
   }
 
   // État pour les heures sélectionnées
-  Set<int> _heuresSelectionnees = <int>{};
+  final Set<int> _heuresSelectionnees = <int>{};
 
-  // UI Design: Modal de sélection des heures
+  // UI Design: Modal de sélection des heures - SCROLLABLE pour éviter overflow
   Widget _construireModalCreneaux(Salle salle) {
     final heuresDisponibles = _genererHeuresDisponibles();
     
     return StatefulBuilder(
       builder: (context, setState) {
         return Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.8,
+          ),
+          child: SingleChildScrollView(
+            child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -622,13 +429,6 @@ class _SallesEcranState extends State<SallesEcran> {
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                             color: CouleursApp.texteFonce,
-                          ),
-                        ),
-                        Text(
-                          '${salle.nom} • Gratuit',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: CouleursApp.texteFonce.withValues(alpha: 0.7),
                           ),
                         ),
                       ],
@@ -653,15 +453,15 @@ class _SallesEcranState extends State<SallesEcran> {
               ),
               const SizedBox(height: 12),
               
-              // Grille d'heures sélectionnables
+                  // Grille d'heures sélectionnables - OPTIMISÉE pour éviter overflow
               GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 4, // 4 carrés par ligne dans le modal
+                      crossAxisCount: 3, // 3 carrés par ligne pour plus d'espace
                   crossAxisSpacing: 8,
                   mainAxisSpacing: 8,
-                  childAspectRatio: 1.5,
+                      childAspectRatio: 1.8, // Plus large pour éviter l'overflow
                 ),
                 itemCount: heuresDisponibles.length,
                 itemBuilder: (context, index) {
@@ -749,7 +549,10 @@ class _SallesEcranState extends State<SallesEcran> {
                   ),
                 ),
               ),
+                  const SizedBox(height: 20), // Espace en bas pour le scroll
             ],
+              ),
+            ),
           ),
         );
       },
@@ -775,8 +578,6 @@ class _SallesEcranState extends State<SallesEcran> {
             Text('Salle : ${salle.nom}'),
             Text('Heures : $heuresTexte'),
             Text('Durée : ${heuresSelectionnees.length} heure${heuresSelectionnees.length > 1 ? 's' : ''}'),
-            Text('Prix : Gratuit', style: TextStyle(color: CouleursApp.accent, fontWeight: FontWeight.w600)),
-            const SizedBox(height: 8),
             Text(
               'Confirmer cette réservation ?',
               style: TextStyle(fontWeight: FontWeight.w600),

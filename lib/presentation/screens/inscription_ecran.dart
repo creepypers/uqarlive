@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
+import 'accueil_ecran.dart';
 
 // UI Design: Écran d'inscription avec design UQAR et fond dégradé bleu UQAR
 class InscriptionEcran extends StatefulWidget {
-  const InscriptionEcran({Key? key}) : super(key: key);
+  const InscriptionEcran({super.key});
 
   @override
   State<InscriptionEcran> createState() => _InscriptionEcranState();
@@ -46,11 +47,40 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
           SnackBar(
             content: Text('Les mots de passe ne correspondent pas'),
             backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           ),
         );
         return;
       }
-      // TODO: Implémenter la logique d'inscription
+
+      // UI Design: Connexion automatique après inscription réussie
+      // Navigation directe vers l'accueil avec message de bienvenue
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const AccueilEcran()),
+        (route) => false, // Supprime toutes les routes précédentes
+      );
+      
+      // Message de bienvenue après connexion automatique
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.white, size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text('Bienvenue ${_controleurPrenom.text} ${_controleurNom.text} ! Vous êtes maintenant connecté(e).'),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 4),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      );
+
+      // TODO: Implémenter la logique d'inscription réelle
       print(
         'Inscription avec: ${_controleurPrenom.text} ${_controleurNom.text}, Code: ${_controleurCodePermanent.text}, User: ${_controleurNomUtilisateur.text}, Email: ${_controleurEmail.text}',
       );
@@ -58,7 +88,39 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
   }
 
   void _retournerVersConnexion() {
-    Navigator.of(context).pop();
+    // Vérifier s'il y a des données saisies
+    bool aDonneesSaisies = _controleurPrenom.text.isNotEmpty ||
+        _controleurNom.text.isNotEmpty ||
+        _controleurCodePermanent.text.isNotEmpty ||
+        _controleurNomUtilisateur.text.isNotEmpty ||
+        _controleurEmail.text.isNotEmpty ||
+        _controleurMotDePasse.text.isNotEmpty;
+
+    if (aDonneesSaisies) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Quitter l\'inscription'),
+          content: Text('Vos données saisies seront perdues. Continuer ?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Annuler'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context); // Fermer le dialogue
+                Navigator.pop(context); // Retour à la connexion
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: CouleursApp.accent),
+              child: Text('Continuer', style: TextStyle(color: CouleursApp.blanc)),
+            ),
+          ],
+        ),
+      );
+    } else {
+      Navigator.pop(context);
+    }
   }
 
   void _pageSuivante() {
@@ -154,221 +216,225 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
             ],
           ),
           
-          // Contenu par-dessus le background
+          // Contenu par-dessus le background  
           SafeArea(
-            child: Column(
-              children: [
-                // Section supérieure avec logo et illustrations
-                Expanded(
-                  flex: 2,
-                  child: Stack(
-                    children: [
-                      // Logo et nom de l'application au centre
-                      Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            // Logo UqarLive
-                            _construireLogoUqarLive(),
-                            const SizedBox(height: 16),
-                            // Nom de l'application
-                            Text(
-                              'UqarLive',
-                              style: StylesTexteApp.titre.copyWith(
-                                fontSize: 32,
-                                color: CouleursApp.blanc,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            // Indicateur de page
-                            Row(
+            child: SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height - 
+                            MediaQuery.of(context).padding.top - 
+                            MediaQuery.of(context).padding.bottom,
+                ),
+                child: Column(
+                  children: [
+                    // Section supérieure avec logo et illustrations
+                    Container(
+                      height: MediaQuery.of(context).size.height * 0.35,
+                      child: Stack(
+                        children: [
+                          // Logo et nom de l'application au centre
+                          Center(
+                            child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Container(
-                                  width: 8,
-                                  height: 8,
-                                  decoration: BoxDecoration(
-                                    color:
-                                        _pageActuelle == 0
-                                            ? CouleursApp.blanc
-                                            : CouleursApp.blanc.withValues(
-                                              alpha: 0.5,
-                                            ),
-                                    shape: BoxShape.circle,
+                                // Logo UqarLive
+                                _construireLogoUqarLive(),
+                                const SizedBox(height: 16),
+                                // Nom de l'application
+                                Text(
+                                  'UqarLive',
+                                  style: StylesTexteApp.titre.copyWith(
+                                    fontSize: 32,
+                                    color: CouleursApp.blanc,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                const SizedBox(width: 8),
-                                Container(
-                                  width: 8,
-                                  height: 8,
-                                  decoration: BoxDecoration(
-                                    color:
-                                        _pageActuelle == 1
+                                const SizedBox(height: 8),
+                                // Indicateur de page
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      width: 8,
+                                      height: 8,
+                                      decoration: BoxDecoration(
+                                        color: _pageActuelle == 0
                                             ? CouleursApp.blanc
-                                            : CouleursApp.blanc.withValues(
-                                              alpha: 0.5,
-                                            ),
-                                    shape: BoxShape.circle,
-                                  ),
+                                            : CouleursApp.blanc.withValues(alpha: 0.5),
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Container(
+                                      width: 8,
+                                      height: 8,
+                                      decoration: BoxDecoration(
+                                        color: _pageActuelle == 1
+                                            ? CouleursApp.blanc
+                                            : CouleursApp.blanc.withValues(alpha: 0.5),
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                          ],
-                        ),
-                      ),
-                      // Illustration de feuilles stylisées
-                      Positioned(
-                        top: 40,
-                        left: 20,
-                        child: _construireIllustrationFeuille(50, 35),
-                      ),
-                      Positioned(
-                        top: 60,
-                        right: 30,
-                        child: _construireIllustrationFeuille(60, 45),
-                      ),
-                      Positioned(
-                        bottom: 20,
-                        left: 40,
-                        child: _construireIllustrationFeuille(70, 55),
-                      ),
-                      Positioned(
-                        bottom: 40,
-                        right: 20,
-                        child: _construireIllustrationFeuille(80, 65),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Section inférieure avec formulaire paginé superposé sur le dégradé
-                Expanded(
-                  flex: 5,
-                  child: Container(
-                    width: double.infinity,
-                    margin: const EdgeInsets.only(top: 30),
-                    padding: const EdgeInsets.all(32),
-                    decoration: BoxDecoration(
-                      color: CouleursApp.blanc,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(50),
-                        topRight: Radius.circular(50),
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: CouleursApp.principal.withValues(alpha: 0.1),
-                          blurRadius: 20,
-                          offset: Offset(0, -10),
-                        ),
-                      ],
-                    ),
-                    child: Form(
-                      key: _cleFormulaire,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          // Titre
-                          Text(
-                            'Inscription',
-                            style: StylesTexteApp.titre,
-                            textAlign: TextAlign.left,
                           ),
-                          const SizedBox(height: 32),
-
-                          // Contenu paginé
-                          Expanded(
-                            child: PageView(
-                              controller: _controleurPage,
-                              onPageChanged: (index) {
-                                setState(() {
-                                  _pageActuelle = index;
-                                });
-                              },
-                              children: [
-                                // Page 1: Informations personnelles
-                                _construirePage1(),
-                                // Page 2: Informations de compte
-                                _construirePage2(),
-                              ],
-                            ),
+                          // Illustration de feuilles stylisées
+                          Positioned(
+                            top: 40,
+                            left: 20,
+                            child: _construireIllustrationFeuille(50, 35),
                           ),
-
-                          const SizedBox(height: 24),
-
-                          // Boutons de navigation
-                          Row(
-                            children: [
-                              // Bouton Précédent
-                              if (_pageActuelle > 0)
-                                Expanded(
-                                  child: OutlinedButton(
-                                    onPressed: _pagePrecedente,
-                                    style: OutlinedButton.styleFrom(
-                                      side: BorderSide(
-                                        color: CouleursApp.principal,
-                                      ),
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 16,
-                                      ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(32),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      'Précédent',
-                                      style: StylesTexteApp.bouton.copyWith(
-                                        color: CouleursApp.principal,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-
-                              if (_pageActuelle > 0) const SizedBox(width: 16),
-
-                              // Bouton Suivant/S'inscrire
-                              Expanded(
-                                child: ElevatedButton(
-                                  onPressed:
-                                      _pageActuelle == 1
-                                          ? _gererInscription
-                                          : _pageSuivante,
-                                  style: DecorationsApp.boutonPrincipal,
-                                  child: FittedBox(
-                                    fit: BoxFit.scaleDown,
-                                    child: Text(
-                                      _pageActuelle == 1
-                                          ? 'S\'inscrire'
-                                          : 'Suivant',
-                                      style: StylesTexteApp.bouton,
-                                      maxLines: 1,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
+                          Positioned(
+                            top: 60,
+                            right: 30,
+                            child: _construireIllustrationFeuille(60, 45),
                           ),
-                          const SizedBox(height: 16),
-
-                          // Lien "Déjà un compte ?"
-                          Center(
-                            child: TextButton(
-                              onPressed: _retournerVersConnexion,
-                              child: Text(
-                                'Déjà un compte ? Se connecter',
-                                style: StylesTexteApp.lien.copyWith(
-                                  color: CouleursApp.texteFonce,
-                                  decoration: TextDecoration.none,
-                                ),
-                              ),
-                            ),
+                          Positioned(
+                            bottom: 20,
+                            left: 40,
+                            child: _construireIllustrationFeuille(70, 55),
+                          ),
+                          Positioned(
+                            bottom: 40,
+                            right: 20,
+                            child: _construireIllustrationFeuille(80, 65),
                           ),
                         ],
                       ),
                     ),
-                  ),
+
+                    // Section inférieure avec formulaire paginé superposé sur le dégradé
+                    Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.only(top: 20),
+                      padding: const EdgeInsets.all(32),
+                      decoration: BoxDecoration(
+                        color: CouleursApp.blanc,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(50),
+                          topRight: Radius.circular(50),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: CouleursApp.principal.withValues(alpha: 0.1),
+                            blurRadius: 20,
+                            offset: Offset(0, -10),
+                          ),
+                        ],
+                      ),
+                      child: Form(
+                        key: _cleFormulaire,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            // Titre
+                            Text(
+                              'Inscription',
+                              style: StylesTexteApp.titre,
+                              textAlign: TextAlign.left,
+                            ),
+                            const SizedBox(height: 24),
+
+                            // Contenu paginé - HAUTEUR FIXE pour éviter les conflits
+                            Container(
+                              height: 400, // Hauteur fixe pour le PageView
+                              child: PageView(
+                                controller: _controleurPage,
+                                onPageChanged: (index) {
+                                  setState(() {
+                                    _pageActuelle = index;
+                                  });
+                                },
+                                children: [
+                                  // Page 1: Informations personnelles
+                                  _construirePage1(),
+                                  // Page 2: Informations de compte
+                                  _construirePage2(),
+                                ],
+                              ),
+                            ),
+
+                            const SizedBox(height: 24),
+
+                            // Boutons de navigation
+                            Row(
+                              children: [
+                                // Bouton Précédent
+                                if (_pageActuelle > 0)
+                                  Expanded(
+                                    child: OutlinedButton(
+                                      onPressed: _pagePrecedente,
+                                      style: OutlinedButton.styleFrom(
+                                        side: BorderSide(color: CouleursApp.principal),
+                                        padding: const EdgeInsets.symmetric(vertical: 16),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(32),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        'Précédent',
+                                        style: StylesTexteApp.bouton.copyWith(
+                                          color: CouleursApp.principal,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+
+                                if (_pageActuelle > 0) const SizedBox(width: 16),
+
+                                // Bouton Suivant/S'inscrire
+                                Expanded(
+                                  child: ElevatedButton(
+                                    onPressed: _pageActuelle == 1 ? _gererInscription : _pageSuivante,
+                                    style: DecorationsApp.boutonPrincipal,
+                                    child: Text(
+                                      _pageActuelle == 1 ? 'S\'inscrire' : 'Suivant',
+                                      style: StylesTexteApp.bouton,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+
+                            // Lien "Déjà un compte ?" - STYLE COHÉRENT AVEC CONNEXION
+                            Center(
+                              child: RichText(
+                                text: TextSpan(
+                                  text: 'Déjà un compte? ',
+                                  style: TextStyle(
+                                    color: CouleursApp.texteFonce.withValues(alpha: 0.7),
+                                    fontSize: 14,
+                                  ),
+                                  children: [
+                                    WidgetSpan(
+                                      child: GestureDetector(
+                                        onTap: _retournerVersConnexion,
+                                        child: Text(
+                                          'Se connecter',
+                                          style: TextStyle(
+                                            color: CouleursApp.accent,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                            decoration: TextDecoration.underline,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ],

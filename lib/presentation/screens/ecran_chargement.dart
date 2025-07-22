@@ -4,7 +4,7 @@ import 'connexion_ecran.dart';
 
 // UI Design: Écran de chargement avec fond noir et logo UqarLive
 class EcranChargement extends StatefulWidget {
-  const EcranChargement({Key? key}) : super(key: key);
+  const EcranChargement({super.key});
 
   @override
   State<EcranChargement> createState() => _EcranChargementState();

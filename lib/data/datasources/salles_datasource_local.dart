@@ -3,7 +3,7 @@ import '../models/salle_model.dart';
 // Datasource locale pour les salles de révision
 class SallesDatasourceLocal {
   // Liste des 7 salles de révision
-  static List<SalleModel> _salles = [
+  static final List<SalleModel> _salles = [
     SalleModel(
       id: '1',
       nom: 'Salle de Révision A',

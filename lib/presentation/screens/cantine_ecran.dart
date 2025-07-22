@@ -10,10 +10,11 @@ import '../widgets/widget_carte.dart';
 import '../widgets/widget_collection.dart';
 import '../widgets/widget_section_statistiques.dart';
 import '../services/navigation_service.dart';
+import 'details_menu_ecran.dart';
 
 // UI Design: Page cantine UQAR avec menus, horaires et design moderne
 class CantineEcran extends StatefulWidget {
-  const CantineEcran({Key? key}) : super(key: key);
+  const CantineEcran({super.key});
 
   @override
   State<CantineEcran> createState() => _CantineEcranState();
@@ -263,6 +264,7 @@ class _CantineEcranState extends State<CantineEcran> {
               modeListe: true,
               largeur: 200,
               hauteur: 185,
+              onTap: () => _ouvrirDetailsMenu(menu), // Ajout navigation
             );
           },
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -357,11 +359,10 @@ class _CantineEcranState extends State<CantineEcran> {
   }
 
   void _ouvrirDetailsMenu(Menu menu) {
-    // TODO: Implémenter la page de détails du menu
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Détails de ${menu.nom}'),
-        backgroundColor: CouleursApp.principal,
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DetailsMenuEcran(menu: menu),
       ),
     );
   }
