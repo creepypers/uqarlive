@@ -6,12 +6,19 @@ import '../widgets/widget_section_statistiques.dart';
 import '../services/navigation_service.dart';
 import 'modifier_profil_ecran.dart';
 import 'gerer_livres_ecran.dart';
+import 'salles_ecran.dart';
 import 'connexion_ecran.dart';
 import 'marketplace_ecran.dart';
 
 // UI Design: Page profil utilisateur avec informations personnelles et statistiques - OPTIMISÉ avec widgets réutilisables
-class ProfilEcran extends StatelessWidget {
+class ProfilEcran extends StatefulWidget {
   const ProfilEcran({super.key});
+
+  @override
+  State<ProfilEcran> createState() => _ProfilEcranState();
+}
+
+class _ProfilEcranState extends State<ProfilEcran> {
 
   @override
   Widget build(BuildContext context) {
@@ -99,6 +106,12 @@ class ProfilEcran extends StatelessWidget {
               // Section mes livres - VERSION OPTIMISÉE
               _construireSectionLivres(context),
               const SizedBox(height: 24),
+              
+              // Section mes réservations - NOUVELLE
+              _construireSectionReservations(context),
+              const SizedBox(height: 24),
+              
+
               
               // Section mes associations - VERSION OPTIMISÉE
               _construireSectionAssociations(context),
@@ -231,25 +244,67 @@ class ProfilEcran extends StatelessWidget {
               _construireInfoLivre('5', 'Disponibles', CouleursApp.accent),
               _construireInfoLivre('2', 'En cours', Colors.orange),
               _construireInfoLivre('12', 'Terminés', Colors.green),
+              _construireInfoLivre('2', 'En vente', CouleursApp.principal),
             ],
           ),
-          const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton(
-                              onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const GererLivresEcran()),
+          const SizedBox(height: 20),
+          
+          // UI Design: Sous-section livres en vente intégrée
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: CouleursApp.principal.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: CouleursApp.principal.withOpacity(0.2)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.sell, color: CouleursApp.principal, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Mes Livres en Vente',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: CouleursApp.principal,
+                      ),
+                    ),
+                  ],
                 ),
-              style: OutlinedButton.styleFrom(
-                side: BorderSide(color: CouleursApp.accent),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-              child: Text(
-                'Gérer mes livres',
-                style: TextStyle(color: CouleursApp.accent, fontWeight: FontWeight.w600),
-              ),
+                const SizedBox(height: 12),
+                
+                // Liste des livres en vente (simulés)
+                _construireLivreEnVente('Calcul Différentiel', '12,50 €', 'En vente'),
+                const SizedBox(height: 8),
+                _construireLivreEnVente('Physique Générale', '18,00 €', 'Vendu'),
+                
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const GererLivresEcran()),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: CouleursApp.principal),
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    child: Text(
+                      'Ajouter un livre',
+                      style: TextStyle(
+                        color: CouleursApp.principal,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -270,6 +325,412 @@ class ProfilEcran extends StatelessWidget {
           style: TextStyle(fontSize: 12, color: CouleursApp.texteFonce.withValues(alpha: 0.6)),
         ),
       ],
+    );
+  }
+
+  // UI Design: Section mes réservations - NOUVELLE
+  Widget _construireSectionReservations(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: CouleursApp.blanc,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: CouleursApp.principal.withValues(alpha: 0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.event_seat, color: CouleursApp.accent, size: 24),
+              const SizedBox(width: 12),
+              Text('Mes Réservations', style: StylesTexteApp.titre.copyWith(fontSize: 18)),
+            ],
+          ),
+          const SizedBox(height: 16),
+          
+          // Liste des réservations (simulées)
+          _construireReservation('Salle 302A', 'Aujourd\'hui 14h-16h', 'Confirmée', Colors.green),
+          const SizedBox(height: 12),
+          _construireReservation('Salle 105B', 'Demain 10h-12h', 'En attente', Colors.orange),
+          
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton(
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SallesEcran()),
+              ),
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(color: CouleursApp.accent),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              child: Text(
+                'Réserver une salle',
+                style: TextStyle(
+                  color: CouleursApp.accent,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // UI Design: Helper pour une réservation
+  Widget _construireReservation(String salle, String creneau, String statut, Color couleurStatut) {
+    return Row(
+      children: [
+        Icon(Icons.meeting_room, color: CouleursApp.accent, size: 20),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                salle,
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: CouleursApp.texteFonce),
+              ),
+              Text(
+                creneau,
+                style: TextStyle(fontSize: 12, color: CouleursApp.texteFonce.withValues(alpha: 0.6)),
+              ),
+            ],
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: couleurStatut.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            statut,
+            style: TextStyle(
+              fontSize: 11,
+              color: couleurStatut,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+                 Builder(
+           builder: (context) => IconButton(
+             icon: Icon(Icons.more_vert, color: CouleursApp.texteFonce.withValues(alpha: 0.5), size: 18),
+             onPressed: () => _gererReservation(salle),
+           ),
+         ),
+      ],
+    );
+  }
+
+
+
+  // UI Design: Helper pour un livre en vente
+  Widget _construireLivreEnVente(String titre, String prix, String statut) {
+    return Row(
+      children: [
+        Icon(Icons.menu_book, color: CouleursApp.principal, size: 20),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                titre,
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: CouleursApp.texteFonce),
+              ),
+              Text(
+                prix,
+                style: TextStyle(fontSize: 12, color: CouleursApp.accent, fontWeight: FontWeight.w600),
+              ),
+            ],
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: statut == 'En vente' ? Colors.green.withOpacity(0.1) : Colors.grey.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            statut,
+            style: TextStyle(
+              fontSize: 11,
+              color: statut == 'En vente' ? Colors.green : Colors.grey,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        IconButton(
+          icon: Icon(Icons.more_vert, color: CouleursApp.texteFonce.withValues(alpha: 0.5), size: 18),
+                     onPressed: () => _gererLivreEnVente(titre),
+        ),
+      ],
+    );
+  }
+
+  // Actions pour les réservations
+  void _gererReservations(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Gérer mes réservations', style: StylesTexteApp.titre.copyWith(fontSize: 18)),
+            const SizedBox(height: 20),
+            ListTile(
+              leading: Icon(Icons.list, color: CouleursApp.accent),
+              title: const Text('Voir toutes mes réservations'),
+              onTap: () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Affichage de toutes les réservations - À venir')),
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.add, color: CouleursApp.principal),
+              title: const Text('Nouvelle réservation'),
+              onTap: () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Redirection vers les salles - À venir')),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _gererReservation(String salle) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Réservation - $salle', style: StylesTexteApp.titre.copyWith(fontSize: 18)),
+            const SizedBox(height: 20),
+            ListTile(
+              leading: Icon(Icons.edit, color: CouleursApp.accent),
+              title: const Text('Modifier la réservation'),
+              onTap: () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Modification de la réservation $salle'),
+                    backgroundColor: CouleursApp.accent,
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.cancel, color: Colors.red),
+              title: const Text('Annuler la réservation'),
+                             onTap: () {
+                 Navigator.pop(context);
+                 _confirmerAnnulationReservation(salle);
+               },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _confirmerAnnulationReservation(String salle) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Annuler la réservation'),
+        content: Text('Êtes-vous sûr de vouloir annuler votre réservation pour $salle ?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Non'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Réservation $salle annulée'),
+                  backgroundColor: Colors.red,
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: Text('Oui, annuler', style: TextStyle(color: CouleursApp.blanc)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Actions pour les livres en vente
+  void _gererLivresEnVente(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Gérer mes ventes', style: StylesTexteApp.titre.copyWith(fontSize: 18)),
+            const SizedBox(height: 20),
+            ListTile(
+              leading: Icon(Icons.list, color: CouleursApp.principal),
+              title: const Text('Voir tous mes livres en vente'),
+              onTap: () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Affichage de tous les livres en vente - À venir')),
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.add, color: CouleursApp.accent),
+              title: const Text('Mettre un livre en vente'),
+              onTap: () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Redirection vers mes livres - À venir')),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _gererLivreEnVente(String titre) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Livre - $titre', style: StylesTexteApp.titre.copyWith(fontSize: 18)),
+            const SizedBox(height: 20),
+            ListTile(
+              leading: Icon(Icons.edit, color: CouleursApp.accent),
+              title: const Text('Modifier le prix'),
+              onTap: () {
+                Navigator.pop(context);
+                _modifierPrixLivre(titre);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.remove_shopping_cart, color: Colors.orange),
+              title: const Text('Retirer de la vente'),
+              onTap: () {
+                Navigator.pop(context);
+                _retirerDeLaVente(titre);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _modifierPrixLivre(String titre) {
+    final prixController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Modifier le prix'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Livre: $titre'),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: prixController,
+              keyboardType: TextInputType.numberWithOptions(decimal: true),
+              decoration: InputDecoration(
+                labelText: 'Nouveau prix (€)',
+                hintText: 'Ex: 12.50',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Annuler'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Prix de "$titre" modifié à ${prixController.text} €'),
+                  backgroundColor: CouleursApp.accent,
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: CouleursApp.accent),
+            child: Text('Confirmer', style: TextStyle(color: CouleursApp.blanc)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _retirerDeLaVente(String titre) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Retirer de la vente'),
+        content: Text('Êtes-vous sûr de vouloir retirer "$titre" de la vente ?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Annuler'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('"$titre" retiré de la vente'),
+                  backgroundColor: Colors.orange,
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+            child: Text('Oui, retirer', style: TextStyle(color: CouleursApp.blanc)),
+          ),
+        ],
+      ),
     );
   }
 

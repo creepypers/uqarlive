@@ -1,5 +1,61 @@
 # 🎨 Journal de Design UI - UqarLive | SESSION COMPLÈTE
 
+## 🔄 17 Janvier 2025 - RÉORGANISATION SECTION LIVRES
+
+### ✅ **MODIFICATION 3**: Redirection vers gestion des réservations
+- **Bouton**: "Gérer mes réservations" → "Réserver une salle"
+- **Navigation**: `_gererReservations(context)` → `Navigator.push(SallesEcran())`
+- **Import ajouté**: `import 'salles_ecran.dart';`
+- **UX**: Action directe vers l'écran de réservation de salles
+
+### ✅ **MODIFICATION 2**: Redirection vers ajout de livres
+- **Bouton**: "Gérer mes ventes" → "Ajouter un livre"  
+- **Navigation**: `_gererLivresEnVente(context)` → `Navigator.push(GererLivresEcran())`
+- **UX**: Action directe et claire pour l'utilisateur
+
+### ✅ **MODIFICATION 1**: Intégration "Mes Livres en Vente" dans "Mes Livres"
+
+#### **AVANT**: Deux sections séparées
+- Section "Mes Livres" avec statistiques (5 Disponibles, 2 En cours, 12 Terminés)
+- Section "Mes Livres en Vente" séparée avec liste des livres
+
+#### **APRÈS**: Section unifiée
+```dart
+// Statistiques étendues avec "En vente"
+Row(
+  mainAxisAlignment: MainAxisAlignment.spaceAround,
+  children: [
+    _construireInfoLivre('5', 'Disponibles', CouleursApp.accent),
+    _construireInfoLivre('2', 'En cours', Colors.orange),
+    _construireInfoLivre('12', 'Terminés', Colors.green),
+    _construireInfoLivre('2', 'En vente', CouleursApp.principal), // NOUVEAU
+  ],
+),
+
+// Sous-section intégrée dans un container stylisé
+Container(
+  padding: EdgeInsets.all(16),
+  decoration: BoxDecoration(
+    color: CouleursApp.principal.withOpacity(0.05),
+    borderRadius: BorderRadius.circular(12),
+    border: Border.all(color: CouleursApp.principal.withOpacity(0.2)),
+  ),
+  // Contenu des livres en vente avec bouton "Gérer mes ventes"
+)
+```
+
+#### **🗑️ NETTOYAGE**
+- **Supprimé**: `_construireSectionLivresEnVente()` (méthode complète)
+- **Supprimé**: Appel séparé dans `build()`
+- **Conservé**: `_construireLivreEnVente()` helper (réutilisé)
+
+#### **🎨 DESIGN COHÉRENT**
+- Container avec fond teinté UQAR et bordure subtile
+- Icône et texte dans la couleur principale
+- Espacement optimisé et bouton plus compact
+
+---
+
 ## 🚀 17 Janvier 2025 - SESSION OPTIMISATION TOTALE
 
 ### 🎯 **OBJECTIF ACCOMPLI**: Application des règles utilisateur à 100%

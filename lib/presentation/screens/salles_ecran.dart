@@ -350,17 +350,24 @@ class _SallesEcranState extends State<SallesEcran> {
           // Bouton réserver
           SizedBox(
             width: double.infinity,
-                                  child: ElevatedButton(
-                        onPressed: salle.estDisponible 
-                          ? () {
-                              Navigator.pop(context);
-                              _choisirCreneauEtReserver(salle);
-                            }
-                          : null,
+            child: ElevatedButton(
+              onPressed: salle.estDisponible 
+                ? () {
+                    Navigator.pop(context);
+                    _choisirCreneauEtReserver(salle);
+                  }
+                : (salle.reserveePar == 'DUBM12345678') // Si c'est ma réservation
+                  ? () {
+                      Navigator.pop(context);
+                      _gererMaReservation(salle);
+                    }
+                  : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: salle.estDisponible 
                   ? CouleursApp.accent 
-                  : Colors.grey,
+                  : (salle.reserveePar == 'DUBM12345678')
+                    ? CouleursApp.principal // Ma réservation
+                    : Colors.grey,
                 foregroundColor: CouleursApp.blanc,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
@@ -370,7 +377,9 @@ class _SallesEcranState extends State<SallesEcran> {
               child: Text(
                 salle.estDisponible 
                   ? 'Réserver cette salle'
-                  : 'Salle indisponible',
+                  : (salle.reserveePar == 'DUBM12345678')
+                    ? 'Modifier ma réservation'
+                    : 'Salle indisponible',
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -398,7 +407,7 @@ class _SallesEcranState extends State<SallesEcran> {
   final Set<int> _heuresSelectionnees = <int>{};
 
   // UI Design: Modal de sélection des heures - SCROLLABLE pour éviter overflow
-  Widget _construireModalCreneaux(Salle salle) {
+  Widget _construireModalCreneaux(Salle salle, {bool estModification = false}) {
     final heuresDisponibles = _genererHeuresDisponibles();
     
     return StatefulBuilder(
@@ -424,7 +433,7 @@ class _SallesEcranState extends State<SallesEcran> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Sélectionner les heures',
+                          estModification ? 'Modifier les heures' : 'Sélectionner les heures',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -533,9 +542,9 @@ class _SallesEcranState extends State<SallesEcran> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _heuresSelectionnees.isNotEmpty 
-                    ? () => _confirmerReservationHeures(salle, _heuresSelectionnees.toList())
-                    : null,
+                                          onPressed: _heuresSelectionnees.isNotEmpty 
+                          ? () => _confirmerReservationHeures(salle, _heuresSelectionnees.toList(), estModification)
+                          : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: CouleursApp.accent,
                     foregroundColor: CouleursApp.blanc,
@@ -560,7 +569,7 @@ class _SallesEcranState extends State<SallesEcran> {
   }
 
   // Confirmer la réservation avec heures sélectionnées
-  void _confirmerReservationHeures(Salle salle, List<int> heuresSelectionnees) {
+  void _confirmerReservationHeures(Salle salle, List<int> heuresSelectionnees, [bool estModification = false]) {
     Navigator.pop(context);
     
     // Trier les heures
@@ -570,7 +579,7 @@ class _SallesEcranState extends State<SallesEcran> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Confirmer la réservation'),
+        title: Text(estModification ? 'Confirmer la modification' : 'Confirmer la réservation'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -579,7 +588,7 @@ class _SallesEcranState extends State<SallesEcran> {
             Text('Heures : $heuresTexte'),
             Text('Durée : ${heuresSelectionnees.length} heure${heuresSelectionnees.length > 1 ? 's' : ''}'),
             Text(
-              'Confirmer cette réservation ?',
+              estModification ? 'Confirmer cette modification ?' : 'Confirmer cette réservation ?',
               style: TextStyle(fontWeight: FontWeight.w600),
             ),
           ],
@@ -592,7 +601,11 @@ class _SallesEcranState extends State<SallesEcran> {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              _reserverSalleAvecHeures(salle, heuresSelectionnees);
+              if (estModification) {
+                _modifierReservationAvecHeures(salle, heuresSelectionnees);
+              } else {
+                _reserverSalleAvecHeures(salle, heuresSelectionnees);
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: CouleursApp.accent,
@@ -603,6 +616,52 @@ class _SallesEcranState extends State<SallesEcran> {
         ],
       ),
     );
+  }
+
+  Future<void> _modifierReservationAvecHeures(Salle salle, List<int> heuresSelectionnees) async {
+    // Réinitialiser la sélection
+    setState(() {
+      _heuresSelectionnees.clear();
+    });
+
+    // Pour simplifier, on utilise la première et dernière heure comme début et fin
+    heuresSelectionnees.sort();
+    final heureDebut = heuresSelectionnees.first;
+    final heureFin = heuresSelectionnees.last + 1; // +1 pour inclure l'heure complète
+    
+    final maintenant = DateTime.now();
+    final dateReservation = DateTime(maintenant.year, maintenant.month, maintenant.day, heureDebut);
+    final dateFin = DateTime(maintenant.year, maintenant.month, maintenant.day, heureFin);
+    
+    // D'abord annuler l'ancienne réservation, puis créer la nouvelle
+    final annulationSuccess = await _sallesRepository.annulerReservation(salle.id);
+    if (!annulationSuccess) {
+      _afficherErreur('Erreur lors de la modification');
+      return;
+    }
+    
+    final success = await _sallesRepository.reserverSalle(
+      salle.id,
+      'DUBM12345678', // ID utilisateur actuel
+      DateTime.now(),
+      dateReservation,
+      dateFin,
+    );
+
+    if (success) {
+      final heuresTexte = heuresSelectionnees.map((h) => '${h}h').join(', ');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${salle.nom} modifiée pour $heuresTexte'),
+          backgroundColor: CouleursApp.accent,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      );
+      _chargerSalles(); // Recharger les salles
+    } else {
+      _afficherErreur('Erreur lors de la modification');
+    }
   }
 
   Future<void> _reserverSalleAvecHeures(Salle salle, List<int> heuresSelectionnees) async {
@@ -678,5 +737,187 @@ class _SallesEcranState extends State<SallesEcran> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
+  }
+
+  // UI Design: Gérer ma réservation existante
+  void _gererMaReservation(Salle salle) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // En-tête
+            Row(
+              children: [
+                Icon(Icons.event_seat, color: CouleursApp.principal, size: 24),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Ma réservation - ${salle.nom}',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: CouleursApp.texteFonce,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: Icon(Icons.close, color: CouleursApp.texteFonce),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            
+            // Informations de la réservation
+            if (salle.heureDebut != null && salle.heureFin != null) ...[
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: CouleursApp.principal.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: CouleursApp.principal.withOpacity(0.3)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Réservation actuelle :',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: CouleursApp.principal,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text('Date : ${_formaterDate(salle.dateReservation!)}'),
+                    Text('Heure : ${_formaterHeure(salle.heureDebut!)} - ${_formaterHeure(salle.heureFin!)}'),
+                    Text('Durée : ${_calculerDuree(salle.heureDebut!, salle.heureFin!)}'),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
+            
+            // Actions
+            ListTile(
+              leading: Icon(Icons.edit, color: CouleursApp.accent),
+              title: const Text('Modifier le créneau'),
+              subtitle: const Text('Changer les heures de réservation'),
+              onTap: () {
+                Navigator.pop(context);
+                _modifierCreneauReservation(salle);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.cancel, color: Colors.red),
+              title: const Text('Annuler la réservation'),
+              subtitle: const Text('Libérer la salle'),
+              onTap: () {
+                Navigator.pop(context);
+                _confirmerAnnulationReservation(salle);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // UI Design: Helpers pour formatage
+  String _formaterDate(DateTime date) {
+    final maintenant = DateTime.now();
+    if (date.day == maintenant.day && date.month == maintenant.month && date.year == maintenant.year) {
+      return 'Aujourd\'hui';
+    } else if (date.day == maintenant.day + 1 && date.month == maintenant.month && date.year == maintenant.year) {
+      return 'Demain';
+    }
+    return '${date.day}/${date.month}/${date.year}';
+  }
+
+  String _formaterHeure(DateTime dateTime) {
+    return '${dateTime.hour.toString().padLeft(2, '0')}h${dateTime.minute.toString().padLeft(2, '0')}';
+  }
+
+  String _calculerDuree(DateTime debut, DateTime fin) {
+    final duree = fin.difference(debut);
+    final heures = duree.inHours;
+    final minutes = duree.inMinutes % 60;
+    if (minutes == 0) {
+      return '$heures heure${heures > 1 ? 's' : ''}';
+    }
+    return '${heures}h${minutes.toString().padLeft(2, '0')}';
+  }
+
+  // UI Design: Modifier le créneau de réservation
+  void _modifierCreneauReservation(Salle salle) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => _construireModalCreneaux(salle, estModification: true),
+    );
+  }
+
+  // UI Design: Confirmer l'annulation de réservation
+  void _confirmerAnnulationReservation(Salle salle) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Annuler la réservation'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Êtes-vous sûr de vouloir annuler votre réservation pour :'),
+            const SizedBox(height: 8),
+            Text('• Salle : ${salle.nom}'),
+            if (salle.heureDebut != null && salle.heureFin != null) ...[
+              Text('• Créneau : ${_formaterHeure(salle.heureDebut!)} - ${_formaterHeure(salle.heureFin!)}'),
+            ],
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Non, garder'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await _annulerReservation(salle);
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: Text('Oui, annuler', style: TextStyle(color: CouleursApp.blanc)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // UI Design: Annuler la réservation
+  Future<void> _annulerReservation(Salle salle) async {
+    final success = await _sallesRepository.annulerReservation(salle.id);
+    
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Réservation de "${salle.nom}" annulée'),
+          backgroundColor: Colors.orange,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      );
+      _chargerSalles(); // Recharger les salles
+    } else {
+      _afficherErreur('Erreur lors de l\'annulation');
+    }
   }
 } 
