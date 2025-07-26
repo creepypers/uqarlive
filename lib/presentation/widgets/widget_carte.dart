@@ -82,6 +82,7 @@ class WidgetCarte extends StatelessWidget {
     double? hauteur,
     VoidCallback? onTap,
     bool modeListe = false,
+    List<Widget>? actionsPersonnalisees, // UI Design: Actions personnalisées pour admin
   }) {
     List<WidgetBadge> badges = [
       WidgetBadge(
@@ -111,7 +112,7 @@ class WidgetCarte extends StatelessWidget {
       couleurIcone: couleurCategorie,
       couleurFond: couleurCategorie.withValues(alpha: 0.1),
       badges: badges,
-      piedDePage: _construirePiedPageMenu(menu),
+      piedDePage: _construirePiedPageMenu(menu, modeListe, actionsPersonnalisees),
       onTap: onTap,
       largeur: largeur ?? (modeListe ? 180 : null),
       hauteur:
@@ -525,7 +526,7 @@ class WidgetCarte extends StatelessWidget {
     );
   }
 
-  static Widget _construirePiedPageMenu(Menu menu) {
+  static Widget _construirePiedPageMenu(Menu menu, bool modeListe, List<Widget>? actionsPersonnalisees) {
     return SizedBox(
       height: 14, // UI Design: Hauteur contrôlée similaire aux livres
       child: Row(

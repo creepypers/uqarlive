@@ -88,4 +88,14 @@ class MenusRepositoryImpl implements MenusRepository {
       throw Exception('Erreur lors du chargement des menus populaires: $e');
     }
   }
+
+  @override
+  Future<List<Menu>> obtenirTousLesMenus() async {
+    try {
+      final menusData = _datasourceLocal.obtenirTousLesMenus();
+      return menusData.map((data) => MenuModel.fromMap(data)).toList();
+    } catch (e) {
+      throw Exception('Erreur lors du chargement de tous les menus: $e');
+    }
+  }
 } 

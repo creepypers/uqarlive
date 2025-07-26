@@ -141,12 +141,12 @@ class _AccueilEcranState extends State<AccueilEcran> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Section échange de livres
-                _construireSectionEchangeLivres(),
+                // Section actualités des assos
+                _construireSectionActualites(),
                 const SizedBox(height: 24),
                 
-                // Section associations
-                _construireSectionAssociations(),
+                // Section échange de livres
+                _construireSectionEchangeLivres(),
                 const SizedBox(height: 24),
                 
                 // Section cantine
@@ -240,50 +240,167 @@ class _AccueilEcranState extends State<AccueilEcran> {
     );
   }
 
-  // UI Design: Section associations avec WidgetCollection
-  Widget _construireSectionAssociations() {
+  // UI Design: Section actualités des associations avec design moderne
+  Widget _construireSectionActualites() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
         Text(
-          'Associations Étudiantes',
+                  'Actualités des Assos',
           style: StylesTexteApp.titre.copyWith(fontSize: 22),
         ),
-        const SizedBox(height: 4),
         Text(
-          'Découvrez la vie étudiante à l\'UQAR',
+                  'Dernières nouvelles de la vie étudiante',
           style: TextStyle(
             fontSize: 14,
             color: CouleursApp.texteFonce.withValues(alpha: 0.6),
           ),
         ),
-        const SizedBox(height: 16),
-        WidgetCollection<Association>.listeHorizontale(
-          elements: _associationsPopulaires,
-          enChargement: _chargementAssociations,
-          hauteur: 130, // UI Design: Augmente légèrement la hauteur de 120 à 130 pour éviter l'overflow
-          espacementHorizontal: 12, // UI Design: Espacement entre les cartes
-          constructeurElement: (context, association, index) {
-            return WidgetCarte.association(
-              nom: association.nom,
-              description: association.description,
-              icone: AssociationsUtils.obtenirIconeType(association.typeAssociation),
-              couleurIcone: AssociationsUtils.obtenirCouleurType(association.typeAssociation),
-              largeur: 140, // UI Design: Réduit légèrement la largeur de 150 à 140
-              hauteur: 115, // UI Design: Réduit la hauteur de 120 à 115 pour plus de marge
+              ],
+            ),
+            GestureDetector(
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => DetailsAssociationEcran(association: association),
+                    builder: (context) => const AssociationsEcran(),
                   ),
                 );
               },
-            );
-          },
-          padding: const EdgeInsets.symmetric(horizontal: 16), // UI Design: Padding pour éviter les débordements
-          messageEtatVide: 'Aucune association disponible',
-          iconeEtatVide: Icons.groups_outlined,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: CouleursApp.principal.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: CouleursApp.principal.withValues(alpha: 0.3)),
+                ),
+                child: Text(
+                  'Voir tout',
+                  style: TextStyle(
+                    color: CouleursApp.principal,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        // UI Design: Liste horizontale d'actualités simulées
+        SizedBox(
+          height: 150,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: 3, // Afficher 3 actualités sur l'accueil
+            itemBuilder: (context, index) {
+              final actualites = [
+                {
+                  'titre': 'Tournoi Gaming Inter-Programmes',
+                  'association': 'Étudiants Informatique',
+                  'date': '25 Jan',
+                  'priorite': 'haute',
+                },
+                {
+                  'titre': 'Atelier Gestion du Stress',
+                  'association': 'AGEUQAR',
+                  'date': '24 Jan',
+                  'priorite': 'haute',
+                },
+                {
+                  'titre': 'Collecte Banque Alimentaire',
+                  'association': 'Association Humanitaire',
+                  'date': 'En cours',
+                  'priorite': 'normale',
+                },
+              ];
+              
+              final actualite = actualites[index];
+              return Container(
+                width: 180,
+                margin: const EdgeInsets.only(right: 12),
+                decoration: BoxDecoration(
+                  color: CouleursApp.blanc,
+                  borderRadius: BorderRadius.circular(12),
+                  border: actualite['priorite'] == 'haute' 
+                    ? Border.all(color: CouleursApp.principal, width: 2)
+                    : null,
+                  boxShadow: [
+                    BoxShadow(
+                      color: CouleursApp.principal.withValues(alpha: 0.08),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Badge priorité si haute
+                      if (actualite['priorite'] == 'haute') ...[
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            'URGENT',
+                            style: TextStyle(
+                              color: CouleursApp.blanc,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+                      // Titre
+                      Text(
+                        actualite['titre']!,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: CouleursApp.texteFonce,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const Spacer(),
+                      // Association et date
+                      Text(
+                        actualite['association']!,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: CouleursApp.principal,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        actualite['date']!,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
         ),
       ],
     );

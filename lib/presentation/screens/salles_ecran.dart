@@ -350,24 +350,24 @@ class _SallesEcranState extends State<SallesEcran> {
           // Bouton réserver
           SizedBox(
             width: double.infinity,
-            child: ElevatedButton(
-              onPressed: salle.estDisponible 
-                ? () {
-                    Navigator.pop(context);
-                    _choisirCreneauEtReserver(salle);
-                  }
+                                  child: ElevatedButton(
+                        onPressed: salle.estDisponible 
+                          ? () {
+                              Navigator.pop(context);
+                              _choisirCreneauEtReserver(salle);
+                            }
                 : (salle.reserveePar == 'DUBM12345678') // Si c'est ma réservation
                   ? () {
                       Navigator.pop(context);
                       _gererMaReservation(salle);
                     }
-                  : null,
+                          : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: salle.estDisponible 
                   ? CouleursApp.accent 
                   : (salle.reserveePar == 'DUBM12345678')
                     ? CouleursApp.principal // Ma réservation
-                    : Colors.grey,
+                  : Colors.grey,
                 foregroundColor: CouleursApp.blanc,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
@@ -379,7 +379,7 @@ class _SallesEcranState extends State<SallesEcran> {
                   ? 'Réserver cette salle'
                   : (salle.reserveePar == 'DUBM12345678')
                     ? 'Modifier ma réservation'
-                    : 'Salle indisponible',
+                  : 'Salle indisponible',
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -542,9 +542,9 @@ class _SallesEcranState extends State<SallesEcran> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                                          onPressed: _heuresSelectionnees.isNotEmpty 
+                  onPressed: _heuresSelectionnees.isNotEmpty 
                           ? () => _confirmerReservationHeures(salle, _heuresSelectionnees.toList(), estModification)
-                          : null,
+                    : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: CouleursApp.accent,
                     foregroundColor: CouleursApp.blanc,
@@ -604,7 +604,7 @@ class _SallesEcranState extends State<SallesEcran> {
               if (estModification) {
                 _modifierReservationAvecHeures(salle, heuresSelectionnees);
               } else {
-                _reserverSalleAvecHeures(salle, heuresSelectionnees);
+              _reserverSalleAvecHeures(salle, heuresSelectionnees);
               }
             },
             style: ElevatedButton.styleFrom(

@@ -282,19 +282,19 @@ class _ProfilEcranState extends State<ProfilEcran> {
                 _construireLivreEnVente('Physique Générale', '18,00 €', 'Vendu'),
                 
                 const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const GererLivresEcran()),
-                    ),
-                    style: OutlinedButton.styleFrom(
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton(
+                              onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const GererLivresEcran()),
+                ),
+              style: OutlinedButton.styleFrom(
                       side: BorderSide(color: CouleursApp.principal),
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                    ),
-                    child: Text(
+              ),
+              child: Text(
                       'Ajouter un livre',
                       style: TextStyle(
                         color: CouleursApp.principal,
@@ -303,7 +303,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
                       ),
                     ),
                   ),
-                ),
+              ),
               ],
             ),
           ),

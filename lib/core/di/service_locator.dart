@@ -2,14 +2,21 @@ import '../../domain/repositories/livres_repository.dart';
 import '../../domain/repositories/associations_repository.dart';
 import '../../domain/repositories/menus_repository.dart';
 import '../../domain/repositories/salles_repository.dart';
+import '../../domain/repositories/actualites_repository.dart';
 import '../../data/repositories/livres_repository_impl.dart';
 import '../../data/repositories/associations_repository_impl.dart';
 import '../../data/repositories/menus_repository_impl.dart';
 import '../../data/repositories/salles_repository_impl.dart';
+import '../../data/repositories/actualites_repository_impl.dart';
+import '../../domain/entities/utilisateur.dart';
+import '../../domain/repositories/utilisateurs_repository.dart';
+import '../../data/datasources/utilisateurs_datasource_local.dart';
+import '../../data/repositories/utilisateurs_repository_impl.dart';
 import '../../data/datasources/livres_datasource_local.dart';
 import '../../data/datasources/associations_datasource_local.dart';
 import '../../data/datasources/menus_datasource_local.dart';
 import '../../data/datasources/salles_datasource_local.dart';
+import '../../data/datasources/actualites_datasource_local.dart';
 
 // UI Design: Service Locator pour injection de dépendances - Clean Architecture
 class ServiceLocator {
@@ -25,6 +32,7 @@ class ServiceLocator {
     _services[AssociationsDatasourceLocal] = AssociationsDatasourceLocal();
     _services[MenusDatasourceLocal] = MenusDatasourceLocal();
     _services[SallesDatasourceLocal] = SallesDatasourceLocal();
+    _services[ActualitesDatasourceLocal] = ActualitesDatasourceLocal();
 
     // Configuration des repositories (Data Layer → Domain Interface)
     _services[LivresRepository] = LivresRepositoryImpl(
@@ -38,6 +46,9 @@ class ServiceLocator {
     );
     _services[SallesRepository] = SallesRepositoryImpl(
       _services[SallesDatasourceLocal] as SallesDatasourceLocal,
+    );
+    _services[ActualitesRepository] = ActualitesRepositoryImpl(
+      _services[ActualitesDatasourceLocal] as ActualitesDatasourceLocal,
     );
 
     _isConfigured = true;

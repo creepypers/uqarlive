@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
 import 'inscription_ecran.dart';
 import 'accueil_ecran.dart';
+import 'admin_dashboard_ecran.dart';
+import '../../core/di/service_locator.dart';
+import '../../domain/repositories/utilisateurs_repository.dart';
+
+
 
 // UI Design: Écran de connexion avec design UQAR et fond dégradé violet/bleu
 class ConnexionEcran extends StatefulWidget {
@@ -16,6 +21,16 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
       TextEditingController();
   final TextEditingController _controleurMotDePasse = TextEditingController();
   final GlobalKey<FormState> _cleFormulaire = GlobalKey<FormState>();
+  
+  // UI Design: Repository pour l'authentification
+  late UtilisateursRepository _utilisateursRepository;
+  bool _connexionEnCours = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _utilisateursRepository = ServiceLocator.obtenirService<UtilisateursRepository>();
+  }
 
   @override
   void dispose() {
@@ -24,15 +39,166 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
     super.dispose();
   }
 
-  void _gererConnexion() {
+  void _gererConnexion() async {
     if (_cleFormulaire.currentState!.validate()) {
-      // TODO: Implémenter la logique de connexion réelle
-      print('Connexion avec: ${_controleurNomUtilisateur.text}');
+      setState(() => _connexionEnCours = true);
       
-      // Navigation vers la page d'accueil après connexion réussie
-      Navigator.of(context).pushReplacement(
+      try {
+        final utilisateur = await _utilisateursRepository.authentifierUtilisateur(
+          _controleurNomUtilisateur.text,
+          _controleurMotDePasse.text,
+        );
+        
+        if (utilisateur != null) {
+          // UI Design: Redirection selon le type d'utilisateur
+          if (utilisateur.estAdmin) {
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => const AdminDashboardEcran()),
+              (route) => false,
+            );
+            
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: [
+                    const Icon(Icons.admin_panel_settings, color: Colors.white, size: 20),
+                    const SizedBox(width: 8),
+                    Text('Bienvenue Administrateur ${utilisateur.prenom} !'),
+                  ],
+                ),
+                backgroundColor: Colors.green,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+            );
+          } else {
+            Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const AccueilEcran()),
+              (route) => false,
+            );
+            
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: [
+                    const Icon(Icons.check_circle, color: Colors.white, size: 20),
+                    const SizedBox(width: 8),
+                    Text('Bienvenue ${utilisateur.prenom} !'),
+                  ],
+                ),
+                backgroundColor: Colors.green,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+            );
+          }
+        } else {
+          _afficherErreurConnexion();
+        }
+      } catch (e) {
+        _afficherErreurConnexion();
+      } finally {
+        if (mounted) {
+          setState(() => _connexionEnCours = false);
+        }
+      }
+    }
+  }
+  
+  void _afficherErreurConnexion() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.error, color: Colors.white, size: 20),
+            const SizedBox(width: 8),
+            const Text('Email ou mot de passe incorrect'),
+          ],
+        ),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+       ),
+     );
+   }
+   
+   // UI Design: Connexion rapide admin pour les tests
+   void _connexionAdminRapide() async {
+    setState(() => _connexionEnCours = true);
+    
+    try {
+      final utilisateur = await _utilisateursRepository.authentifierUtilisateur(
+        'admin@uqar.ca',
+        'admin123',
       );
+      
+      if (utilisateur != null && utilisateur.estAdmin) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const AdminDashboardEcran()),
+          (route) => false,
+        );
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.admin_panel_settings, color: Colors.white, size: 20),
+                const SizedBox(width: 8),
+                Text('Connexion Admin - ${utilisateur.prenom} ${utilisateur.nom}'),
+              ],
+            ),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        );
+      }
+    } catch (e) {
+      _afficherErreurConnexion();
+    } finally {
+      if (mounted) {
+        setState(() => _connexionEnCours = false);
+      }
+    }
+  }
+  
+  // UI Design: Connexion rapide étudiant pour les tests
+  void _connexionEtudiantDemo() async {
+    setState(() => _connexionEnCours = true);
+    
+    try {
+      final utilisateur = await _utilisateursRepository.authentifierUtilisateur(
+        'alexandre.martin@uqar.ca',
+        'alex123',
+      );
+      
+      if (utilisateur != null) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const AccueilEcran()),
+          (route) => false,
+        );
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle, color: Colors.white, size: 20),
+                const SizedBox(width: 8),
+                Text('Connexion Démo - ${utilisateur.prenom} ${utilisateur.nom}'),
+              ],
+            ),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        );
+      }
+    } catch (e) {
+      _afficherErreurConnexion();
+    } finally {
+      if (mounted) {
+        setState(() => _connexionEnCours = false);
+      }
     }
   }
 

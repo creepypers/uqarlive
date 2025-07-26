@@ -25,4 +25,7 @@ abstract class MenusRepository {
 
   /// Obtenir les menus populaires (note >= 4.5)
   Future<List<Menu>> obtenirMenusPopulaires();
+
+  /// Obtenir tous les menus (pour administration)
+  Future<List<Menu>> obtenirTousLesMenus();
 } 
