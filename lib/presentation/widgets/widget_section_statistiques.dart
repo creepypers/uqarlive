@@ -200,11 +200,13 @@ class WidgetSectionStatistiques extends StatelessWidget {
     }
   }
 
-  // Style Associations : 3 colonnes de chiffres simples
+  // Style Associations : 3 colonnes de chiffres simples (corrigé overflow)
   Widget _construireStyleAssociations() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: statistiques.map((stat) => _construireStatistiqueAssociation(stat)).toList(),
+      children: statistiques.map((stat) => Expanded(
+        child: _construireStatistiqueAssociation(stat),
+      )).toList(),
     );
   }
 
@@ -226,17 +228,22 @@ class WidgetSectionStatistiques extends StatelessWidget {
             fontSize: 12,
             color: CouleursApp.blanc.withValues(alpha: 0.9),
           ),
+          textAlign: TextAlign.center,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
         ),
       ],
     );
   }
 
-  // Style Marketplace : 3 colonnes avec icônes et séparateurs
+  // Style Marketplace : 3 colonnes avec icônes et séparateurs (corrigé overflow)
   Widget _construireStyleMarketplace() {
     final widgets = <Widget>[];
     
     for (int i = 0; i < statistiques.length; i++) {
-      widgets.add(_construireStatistiqueMarketplace(statistiques[i]));
+      widgets.add(Expanded(
+        child: _construireStatistiqueMarketplace(statistiques[i]),
+      ));
       
       // Ajouter séparateur sauf pour le dernier élément
       if (i < statistiques.length - 1) {
@@ -244,12 +251,12 @@ class WidgetSectionStatistiques extends StatelessWidget {
           height: 40,
           width: 1,
           color: CouleursApp.principal.withValues(alpha: 0.3),
+          margin: const EdgeInsets.symmetric(horizontal: 8),
         ));
       }
     }
     
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: widgets,
     );
   }
@@ -281,6 +288,8 @@ class WidgetSectionStatistiques extends StatelessWidget {
             fontSize: 12,
             color: CouleursApp.texteFonce.withValues(alpha: 0.7),
           ),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
         ),
       ],
     );

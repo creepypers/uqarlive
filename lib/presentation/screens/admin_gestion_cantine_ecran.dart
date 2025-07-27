@@ -5,10 +5,12 @@ import '../../core/di/service_locator.dart';
 import '../../domain/entities/menu.dart';
 import '../../domain/repositories/menus_repository.dart';
 import '../../data/datasources/horaires_datasource_local.dart';
-import '../widgets/widget_barre_app_personnalisee.dart';
+import '../widgets/widget_barre_app_navigation_admin.dart';
 import '../widgets/widget_carte.dart';
 import '../widgets/widget_collection.dart';
 import '../widgets/widget_section_statistiques.dart';
+import '../screens/admin_ajouter_menu_ecran.dart';
+import '../screens/admin_modifier_horaires_ecran.dart';
 
 class AdminGestionCantineEcran extends StatefulWidget {
   const AdminGestionCantineEcran({super.key});
@@ -64,10 +66,10 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: CouleursApp.fond,
-      appBar: WidgetBarreAppPersonnalisee(
+      appBar: WidgetBarreAppNavigationAdmin(
         titre: 'Gestion Cantine',
         sousTitre: 'Menus et horaires',
-        afficherBoutonRetour: true,
+        sectionActive: 'cantine',
       ),
       body: _chargementEnCours
           ? const Center(child: CircularProgressIndicator())
@@ -437,51 +439,38 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
     );
   }
 
-  void _modifierHoraireJour(String jour) async {
-    // UI Design: Utiliser le datasource pour modifier les horaires
-    final horaire = _horaires[jour];
-    if (horaire != null) {
-      final succes = await _horairesDatasource.modifierHoraireCantineJour(
-        jour,
-        horaire['ouverture'] ?? '',
-        horaire['fermeture'] ?? '',
-      );
-      
-      if (succes && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Horaires $jour modifiés avec succès'),
-            backgroundColor: Colors.green,
-          ),
-        );
-        _chargerDonnees(); // Recharger les données
-      }
-    }
+  void _modifierHoraireJour(String jour) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AdminModifierHorairesEcran(),
+      ),
+    );
   }
 
   void _modifierTousLesHoraires() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Modification des horaires globaux - Fonctionnalité en développement'),
-        backgroundColor: Colors.orange,
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AdminModifierHorairesEcran(),
       ),
     );
   }
 
   void _ajouterNouveauMenu() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Ajout nouveau menu - Fonctionnalité en développement'),
-        backgroundColor: Colors.green,
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AdminAjouterMenuEcran(),
       ),
     );
   }
 
   void _modifierMenu(Menu menu) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Modification menu ${menu.nom}'),
-        backgroundColor: CouleursApp.accent,
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AdminAjouterMenuEcran(menuAModifier: menu),
       ),
     );
   }

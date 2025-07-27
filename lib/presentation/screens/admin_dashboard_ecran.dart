@@ -4,8 +4,8 @@ import '../../core/theme/app_theme.dart';
 import '../../core/di/service_locator.dart';
 import '../../domain/entities/utilisateur.dart';
 import '../../domain/repositories/utilisateurs_repository.dart';
-import '../widgets/widget_barre_app_personnalisee.dart';
-
+import '../widgets/widget_barre_app_navigation_admin.dart';
+import '../widgets/widget_carte.dart';
 import '../widgets/widget_section_statistiques.dart';
 import '../widgets/widget_collection.dart';
 import 'admin_gestion_comptes_ecran.dart';
@@ -61,10 +61,10 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: CouleursApp.fond,
-      appBar: WidgetBarreAppPersonnalisee(
+      appBar: WidgetBarreAppNavigationAdmin(
         titre: 'Dashboard Admin',
         sousTitre: 'Gestion de l\'application UqarLive',
-        afficherBoutonRetour: true,
+        sectionActive: 'dashboard',
       ),
       body: _chargementEnCours 
         ? const Center(child: CircularProgressIndicator())
@@ -78,8 +78,6 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
                 _construireSectionsGestion(),
                 const SizedBox(height: 24),
                 _construireUtilisateursRecents(),
-                const SizedBox(height: 24),
-                _construireActionsRapides(),
               ],
             ),
           ),
@@ -119,40 +117,43 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
     );
   }
 
-  // UI Design: Sections de gestion principales
+  // UI Design: Sections de gestion principales avec cartes réutilisables
   Widget _construireSectionsGestion() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-                    Text(
-              'Gestion',
-              style: StylesTexteApp.titrePage,
-            ),
+        Text(
+          'Gestion',
+          style: StylesTexteApp.titrePage,
+        ),
         const SizedBox(height: 16),
-        WidgetCollection.grille(
-          elements: [
-            _CarteGestionData(
+        // UI Design: Utilisation de Row et Wrap pour éviter les problèmes de grille
+        Wrap(
+          spacing: 16,
+          runSpacing: 16,
+          children: [
+            _construireCarteGestionAvecWidget(
               'Gestion des Comptes',
               'Gérer les utilisateurs et leurs privilèges',
               Icons.account_circle,
               CouleursApp.principal,
               () => _naviguerVersGestionComptes(),
             ),
-            _CarteGestionData(
+            _construireCarteGestionAvecWidget(
               'Gestion Cantine',
               'Gérer les menus et horaires',
               Icons.restaurant,
               CouleursApp.accent,
               () => _naviguerVersGestionCantine(),
             ),
-            _CarteGestionData(
+            _construireCarteGestionAvecWidget(
               'Actualités & Assos',
               'Gérer les actualités et événements',
               Icons.newspaper,
               Colors.orange,
               () => _naviguerVersGestionActualites(),
             ),
-            _CarteGestionData(
+            _construireCarteGestionAvecWidget(
               'Modération',
               'Modérer le contenu de l\'app',
               Icons.gavel,
@@ -160,80 +161,34 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
               () => _afficherMessageModeration(),
             ),
           ],
-          constructeurElement: (context, data, index) => _construireCarteGestion(
-            data.titre,
-            data.description,
-            data.icone,
-            data.couleur,
-            data.onTap,
-          ),
-          nombreColonnes: 2,
-          espacementColonnes: 16,
-          espacementLignes: 16,
-          ratioAspect: 1.1,
         ),
       ],
     );
   }
 
-  Widget _construireCarteGestion(
+  // UI Design: Utilisation de WidgetCarte réutilisable pour les cartes de gestion
+  Widget _construireCarteGestionAvecWidget(
     String titre,
     String description,
     IconData icone,
     Color couleur,
     VoidCallback onTap,
   ) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: InkWell(
+    // Calcul de la largeur pour 2 colonnes avec espacement
+    final largeur = (MediaQuery.of(context).size.width - 48) / 2; // 16px padding + 16px spacing
+    
+    return SizedBox(
+      width: largeur,
+      height: 140, // UI Design: Hauteur fixe pour uniformité
+      child: WidgetCarte.association(
+        nom: titre,
+        description: description,
+        icone: icone,
+        couleurIcone: couleur,
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            gradient: LinearGradient(
-              colors: [couleur.withValues(alpha: 0.1), couleur.withValues(alpha: 0.05)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: couleur.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  icone,
-                  size: 32,
-                  color: couleur,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                titre,
-                style: StylesTexteApp.moyenTitre.copyWith(
-                  color: couleur,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                description,
-                style: StylesTexteApp.corpsGris,
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
-        ),
+        largeur: largeur,
+        hauteur: 140,
+        modeHorizontal: false,
       ),
     );
   }
@@ -260,13 +215,46 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
           ],
         ),
         const SizedBox(height: 12),
-        WidgetCollection.listeVerticale(
-          elements: _utilisateursRecents,
-          constructeurElement: (context, utilisateur, index) => _construireCarteUtilisateur(utilisateur),
-          espacementVertical: 8,
-          messageEtatVide: 'Aucun nouvel utilisateur récemment',
-          iconeEtatVide: Icons.people_outline,
-        ),
+        // UI Design: Utilisation de Column au lieu de ListView pour éviter les problèmes de viewport
+        _utilisateursRecents.isEmpty
+          ? Center(
+              child: Padding(
+                padding: const EdgeInsets.all(40),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.people_outline,
+                      size: 80,
+                      color: CouleursApp.principal.withValues(alpha: 0.3),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      'Aucun nouvel utilisateur récemment',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: CouleursApp.texteFonce,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            )
+          : Column(
+              children: _utilisateursRecents.asMap().entries.map((entry) {
+                final index = entry.key;
+                final utilisateur = entry.value;
+                return Column(
+                  children: [
+                    _construireCarteUtilisateur(utilisateur),
+                    if (index < _utilisateursRecents.length - 1) 
+                      const SizedBox(height: 8),
+                  ],
+                );
+              }).toList(),
+            ),
       ],
     );
   }
@@ -316,50 +304,7 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
     );
   }
 
-  // UI Design: Actions rapides
-  Widget _construireActionsRapides() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Actions Rapides',
-          style: StylesTexteApp.grandTitre,
-        ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: ElevatedButton.icon(
-                onPressed: _actualiserDonnees,
-                icon: const Icon(Icons.refresh),
-                label: const Text('Actualiser'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: CouleursApp.principal,
-                  foregroundColor: CouleursApp.blanc,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: ElevatedButton.icon(
-                onPressed: _exporterRapport,
-                icon: const Icon(Icons.download),
-                label: const Text('Exporter'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: CouleursApp.accent,
-                  foregroundColor: CouleursApp.blanc,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
+
 
   // UI Design: Méthodes de navigation
   void _naviguerVersGestionComptes() {
@@ -405,47 +350,11 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
     );
   }
 
-  void _actualiserDonnees() {
-    _chargerDonnees();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.check_circle, color: Colors.white, size: 20),
-            const SizedBox(width: 8),
-            const Text('Données actualisées avec succès !'),
-          ],
-        ),
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-    );
-  }
 
-  void _exporterRapport() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Export des rapports en cours...'),
-        backgroundColor: CouleursApp.accent,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-    );
-  }
 
   String _formaterDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
   }
 }
 
-// UI Design: Classe de données pour les cartes de gestion
-class _CarteGestionData {
-  final String titre;
-  final String description;
-  final IconData icone;
-  final Color couleur;
-  final VoidCallback onTap;
-
-  _CarteGestionData(this.titre, this.description, this.icone, this.couleur, this.onTap);
-} 
+ 

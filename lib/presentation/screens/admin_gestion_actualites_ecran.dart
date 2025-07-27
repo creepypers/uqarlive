@@ -4,7 +4,7 @@ import '../../core/theme/app_theme.dart';
 import '../../core/di/service_locator.dart';
 import '../../domain/entities/actualite.dart';
 import '../../domain/repositories/actualites_repository.dart';
-import '../widgets/widget_barre_app_personnalisee.dart';
+import '../widgets/widget_barre_app_navigation_admin.dart';
 import '../widgets/widget_collection.dart';
 import '../widgets/widget_section_statistiques.dart';
 
@@ -80,10 +80,10 @@ class _AdminGestionActualitesEcranState extends State<AdminGestionActualitesEcra
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: CouleursApp.fond,
-      appBar: WidgetBarreAppPersonnalisee(
+      appBar: WidgetBarreAppNavigationAdmin(
         titre: 'Gestion Actualités',
         sousTitre: '${_actualitesFiltrees.length} actualité(s)',
-        afficherBoutonRetour: true,
+        sectionActive: 'actualites',
       ),
       body: Column(
         children: [
@@ -267,37 +267,17 @@ class _AdminGestionActualitesEcranState extends State<AdminGestionActualitesEcra
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Entête avec priorité et association
+            // Entête avec priorité et association (badge épinglé déplacé)
             Row(
               children: [
                 _construireBadgePriorite(actualite.priorite),
-                const SizedBox(width: 8),
-                if (actualite.estEpinglee)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.amber,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.push_pin, size: 12, color: Colors.white),
-                        const SizedBox(width: 4),
-                        Text(
-                          'ÉPINGLÉ',
-                          style: StylesTexteApp.petitBlanc.copyWith(
-                            fontSize: 8,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
                 const Spacer(),
-                Text(
-                  actualite.nomAssociation,
-                  style: StylesTexteApp.corpsGris,
+                Flexible(
+                  child: Text(
+                    actualite.nomAssociation,
+                    style: StylesTexteApp.corpsGris,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ],
             ),
@@ -340,13 +320,37 @@ class _AdminGestionActualitesEcranState extends State<AdminGestionActualitesEcra
             
             const SizedBox(height: 12),
             
-            // Statistiques
+            // Statistiques et badge épinglé
             Row(
               children: [
                 _construireStatMini(Icons.visibility, actualite.nombreVues.toString()),
                 const SizedBox(width: 16),
                 _construireStatMini(Icons.favorite, actualite.nombreLikes.toString()),
                 const SizedBox(width: 16),
+                if (actualite.estEpinglee) ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.amber,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.push_pin, size: 12, color: Colors.white),
+                        const SizedBox(width: 4),
+                        Text(
+                          'ÉPINGLÉ',
+                          style: StylesTexteApp.petitBlanc.copyWith(
+                            fontSize: 8,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                ],
                 Text(
                   'Publié le ${_formaterDate(actualite.datePublication)}',
                   style: StylesTexteApp.petitGris,

@@ -4,8 +4,9 @@ import '../../core/theme/app_theme.dart';
 import '../../core/di/service_locator.dart';
 import '../../domain/entities/utilisateur.dart';
 import '../../domain/repositories/utilisateurs_repository.dart';
-import '../widgets/widget_barre_app_personnalisee.dart';
+import '../widgets/widget_barre_app_navigation_admin.dart';
 import '../widgets/widget_collection.dart';
+import 'modifier_profil_ecran.dart';
 
 class AdminGestionComptesEcran extends StatefulWidget {
   const AdminGestionComptesEcran({super.key});
@@ -77,10 +78,10 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: CouleursApp.fond,
-      appBar: WidgetBarreAppPersonnalisee(
+      appBar: WidgetBarreAppNavigationAdmin(
         titre: 'Gestion des Comptes',
         sousTitre: '${_utilisateursFiltres.length} utilisateur(s)',
-        afficherBoutonRetour: true,
+        sectionActive: 'comptes',
       ),
       body: Column(
         children: [
@@ -378,13 +379,16 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran> {
   }
 
   void _modifierUtilisateur(Utilisateur utilisateur) {
-    // TODO: Implémenter l'édition d'utilisateur
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Modification de ${utilisateur.prenom} ${utilisateur.nom}'),
-        backgroundColor: CouleursApp.accent,
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ModifierProfilEcran(),
       ),
-    );
+    ).then((resultat) {
+      if (resultat == true) {
+        _chargerUtilisateurs(); // Recharger la liste
+      }
+    });
   }
 
   void _changerStatutUtilisateur(Utilisateur utilisateur) async {
@@ -496,14 +500,19 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran> {
   }
 
   void _afficherModalNouvelUtilisateur() {
-    // TODO: Implémenter la création d'utilisateur
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Création d\'utilisateur - fonctionnalité en développement'),
-        backgroundColor: Colors.orange,
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const ModifierProfilEcran(),
       ),
-    );
+    ).then((resultat) {
+      if (resultat == true) {
+        _chargerUtilisateurs(); // Recharger la liste
+      }
+    });
   }
+
+
 
   String _formaterDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';

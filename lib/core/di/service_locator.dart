@@ -33,6 +33,7 @@ class ServiceLocator {
     _services[MenusDatasourceLocal] = MenusDatasourceLocal();
     _services[SallesDatasourceLocal] = SallesDatasourceLocal();
     _services[ActualitesDatasourceLocal] = ActualitesDatasourceLocal();
+    _services[UtilisateursDatasourceLocal] = UtilisateursDatasourceLocal();
 
     // Configuration des repositories (Data Layer → Domain Interface)
     _services[LivresRepository] = LivresRepositoryImpl(
@@ -49,6 +50,9 @@ class ServiceLocator {
     );
     _services[ActualitesRepository] = ActualitesRepositoryImpl(
       _services[ActualitesDatasourceLocal] as ActualitesDatasourceLocal,
+    );
+    _services[UtilisateursRepository] = UtilisateursRepositoryImpl(
+      _services[UtilisateursDatasourceLocal] as UtilisateursDatasourceLocal,
     );
 
     _isConfigured = true;
