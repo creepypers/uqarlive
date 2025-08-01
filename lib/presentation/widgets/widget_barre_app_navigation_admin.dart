@@ -3,7 +3,7 @@ import '../../core/theme/app_theme.dart';
 import '../screens/admin_dashboard_ecran.dart';
 import '../screens/admin_gestion_comptes_ecran.dart';
 import '../screens/admin_gestion_cantine_ecran.dart';
-import '../screens/admin_gestion_actualites_ecran.dart';
+import '../screens/admin_gestion_associations_ecran.dart';
 import '../screens/admin_ajouter_menu_ecran.dart';
 import '../screens/admin_modifier_horaires_ecran.dart';
 import '../screens/associations_ecran.dart';
@@ -248,8 +248,8 @@ class WidgetBarreAppNavigationAdmin extends StatelessWidget implements Preferred
             context,
             'Assos',
             Icons.groups,
-            'actualites',
-            () => _naviguerVersActualites(context),
+            'associations',
+            () => _naviguerVersAssociations(context),
           ),
         ],
       ),
@@ -332,11 +332,11 @@ class WidgetBarreAppNavigationAdmin extends StatelessWidget implements Preferred
     }
   }
 
-  void _naviguerVersActualites(BuildContext context) {
-    if (sectionActive != 'actualites') {
+  void _naviguerVersAssociations(BuildContext context) {
+    if (sectionActive != 'associations') {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const AdminGestionActualitesEcran()),
+        MaterialPageRoute(builder: (context) => const AdminGestionAssociationsEcran()),
       );
     }
   }

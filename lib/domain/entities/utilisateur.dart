@@ -78,7 +78,6 @@ class Utilisateur {
 enum TypeUtilisateur {
   etudiant,
   administrateur,
-  moderateur,
 }
 
 // UI Design: Constantes pour les privilèges

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
+import '../../data/datasources/horaires_datasource_local.dart';
 import '../widgets/widget_barre_app_navigation_admin.dart';
 
-// UI Design: Écran de modification des horaires d'ouverture de la cantine
 class AdminModifierHorairesEcran extends StatefulWidget {
   const AdminModifierHorairesEcran({super.key});
 
@@ -11,47 +11,102 @@ class AdminModifierHorairesEcran extends StatefulWidget {
 }
 
 class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran> {
-  final _formKey = GlobalKey<FormState>();
+  final _horairesDatasource = HorairesDatasourceLocal();
+  String _jourSelectionne = 'Lundi';
   bool _isLoading = false;
+  late Map<String, TimeOfDay> _horairesJourSelectionne;
 
-  // Horaires par défaut
-  Map<String, Map<String, dynamic>> _horaires = {
-    'lundi': {
-      'ouvert': true,
-      'debut': '08:00',
-      'fin': '18:00',
-    },
-    'mardi': {
-      'ouvert': true,
-      'debut': '08:00',
-      'fin': '18:00',
-    },
-    'mercredi': {
-      'ouvert': true,
-      'debut': '08:00',
-      'fin': '18:00',
-    },
-    'jeudi': {
-      'ouvert': true,
-      'debut': '08:00',
-      'fin': '18:00',
-    },
-    'vendredi': {
-      'ouvert': true,
-      'debut': '08:00',
-      'fin': '18:00',
-    },
-    'samedi': {
-      'ouvert': false,
-      'debut': '10:00',
-      'fin': '16:00',
-    },
-    'dimanche': {
-      'ouvert': false,
-      'debut': '10:00',
-      'fin': '16:00',
-    },
-  };
+  @override
+  void initState() {
+    super.initState();
+    _horairesJourSelectionne = _horairesDatasource.obtenirHorairesCantine(_jourSelectionne);
+  }
+
+  Future<void> _sauvegarderHoraires() async {
+    setState(() => _isLoading = true);
+
+    try {
+      await _horairesDatasource.mettreAJourHorairesCantine(
+        _jourSelectionne,
+        _horairesJourSelectionne['ouverture']!,
+        _horairesJourSelectionne['fermeture']!,
+      );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.check_circle, color: CouleursApp.blanc),
+                const SizedBox(width: 8),
+                Text('Horaires mis à jour pour $_jourSelectionne'),
+              ],
+            ),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.error, color: CouleursApp.blanc),
+                const SizedBox(width: 8),
+                const Text('Erreur lors de la mise à jour des horaires'),
+              ],
+            ),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _selectionnerHeure(String type) async {
+    final heureInitiale = _horairesJourSelectionne[type]!;
+    
+    final heureSelectionnee = await showTimePicker(
+      context: context,
+      initialTime: heureInitiale,
+      helpText: type == 'ouverture' ? 'Heure d\'ouverture' : 'Heure de fermeture',
+      cancelText: 'ANNULER',
+      confirmText: 'OK',
+      hourLabelText: 'Heure',
+      minuteLabelText: 'Minute',
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: CouleursApp.principal,
+              onPrimary: CouleursApp.blanc,
+              surface: CouleursApp.blanc,
+              onSurface: CouleursApp.principal,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (heureSelectionnee != null) {
+      setState(() {
+        _horairesJourSelectionne = {
+          ..._horairesJourSelectionne,
+          type: heureSelectionnee,
+        };
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,47 +114,35 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
       backgroundColor: CouleursApp.fond,
       appBar: WidgetBarreAppNavigationAdmin(
         titre: 'Modifier les Horaires',
-        sousTitre: 'Horaires d\'ouverture de la cantine',
+        sousTitre: 'Gestion des horaires de la cantine',
         sectionActive: 'cantine',
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Padding(
             padding: const EdgeInsets.all(16),
-            child: Form(
-              key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Section d'information
                   _construireSectionInformation(),
                   const SizedBox(height: 24),
-                  
-                  // Horaires par jour
                   _construireSectionHoraires(),
                   const SizedBox(height: 32),
-                  
-                  // Boutons d'action
-                  _construireBoutonsAction(),
-                  const SizedBox(height: 20),
+              _construireBoutonsSauvegarde(),
                 ],
-              ),
-            ),
           ),
         ),
       ),
     );
   }
 
-  // UI Design: Section d'information
   Widget _construireSectionInformation() {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.blue.withValues(alpha: 0.1),
+        color: CouleursApp.principal.withOpacity(0.1),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: Colors.blue.withValues(alpha: 0.3),
+          color: CouleursApp.principal.withOpacity(0.3),
           width: 1,
         ),
       ),
@@ -108,12 +151,12 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.blue.withValues(alpha: 0.2),
+              color: CouleursApp.principal.withOpacity(0.2),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Icon(
-              Icons.schedule,
-              color: Colors.blue,
+              Icons.access_time,
+              color: CouleursApp.principal,
               size: 28,
             ),
           ),
@@ -123,12 +166,14 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Horaires d\'ouverture',
-                  style: StylesTexteApp.moyenTitre.copyWith(color: Colors.blue),
+                  'Gestion des Horaires',
+                  style: StylesTexteApp.moyenTitre.copyWith(
+                    color: CouleursApp.principal,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Configurez les horaires d\'ouverture de la cantine pour chaque jour de la semaine',
+                  'Modifiez les horaires d\'ouverture et de fermeture de la cantine',
                   style: StylesTexteApp.corpsGris,
                 ),
               ],
@@ -139,36 +184,15 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
     );
   }
 
-  // UI Design: Section des horaires
   Widget _construireSectionHoraires() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Horaires par jour',
-          style: StylesTexteApp.grandTitre,
-        ),
-        const SizedBox(height: 16),
-        
-        ..._horaires.entries.map((entry) => _construireJourHoraires(entry.key, entry.value)),
-      ],
-    );
-  }
-
-  // UI Design: Horaires pour un jour
-  Widget _construireJourHoraires(String jour, Map<String, dynamic> horaires) {
-    final nomJour = _obtenirNomJour(jour);
-    final estOuvert = horaires['ouvert'] as bool;
-    
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: CouleursApp.blanc,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: CouleursApp.principal.withValues(alpha: 0.08),
+            color: CouleursApp.principal.withOpacity(0.08),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -177,138 +201,103 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // En-tête du jour
-          Row(
-            children: [
-              Icon(
-                _obtenirIconeJour(jour),
-                color: CouleursApp.principal,
-                size: 24,
-              ),
-              const SizedBox(width: 12),
-              Text(
-                nomJour,
-                style: StylesTexteApp.moyenTitre,
-              ),
-              const Spacer(),
-              Switch(
-                value: estOuvert,
-                onChanged: (valeur) {
-                  setState(() {
-                    _horaires[jour]!['ouvert'] = valeur;
-                  });
-                },
-                activeColor: CouleursApp.principal,
-              ),
-            ],
+          Text(
+            'Sélectionner un jour',
+            style: StylesTexteApp.petitTitre,
           ),
           const SizedBox(height: 16),
           
+          // Sélecteur de jour
+          DropdownButtonFormField<String>(
+            value: _jourSelectionne,
+            decoration: InputDecoration(
+              prefixIcon: Icon(Icons.calendar_today, color: CouleursApp.principal),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(color: CouleursApp.principal.withOpacity(0.3)),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(color: CouleursApp.principal.withOpacity(0.3)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(color: CouleursApp.principal, width: 2),
+              ),
+            ),
+            items: const [
+              DropdownMenuItem(value: 'Lundi', child: Text('Lundi')),
+              DropdownMenuItem(value: 'Mardi', child: Text('Mardi')),
+              DropdownMenuItem(value: 'Mercredi', child: Text('Mercredi')),
+              DropdownMenuItem(value: 'Jeudi', child: Text('Jeudi')),
+              DropdownMenuItem(value: 'Vendredi', child: Text('Vendredi')),
+              DropdownMenuItem(value: 'Samedi', child: Text('Samedi')),
+              DropdownMenuItem(value: 'Dimanche', child: Text('Dimanche')),
+            ],
+            onChanged: (jour) {
+              if (jour != null) {
+                setState(() {
+                  _jourSelectionne = jour;
+                  _horairesJourSelectionne = _horairesDatasource.obtenirHorairesCantine(jour);
+                });
+              }
+            },
+          ),
+          const SizedBox(height: 24),
+          
           // Horaires
-          if (estOuvert) ...[
-            Row(
-              children: [
-                Expanded(
-                  child: _construireChampHeure(
-                    label: 'Ouverture',
-                    valeur: horaires['debut'] as String,
-                    onChanged: (valeur) {
-                      setState(() {
-                        _horaires[jour]!['debut'] = valeur;
-                      });
-                    },
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _construireChampHeure(
-                    label: 'Fermeture',
-                    valeur: horaires['fin'] as String,
-                    onChanged: (valeur) {
-                      setState(() {
-                        _horaires[jour]!['fin'] = valeur;
-                      });
-                    },
-                  ),
-                ),
-              ],
+          Text(
+            'Horaires',
+            style: StylesTexteApp.petitTitre,
+          ),
+          const SizedBox(height: 16),
+          
+          // Heure d'ouverture
+          ListTile(
+            title: const Text('Heure d\'ouverture'),
+            subtitle: Text(
+              _formatterHeure(_horairesJourSelectionne['ouverture']!),
+              style: TextStyle(color: CouleursApp.principal, fontWeight: FontWeight.bold),
             ),
-          ] else ...[
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.grey.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.block, color: Colors.grey, size: 20),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Fermé ce jour',
-                    style: StylesTexteApp.corpsGris,
-                  ),
-                ],
-              ),
+            leading: Icon(Icons.wb_sunny, color: CouleursApp.principal),
+            trailing: Icon(Icons.edit, color: CouleursApp.principal),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: CouleursApp.principal.withOpacity(0.3)),
             ),
-          ],
+            onTap: () => _selectionnerHeure('ouverture'),
+          ),
+          const SizedBox(height: 12),
+          
+          // Heure de fermeture
+          ListTile(
+            title: const Text('Heure de fermeture'),
+            subtitle: Text(
+              _formatterHeure(_horairesJourSelectionne['fermeture']!),
+              style: TextStyle(color: CouleursApp.principal, fontWeight: FontWeight.bold),
+            ),
+            leading: Icon(Icons.nights_stay, color: CouleursApp.principal),
+            trailing: Icon(Icons.edit, color: CouleursApp.principal),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: CouleursApp.principal.withOpacity(0.3)),
+            ),
+            onTap: () => _selectionnerHeure('fermeture'),
+          ),
         ],
       ),
     );
   }
 
-  // UI Design: Champ de sélection d'heure
-  Widget _construireChampHeure({
-    required String label,
-    required String valeur,
-    required Function(String) onChanged,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: StylesTexteApp.petitTitre,
-        ),
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            border: Border.all(color: CouleursApp.principal.withValues(alpha: 0.3)),
-            borderRadius: BorderRadius.circular(16),
-            color: CouleursApp.blanc,
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              value: valeur,
-              isExpanded: true,
-              items: _genererOptionsHeures().map((heure) => DropdownMenuItem(
-                value: heure,
-                child: Text(heure),
-              )).toList(),
-              onChanged: (valeur) {
-                if (valeur != null) {
-                  onChanged(valeur);
-                }
-              },
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // UI Design: Boutons d'action
-  Widget _construireBoutonsAction() {
+  Widget _construireBoutonsSauvegarde() {
     return Column(
       children: [
-        // Bouton sauvegarder
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
             onPressed: _isLoading ? null : _sauvegarderHoraires,
             style: ElevatedButton.styleFrom(
-              backgroundColor: CouleursApp.principal,
+              backgroundColor: Colors.green,
               foregroundColor: CouleursApp.blanc,
               padding: const EdgeInsets.symmetric(vertical: 18),
               shape: RoundedRectangleBorder(
@@ -330,9 +319,9 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
                     children: [
                       Icon(Icons.save, size: 20),
                       const SizedBox(width: 8),
-                      Text(
-                        'Sauvegarder les horaires',
-                        style: const TextStyle(
+                      const Text(
+                        'Sauvegarder les modifications',
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
@@ -342,12 +331,10 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
           ),
         ),
         const SizedBox(height: 12),
-        
-        // Bouton réinitialiser
         SizedBox(
           width: double.infinity,
           child: OutlinedButton(
-            onPressed: _isLoading ? null : _reinitialiserHoraires,
+            onPressed: _isLoading ? null : () => Navigator.pop(context),
             style: OutlinedButton.styleFrom(
               foregroundColor: CouleursApp.principal,
               side: BorderSide(color: CouleursApp.principal, width: 2),
@@ -359,11 +346,11 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.refresh, size: 20),
+                Icon(Icons.cancel, size: 20),
                 const SizedBox(width: 8),
-                Text(
-                  'Réinitialiser',
-                  style: const TextStyle(
+                const Text(
+                  'Annuler',
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -376,96 +363,8 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
     );
   }
 
-  // Helpers
-  String _obtenirNomJour(String jour) {
-    switch (jour) {
-      case 'lundi': return 'Lundi';
-      case 'mardi': return 'Mardi';
-      case 'mercredi': return 'Mercredi';
-      case 'jeudi': return 'Jeudi';
-      case 'vendredi': return 'Vendredi';
-      case 'samedi': return 'Samedi';
-      case 'dimanche': return 'Dimanche';
-      default: return jour;
-    }
-  }
-
-  IconData _obtenirIconeJour(String jour) {
-    switch (jour) {
-      case 'lundi': return Icons.calendar_today;
-      case 'mardi': return Icons.calendar_today;
-      case 'mercredi': return Icons.calendar_today;
-      case 'jeudi': return Icons.calendar_today;
-      case 'vendredi': return Icons.calendar_today;
-      case 'samedi': return Icons.weekend;
-      case 'dimanche': return Icons.weekend;
-      default: return Icons.calendar_today;
-    }
-  }
-
-  List<String> _genererOptionsHeures() {
-    List<String> heures = [];
-    for (int heure = 0; heure < 24; heure++) {
-      for (int minute = 0; minute < 60; minute += 30) {
-        heures.add('${heure.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}');
-      }
-    }
-    return heures;
-  }
-
-  // Actions
-  void _sauvegarderHoraires() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    // Simuler la sauvegarde
-    await Future.delayed(const Duration(seconds: 2));
-
-    setState(() {
-      _isLoading = false;
-    });
-
-    // Afficher confirmation
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.check_circle, color: Colors.white, size: 20),
-            const SizedBox(width: 8),
-            Text('Horaires sauvegardés avec succès !'),
-          ],
-        ),
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      ),
-    );
-
-    // Retourner à l'écran précédent
-    Navigator.pop(context);
-  }
-
-  void _reinitialiserHoraires() {
-    setState(() {
-      _horaires = {
-        'lundi': {'ouvert': true, 'debut': '08:00', 'fin': '18:00'},
-        'mardi': {'ouvert': true, 'debut': '08:00', 'fin': '18:00'},
-        'mercredi': {'ouvert': true, 'debut': '08:00', 'fin': '18:00'},
-        'jeudi': {'ouvert': true, 'debut': '08:00', 'fin': '18:00'},
-        'vendredi': {'ouvert': true, 'debut': '08:00', 'fin': '18:00'},
-        'samedi': {'ouvert': false, 'debut': '10:00', 'fin': '16:00'},
-        'dimanche': {'ouvert': false, 'debut': '10:00', 'fin': '16:00'},
-      };
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Horaires réinitialisés'),
-        backgroundColor: Colors.orange,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      ),
-    );
+  String _formatterHeure(TimeOfDay heure) {
+    final minute = heure.minute.toString().padLeft(2, '0');
+    return '${heure.hour}h$minute';
   }
 } 

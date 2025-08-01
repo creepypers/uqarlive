@@ -20,7 +20,7 @@ class ElementStatistique {
 class WidgetSectionStatistiques extends StatelessWidget {
   final String? titre;
   final IconData? iconeTitre;
-  final List<ElementStatistique> statistiques;
+  final List<dynamic> statistiques; // Accepte ElementStatistique ou Map<String, dynamic>
   final TypeSectionStatistiques typeStyling;
   final EdgeInsets? margin;
   final EdgeInsets? padding;
@@ -39,7 +39,7 @@ class WidgetSectionStatistiques extends StatelessWidget {
   const WidgetSectionStatistiques.associations({
     Key? key,
     required String titre,
-    required List<ElementStatistique> statistiques,
+    required List<dynamic> statistiques, // Accepte ElementStatistique ou Map
     EdgeInsets? margin,
     EdgeInsets? padding,
   }) : this(
@@ -54,7 +54,7 @@ class WidgetSectionStatistiques extends StatelessWidget {
   // Factory constructor pour le style Marketplace (gradient clair avec icônes)
   const WidgetSectionStatistiques.marketplace({
     Key? key,
-    required List<ElementStatistique> statistiques,
+    required List<dynamic> statistiques, // Accepte ElementStatistique ou Map
     EdgeInsets? margin,
     EdgeInsets? padding,
   }) : this(
@@ -70,7 +70,7 @@ class WidgetSectionStatistiques extends StatelessWidget {
     Key? key,
     required String titre,
     required IconData iconeTitre,
-    required List<ElementStatistique> statistiques,
+    required List<dynamic> statistiques, // Accepte ElementStatistique ou Map
     EdgeInsets? margin,
     EdgeInsets? padding,
   }) : this(
@@ -200,12 +200,32 @@ class WidgetSectionStatistiques extends StatelessWidget {
     }
   }
 
+  // UI Design: Méthode utilitaire pour extraire les données de statistique
+  ElementStatistique _extraireStatistique(dynamic stat) {
+    if (stat is ElementStatistique) {
+      return stat;
+    } else if (stat is Map<String, dynamic>) {
+      return ElementStatistique(
+        valeur: stat['valeur']?.toString() ?? stat['titre']?.toString() ?? '0',
+        label: stat['label']?.toString() ?? stat['titre']?.toString() ?? '',
+        icone: stat['icone'] as IconData?,
+        couleurIcone: stat['couleur'] as Color? ?? stat['couleurIcone'] as Color?,
+      );
+    } else {
+      // Fallback pour autres types
+      return ElementStatistique(
+        valeur: stat.toString(),
+        label: 'Donnée',
+      );
+    }
+  }
+
   // Style Associations : 3 colonnes de chiffres simples (corrigé overflow)
   Widget _construireStyleAssociations() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: statistiques.map((stat) => Expanded(
-        child: _construireStatistiqueAssociation(stat),
+        child: _construireStatistiqueAssociation(_extraireStatistique(stat)),
       )).toList(),
     );
   }
@@ -242,7 +262,7 @@ class WidgetSectionStatistiques extends StatelessWidget {
     
     for (int i = 0; i < statistiques.length; i++) {
       widgets.add(Expanded(
-        child: _construireStatistiqueMarketplace(statistiques[i]),
+        child: _construireStatistiqueMarketplace(_extraireStatistique(statistiques[i])),
       ));
       
       // Ajouter séparateur sauf pour le dernier élément
@@ -302,10 +322,10 @@ class WidgetSectionStatistiques extends StatelessWidget {
     for (int i = 0; i < statistiques.length; i += 2) {
       final row = <Widget>[];
       
-      row.add(Expanded(child: _construireInfoCantine(statistiques[i])));
+      row.add(Expanded(child: _construireInfoCantine(_extraireStatistique(statistiques[i]))));
       
       if (i + 1 < statistiques.length) {
-        row.add(Expanded(child: _construireInfoCantine(statistiques[i + 1])));
+        row.add(Expanded(child: _construireInfoCantine(_extraireStatistique(statistiques[i + 1]))));
       }
       
       widgets.add(Row(children: row));

@@ -10,6 +10,7 @@ import '../widgets/widget_barre_app_personnalisee.dart';
 import '../widgets/widget_collection.dart';
 import '../widgets/widget_carte.dart';
 import '../widgets/widget_section_statistiques.dart';
+import '../services/statistiques_service.dart';
 
 // UI Design: Écran marketplace avec widgets ultra-minimalistes
 class MarketplaceEcran extends StatefulWidget {
@@ -22,8 +23,10 @@ class MarketplaceEcran extends StatefulWidget {
 class _MarketplaceEcranState extends State<MarketplaceEcran> {
   // Repository pour accéder aux données des livres
   late final LivresRepository _livresRepository;
+  late final StatistiquesService _statistiquesService;
   List<Livre> _livresDisponibles = [];
   List<Livre> _livresFiltres = [];
+  StatistiquesGlobales? _statistiques;
   bool _chargementLivres = false;
 
   // Variables pour les filtres
@@ -42,37 +45,47 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
   @override
   void initState() {
     super.initState();
-    _initialiserRepository();
-    _chargerLivres();
+    _initialiserRepositories();
+    _chargerDonnees();
   }
 
-  void _initialiserRepository() {
+  void _initialiserRepositories() {
     // UI Design: Injection de dépendances via ServiceLocator - Clean Architecture
     _livresRepository = ServiceLocator.obtenirService<LivresRepository>();
+    _statistiquesService = ServiceLocator.obtenirService<StatistiquesService>();
   }
 
-  Future<void> _chargerLivres() async {
+  Future<void> _chargerDonnees() async {
     setState(() {
       _chargementLivres = true;
     });
 
     try {
-      final livres = await _livresRepository.filtrerLivres(
-        matiere: _matiereSelectionnee == 'Matières' ? null : _matiereSelectionnee,
-        etat: _filtreEtat == 'États' ? null : _filtreEtat,
-        annee: _filtreAnnee == 'Années' ? null : _filtreAnnee,
-      );
+      final results = await Future.wait([
+        _livresRepository.filtrerLivres(
+          matiere: _matiereSelectionnee == 'Matières' ? null : _matiereSelectionnee,
+          etat: _filtreEtat == 'États' ? null : _filtreEtat,
+          annee: _filtreAnnee == 'Années' ? null : _filtreAnnee,
+        ),
+        _statistiquesService.obtenirStatistiquesGlobales(),
+      ]);
+
       setState(() {
-        _livresDisponibles = livres;
-        _livresFiltres = livres;
+        _livresDisponibles = results[0] as List<Livre>;
+        _livresFiltres = results[0] as List<Livre>;
+        _statistiques = results[1] as StatistiquesGlobales;
         _chargementLivres = false;
       });
     } catch (e) {
-      print('Erreur lors du chargement des livres: $e');
+      print('Erreur lors du chargement des données: $e');
       setState(() {
         _chargementLivres = false;
       });
     }
+  }
+
+  Future<void> _chargerLivres() async {
+    await _chargerDonnees();
   }
 
   @override
@@ -277,28 +290,32 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
     );
   }
 
-  // UI Design: Statistiques spécialisées pour l'échange de livres - NOUVEAU WIDGET RÉUTILISABLE
+  // UI Design: Statistiques dynamiques pour l'échange de livres
   Widget _construireStatistiquesEchangeLivres() {
+    if (_statistiques == null) {
+      return const SizedBox.shrink();
+    }
+
     return WidgetSectionStatistiques.marketplace(
       statistiques: [
-        ElementStatistique(
-          valeur: '127',
-          label: 'Livres\ndisponibles',
-          icone: Icons.menu_book,
-          couleurIcone: CouleursApp.principal,
-        ),
-        ElementStatistique(
-          valeur: '68',
-          label: 'Échanges\nce mois',
-          icone: Icons.swap_horiz,
-          couleurIcone: CouleursApp.principal,
-        ),
-        ElementStatistique(
-          valeur: '45',
-          label: 'Étudiants\nactifs',
-          icone: Icons.school,
-          couleurIcone: CouleursApp.principal,
-        ),
+        {
+          'valeur': _statistiques!.livresDisponibles.toString(),
+          'label': 'Livres\ndisponibles',
+          'icone': Icons.menu_book,
+          'couleur': CouleursApp.principal,
+        },
+        {
+          'valeur': _statistiques!.livresRecents.toString(),
+          'label': 'Livres\nrécents',
+          'icone': Icons.swap_horiz,
+          'couleur': CouleursApp.principal,
+        },
+        {
+          'valeur': _statistiques!.utilisateursActifs.toString(),
+          'label': 'Étudiants\nactifs',
+          'icone': Icons.school,
+          'couleur': CouleursApp.principal,
+        },
       ],
     );
   }

@@ -10,6 +10,44 @@
 
 ## 🔧 Corrections Récentes
 
+### 2024-12-19 - Correction Erreurs Linter + Méthodes Manquantes
+**Nouvelles corrections :**
+- Correction des erreurs de linter dans `admin_gestion_cantine_ecran.dart`
+- Ajout des méthodes manquantes pour la gestion des horaires
+- Correction des types pour `Future.wait` et conversion des horaires
+
+**Modifications techniques :**
+
+#### 1. **Correction Future.wait** 🔧
+- **Problème résolu :** Erreur de type avec `Future.wait` et types incompatibles
+- **Solution :** Ajout du type explicite `Future.wait<dynamic>` 
+- **Conversion :** `obtenirHorairesCantine()` → `obtenirTousLesHorairesCantine()`
+- **Wrapper :** `Future.value()` pour convertir la méthode synchrone en Future
+
+#### 2. **Méthode de Conversion Horaires** 🕐
+- **Nouvelle méthode :** `_convertirHorairesEnString()` pour convertir `TimeOfDay` en `String`
+- **Formatage :** `_formatterHeure()` pour afficher les heures au format "HH:MM"
+- **Conversion :** `Map<String, Map<String, TimeOfDay>>` → `Map<String, Map<String, String>>`
+- **Affichage :** Horaires formatés pour l'interface utilisateur
+
+#### 3. **Correction Méthode Prochain Créneau** 📅
+- **Problème résolu :** Méthode `obtenirProchainCreneauOuvertureCantine()` inexistante
+- **Solution :** Utilisation de `obtenirStatutCantineFormatte()` existante
+- **Fonctionnalité :** Affichage du statut actuel de la cantine
+
+#### 4. **Types Corrigés** ✅
+- **Futures :** Type explicite `Future.wait<dynamic>` pour éviter l'inférence
+- **Conversion :** Méthode de conversion des horaires `TimeOfDay` → `String`
+- **Affichage :** Horaires formatés correctement dans l'interface
+
+**Fonctionnalités corrigées :**
+- ✅ **Chargement données :** `Future.wait` fonctionnel avec types corrects
+- ✅ **Conversion horaires :** Méthode de conversion `TimeOfDay` → `String`
+- ✅ **Affichage statut :** Utilisation de la méthode existante pour le statut
+- ✅ **Types cohérents :** Plus d'erreurs de linter dans le fichier
+
+---
+
 ### 2024-12-19 - Correction Navigation + AppBar Assos
 **Nouvelles améliorations :**
 - Correction des problèmes de navigation vers les écrans de modification
@@ -55,6 +93,119 @@
 - ✅ **Icônes valides :** Correction des icônes Flutter inexistantes
 - ✅ **Menu fonctionnel :** Toutes les actions du menu dropdown marchent
 - ✅ **Navigation robuste :** Gestion des cas edge et fallbacks
+
+---
+
+### 2025-01-XX - Refactoring Gestion Associations Unifiée
+**Nouvelles améliorations :**
+- Remplacement de la gestion d'actualités par une gestion d'associations unifiée
+- Création d'un écran avec onglets pour gérer associations, actualités et événements
+- Interface moderne avec TabController et design UQAR cohérent
+
+**Modifications majeures :**
+
+#### 1. **Nouvel Écran Unifié** 🏛️
+- **Création :** `AdminGestionAssociationsEcran` avec interface à onglets
+- **Onglets :** "Associations", "Actualités", "Événements"
+- **Design :** TabController avec thème UQAR cohérent
+- **Navigation :** Remplacement de l'ancien écran d'actualités
+
+#### 2. **Dashboard Mis à Jour** 📊
+- **Carte modifiée :** "Actualités & Assos" → "Gestion Assos"
+- **Description :** "Gérer les associations, actualités et événements"
+- **Icône :** `Icons.newspaper` → `Icons.groups`
+- **Navigation :** Vers le nouvel écran unifié
+
+#### 3. **Interface à Onglets** 🎯
+- **Onglet Associations :** Liste des associations avec actions CRUD
+- **Onglet Actualités :** Gestion des actualités avec modification/suppression
+- **Onglet Événements :** Placeholder pour la gestion d'événements
+- **Design :** Couleurs UQAR, icônes cohérentes, messages d'état
+
+#### 4. **Fonctionnalités CRUD** ⚙️
+- **Ajout :** Boutons "Ajouter" pour chaque section
+- **Modification :** Menu contextuel pour modifier les éléments
+- **Suppression :** Confirmation avant suppression
+- **État vide :** Messages informatifs quand aucune donnée
+
+#### 5. **Design Cohérent** 🎨
+- **Thème UQAR :** Couleurs officielles appliquées partout
+- **Composants réutilisables :** WidgetCollection, WidgetCarte
+- **Messages d'état :** Interface informative pour les états vides
+- **Navigation :** Intégration avec l'AppBar admin existante
+
+**Fonctionnalités implémentées :**
+- ✅ **Écran unifié :** Gestion centralisée des associations et contenus
+- ✅ **Interface onglets :** Navigation intuitive entre les sections
+- ✅ **Actions CRUD :** Ajout, modification, suppression d'éléments
+- ✅ **Design UQAR :** Thème cohérent avec l'identité visuelle
+- ✅ **Messages d'état :** Interface informative pour les utilisateurs
+- ✅ **Navigation :** Intégration parfaite avec le dashboard admin
+
+**Fichiers créés/modifiés :**
+- ✅ `admin_gestion_associations_ecran.dart` - Nouvel écran unifié
+- 🔄 `admin_dashboard_ecran.dart` - Navigation mise à jour
+- ❌ `admin_gestion_actualites_ecran.dart` - Supprimé (remplacé)
+
+---
+
+### 2025-01-XX - Correction RenderFlex + Création Écrans d'Ajout CRUD
+**Nouvelles améliorations :**
+- Correction du débordement RenderFlex de 27 pixels sur les associations
+- Création complète des écrans d'ajout pour associations, actualités et événements
+- Navigation fonctionnelle avec rechargement automatique des données
+
+**Modifications majeures :**
+
+#### 1. **Correction Débordement UI** 🔧
+- **Problème résolu :** RenderFlex overflow de 27 pixels sur la grille d'associations
+- **Solution :** Calcul dynamique de la largeur avec `MediaQuery` 
+- **Formule :** `(MediaQuery.of(context).size.width - 48) / 2 - 6`
+- **Espacement :** Réduction de 12px à 8px pour les colonnes et lignes
+
+#### 2. **Écran Ajout Association** 🏛️
+- **Création :** `AdminAjouterAssociationEcran` avec formulaire complet
+- **Sections :** Informations générales, Contact, Paramètres
+- **Validation :** Formulaire avec validation robuste et messages d'erreur
+- **Fonctionnalités :** Mode ajout/modification, switch actif/inactif, catégories
+
+#### 3. **Écran Ajout Actualité** 📰
+- **Création :** `AdminAjouterActualiteEcran` avec gestion des priorités
+- **Sections :** Contenu principal, Paramètres de publication
+- **Fonctionnalités :** Tags, priorités avec couleurs, épinglage, sélection de date
+- **Validation :** Contenu minimum, titre obligatoire, format des tags
+
+#### 4. **Écran Ajout Événement** 🎉
+- **Création :** `AdminAjouterEvenementEcran` avec gestion date/heure
+- **Sections :** Informations générales, Date/heure, Inscription/participation
+- **Fonctionnalités :** Types d'événements, inscription requise, prix, capacité
+- **Validation :** Dates cohérentes, prix conditionnels, capacité pour inscriptions
+
+#### 5. **Navigation Connectée** 🔗
+- **Boutons fonctionnels :** Tous les boutons "Ajouter" naviguent vers les bons écrans
+- **Rechargement auto :** Retour avec `resultat == true` recharge les données
+- **Imports :** Ajout des imports pour tous les nouveaux écrans
+- **Architecture :** Respect de Clean Architecture dans tous les écrans
+
+#### 6. **Design Cohérent UQAR** 🎨
+- **Thème uniforme :** Couleurs UQAR appliquées dans tous les nouveaux écrans
+- **Composants :** Cards avec bordures arrondies, validation cohérente
+- **AppBar :** Navigation admin uniforme avec sections actives
+- **Boutons :** Style cohérent avec thème principal/accent
+
+**Fonctionnalités implémentées :**
+- ✅ **Débordement corrigé :** Plus d'overflow sur la grille d'associations
+- ✅ **Ajout association :** Formulaire complet avec validation
+- ✅ **Ajout actualité :** Gestion priorités, tags, épinglage
+- ✅ **Ajout événement :** Gestion date/heure, inscription, prix
+- ✅ **Navigation CRUD :** Boutons connectés avec rechargement
+- ✅ **Design UQAR :** Thème cohérent dans tous les écrans
+
+**Fichiers créés/modifiés :**
+- ✅ `admin_ajouter_association_ecran.dart` - Écran ajout association
+- ✅ `admin_ajouter_actualite_ecran.dart` - Écran ajout actualité  
+- ✅ `admin_ajouter_evenement_ecran.dart` - Écran ajout événement
+- 🔄 `admin_gestion_associations_ecran.dart` - Navigation connectée + débordement corrigé
 
 ---
 
@@ -461,4 +612,521 @@
 
 ---
 
-*Dernière mise à jour : 19 décembre 2024*
+## 📅 2025-01-XX - CRUD Complet avec UI Interactive
+
+### 🎯 Objectif
+Implémenter une interface utilisateur complète pour la modification des associations, actualités et événements avec interactions avancées.
+
+### ✅ Améliorations UI Implémentées
+
+#### 1. **Interface de Modification Interactive**
+- **Menu Contextuel Associations** : `GestureDetector` avec `onLongPress` → `ModalBottomSheet`
+  - Design roundy avec `BorderRadius.vertical(top: Radius.circular(20))`
+  - Actions : Modifier, Voir détails, Supprimer avec icônes colorées
+  - Animations fluides d'ouverture/fermeture
+
+- **PopupMenu Actualités/Événements** : `PopupMenuButton` intégré dans chaque `ListTile`
+  - Icônes différenciées : `Icons.edit` et `Icons.delete` (rouge)
+  - Actions cohérentes avec les associations
+
+#### 2. **Formulaires Intelligents**
+- **Mode Ajout/Modification** : UI différenciée automatiquement
+  - Titres dynamiques : "Ajouter" vs "Modifier" dans AppBar et boutons
+  - Remplissage automatique des champs en mode modification
+  - Validation cohérente avec messages d'erreur contextuels
+
+- **Gestion Dates/Heures Événements** : 
+  - Sélecteurs de date intégrés avec validation
+  - Conversion intelligente `DateTime` ↔ `TimeOfDay`
+  - Validation logique (date fin > date début)
+
+#### 3. **Feedback Utilisateur Optimisé**
+- **Messages Contextuels** : `SnackBar` avec couleurs appropriées
+  - Succès : `Colors.green` avec messages spécifiques au mode
+  - Erreurs : `Colors.red` avec détails de l'erreur
+  - Actions : `CouleursApp.principal` pour informations
+
+- **Dialogues de Confirmation** : `AlertDialog` avec style UQAR
+  - Confirmation de suppression avec nom de l'élément
+  - Boutons stylisés : Annuler (principal) vs Supprimer (rouge)
+
+#### 4. **Gestion des Événements Avancée**
+- **Statuts Visuels** : Badges colorés selon le statut
+  - "À venir" : `CouleursApp.principal`
+  - "En cours" : `Colors.green`
+  - "Terminé" : `Colors.grey`
+
+- **Icônes par Type** : Différenciation visuelle des événements
+  - Conférence : `Icons.mic`
+  - Atelier : `Icons.build`
+  - Social : `Icons.people`
+  - Sportif : `Icons.sports`
+  - Culturel : `Icons.theater_comedy`
+  - Académique : `Icons.school`
+
+#### 5. **Intégration de l'Entité Événements**
+- **Liste Dynamique** : `ListView.builder` avec `Card` design
+- **Informations Riches** : Lieu, date, statut, organisateur
+- **UI Responsive** : Gestion des textes longs avec `TextOverflow.ellipsis`
+
+### 🧩 Composants UI Créés/Modifiés
+- **Amélioration** : `AdminGestionAssociationsEcran` avec gestion complète des 3 entités
+- **Extension** : `AdminAjouterEvenementEcran` avec support modification
+- **Optimisation** : Navigation cohérente avec rechargement automatique des données
+
+### 🎨 Respect du Thème UQAR
+- **Couleurs** : Utilisation systématique de `CouleursApp.principal`, `CouleursApp.accent`
+- **Typographie** : Application de `StylesTexteApp` pour tous les textes
+- **Cohérence** : Design uniforme entre toutes les sections
+
+### 🔧 Défis Techniques Résolus
+1. **Gestion d'État** : Synchronisation entre mode ajout/modification
+2. **Validation de Formulaires** : Contraintes métier pour événements
+3. **Navigation** : Passage de paramètres entre écrans avec retour de résultat
+4. **UI Responsive** : Calcul dynamique des largeurs pour éviter débordements
+
+### 📱 Expérience Utilisateur
+- **Intuitive** : Actions découvrables avec feedback immédiat
+- **Cohérente** : Patterns identiques pour toutes les entités
+- **Efficace** : Workflows optimisés pour l'administration
+- **Accessible** : Informations claires et actions bien visibles
+
+#### 6. **Optimisations UX Supplémentaires**
+- **Associations Cliquables** : Clic direct sur les cartes d'associations pour modification
+  - Comportement intuitif : clic = modifier, appui long = menu complet
+  - Action principale accessible en un clic
+
+- **Correction Débordement Événements** : Restructuration complète du layout
+  - Remplacement `ListTile` par `Row` avec `Expanded` et `Flexible`
+  - Gestion intelligente de l'espace avec `TextOverflow.ellipsis`
+  - Colonnes séparées : Avatar | Contenu principal | Menu actions
+  - Espacement optimisé pour éviter les débordements
+
+### 🔧 Problèmes Résolus
+- ❌ **RenderFlex overflow** : 39 pixels de débordement dans les événements
+- ✅ **Solution** : Layout responsive avec `Expanded` et gestion de texte tronqué
+- ❌ **Associations non-cliquables** : Nécessitait appui long pour toute action
+- ✅ **Solution** : Clic direct pour modifier + appui long pour menu complet
+
+---
+
+## 📅 2025-01-XX - Dashboard Dynamique et Interface d'Administration Modernisée
+
+### 🎯 Objectif
+Créer une interface d'administration moderne avec des statistiques dynamiques et une expérience utilisateur optimisée.
+
+### ✅ Améliorations UI Implémentées
+
+#### 1. **Dashboard Admin Complètement Refait**
+- **Design Moderne** : Cartes statistiques avec gradients et élévations
+  - GridView responsive avec cartes 2x2 pour les métriques principales
+  - Couleurs thématiques pour chaque type de donnée
+  - Détails contextuels sous chaque métrique
+
+- **Sections Hiérarchiques** :
+  - **Vue d'ensemble** : 4 cartes principales (Utilisateurs, Associations, Événements, Actualités)
+  - **Statistiques détaillées** : Métriques secondaires en liste structurée
+  - **Gestion du système** : Navigation vers les différents modules
+  - **Activité récente** : Derniers utilisateurs avec cartes compactes
+
+#### 2. **Statistiques Dynamiques en Temps Réel**
+- **Calculs Automatiques** : Toutes les métriques calculées à partir des données réelles
+- **Tendances Contextuelles** : "+X cette semaine", "Y actives", "Z à venir"
+- **Pourcentages Intelligents** : Taux d'activité, occupation, participation
+- **Agrégations Complexes** : Membres totaux, vues moyennes, capacités
+
+#### 3. **Gestion des Comptes Modernisée**
+- **Interface Tabulée** : Onglets pour filtrer par type d'utilisateur
+  - Tous (avec compteur dynamique)
+  - Étudiants, Modérateurs, Admins avec totaux en temps réel
+
+- **Cartes Utilisateurs Élégantes** :
+  - Avatars avec initiales sur fond coloré selon le rôle
+  - Badges de statut (Actif/Suspendu) visuellement distincts
+  - Informations hiérarchisées (nom, email, code, type)
+  - Menu contextuel avec actions appropriées
+
+- **Recherche Avancée** :
+  - Barre de recherche en temps réel
+  - Compteur de résultats dynamique
+  - Recherche multi-champs (nom, email, code étudiant)
+
+#### 4. **Expérience Utilisateur Optimisée**
+- **Navigation Intuitive** : Cartes cliquables vers les modules de gestion
+- **Feedback Visuel** : Loading states, refresh pull-to-refresh
+- **Gestion d'État** : Toggle statut utilisateur avec feedback immédiat
+- **Messages Contextuels** : Confirmations de suppression, messages d'état
+
+#### 5. **Design System Cohérent**
+- **Couleurs Thématiques** :
+  - Utilisateurs : `CouleursApp.principal` (bleu UQAR)
+  - Associations : `Colors.orange`
+  - Événements : `Colors.green`
+  - Actualités : `CouleursApp.accent` (bleu clair)
+
+- **Composants Réutilisables** :
+  - Cartes statistiques avec format uniforme
+  - Cartes utilisateurs avec template cohérent
+  - Lignes de statistiques détaillées
+  - Messages vides avec call-to-action
+
+### 🧩 Composants UI Créés
+- **CarteStatistique** : Widget pour métriques avec gradient et détails
+- **CarteUtilisateurCompacte** : Version condensée pour activité récente
+- **CarteGestion** : Navigation vers modules d'administration
+- **LigneStatistique** : Affichage clé-valeur pour données détaillées
+
+### 🎨 Respect du Thème UQAR
+- **Cohérence Visuelle** : Application systématique des couleurs de la charte
+- **Typographie** : Utilisation exclusive de `StylesTexteApp`
+- **Espacements** : Padding et margins harmonisés (8, 12, 16, 20, 24px)
+- **Élévations** : Cartes avec ombres subtiles pour la profondeur
+
+### 🔧 Innovations Techniques
+- **Service Centralisé** : `StatistiquesService` pour unifier toutes les données
+- **Calculs Parallèles** : `Future.wait` pour optimiser les performances
+- **Types Sécurisés** : Modèles `StatistiquesGlobales` et `StatistiquesDashboard`
+- **Gestion d'Erreurs** : Try-catch avec feedback utilisateur approprié
+
+### 📱 Responsivité et Accessibilité
+- **GridView Adaptatif** : childAspectRatio optimisé pour différentes tailles
+- **Texte Tronqué** : `TextOverflow.ellipsis` pour les contenus longs
+- **Contraste** : Couleurs respectant les standards d'accessibilité
+- **Navigation** : Actions découvrables avec icônes explicites
+
+### 🚀 Performance et UX
+- **Chargement Progressif** : CircularProgressIndicator pendant les calculs
+- **Refresh Intelligent** : Pull-to-refresh pour actualiser les données
+- **Navigation Fluide** : Transitions cohérentes entre écrans
+- **Feedback Immédiat** : SnackBar pour confirmer les actions
+
+---
+
+## 📅 2025-01-XX - Suppression Type Modérateur + Corrections Linter
+
+### 🎯 Objectif  
+Simplifier l'architecture en supprimant le type d'utilisateur "modérateur" et corriger toutes les erreurs de compilation.
+
+### ✅ Modifications Implémentées
+
+#### 1. **Suppression Type Modérateur** 🗑️
+- **Entité utilisateur** : `lib/domain/entities/utilisateur.dart`
+  - Suppression `moderateur` de l'enum `TypeUtilisateur`
+  - Enum simplifié : `etudiant`, `administrateur` uniquement
+  - Architecture plus simple avec deux niveaux de privilèges
+
+#### 2. **Corrections Écrans Admin** 🔧
+- **Gestion Comptes** : `lib/presentation/screens/admin_gestion_comptes_ecran.dart`
+  - Suppression onglet "Modérateurs" de la TabBar
+  - Mise à jour du TabController : `length: 4` → `length: 3`
+  - Correction des méthodes utilitaires pour TypeUtilisateur enum
+  - Correction styles de texte : `StylesTexteApp.corps` → `StylesTexteApp.corpsNormal`
+
+- **Dashboard Admin** : `lib/presentation/screens/admin_dashboard_ecran.dart`
+  - Ajout méthode `_obtenirLibelleTypeUtilisateur()` manquante
+  - Correction affichage type utilisateur dans les cartes compactes
+  - Suppression import inutile `widget_carte.dart`
+
+#### 3. **Corrections Backend** 🛠️
+- **Service Statistiques** : `lib/presentation/services/statistiques_service.dart`
+  - Ajout import `utilisateur.dart` pour TypeUtilisateur
+  - Suppression champ `moderateurs` de StatistiquesGlobales
+  - Correction des types dans `Future.wait` avec cast explicite
+  - Mise à jour constructeur sans référence aux modérateurs
+
+- **Datasource Locale** : `lib/data/datasources/utilisateurs_datasource_local.dart`
+  - Correction `TypeUtilisateur.moderateur` → `TypeUtilisateur.administrateur`
+  - Suppression calcul statistiques modérateurs
+
+#### 4. **Corrections ModifierProfilEcran** 👤
+- **Paramètre utilisateur** : `lib/presentation/screens/modifier_profil_ecran.dart`
+  - Ajout paramètre optionnel `Utilisateur? utilisateur`
+  - Import entité utilisateur pour compatibilité admin
+  - Constructeur étendu pour réutilisation admin/étudiant
+
+#### 5. **Amélioration Méthodes Utilitaires** ⚙️
+- **Type Safety** : Méthodes `_obtenirCouleurTypeUtilisateur` et `_obtenirLibelleTypeUtilisateur`
+  - Paramètres `String` → `TypeUtilisateur` pour type safety
+  - Switch exhaustifs sans clause `default` inutile
+  - Mapping correct enum → couleurs/libellés
+
+### 🧩 Résolutions d'Erreurs
+
+#### **Erreurs Linter Corrigées** ✅
+- ❌ `StylesTexteApp.corps` n'existe pas → ✅ `StylesTexteApp.corpsNormal`
+- ❌ `Icons.moderator` n'existe pas → ✅ Suppression onglet modérateurs
+- ❌ `TypeUtilisateur` vs `String` incompatibles → ✅ Type safety avec enum
+- ❌ Paramètre `utilisateur` manquant → ✅ Constructeur ModifierProfilEcran étendu
+- ❌ Clauses `default` inutiles → ✅ Switch exhaustifs simplifiés
+- ❌ Import inutile → ✅ Nettoyage des imports
+
+#### **Consistance Architecture** 🏗️
+- **Domain Layer** : Enum TypeUtilisateur simplifié et cohérent
+- **Data Layer** : Datasource alignée avec nouveau type système
+- **Presentation Layer** : UI adaptée aux deux types utilisateur seulement
+- **Service Layer** : Statistiques sans références aux modérateurs
+
+### 🎨 Respect du Thème UQAR
+- **Cohérence UI** : Aucun changement visuel pour l'utilisateur final
+- **Architecture** : Simplification sans impact UX
+- **Performance** : Moins de calculs avec un type utilisateur en moins
+
+### 🔧 Impact Technique
+- **Simplification** : Architecture plus simple à maintenir
+- **Type Safety** : Meilleure sécurité des types avec enum
+- **Consistance** : Suppression complète des références modérateurs
+- **Maintenance** : Code plus propre sans cas edge modérateurs
+
+### 📱 Fonctionnalités Préservées
+- ✅ **Gestion Utilisateurs** : Admins peuvent toujours tout gérer
+- ✅ **Navigation** : Onglets et filtres fonctionnels
+- ✅ **Statistiques** : Calculs corrects avec deux types seulement
+- ✅ **CRUD** : Toutes les opérations préservées
+- ✅ **UI** : Aucun changement visuel utilisateur
+
+**Fichiers modifiés :**
+- 🔄 `lib/domain/entities/utilisateur.dart` - Enum simplifié
+- 🔄 `lib/presentation/screens/admin_gestion_comptes_ecran.dart` - UI adaptée
+- 🔄 `lib/presentation/screens/admin_dashboard_ecran.dart` - Méthode ajoutée
+- 🔄 `lib/presentation/screens/modifier_profil_ecran.dart` - Paramètre ajouté
+- 🔄 `lib/presentation/services/statistiques_service.dart` - Backend corrigé
+- 🔄 `lib/data/datasources/utilisateurs_datasource_local.dart` - Données adaptées
+
+---
+
+## 📅 2025-01-XX - Correction Erreurs Dashboard + Overflow
+
+### 🎯 Objectif  
+Corriger l'exception NoSuchMethodError et l'overflow RenderFlex sur le dashboard admin.
+
+### ✅ Corrections Implémentées
+
+#### 1. **Erreur NoSuchMethodError Corrigée** 🔧
+- **Problème** : `Class 'SalleModel' has no instance getter 'capacite'`
+- **Cause** : Dans l'entité/modèle Salle, le champ s'appelle `capaciteMax`, pas `capacite`
+- **Solution** : `lib/presentation/services/statistiques_service.dart`
+  - Ligne 98 : `capacite` → `capaciteMax`
+  - Cast correct : `((s as dynamic).capaciteMax as num).toInt()`
+- **Résultat** : Calcul des statistiques de salles fonctionnel
+
+#### 2. **Overflow RenderFlex Corrigé** 📐
+- **Problème** : RenderFlex overflow de 4.8 pixels sur le bottom du dashboard
+- **Cause** : Espacement trop serré entre sections et padding insuffisant
+- **Solution** : `lib/presentation/screens/admin_dashboard_ecran.dart`
+  - **Padding ajusté** : `EdgeInsets.all(16)` → `EdgeInsets.fromLTRB(16, 16, 16, 20)`
+  - **Espacement réduit** : `SizedBox(height: 24)` → `SizedBox(height: 20)`
+  - **Padding final** : Ajout `SizedBox(height: 8)` à la fin de la Column
+- **Résultat** : Plus d'overflow, interface fluide
+
+#### 3. **Améliorations Layout** 🎨
+- **Optimisation espacement** : Balance entre densité et respiration
+- **Padding intelligent** : Plus d'espace en bas pour la navigation
+- **Commentaire ajouté** : Documentation de la correction overflow
+- **Performance** : Pas d'impact sur les performances de rendu
+
+### 🧩 Détails Techniques
+
+#### **Mapping Entité/Modèle** 🗂️
+- **Problème identifié** : Incohérence dans les noms de propriétés
+- **Entité Salle** : Utilise `capaciteMax` (int)
+- **Service Statistiques** : Tentait d'accéder à `capacite` (inexistant)
+- **Correction** : Alignement sur la nomenclature de l'entité
+
+#### **Calcul Statistiques Salles** 📊
+- **Capacité totale** : Somme de toutes les `capaciteMax` des salles
+- **Type safety** : Cast approprié `(s as dynamic).capaciteMax as num`
+- **Conversion** : `.toInt()` pour garantir le type `int`
+- **Performance** : `fold<int>` pour type explicit et optimisation
+
+#### **Layout Responsive** 📱
+- **Overflow evité** : Gestion intelligente de l'espace disponible
+- **Padding progressif** : Plus d'espace vers le bas
+- **Sections équilibrées** : Espacement uniforme mais optimisé
+- **Navigation préservée** : Espace pour le scroll et les interactions
+
+### 🎨 Respect du Thème UQAR
+- **Aucun changement visuel** : Corrections purement techniques
+- **Layout préservé** : Même disposition, juste optimisée
+- **Performance** : Interface plus fluide sans overflow
+
+### 🔧 Impact Technique
+- **Stabilité** : Plus d'exceptions lors du chargement des statistiques
+- **UI** : Interface fluide sans débordement
+- **Maintenance** : Code plus robuste avec noms cohérents
+- **Performance** : Calculs statistiques optimisés
+
+### 📱 Fonctionnalités Corrigées
+- ✅ **Chargement statistiques** : Dashboard se charge sans erreur
+- ✅ **Affichage capacités** : Total des capacités de salles calculé correctement
+- ✅ **Layout responsive** : Plus d'overflow sur aucune taille d'écran
+- ✅ **Navigation fluide** : Scroll sans accrocs ni débordements
+
+**Fichiers modifiés :**
+- 🔄 `lib/presentation/services/statistiques_service.dart` - Correction `capacite` → `capaciteMax`
+- 🔄 `lib/presentation/screens/admin_dashboard_ecran.dart` - Correction overflow layout
+
+---
+
+## 📅 2025-01-XX - Amélioration UX Dashboard + Gestion Utilisateurs
+
+### 🎯 Objectif  
+Améliorer l'expérience utilisateur avec masquage de statistiques, connexion complète des boutons et gestion intelligente des utilisateurs.
+
+### ✅ Fonctionnalités Implémentées
+
+#### 1. **Masquage/Affichage Statistiques Dashboard** 👁️
+- **Fonctionnalité** : Bouton œil pour masquer/afficher les statistiques
+- **Position** : À côté du titre "Vue d'ensemble"
+- **Implémentation** : `lib/presentation/screens/admin_dashboard_ecran.dart`
+  - Variable d'état : `bool _statistiquesVisibles = true`
+  - Icône dynamique : `Icons.visibility_off` / `Icons.visibility`
+  - Tooltip informatif : "Masquer/Afficher les statistiques"
+  - Message informatif quand masqué : "Statistiques masquées - Cliquez sur l'œil pour les afficher"
+
+#### 2. **Bouton Ajouter Utilisateur Connecté** ➕
+- **Problème résolu** : FloatingActionButton ne faisait rien
+- **Solution** : `lib/presentation/screens/admin_gestion_comptes_ecran.dart`
+  - Méthode `_afficherModalNouvelUtilisateur()` complètement refaite
+  - Navigation vers `ModifierProfilEcran()` sans paramètre utilisateur
+  - Rechargement automatique des données après création
+  - Suppression du message "en cours de développement"
+
+#### 3. **Gestion Intelligente Modification/Création** 🧠
+- **ModifierProfilEcran** adaptatif : `lib/presentation/screens/modifier_profil_ecran.dart`
+  - **Mode Création** : `widget.utilisateur == null`
+    - Titre : "Créer un utilisateur"
+    - Sous-titre : "Création d'un nouvel utilisateur"
+    - Champs vides (`.clear()`)
+  - **Mode Modification** : `widget.utilisateur != null`
+    - Titre : "Modifier le profil"
+    - Sous-titre : "Mise à jour des informations"
+    - Champs pré-remplis avec données utilisateur sélectionné
+
+#### 4. **Navigation Cohérente** 🔗
+- **Passage d'utilisateur** : Vérification que l'utilisateur sélectionné est bien passé
+- **Ligne correcte** : `ModifierProfilEcran(utilisateur: utilisateur)` ✅
+- **Rechargement** : `_chargerDonnees()` après modification/création
+- **Navigation retour** : Gestion du résultat `resultat == true`
+
+### 🧩 Détails Techniques
+
+#### **Masquage Statistiques** 📊
+- **Widget conditionnel** : Opérateur ternaire `_statistiquesVisibles ? GridView : Container`
+- **State management** : `setState()` pour mise à jour immédiate
+- **UI consistante** : Même espacement avec ou sans statistiques
+- **Accessibilité** : Tooltip explicatif sur le bouton
+
+#### **Gestion Utilisateur Adaptative** 👤
+- **Détection automatique** : `widget.utilisateur != null` pour le mode
+- **Chargement conditionnel** : Données utilisateur ou champs vides
+- **Interface dynamique** : Titres et sous-titres adaptatifs
+- **Réutilisation maximale** : Un seul écran pour deux usages
+
+#### **Flow Navigation** 🚀
+1. **Création** : FloatingActionButton → ModifierProfilEcran() → Retour avec succès → Rechargement
+2. **Modification** : Clic utilisateur → ModifierProfilEcran(utilisateur) → Retour → Rechargement
+3. **Cohérence** : Même pattern de navigation dans les deux cas
+
+### 🎨 Respect du Thème UQAR
+- **Icônes cohérentes** : `Icons.visibility` / `Icons.visibility_off` en couleur principale
+- **Messages informatifs** : `StylesTexteApp.corpsGris` pour les états
+- **Boutons standards** : Design cohérent avec FloatingActionButton existant
+- **Spacing uniforme** : Même espacement avec ou sans statistiques
+
+### 🔧 Impact Technique
+- **Performance** : Pas de re-render inutile, state management optimal
+- **Maintenabilité** : Code plus propre avec réutilisation maximale
+- **UX** : Interface plus flexible et intuitive
+- **Robustesse** : Gestion d'erreurs et cas edge
+
+### 📱 Fonctionnalités Utilisateur
+- ✅ **Dashboard personnalisable** : Masquer/afficher selon préférence
+- ✅ **Création utilisateur** : Bouton fonctionnel avec écran adapté
+- ✅ **Modification utilisateur** : Données pré-remplies de l'utilisateur sélectionné
+- ✅ **Navigation fluide** : Rechargement automatique après actions
+- ✅ **Feedback visuel** : États clairs et messages informatifs
+
+### 🚀 Workflow Complet
+1. **Admin clique FloatingActionButton** → Écran création (champs vides)
+2. **Admin clique sur utilisateur** → Écran modification (données pré-remplies)
+3. **Admin masque statistiques** → Interface épurée pour focus sur gestion
+4. **Retour d'écran** → Rechargement automatique des données
+
+**Fichiers modifiés :**
+- 🔄 `lib/presentation/screens/admin_dashboard_ecran.dart` - Masquage statistiques
+- 🔄 `lib/presentation/screens/admin_gestion_comptes_ecran.dart` - Bouton ajouter connecté  
+- 🔄 `lib/presentation/screens/modifier_profil_ecran.dart` - Mode adaptatif création/modification
+
+---
+
+## 📅 2025-01-XX - Correction Overflow Gestion Système + Masquage Statistiques Comptes
+
+### 🎯 Objectif  
+Corriger l'overflow RenderFlex dans la section "Gestion du système" du dashboard admin et ajouter le masquage des statistiques dans l'écran de gestion des comptes.
+
+### ✅ Corrections Implémentées
+
+#### 1. **Overflow RenderFlex Corrigé dans Gestion Système** 📐
+- **Problème** : RenderFlex overflow de 6.7 pixels dans la section "Gestion du système"
+- **Cause** : GridView avec contraintes fixes causant des débordements
+- **Solution** : `lib/presentation/screens/admin_dashboard_ecran.dart`
+  - **Remplacement GridView** : `GridView.count` → `Wrap` pour flexibilité
+  - **Utilisation composant existant** : `WidgetCarte.association()` au lieu de cartes personnalisées
+  - **Espacement optimisé** : `spacing: 12`, `runSpacing: 12`
+  - **Paramètres corrects** : `nom`, `description`, `couleurIcone` selon la signature
+  - **Import ajouté** : `widget_carte.dart` pour utiliser le composant existant
+
+#### 2. **Masquage Statistiques dans Gestion Comptes** 👁️
+- **Fonctionnalité** : Bouton œil pour masquer/afficher les statistiques utilisateurs
+- **Position** : À côté du titre "Statistiques Utilisateurs"
+- **Implémentation** : `lib/presentation/screens/admin_gestion_comptes_ecran.dart`
+  - Variable d'état : `bool _statistiquesVisibles = true`
+  - Icône dynamique : `Icons.visibility_off` / `Icons.visibility`
+  - Tooltip informatif : "Masquer/Afficher les statistiques"
+  - Message informatif quand masqué : "Statistiques masquées - Cliquez sur l'œil pour les afficher"
+
+### 🧩 Détails Techniques
+
+#### **Optimisation Layout Gestion Système** 🎯
+- **Layout flexible** : `Wrap` au lieu de `GridView` pour éviter les contraintes fixes
+- **Composant réutilisé** : `WidgetCarte.association()` déjà testé et optimisé
+- **Espacement cohérent** : `spacing: 12`, `runSpacing: 12` pour uniformité
+- **Performance** : Moins de calculs de layout, rendu plus fluide
+
+#### **Masquage Statistiques Comptes** 📊
+- **Widget conditionnel** : Opérateur ternaire `_statistiquesVisibles ? WidgetSectionStatistiques : Container`
+- **State management** : `setState()` pour mise à jour immédiate
+- **UI consistante** : Même espacement avec ou sans statistiques
+- **Accessibilité** : Tooltip explicatif sur le bouton
+
+### 🎨 Respect du Thème UQAR
+- **Cohérence visuelle** : Même design que le dashboard principal
+- **Icônes cohérentes** : `Icons.visibility` / `Icons.visibility_off` en couleur principale
+- **Messages informatifs** : `StylesTexteApp.corpsGris` pour les états
+- **Spacing uniforme** : Optimisation sans perte de lisibilité
+
+### 🔧 Impact Technique
+- **Performance** : Layout plus efficace, moins de débordements
+- **Maintenabilité** : Code cohérent entre dashboard et gestion comptes
+- **UX** : Interface plus fluide et responsive
+- **Robustesse** : Gestion d'overflow préventive
+
+### 📱 Fonctionnalités Corrigées
+- ✅ **Gestion système** : Plus d'overflow sur les cartes de navigation
+- ✅ **Statistiques comptes** : Masquage/affichage selon préférence
+- ✅ **Layout responsive** : Adaptation aux différentes tailles d'écran
+- ✅ **Navigation fluide** : Cartes de gestion plus compactes
+
+### 🚀 Workflow Complet
+1. **Dashboard** : Section "Gestion du système" sans overflow
+2. **Gestion comptes** : Statistiques masquables comme le dashboard principal
+3. **Cohérence** : Même pattern de masquage dans les deux écrans
+4. **Performance** : Layout optimisé pour tous les écrans
+
+**Fichiers modifiés :**
+- 🔄 `lib/presentation/screens/admin_dashboard_ecran.dart` - Correction overflow gestion système
+- 🔄 `lib/presentation/screens/admin_gestion_comptes_ecran.dart` - Masquage statistiques
+
+---
+
+*Dernière mise à jour : 2025-01-XX*

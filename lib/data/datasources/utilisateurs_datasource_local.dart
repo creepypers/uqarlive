@@ -46,7 +46,7 @@ class UtilisateursDatasourceLocal {
       telephone: '418-724-2222',
       dateInscription: DateTime.now().subtract(const Duration(days: 200)),
       estActif: true,
-      typeUtilisateur: TypeUtilisateur.moderateur,
+      typeUtilisateur: TypeUtilisateur.administrateur,
       privileges: [
         PrivilegesUtilisateur.gestionActualites,
         PrivilegesUtilisateur.moderationContenu,
@@ -232,7 +232,6 @@ class UtilisateursDatasourceLocal {
       'actifs': _utilisateurs.where((u) => u.estActif).length,
       'inactifs': _utilisateurs.where((u) => !u.estActif).length,
       'administrateurs': _utilisateurs.where((u) => u.typeUtilisateur == TypeUtilisateur.administrateur).length,
-      'moderateurs': _utilisateurs.where((u) => u.typeUtilisateur == TypeUtilisateur.moderateur).length,
       'etudiants': _utilisateurs.where((u) => u.typeUtilisateur == TypeUtilisateur.etudiant).length,
     };
   }

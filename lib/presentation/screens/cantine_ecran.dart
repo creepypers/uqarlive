@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/di/service_locator.dart';
 import '../../domain/entities/menu.dart';
 import '../../domain/repositories/menus_repository.dart';
 import '../../data/repositories/menus_repository_impl.dart';
@@ -9,6 +10,7 @@ import '../widgets/widget_barre_app_personnalisee.dart';
 import '../widgets/widget_carte.dart';
 import '../widgets/widget_collection.dart';
 import '../widgets/widget_section_statistiques.dart';
+import '../services/statistiques_service.dart';
 import '../services/navigation_service.dart';
 import 'details_menu_ecran.dart';
 
@@ -23,8 +25,10 @@ class CantineEcran extends StatefulWidget {
 class _CantineEcranState extends State<CantineEcran> {
   // Repository pour accéder aux données des menus
   late final MenusRepository _menusRepository;
+  late final StatistiquesService _statistiquesService;
   List<Menu> _menusDuJour = [];
   List<Menu> _tousLesMenus = [];
+  StatistiquesGlobales? _statistiques;
   String _categorieSelectionnee = 'menu_jour';
   bool _chargementMenus = false;
   bool _afficheVegetarienUniquement = false;
@@ -48,37 +52,44 @@ class _CantineEcranState extends State<CantineEcran> {
   @override
   void initState() {
     super.initState();
-    _initialiserRepository();
-    _chargerMenus();
+    _initialiserRepositories();
+    _chargerDonnees();
   }
 
-  void _initialiserRepository() {
+  void _initialiserRepositories() {
     final datasourceLocal = MenusDatasourceLocal();
     _menusRepository = MenusRepositoryImpl(datasourceLocal);
+    _statistiquesService = ServiceLocator.obtenirService<StatistiquesService>();
   }
 
-  Future<void> _chargerMenus() async {
+  Future<void> _chargerDonnees() async {
     setState(() {
       _chargementMenus = true;
     });
 
     try {
-      final [menusDuJour, menusCategorie] = await Future.wait([
+      final results = await Future.wait([
         _menusRepository.obtenirMenusDuJour(),
         _menusRepository.obtenirMenusParCategorie(_categorieSelectionnee),
+        _statistiquesService.obtenirStatistiquesGlobales(),
       ]);
 
       setState(() {
-        _menusDuJour = menusDuJour;
-        _tousLesMenus = menusCategorie;
+        _menusDuJour = results[0] as List<Menu>;
+        _tousLesMenus = results[1] as List<Menu>;
+        _statistiques = results[2] as StatistiquesGlobales;
         _chargementMenus = false;
       });
     } catch (e) {
-      print('Erreur lors du chargement des menus: $e');
+      print('Erreur lors du chargement des données: $e');
       setState(() {
         _chargementMenus = false;
       });
     }
+  }
+
+  Future<void> _chargerMenus() async {
+    await _chargerDonnees();
   }
 
   Future<void> _changerCategorie(String nouvelleCategorie) async {
@@ -198,36 +209,40 @@ class _CantineEcranState extends State<CantineEcran> {
     );
   }
 
-  // UI Design: Section avec infos et horaires de la cantine - NOUVEAU WIDGET RÉUTILISABLE
+  // UI Design: Section avec infos et horaires de la cantine - Données dynamiques
   Widget _construireSectionInfos() {
+    if (_statistiques == null) {
+      return const SizedBox.shrink();
+    }
+
     return WidgetSectionStatistiques.cantine(
       titre: 'Horaires & Infos',
       iconeTitre: Icons.restaurant,
       statistiques: [
-        ElementStatistique(
-          valeur: '11h30 - 14h00',
-          label: 'Ouverture',
-          icone: Icons.access_time,
-          couleurIcone: CouleursApp.accent,
-        ),
-        ElementStatistique(
-          valeur: '150 places',
-          label: 'Places',
-          icone: Icons.people,
-          couleurIcone: CouleursApp.accent,
-        ),
-        ElementStatistique(
-          valeur: 'Carte & Espèces',
-          label: 'Paiement',
-          icone: Icons.payment,
-          couleurIcone: CouleursApp.accent,
-        ),
-        ElementStatistique(
-          valeur: 'Gratuit',
-          label: 'WiFi',
-          icone: Icons.wifi,
-          couleurIcone: CouleursApp.accent,
-        ),
+        {
+          'valeur': '11h30 - 14h00',
+          'label': 'Ouverture',
+          'icone': Icons.access_time,
+          'couleur': CouleursApp.accent,
+        },
+        {
+          'valeur': '${_statistiques!.capaciteTotal} places',
+          'label': 'Capacité',
+          'icone': Icons.people,
+          'couleur': CouleursApp.accent,
+        },
+        {
+          'valeur': '${_statistiques!.prixMoyen.toStringAsFixed(2)}€',
+          'label': 'Prix moyen',
+          'icone': Icons.payment,
+          'couleur': CouleursApp.accent,
+        },
+        {
+          'valeur': '${_statistiques!.menusDisponibles} menus',
+          'label': 'Disponibles',
+          'icone': Icons.restaurant_menu,
+          'couleur': CouleursApp.accent,
+        },
       ],
     );
   }

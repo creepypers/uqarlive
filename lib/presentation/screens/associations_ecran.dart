@@ -188,18 +188,18 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
     return WidgetSectionStatistiques.associations(
       titre: 'Vie Étudiante UQAR',
       statistiques: [
-        ElementStatistique(
-          valeur: '$totalAssociations',
-          label: 'Associations',
-        ),
-        ElementStatistique(
-          valeur: '${(totalMembres / 1000).toStringAsFixed(1)}k',
-          label: 'Membres',
-        ),
-        ElementStatistique(
-          valeur: '$associationsActives',
-          label: 'Actives',
-        ),
+        {
+          'valeur': '$totalAssociations',
+          'label': 'Associations',
+        },
+        {
+          'valeur': '${(totalMembres / 1000).toStringAsFixed(1)}k',
+          'label': 'Membres',
+        },
+        {
+          'valeur': '$associationsActives',
+          'label': 'Actives',
+        },
       ],
     );
   }

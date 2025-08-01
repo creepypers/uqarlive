@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../domain/entities/association.dart';
@@ -279,33 +278,8 @@ class DetailsAssociationEcran extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           
-          // Email
-          if (association.email != null) ...[
-            GestureDetector(
-              onTap: () => _lancerEmail(association.email!),
-              child: _construireInfoContact(
-                Icons.email,
-                'Email',
-                association.email!,
-                cliquable: true,
-              ),
-            ),
-            const SizedBox(height: 12),
+
           ],
-          
-          // Téléphone
-          if (association.telephone != null) ...[
-            GestureDetector(
-              onTap: () => _lancerTelephone(association.telephone!),
-              child: _construireInfoContact(
-                Icons.phone,
-                'Téléphone',
-                association.telephone!,
-                cliquable: true,
-              ),
-            ),
-          ],
-        ],
       ),
     );
   }
@@ -1215,17 +1189,6 @@ class DetailsAssociationEcran extends StatelessWidget {
     }
   }
 
-  void _lancerEmail(String email) async {
-    final Uri emailUri = Uri(scheme: 'mailto', path: email);
-    if (await canLaunchUrl(emailUri)) {
-      await launchUrl(emailUri);
-    }
-  }
+ 
+}
 
-  void _lancerTelephone(String telephone) async {
-    final Uri phoneUri = Uri(scheme: 'tel', path: telephone);
-    if (await canLaunchUrl(phoneUri)) {
-      await launchUrl(phoneUri);
-    }
-  }
-} 

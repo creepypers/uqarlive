@@ -39,14 +39,14 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
       setState(() => _chargementEnCours = true);
       
       // Charger menus et horaires en parallèle
-      final futures = await Future.wait([
+      final futures = await Future.wait<dynamic>([
         _menusRepository.obtenirTousLesMenus(),
-        _horairesDatasource.obtenirHorairesCantine(),
+        Future.value(_horairesDatasource.obtenirTousLesHorairesCantine()),
       ]);
       
       setState(() {
         _menus = futures[0] as List<Menu>;
-        _horaires = futures[1] as Map<String, Map<String, String>>;
+        _horaires = _convertirHorairesEnString(futures[1] as Map<String, Map<String, TimeOfDay>>);
         _chargementEnCours = false;
       });
     } catch (e) {
@@ -407,7 +407,26 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
   }
 
   String _prochainCreneauOuverture() {
-    return _horairesDatasource.obtenirProchainCreneauOuvertureCantine();
+    return _horairesDatasource.obtenirStatutCantineFormatte();
+  }
+
+  // UI Design: Convertir les horaires TimeOfDay en String pour l'affichage
+  Map<String, Map<String, String>> _convertirHorairesEnString(Map<String, Map<String, TimeOfDay>> horairesTimeOfDay) {
+    final Map<String, Map<String, String>> horairesString = {};
+    
+    horairesTimeOfDay.forEach((jour, horaire) {
+      horairesString[jour] = {
+        'ouverture': _formatterHeure(horaire['ouverture']!),
+        'fermeture': _formatterHeure(horaire['fermeture']!),
+      };
+    });
+    
+    return horairesString;
+  }
+
+  String _formatterHeure(TimeOfDay heure) {
+    final minute = heure.minute.toString().padLeft(2, '0');
+    return '${heure.hour}:$minute';
   }
 
   // UI Design: Actions de gestion

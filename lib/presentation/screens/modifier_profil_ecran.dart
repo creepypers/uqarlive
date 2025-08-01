@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
+import '../../domain/entities/utilisateur.dart';
 import '../widgets/navbar_widget.dart';
 import '../widgets/widget_barre_app_personnalisee.dart';
 import '../services/navigation_service.dart';
 
 // UI Design: Page de modification du profil utilisateur avec formulaires complets
 class ModifierProfilEcran extends StatefulWidget {
-  const ModifierProfilEcran({super.key});
+  final Utilisateur? utilisateur;
+  
+  const ModifierProfilEcran({super.key, this.utilisateur});
 
   @override
   State<ModifierProfilEcran> createState() => _ModifierProfilEcranState();
@@ -43,13 +46,25 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
   }
 
   void _chargerDonneesProfil() {
-    // Charger les données actuelles du profil
-    _nomController.text = 'Dubois';
-    _prenomController.text = 'Marie';
-    _emailController.text = 'marie.dubois@uqar.ca';
-    _telephoneController.text = '418-555-0123';
-    _codePermanentController.text = 'DUBM12345678';
-    _programmeController.text = 'Informatique';
+    // UI Design: Charger les données selon le mode (création ou modification)
+    if (widget.utilisateur != null) {
+      // Mode modification : charger les données de l'utilisateur sélectionné
+      final user = widget.utilisateur!;
+      _nomController.text = user.nom;
+      _prenomController.text = user.prenom;
+      _emailController.text = user.email;
+      _telephoneController.text = user.telephone;
+      _codePermanentController.text = user.codeEtudiant;
+      _programmeController.text = user.programme;
+    } else {
+      // Mode création : champs vides pour nouvel utilisateur
+      _nomController.clear();
+      _prenomController.clear();
+      _emailController.clear();
+      _telephoneController.clear();
+      _codePermanentController.clear();
+      _programmeController.clear();
+    }
   }
 
   @override
@@ -57,8 +72,8 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
     return Scaffold(
       backgroundColor: CouleursApp.fond,
       appBar: WidgetBarreAppPersonnalisee(
-        titre: 'Modifier le profil',
-        sousTitre: 'Mise à jour de vos informations',
+        titre: widget.utilisateur != null ? 'Modifier le profil' : 'Créer un utilisateur',
+        sousTitre: widget.utilisateur != null ? 'Mise à jour des informations' : 'Création d\'un nouvel utilisateur',
         afficherProfil: false,
         widgetFin: IconButton(
           icon: Icon(Icons.arrow_back, color: CouleursApp.blanc),
