@@ -296,10 +296,12 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
         ),
         const SizedBox(height: 16),
         // UI Design: Utilisation du composant WidgetCarte existant pour éviter l'overflow
-        Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: [
+        Center(
+          child: Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            alignment: WrapAlignment.center,
+            children: [
             WidgetCarte.association(
               nom: 'Comptes',
               description: 'Gérer les utilisateurs',
@@ -329,6 +331,7 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
               onTap: () => _afficherMessageDeveloppement(),
             ),
           ],
+        ),
         ),
       ],
     );

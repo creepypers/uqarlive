@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
 import '../widgets/navbar_widget.dart';
 import '../widgets/widget_barre_app_personnalisee.dart';
-import '../widgets/widget_section_statistiques.dart';
 import '../services/navigation_service.dart';
+import '../services/authentification_service.dart';
+import '../../core/di/service_locator.dart';
+import '../../domain/entities/utilisateur.dart';
 import 'modifier_profil_ecran.dart';
 import 'gerer_livres_ecran.dart';
 import 'salles_ecran.dart';
 import 'connexion_ecran.dart';
-import 'marketplace_ecran.dart';
+
 
 // UI Design: Page profil utilisateur avec informations personnelles et statistiques - OPTIMISÉ avec widgets réutilisables
 class ProfilEcran extends StatefulWidget {
@@ -19,14 +21,41 @@ class ProfilEcran extends StatefulWidget {
 }
 
 class _ProfilEcranState extends State<ProfilEcran> {
+  late AuthentificationService _authentificationService;
+  Utilisateur? _utilisateurActuel;
+  bool _chargementEnCours = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _authentificationService = ServiceLocator.obtenirService<AuthentificationService>();
+    _chargerUtilisateurActuel();
+  }
+
+  Future<void> _chargerUtilisateurActuel() async {
+    setState(() => _chargementEnCours = true);
+    await _authentificationService.chargerUtilisateurActuel();
+    setState(() {
+      _utilisateurActuel = _authentificationService.utilisateurActuel;
+      _chargementEnCours = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    // UI Design: Affichage d'un indicateur de chargement si les données ne sont pas encore disponibles
+    if (_chargementEnCours || _utilisateurActuel == null) {
+      return Scaffold(
+        backgroundColor: CouleursApp.fond,
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       backgroundColor: CouleursApp.fond,
       appBar: WidgetBarreAppPersonnalisee(
-        titre: 'Marie Dubois',
-        sousTitre: 'DUBM12345678\nInformatique',
+        titre: '${_utilisateurActuel!.prenom} ${_utilisateurActuel!.nom}', // UI Design: Nom dynamique
+        sousTitre: '${_utilisateurActuel!.codeEtudiant}\n${_utilisateurActuel!.programme}', // UI Design: Informations dynamiques
         hauteurBarre: 140,
         afficherProfil: false,
         afficherBoutonRetour: true,
@@ -57,7 +86,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
           ),
           child: Center(
             child: Text(
-              'MD', // Initiales Marie Dubois
+              _authentificationService.obtenirInitiales(), // UI Design: Initiales dynamiques
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -74,7 +103,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
             children: [
               const SizedBox(height: 16),
               
-              // Section statistiques - VERSION SIMPLE ET FONCTIONNELLE
+              // Section statistiques dynamiques - UI Design: Basées sur l'utilisateur connecté
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 16),
                 padding: const EdgeInsets.all(20),
@@ -97,7 +126,12 @@ class _ProfilEcranState extends State<ProfilEcran> {
                   children: [
                     _construireStatistique('12', 'Livres\néchangés', Icons.swap_horiz, CouleursApp.principal),
                     _construireStatistique('3', 'Associations\nrejointes', Icons.groups, CouleursApp.accent),
-                    _construireStatistique('8', 'Mois\nà l\'UQAR', Icons.school, CouleursApp.principal),
+                    _construireStatistique(
+                      _calculerDureeInscription(),
+                      'Mois\nà l\'UQAR', 
+                      Icons.school, 
+                      CouleursApp.principal
+                    ),
                   ],
                 ),
               ),
@@ -153,8 +187,12 @@ class _ProfilEcranState extends State<ProfilEcran> {
             child: Text('Annuler'),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
+              
+              // UI Design: Utiliser le service d'authentification pour se déconnecter
+              await _authentificationService.deconnecter();
+              
               // Retour à l'écran de connexion
               Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(builder: (context) => const ConnexionEcran()),
@@ -810,6 +848,13 @@ class _ProfilEcranState extends State<ProfilEcran> {
         ),
       ],
     );
+  }
+
+  // UI Design: Calculer la durée d'inscription dynamiquement
+  String _calculerDureeInscription() {
+    if (_utilisateurActuel == null) return '0';
+    final difference = DateTime.now().difference(_utilisateurActuel!.dateInscription);
+    return (difference.inDays / 30).round().toString();
   }
 
   // UI Design: Section actions - BOUTONS PRINCIPAUX

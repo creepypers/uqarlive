@@ -77,7 +77,6 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
         _chargementLivres = false;
       });
     } catch (e) {
-      print('Erreur lors du chargement des données: $e');
       setState(() {
         _chargementLivres = false;
       });

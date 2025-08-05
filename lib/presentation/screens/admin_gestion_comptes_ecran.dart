@@ -445,6 +445,36 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
                       ],
                     ),
                   ),
+                  // UI Design: Option pour attribuer des privilèges admin (seulement pour les étudiants)
+                  if (utilisateur.typeUtilisateur == TypeUtilisateur.etudiant)
+                    const PopupMenuItem(
+                      value: 'attribuer_admin',
+                      child: Row(
+                        children: [
+                          Icon(Icons.admin_panel_settings, color: Colors.orange),
+                          SizedBox(width: 8),
+                          Text(
+                            'Promouvoir Admin',
+                            style: TextStyle(color: Colors.orange),
+                          ),
+                        ],
+                      ),
+                    ),
+                  // UI Design: Option pour gérer les privilèges (seulement pour les admins)
+                  if (utilisateur.typeUtilisateur == TypeUtilisateur.administrateur)
+                    const PopupMenuItem(
+                      value: 'gerer_privileges',
+                      child: Row(
+                        children: [
+                          Icon(Icons.security, color: Colors.blue),
+                          SizedBox(width: 8),
+                          Text(
+                            'Gérer privilèges',
+                            style: TextStyle(color: Colors.blue),
+                          ),
+                        ],
+                      ),
+                    ),
                   PopupMenuItem(
                     value: utilisateur.estActif ? 'suspendre' : 'activer',
                     child: Row(
@@ -582,6 +612,12 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
       case 'modifier':
         _afficherDetailsUtilisateur(utilisateur);
         break;
+      case 'attribuer_admin':
+        _confirmerPromotionAdmin(utilisateur);
+        break;
+      case 'gerer_privileges':
+        _afficherGestionPrivileges(utilisateur);
+        break;
       case 'suspendre':
       case 'activer':
         _toggleStatutUtilisateur(utilisateur);
@@ -654,6 +690,204 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
       SnackBar(
         content: Text('Utilisateur "${utilisateur.prenom} ${utilisateur.nom}" supprimé'),
         backgroundColor: Colors.red,
+      ),
+    );
+  }
+
+  // UI Design: Confirmer la promotion d'un étudiant en administrateur
+  void _confirmerPromotionAdmin(Utilisateur utilisateur) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.admin_panel_settings, color: Colors.orange),
+            const SizedBox(width: 8),
+            Text('Promouvoir Administrateur', style: StylesTexteApp.moyenTitre),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Êtes-vous sûr de vouloir promouvoir "${utilisateur.prenom} ${utilisateur.nom}" en administrateur ?',
+              style: StylesTexteApp.corpsNormal,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Cette action lui donnera accès à :',
+              style: StylesTexteApp.corpsNormal.copyWith(fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 8),
+            ...[
+              '• Gestion des comptes utilisateurs',
+              '• Administration de la cantine',
+              '• Gestion des actualités',
+              '• Modération du contenu',
+              '• Accès aux statistiques'
+            ].map((privilege) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 2),
+              child: Text(
+                privilege,
+                style: StylesTexteApp.corpsNormal.copyWith(
+                  color: CouleursApp.texteFonce.withValues(alpha: 0.8),
+                ),
+              ),
+            )),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Annuler', style: StylesTexteApp.lienPrincipal),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _promouvoirEnAdmin(utilisateur);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.orange,
+              foregroundColor: Colors.white,
+            ),
+            child: Text('Promouvoir'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // UI Design: Promouvoir un utilisateur en administrateur
+  Future<void> _promouvoirEnAdmin(Utilisateur utilisateur) async {
+    try {
+      // Créer un nouvel utilisateur avec le type administrateur et tous les privilèges
+      final utilisateurAdmin = utilisateur.copyWith(
+        typeUtilisateur: TypeUtilisateur.administrateur,
+        privileges: [
+          PrivilegesUtilisateur.gestionComptes,
+          PrivilegesUtilisateur.gestionCantine,
+          PrivilegesUtilisateur.gestionActualites,
+          PrivilegesUtilisateur.gestionAssociations,
+          PrivilegesUtilisateur.gestionSalles,
+          PrivilegesUtilisateur.gestionLivres,
+          PrivilegesUtilisateur.moderationContenu,
+          PrivilegesUtilisateur.statistiques,
+        ],
+      );
+
+      final succes = await _utilisateursRepository.modifierUtilisateur(utilisateurAdmin);
+      
+      if (succes) {
+        await _chargerDonnees(); // Recharger les données
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  Icon(Icons.admin_panel_settings, color: Colors.white),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      '${utilisateur.prenom} ${utilisateur.nom} a été promu administrateur avec succès !',
+                    ),
+                  ),
+                ],
+              ),
+              backgroundColor: Colors.orange,
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 4),
+            ),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Erreur lors de la promotion de l\'utilisateur'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erreur: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  // UI Design: Afficher l'écran de gestion des privilèges pour un administrateur
+  void _afficherGestionPrivileges(Utilisateur utilisateur) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.security, color: Colors.blue),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Privilèges de ${utilisateur.prenom} ${utilisateur.nom}',
+                style: StylesTexteApp.moyenTitre,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Privilèges actuels:',
+                style: StylesTexteApp.corpsNormal.copyWith(fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 12),
+              ...[
+                {'code': PrivilegesUtilisateur.gestionComptes, 'nom': 'Gestion des comptes'},
+                {'code': PrivilegesUtilisateur.gestionCantine, 'nom': 'Gestion de la cantine'},
+                {'code': PrivilegesUtilisateur.gestionActualites, 'nom': 'Gestion des actualités'},
+                {'code': PrivilegesUtilisateur.gestionAssociations, 'nom': 'Gestion des associations'},
+                {'code': PrivilegesUtilisateur.gestionSalles, 'nom': 'Gestion des salles'},
+                {'code': PrivilegesUtilisateur.gestionLivres, 'nom': 'Gestion des livres'},
+                {'code': PrivilegesUtilisateur.moderationContenu, 'nom': 'Modération du contenu'},
+                {'code': PrivilegesUtilisateur.statistiques, 'nom': 'Accès aux statistiques'},
+              ].map((privilege) => CheckboxListTile(
+                title: Text(privilege['nom']!, style: StylesTexteApp.corpsNormal),
+                value: utilisateur.privileges.contains(privilege['code']),
+                onChanged: null, // Read-only pour l'instant
+                dense: true,
+                activeColor: CouleursApp.principal,
+              )),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Fermer', style: StylesTexteApp.lienPrincipal),
+          ),
+          // TODO: Ajouter la fonctionnalité de modification des privilèges
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Modification des privilèges - Fonctionnalité à venir'),
+                  backgroundColor: CouleursApp.accent,
+                ),
+              );
+            },
+            child: Text('Modifier', style: StylesTexteApp.lienPrincipal),
+          ),
+        ],
       ),
     );
   }

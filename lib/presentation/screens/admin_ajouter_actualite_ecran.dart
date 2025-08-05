@@ -393,10 +393,8 @@ class _AdminAjouterActualiteEcranState extends State<AdminAjouterActualiteEcran>
       // TODO: Implémenter les méthodes d'ajout et modification dans le repository
       if (_modeModification) {
         // await _actualitesRepository.mettreAJourActualite(actualite);
-        print('Modification actualité: ${actualite.titre}');
       } else {
         // await _actualitesRepository.ajouterActualite(actualite);
-        print('Ajout actualité: ${actualite.titre}');
       }
 
       if (mounted) {

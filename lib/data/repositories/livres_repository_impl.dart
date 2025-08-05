@@ -17,7 +17,6 @@ class LivresRepositoryImpl implements LivresRepository {
           .map((map) => LivreModel.fromMap(map).toEntity())
           .toList();
     } catch (e) {
-      print('Erreur lors de l\'obtention des livres: $e');
       return [];
     }
   }
@@ -31,7 +30,6 @@ class LivresRepositoryImpl implements LivresRepository {
       }
       return null;
     } catch (e) {
-      print('Erreur lors de l\'obtention du livre par ID: $e');
       return null;
     }
   }
@@ -44,7 +42,6 @@ class LivresRepositoryImpl implements LivresRepository {
           .map((map) => LivreModel.fromMap(map).toEntity())
           .toList();
     } catch (e) {
-      print('Erreur lors de l\'obtention des livres par matière: $e');
       return [];
     }
   }
@@ -57,7 +54,6 @@ class LivresRepositoryImpl implements LivresRepository {
           .map((map) => LivreModel.fromMap(map).toEntity())
           .toList();
     } catch (e) {
-      print('Erreur lors de l\'obtention des livres par état: $e');
       return [];
     }
   }
@@ -70,7 +66,6 @@ class LivresRepositoryImpl implements LivresRepository {
           .map((map) => LivreModel.fromMap(map).toEntity())
           .toList();
     } catch (e) {
-      print('Erreur lors de l\'obtention des livres par année: $e');
       return [];
     }
   }
@@ -83,7 +78,6 @@ class LivresRepositoryImpl implements LivresRepository {
           .map((map) => LivreModel.fromMap(map).toEntity())
           .toList();
     } catch (e) {
-      print('Erreur lors de la recherche des livres: $e');
       return [];
     }
   }
@@ -128,7 +122,6 @@ class LivresRepositoryImpl implements LivresRepository {
           .map((map) => LivreModel.fromMap(map).toEntity())
           .toList();
     } catch (e) {
-      print('Erreur lors du filtrage des livres: $e');
       return [];
     }
   }
@@ -137,10 +130,8 @@ class LivresRepositoryImpl implements LivresRepository {
   Future<bool> ajouterLivre(Livre livre) async {
     try {
       // TODO: Implémenter l'ajout d'un livre (nécessite un datasource modifiable)
-      print('Ajout du livre: ${livre.titre}');
       return true;
     } catch (e) {
-      print('Erreur lors de l\'ajout du livre: $e');
       return false;
     }
   }
@@ -149,10 +140,8 @@ class LivresRepositoryImpl implements LivresRepository {
   Future<bool> modifierLivre(Livre livre) async {
     try {
       // TODO: Implémenter la modification d'un livre (nécessite un datasource modifiable)
-      print('Modification du livre: ${livre.titre}');
       return true;
     } catch (e) {
-      print('Erreur lors de la modification du livre: $e');
       return false;
     }
   }
@@ -161,10 +150,8 @@ class LivresRepositoryImpl implements LivresRepository {
   Future<bool> supprimerLivre(String id) async {
     try {
       // TODO: Implémenter la suppression d'un livre (nécessite un datasource modifiable)
-      print('Suppression du livre avec ID: $id');
       return true;
     } catch (e) {
-      print('Erreur lors de la suppression du livre: $e');
       return false;
     }
   }
@@ -173,10 +160,8 @@ class LivresRepositoryImpl implements LivresRepository {
   Future<bool> marquerLivreEchange(String id) async {
     try {
       // TODO: Implémenter le marquage d'un livre comme échangé
-      print('Marquage du livre comme échangé: $id');
       return true;
     } catch (e) {
-      print('Erreur lors du marquage du livre comme échangé: $e');
       return false;
     }
   }
@@ -185,10 +170,8 @@ class LivresRepositoryImpl implements LivresRepository {
   Future<bool> marquerLivreDisponible(String id) async {
     try {
       // TODO: Implémenter le marquage d'un livre comme disponible
-      print('Marquage du livre comme disponible: $id');
       return true;
     } catch (e) {
-      print('Erreur lors du marquage du livre comme disponible: $e');
       return false;
     }
   }
@@ -204,7 +187,6 @@ class LivresRepositoryImpl implements LivresRepository {
           .map((map) => LivreModel.fromMap(map).toEntity())
           .toList();
     } catch (e) {
-      print('Erreur lors de l\'obtention des livres par propriétaire: $e');
       return [];
     }
   }
@@ -220,7 +202,6 @@ class LivresRepositoryImpl implements LivresRepository {
           .map((map) => LivreModel.fromMap(map).toEntity())
           .toList();
     } catch (e) {
-      print('Erreur lors de l\'obtention des livres disponibles: $e');
       return [];
     }
   }
@@ -236,7 +217,6 @@ class LivresRepositoryImpl implements LivresRepository {
           .map((map) => LivreModel.fromMap(map).toEntity())
           .toList();
     } catch (e) {
-      print('Erreur lors de l\'obtention des livres par cours: $e');
       return [];
     }
   }

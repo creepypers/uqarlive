@@ -65,7 +65,6 @@ class _AccueilEcranState extends State<AccueilEcran> {
       setState(() {
         _chargementLivres = false;
       });
-      print('Erreur lors du chargement des livres: $e');
     }
   }
 
@@ -84,7 +83,6 @@ class _AccueilEcranState extends State<AccueilEcran> {
       setState(() {
         _chargementAssociations = false;
       });
-      print('Erreur lors du chargement des associations: $e');
     }
   }
 

@@ -79,20 +79,12 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
       });
 
       // UI Design: Debug - Afficher les données chargées
-      print('✅ Associations chargées: ${_toutesLesAssociations.length}');
-      print('✅ Associations populaires: ${_associationsPopulaires.length}');
-      print('✅ Types disponibles: $_typesAssociations');
-      
-      // FIXE : Afficher le contenu des associations pour debugging
-      for (var assoc in _toutesLesAssociations) {
-        print('🏛️ Association: ${assoc.nom} (${assoc.typeAssociation})');
-      }
       
     } catch (e) {
       setState(() {
         _chargementAssociations = false;
       });
-      print('❌ Erreur lors du chargement des associations: $e');
+      
     }
   }
 
@@ -106,13 +98,13 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
       
       if (_recherche.isNotEmpty && _recherche.trim() != '') {
         associations = await _associationsRepository.rechercherAssociations(_recherche);
-        print('🔍 Recherche "$_recherche": ${associations.length} résultats');
+        
       } else if (_typeSelectionne != 'toutes') {
         associations = await _associationsRepository.obtenirAssociationsParType(_typeSelectionne);
-        print('🏷️ Filtre type "$_typeSelectionne": ${associations.length} résultats');
+        
       } else {
         associations = await _associationsRepository.obtenirToutesLesAssociations();
-        print('📂 Toutes les associations: ${associations.length} résultats');
+        
       }
 
       setState(() {
@@ -123,7 +115,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
       setState(() {
         _chargementAssociations = false;
       });
-      print('❌ Erreur lors du filtrage des associations: $e');
+      
     }
   }
 

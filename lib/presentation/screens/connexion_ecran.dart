@@ -5,6 +5,7 @@ import 'accueil_ecran.dart';
 import 'admin_dashboard_ecran.dart';
 import '../../core/di/service_locator.dart';
 import '../../domain/repositories/utilisateurs_repository.dart';
+import '../services/authentification_service.dart';
 
 
 
@@ -22,14 +23,14 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
   final TextEditingController _controleurMotDePasse = TextEditingController();
   final GlobalKey<FormState> _cleFormulaire = GlobalKey<FormState>();
   
-  // UI Design: Repository pour l'authentification
-  late UtilisateursRepository _utilisateursRepository;
+  // UI Design: Service d'authentification
+  late AuthentificationService _authentificationService;
   bool _connexionEnCours = false;
 
   @override
   void initState() {
     super.initState();
-    _utilisateursRepository = ServiceLocator.obtenirService<UtilisateursRepository>();
+    _authentificationService = ServiceLocator.obtenirService<AuthentificationService>();
   }
 
   @override
@@ -44,14 +45,14 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
       setState(() => _connexionEnCours = true);
       
       try {
-        final utilisateur = await _utilisateursRepository.authentifierUtilisateur(
+        final utilisateur = await _authentificationService.authentifier(
           _controleurNomUtilisateur.text,
           _controleurMotDePasse.text,
         );
         
         if (utilisateur != null) {
           // UI Design: Redirection selon le type d'utilisateur
-          if (utilisateur.estAdmin) {
+          if (_authentificationService.estAdmin) {
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(builder: (context) => const AdminDashboardEcran()),
               (route) => false,
@@ -127,7 +128,7 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
     setState(() => _connexionEnCours = true);
     
     try {
-      final utilisateur = await _utilisateursRepository.authentifierUtilisateur(
+      final utilisateur = await _authentificationService.authentifier(
         'admin@uqar.ca',
         'admin123',
       );
@@ -167,7 +168,7 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
     setState(() => _connexionEnCours = true);
     
     try {
-      final utilisateur = await _utilisateursRepository.authentifierUtilisateur(
+      final utilisateur = await _authentificationService.authentifier(
         'alexandre.martin@uqar.ca',
         'alex123',
       );

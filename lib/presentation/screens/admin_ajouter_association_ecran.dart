@@ -453,10 +453,8 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
       // TODO: Implémenter les méthodes d'ajout et modification dans le repository
       if (_modeModification) {
         // await _associationsRepository.mettreAJourAssociation(association);
-        print('Modification association: ${association.nom}');
       } else {
         // await _associationsRepository.ajouterAssociation(association);
-        print('Ajout association: ${association.nom}');
       }
 
       if (mounted) {

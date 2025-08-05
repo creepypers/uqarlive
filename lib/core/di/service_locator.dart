@@ -12,6 +12,7 @@ import '../../data/repositories/associations_repository_impl.dart';
 import '../../data/repositories/evenements_repository_impl.dart';
 import '../../data/repositories/horaires_repository_impl.dart';
 import '../../presentation/services/statistiques_service.dart';
+import '../../presentation/services/authentification_service.dart';
 import '../../data/repositories/livres_repository_impl.dart';
 import '../../data/repositories/menus_repository_impl.dart';
 import '../../data/repositories/salles_repository_impl.dart';
@@ -85,6 +86,9 @@ class ServiceLocator {
     // Services
     getIt.registerLazySingleton<StatistiquesService>(
       () => StatistiquesService(),
+    );
+    getIt.registerLazySingleton<AuthentificationService>(
+      () => AuthentificationService.instance,
     );
   }
 

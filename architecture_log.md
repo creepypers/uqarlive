@@ -17,6 +17,33 @@
   - [x] Widgets: Reusable UI components
   - [x] Services: Navigation service
 
+### 🆕 Recent Updates - 2025-01-27
+
+#### Profil Dynamique et Gestion Admin
+- ✅ **Service d'Authentification Créé** - `presentation/services/authentification_service.dart`
+  - Centralise la gestion de l'utilisateur connecté
+  - Méthodes pour vérifier les privilèges et obtenir les informations utilisateur
+  - Singleton pattern pour une gestion globale
+
+- ✅ **Écran Profil Rendu Dynamique** - `presentation/screens/profil_ecran.dart`
+  - Affichage des données réelles de l'utilisateur connecté
+  - Calcul dynamique de la durée d'inscription
+  - Initiales générées automatiquement pour l'avatar
+  - Gestion de l'état de chargement
+
+- ✅ **Attribution de Privilèges Admin** - `presentation/screens/admin_gestion_comptes_ecran.dart`
+  - Nouveau menu d'action "Promouvoir Admin" pour les étudiants
+  - Dialog de confirmation avec liste des privilèges attribués
+  - Menu "Gérer privilèges" pour visualiser les privilèges des admins
+  - Intégration avec le repository pour la modification des utilisateurs
+
+- ✅ **Mise à Jour de l'Authentification** - `presentation/screens/connexion_ecran.dart`
+  - Utilisation du nouveau service d'authentification
+  - Simplification du code avec les méthodes centralisées
+
+- ✅ **Service Locator Étendu** - `core/di/service_locator.dart`
+  - Ajout du service d'authentification dans l'injection de dépendances
+
 ### 📁 Files Added/Changed
 
 #### Domain Layer

@@ -81,7 +81,6 @@ class _CantineEcranState extends State<CantineEcran> {
         _chargementMenus = false;
       });
     } catch (e) {
-      print('Erreur lors du chargement des données: $e');
       setState(() {
         _chargementMenus = false;
       });
@@ -114,7 +113,6 @@ class _CantineEcranState extends State<CantineEcran> {
         _chargementMenus = false;
       });
     } catch (e) {
-      print('Erreur lors du changement de catégorie: $e');
       setState(() {
         _chargementMenus = false;
       });

@@ -81,9 +81,6 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
       );
 
       // TODO: Implémenter la logique d'inscription réelle
-      print(
-        'Inscription avec: ${_controleurPrenom.text} ${_controleurNom.text}, Code: ${_controleurCodePermanent.text}, User: ${_controleurNomUtilisateur.text}, Email: ${_controleurEmail.text}',
-      );
     }
   }
 

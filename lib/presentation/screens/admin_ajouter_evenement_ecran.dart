@@ -647,10 +647,8 @@ class _AdminAjouterEvenementEcranState extends State<AdminAjouterEvenementEcran>
       // TODO: Implémenter la sauvegarde dans le repository
       if (_modeModification) {
         // await _evenementsRepository.mettreAJourEvenement(evenement);
-        print('Modification événement: ${evenement.titre}');
       } else {
         // await _evenementsRepository.ajouterEvenement(evenement);
-        print('Ajout événement: ${evenement.titre}');
       }
 
       await Future.delayed(const Duration(seconds: 1)); // Simulation

@@ -1066,11 +1066,12 @@ Corriger l'overflow RenderFlex dans la section "Gestion du système" du dashboar
 
 ### ✅ Corrections Implémentées
 
-#### 1. **Overflow RenderFlex Corrigé dans Gestion Système** 📐
+#### 1. **Overflow RenderFlex Corrigé + Centrage + Réutilisation Composants** 📐
 - **Problème** : RenderFlex overflow de 6.7 pixels dans la section "Gestion du système"
 - **Cause** : GridView avec contraintes fixes causant des débordements
 - **Solution** : `lib/presentation/screens/admin_dashboard_ecran.dart`
   - **Remplacement GridView** : `GridView.count` → `Wrap` pour flexibilité
+  - **Centrage des cartes** : `Center(child: Wrap(alignment: WrapAlignment.center))`
   - **Utilisation composant existant** : `WidgetCarte.association()` au lieu de cartes personnalisées
   - **Espacement optimisé** : `spacing: 12`, `runSpacing: 12`
   - **Paramètres corrects** : `nom`, `description`, `couleurIcone` selon la signature
@@ -1089,9 +1090,17 @@ Corriger l'overflow RenderFlex dans la section "Gestion du système" du dashboar
 
 #### **Optimisation Layout Gestion Système** 🎯
 - **Layout flexible** : `Wrap` au lieu de `GridView` pour éviter les contraintes fixes
+- **Centrage automatique** : `Center(child: Wrap(alignment: WrapAlignment.center))`
 - **Composant réutilisé** : `WidgetCarte.association()` déjà testé et optimisé
 - **Espacement cohérent** : `spacing: 12`, `runSpacing: 12` pour uniformité
 - **Performance** : Moins de calculs de layout, rendu plus fluide
+
+#### **Réutilisation Composants Existants** 🔄
+- **WidgetCarte** : Utilisé dans tous les écrans principaux (accueil, cantine, marketplace, salles, associations)
+- **WidgetCollection** : Utilisé pour les listes et grilles dans tous les écrans
+- **WidgetSectionStatistiques** : Utilisé pour les statistiques dans cantine et marketplace
+- **WidgetBarreAppPersonnalisee** : AppBar cohérente dans tous les écrans utilisateur
+- **WidgetBarreAppNavigationAdmin** : AppBar admin cohérente dans tous les écrans admin
 
 #### **Masquage Statistiques Comptes** 📊
 - **Widget conditionnel** : Opérateur ternaire `_statistiquesVisibles ? WidgetSectionStatistiques : Container`
@@ -1113,15 +1122,18 @@ Corriger l'overflow RenderFlex dans la section "Gestion du système" du dashboar
 
 ### 📱 Fonctionnalités Corrigées
 - ✅ **Gestion système** : Plus d'overflow sur les cartes de navigation
+- ✅ **Cartes centrées** : Alignement parfait au centre de l'écran
 - ✅ **Statistiques comptes** : Masquage/affichage selon préférence
 - ✅ **Layout responsive** : Adaptation aux différentes tailles d'écran
 - ✅ **Navigation fluide** : Cartes de gestion plus compactes
+- ✅ **Réutilisation maximale** : Composants existants utilisés partout
 
 ### 🚀 Workflow Complet
-1. **Dashboard** : Section "Gestion du système" sans overflow
+1. **Dashboard** : Section "Gestion du système" sans overflow et cartes centrées
 2. **Gestion comptes** : Statistiques masquables comme le dashboard principal
-3. **Cohérence** : Même pattern de masquage dans les deux écrans
-4. **Performance** : Layout optimisé pour tous les écrans
+3. **Réutilisation** : Composants `WidgetCarte` et `WidgetCollection` utilisés partout
+4. **Cohérence** : Même pattern de masquage et même design dans tous les écrans
+5. **Performance** : Layout optimisé et composants réutilisés pour tous les écrans
 
 **Fichiers modifiés :**
 - 🔄 `lib/presentation/screens/admin_dashboard_ecran.dart` - Correction overflow gestion système

@@ -17,7 +17,6 @@ class AssociationsRepositoryImpl implements AssociationsRepository {
           .map((map) => AssociationModel.fromMap(map).toEntity())
           .toList();
     } catch (e) {
-      print('Erreur lors de l\'obtention des associations: $e');
       return [];
     }
   }
@@ -31,7 +30,6 @@ class AssociationsRepositoryImpl implements AssociationsRepository {
       }
       return null;
     } catch (e) {
-      print('Erreur lors de l\'obtention de l\'association par ID: $e');
       return null;
     }
   }
@@ -44,7 +42,6 @@ class AssociationsRepositoryImpl implements AssociationsRepository {
           .map((map) => AssociationModel.fromMap(map).toEntity())
           .toList();
     } catch (e) {
-      print('Erreur lors de l\'obtention des associations par type: $e');
       return [];
     }
   }
@@ -57,7 +54,6 @@ class AssociationsRepositoryImpl implements AssociationsRepository {
           .map((map) => AssociationModel.fromMap(map).toEntity())
           .toList();
     } catch (e) {
-      print('Erreur lors de l\'obtention des associations actives: $e');
       return [];
     }
   }
@@ -70,7 +66,6 @@ class AssociationsRepositoryImpl implements AssociationsRepository {
           .map((map) => AssociationModel.fromMap(map).toEntity())
           .toList();
     } catch (e) {
-      print('Erreur lors de la recherche d\'associations: $e');
       return [];
     }
   }
@@ -83,7 +78,6 @@ class AssociationsRepositoryImpl implements AssociationsRepository {
           .map((map) => AssociationModel.fromMap(map).toEntity())
           .toList();
     } catch (e) {
-      print('Erreur lors de l\'obtention des associations populaires: $e');
       return [];
     }
   }
@@ -93,7 +87,6 @@ class AssociationsRepositoryImpl implements AssociationsRepository {
     try {
       return _datasourceLocal.obtenirTypesAssociations();
     } catch (e) {
-      print('Erreur lors de l\'obtention des types d\'associations: $e');
       return ['toutes'];
     }
   }
