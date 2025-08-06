@@ -255,7 +255,7 @@ class WidgetCarte extends StatelessWidget {
                 children: [
                   Text(
                     titre,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: CouleursApp.texteFonce,
@@ -301,7 +301,7 @@ class WidgetCarte extends StatelessWidget {
             Flexible(
               child: Text(
                 titre,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
                   color: CouleursApp.texteFonce,
@@ -378,7 +378,7 @@ class WidgetCarte extends StatelessWidget {
                 children: [
                   Text(
                     titre,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
                       color: CouleursApp.texteFonce,
@@ -411,97 +411,101 @@ class WidgetCarte extends StatelessWidget {
     }
 
     // Pour les cartes standards (livres, menus) en mode grille
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Section icône avec badges
-        Expanded(
-          flex: 5,
-          child: Container(
-            decoration: BoxDecoration(
-              color: couleurFond,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
+    // UI Design: Utiliser une hauteur fixe pour éviter les conflits avec ListView
+    return SizedBox(
+      height: hauteur ?? 200, // Hauteur par défaut pour éviter les contraintes infinies
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Section icône avec badges
+          Expanded(
+            flex: 5,
+            child: Container(
+              decoration: BoxDecoration(
+                color: couleurFond,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  topRight: Radius.circular(16),
+                ),
+              ),
+              child: Stack(
+                children: [
+                  Center(
+                    child: Icon(
+                      icone,
+                      size: tailleIcone ?? 45,
+                      color: couleurIcone,
+                    ),
+                  ),
+                  // Badges positionnés
+                  ...badges.asMap().entries.map((entry) {
+                    int index = entry.key;
+                    WidgetBadge badge = entry.value;
+
+                    return Positioned(
+                      top: 8,
+                      right: index == 0 ? 8 : null,
+                      left: index == 1 ? 8 : null,
+                      child: badge,
+                    );
+                  }),
+                ],
               ),
             ),
-            child: Stack(
-              children: [
-                Center(
-                  child: Icon(
-                    icone,
-                    size: tailleIcone ?? 45,
-                    color: couleurIcone,
-                  ),
-                ),
-                // Badges positionnés
-                ...badges.asMap().entries.map((entry) {
-                  int index = entry.key;
-                  WidgetBadge badge = entry.value;
-
-                  return Positioned(
-                    top: 8,
-                    right: index == 0 ? 8 : null,
-                    left: index == 1 ? 8 : null,
-                    child: badge,
-                  );
-                }),
-              ],
-            ),
           ),
-        ),
-        // Section informations
-        Expanded(
-          flex: 4,
-          child: Padding(
-            padding: const EdgeInsets.all(8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  titre,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: CouleursApp.texteFonce,
-                    height: 1.1,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  sousTitre,
-                  style: TextStyle(
-                    fontSize: 9,
-                    color: CouleursApp.texteFonce.withValues(alpha: 0.6),
-                    height: 1.1,
-                  ),
-                  maxLines: texteSupplementaire != null ? 1 : 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                if (texteSupplementaire != null) ...[
-                  const SizedBox(height: 2),
+          // Section informations
+          Expanded(
+            flex: 4,
+            child: Padding(
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
                   Text(
-                    texteSupplementaire!,
-                    style: TextStyle(
-                      fontSize: 9,
-                      color: CouleursApp.principal,
-                      fontWeight: FontWeight.w500,
+                    titre,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: CouleursApp.texteFonce,
                       height: 1.1,
                     ),
-                    maxLines: 1,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
+                  const SizedBox(height: 2),
+                  Text(
+                    sousTitre,
+                    style: TextStyle(
+                      fontSize: 9,
+                      color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                      height: 1.1,
+                    ),
+                    maxLines: texteSupplementaire != null ? 1 : 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (texteSupplementaire != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      texteSupplementaire!,
+                      style: const TextStyle(
+                        fontSize: 9,
+                        color: CouleursApp.principal,
+                        fontWeight: FontWeight.w500,
+                        height: 1.1,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                  const Spacer(),
+                  if (piedDePage != null) piedDePage!,
                 ],
-                const Spacer(),
-                if (piedDePage != null) piedDePage!,
-              ],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -515,7 +519,7 @@ class WidgetCarte extends StatelessWidget {
         children: [
           Text(
             '${livre.prix!.toStringAsFixed(2).replaceAll('.', ',')} €',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 14,
               color: CouleursApp.accent,
               fontWeight: FontWeight.bold,
@@ -533,7 +537,7 @@ class WidgetCarte extends StatelessWidget {
         crossAxisAlignment:
             CrossAxisAlignment.center, // UI Design: Centre verticalement
         children: [
-          Icon(
+          const Icon(
             Icons.restaurant_outlined,
             size: 11, // UI Design: Réduit de 12 à 11
             color: CouleursApp.accent,
@@ -542,7 +546,7 @@ class WidgetCarte extends StatelessWidget {
           Flexible(
             child: Text(
               menu.categorie.toUpperCase(),
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 9, // UI Design: Réduit de 10 à 9
                 color: CouleursApp.accent,
                 fontWeight: FontWeight.w500,
@@ -554,7 +558,7 @@ class WidgetCarte extends StatelessWidget {
           ),
           const Spacer(),
           if (menu.note != null) ...[
-            Icon(
+            const Icon(
               Icons.star,
               size: 11, // UI Design: Réduit de 12 à 11
               color: Colors.orange,
@@ -583,7 +587,7 @@ class WidgetCarte extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // Capacité
-          Icon(Icons.people_outline, size: 11, color: CouleursApp.accent),
+          const Icon(Icons.people_outline, size: 11, color: CouleursApp.accent),
           const SizedBox(width: 4),
           Text(
             '$capacite places',
@@ -600,7 +604,7 @@ class WidgetCarte extends StatelessWidget {
           if (equipements.isNotEmpty) 
             Text(
               '${equipements.length} équip.',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 8,
                 color: CouleursApp.principal,
                 fontWeight: FontWeight.w500,

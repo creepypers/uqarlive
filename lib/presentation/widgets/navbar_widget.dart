@@ -61,11 +61,11 @@ class NavBarWidget extends StatelessWidget {
           fontSize: 12,
         ),
         items: [
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.restaurant),
             label: 'Cantine',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.menu_book), // Icône livres cohérente
             label: 'Livres',
           ),
@@ -73,11 +73,11 @@ class NavBarWidget extends StatelessWidget {
             icon: _construireIconeAccueil(),
             label: 'Accueil',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.groups),
             label: 'Assos',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.meeting_room),
             label: 'Salles',
           ),

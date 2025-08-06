@@ -151,9 +151,9 @@ class WidgetCollection<T> extends StatelessWidget {
   Widget _construireContenu() {
     // État de chargement
     if (enChargement) {
-      return Center(
+      return const Center(
         child: Padding(
-          padding: const EdgeInsets.all(32.0),
+          padding: EdgeInsets.all(32.0),
           child: CircularProgressIndicator(
             color: CouleursApp.principal,
           ),
@@ -315,15 +315,11 @@ class _WidgetEtatVide extends StatelessWidget {
   final IconData icone;
   final String titre;
   final String? sousTitre;
-  final Color? couleurIcone;
-  final Color? couleurTitre;
 
   const _WidgetEtatVide({
     required this.icone,
     required this.titre,
     this.sousTitre,
-    this.couleurIcone,
-    this.couleurTitre,  
   });
 
   @override
@@ -336,7 +332,7 @@ class _WidgetEtatVide extends StatelessWidget {
           Icon(
             icone,
             size: 80,
-            color: couleurIcone ?? CouleursApp.principal.withValues(alpha: 0.3),
+            color: CouleursApp.principal.withValues(alpha: 0.3),
           ),
           const SizedBox(height: 20),
           Text(
@@ -344,7 +340,7 @@ class _WidgetEtatVide extends StatelessWidget {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: couleurTitre ?? CouleursApp.texteFonce,
+              color: CouleursApp.texteFonce,
             ),
             textAlign: TextAlign.center,
           ),

@@ -121,7 +121,7 @@ class DecorationsApp {
       BoxShadow(
         color: CouleursApp.principal.withValues(alpha: 0.08),
         blurRadius: 24,
-        offset: Offset(0, 8),
+        offset: const Offset(0, 8),
       ),
     ],
   );

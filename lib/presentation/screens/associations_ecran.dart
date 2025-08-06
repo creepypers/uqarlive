@@ -205,7 +205,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.trending_up,
                 color: CouleursApp.principal,
                 size: 24,
@@ -259,7 +259,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.search, color: CouleursApp.accent, size: 20),
+                  const Icon(Icons.search, color: CouleursApp.accent, size: 20),
                   const SizedBox(width: 8),
                   Expanded(
                     child: TextField(
@@ -269,7 +269,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
                         border: InputBorder.none,
                         hintStyle: TextStyle(color: CouleursApp.texteFonce.withValues(alpha: 0.6)),
                       ),
-                      style: TextStyle(color: CouleursApp.texteFonce),
+                      style: const TextStyle(color: CouleursApp.texteFonce),
                       onChanged: (valeur) {
                         setState(() {
                           _recherche = valeur;
@@ -279,7 +279,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
                     ),
                   ),
                   IconButton(
-                    icon: Icon(Icons.clear, color: CouleursApp.accent),
+                    icon: const Icon(Icons.clear, color: CouleursApp.accent),
                     onPressed: () {
                       _controleurRecherche.clear();
                       setState(() {
@@ -344,7 +344,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.groups,
                 color: CouleursApp.principal,
                 size: 24,
@@ -357,7 +357,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
               const Spacer(),
               Text(
                 '${_toutesLesAssociations.length}',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: CouleursApp.accent,
@@ -426,7 +426,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.newspaper,
                 color: CouleursApp.accent,
                 size: 24,
@@ -440,13 +440,13 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
               TextButton(
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
+                    const SnackBar(
                       content: Text('Toutes les actualités - À venir'),
                       backgroundColor: CouleursApp.accent,
                     ),
                   );
                 },
-                child: Text(
+                child: const Text(
                   'Voir tout',
                   style: TextStyle(color: CouleursApp.accent),
                 ),
@@ -514,7 +514,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
                     // Titre
                     Text(
                       actualite['titre']!,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
                         color: CouleursApp.texteFonce,
@@ -552,7 +552,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
                            } catch (e) {
                              // Association non trouvée, afficher un message
                              ScaffoldMessenger.of(context).showSnackBar(
-                               SnackBar(
+                               const SnackBar(
                                  content: Text('Association non trouvée'),
                                  backgroundColor: Colors.red,
                                ),

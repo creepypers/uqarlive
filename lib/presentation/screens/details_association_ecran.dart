@@ -26,11 +26,11 @@ class DetailsAssociationEcran extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
-              icon: Icon(Icons.person_add, color: CouleursApp.blanc),
+              icon: const Icon(Icons.person_add, color: CouleursApp.blanc),
               onPressed: () => _rejoindreAssociation(context),
             ),
             IconButton(
-              icon: Icon(Icons.share, color: CouleursApp.blanc),
+              icon: const Icon(Icons.share, color: CouleursApp.blanc),
               onPressed: () => _partagerAssociation(context),
             ),
           ],
@@ -141,7 +141,7 @@ class DetailsAssociationEcran extends StatelessWidget {
               children: [
                 Text(
                   association.nom,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: CouleursApp.blanc,
@@ -169,7 +169,7 @@ class DetailsAssociationEcran extends StatelessWidget {
                       ),
                       child: Text(
                         '${association.nombreMembresFormatte} membres',
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: CouleursApp.blanc,
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
@@ -187,7 +187,7 @@ class DetailsAssociationEcran extends StatelessWidget {
                           color: Colors.green.withValues(alpha: 0.8),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Text(
+                        child: const Text(
                           'ACTIVE',
                           style: TextStyle(
                             color: CouleursApp.blanc,
@@ -301,11 +301,11 @@ class DetailsAssociationEcran extends StatelessWidget {
           ),
           elevation: 8,
         ),
-        child: Row(
+        child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.group_add, size: 24),
-            const SizedBox(width: 12),
+            SizedBox(width: 12),
             Text(
               'Rejoindre l\'association',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -404,7 +404,7 @@ class DetailsAssociationEcran extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             association.descriptionLongue!,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 14,
               height: 1.5,
               color: CouleursApp.texteFonce,
@@ -436,7 +436,7 @@ class DetailsAssociationEcran extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.event, color: Colors.orange, size: 24),
+              const Icon(Icons.event, color: Colors.orange, size: 24),
               const SizedBox(width: 8),
               Text(
                 'Événements à Venir',
@@ -464,7 +464,7 @@ class DetailsAssociationEcran extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.calendar_today,
                         color: Colors.orange,
                         size: 20,
@@ -473,7 +473,7 @@ class DetailsAssociationEcran extends StatelessWidget {
                       Expanded(
                         child: Text(
                           evenement,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                             color: CouleursApp.texteFonce,
@@ -499,8 +499,8 @@ class DetailsAssociationEcran extends StatelessWidget {
                       const SizedBox(width: 12),
                       ElevatedButton.icon(
                         onPressed: () => _inscrireEvenement(context, evenement),
-                        icon: Icon(Icons.event_available, size: 16),
-                        label: Text('S\'inscrire'),
+                        icon: const Icon(Icons.event_available, size: 16),
+                        label: const Text('S\'inscrire'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.orange,
                           foregroundColor: Colors.white,
@@ -625,7 +625,7 @@ class DetailsAssociationEcran extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.newspaper, color: CouleursApp.accent, size: 24),
+              const Icon(Icons.newspaper, color: CouleursApp.accent, size: 24),
               const SizedBox(width: 8),
               Text(
                 'Actualités Internes',
@@ -645,7 +645,7 @@ class DetailsAssociationEcran extends StatelessWidget {
                       Container(
                         width: 8,
                         height: 8,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           color: CouleursApp.accent,
                           shape: BoxShape.circle,
                         ),
@@ -669,7 +669,7 @@ class DetailsAssociationEcran extends StatelessWidget {
                       children: [
                         Text(
                           actualite['titre']!,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                             color: CouleursApp.texteFonce,
@@ -813,7 +813,7 @@ class DetailsAssociationEcran extends StatelessWidget {
             width: double.infinity,
             child: ElevatedButton.icon(
               onPressed: () => _rejoindreAssociation(context),
-              icon: Icon(Icons.group_add, size: 20),
+              icon: const Icon(Icons.group_add, size: 20),
               label: Text('Rejoindre ${association.nom}'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AssociationsUtils.obtenirCouleurType(
@@ -838,8 +838,8 @@ class DetailsAssociationEcran extends StatelessWidget {
             width: double.infinity,
             child: OutlinedButton.icon(
               onPressed: () => _sabonnerActualites(context),
-              icon: Icon(Icons.notifications_active, size: 20),
-              label: Text('S\'abonner aux actualités'),
+              icon: const Icon(Icons.notifications_active, size: 20),
+              label: const Text('S\'abonner aux actualités'),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AssociationsUtils.obtenirCouleurType(
                   association.typeAssociation,
@@ -877,7 +877,7 @@ class DetailsAssociationEcran extends StatelessWidget {
           ),
           title: Row(
             children: [
-              Icon(Icons.event_available, color: Colors.orange, size: 24),
+              const Icon(Icons.event_available, color: Colors.orange, size: 24),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -906,7 +906,7 @@ class DetailsAssociationEcran extends StatelessWidget {
                 ),
                 child: Text(
                   evenement,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.w600,
                     color: CouleursApp.texteFonce,
                   ),
@@ -939,7 +939,7 @@ class DetailsAssociationEcran extends StatelessWidget {
                   SnackBar(
                     content: Row(
                       children: [
-                        Icon(Icons.check_circle, color: Colors.white),
+                        const Icon(Icons.check_circle, color: Colors.white),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
@@ -960,7 +960,7 @@ class DetailsAssociationEcran extends StatelessWidget {
                 backgroundColor: Colors.orange,
                 foregroundColor: Colors.white,
               ),
-              child: Text('Confirmer'),
+              child: const Text('Confirmer'),
             ),
           ],
         );
@@ -973,7 +973,7 @@ class DetailsAssociationEcran extends StatelessWidget {
       SnackBar(
         content: Row(
           children: [
-            Icon(Icons.notifications_active, color: Colors.white),
+            const Icon(Icons.notifications_active, color: Colors.white),
             const SizedBox(width: 8),
             Expanded(
               child: Text('Abonné aux actualités de ${association.nom}'),
@@ -1032,7 +1032,7 @@ class DetailsAssociationEcran extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 'En rejoignant cette association, vous bénéficierez de :',
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
@@ -1108,7 +1108,7 @@ class DetailsAssociationEcran extends StatelessWidget {
                   SnackBar(
                     content: Row(
                       children: [
-                        Icon(Icons.group_add, color: Colors.white),
+                        const Icon(Icons.group_add, color: Colors.white),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
@@ -1133,7 +1133,7 @@ class DetailsAssociationEcran extends StatelessWidget {
                 ),
                 foregroundColor: Colors.white,
               ),
-              child: Text('Rejoindre'),
+              child: const Text('Rejoindre'),
             ),
           ],
         );

@@ -12,10 +12,8 @@ class LivresRepositoryImpl implements LivresRepository {
   @override
   Future<List<Livre>> obtenirTousLesLivres() async {
     try {
-      final livresMap = _datasourceLocal.obtenirTousLesLivres();
-      return livresMap
-          .map((map) => LivreModel.fromMap(map).toEntity())
-          .toList();
+      final livresModels = await _datasourceLocal.obtenirTousLesLivres();
+      return livresModels.map((model) => model.toEntity()).toList();
     } catch (e) {
       return [];
     }
@@ -24,11 +22,8 @@ class LivresRepositoryImpl implements LivresRepository {
   @override
   Future<Livre?> obtenirLivreParId(String id) async {
     try {
-      final livreMap = _datasourceLocal.obtenirLivreParId(id);
-      if (livreMap != null) {
-        return LivreModel.fromMap(livreMap).toEntity();
-      }
-      return null;
+      final livreModel = await _datasourceLocal.obtenirLivreParId(id);
+      return livreModel?.toEntity();
     } catch (e) {
       return null;
     }
@@ -37,10 +32,8 @@ class LivresRepositoryImpl implements LivresRepository {
   @override
   Future<List<Livre>> obtenirLivresParMatiere(String matiere) async {
     try {
-      final livresMap = _datasourceLocal.obtenirLivresParMatiere(matiere);
-      return livresMap
-          .map((map) => LivreModel.fromMap(map).toEntity())
-          .toList();
+      final livresModels = await _datasourceLocal.obtenirLivresParMatiere(matiere);
+      return livresModels.map((model) => model.toEntity()).toList();
     } catch (e) {
       return [];
     }
@@ -49,10 +42,8 @@ class LivresRepositoryImpl implements LivresRepository {
   @override
   Future<List<Livre>> obtenirLivresParEtat(String etat) async {
     try {
-      final livresMap = _datasourceLocal.obtenirLivresParEtat(etat);
-      return livresMap
-          .map((map) => LivreModel.fromMap(map).toEntity())
-          .toList();
+      final livresModels = await _datasourceLocal.obtenirLivresParEtat(etat);
+      return livresModels.map((model) => model.toEntity()).toList();
     } catch (e) {
       return [];
     }
@@ -61,10 +52,8 @@ class LivresRepositoryImpl implements LivresRepository {
   @override
   Future<List<Livre>> obtenirLivresParAnnee(String annee) async {
     try {
-      final livresMap = _datasourceLocal.obtenirLivresParAnnee(annee);
-      return livresMap
-          .map((map) => LivreModel.fromMap(map).toEntity())
-          .toList();
+      final livresModels = await _datasourceLocal.obtenirLivresParAnnee(annee);
+      return livresModels.map((model) => model.toEntity()).toList();
     } catch (e) {
       return [];
     }
@@ -73,10 +62,8 @@ class LivresRepositoryImpl implements LivresRepository {
   @override
   Future<List<Livre>> rechercherLivres(String recherche) async {
     try {
-      final livresMap = _datasourceLocal.rechercherLivres(recherche);
-      return livresMap
-          .map((map) => LivreModel.fromMap(map).toEntity())
-          .toList();
+      final livresModels = await _datasourceLocal.rechercherLivres(recherche);
+      return livresModels.map((model) => model.toEntity()).toList();
     } catch (e) {
       return [];
     }
@@ -90,37 +77,35 @@ class LivresRepositoryImpl implements LivresRepository {
     String? recherche,
   }) async {
     try {
-      List<Map<String, dynamic>> livresMap = _datasourceLocal.obtenirTousLesLivres();
+      List<LivreModel> livresModels = await _datasourceLocal.obtenirTousLesLivres();
 
       // Filtrer par matière
       if (matiere != null && matiere != 'Toutes') {
-        livresMap = livresMap.where((livre) => livre['matiere'] == matiere).toList();
+        livresModels = livresModels.where((livre) => livre.matiere == matiere).toList();
       }
 
       // Filtrer par état
       if (etat != null && etat != 'Tous') {
-        livresMap = livresMap.where((livre) => livre['etatLivre'] == etat).toList();
+        livresModels = livresModels.where((livre) => livre.etatLivre == etat).toList();
       }
 
       // Filtrer par année
       if (annee != null && annee != 'Toutes') {
-        livresMap = livresMap.where((livre) => livre['anneeEtude'] == annee).toList();
+        livresModels = livresModels.where((livre) => livre.anneeEtude == annee).toList();
       }
 
       // Filtrer par recherche
       if (recherche != null && recherche.isNotEmpty) {
         final rechercheLowerCase = recherche.toLowerCase();
-        livresMap = livresMap.where((livre) {
-          return livre['titre'].toLowerCase().contains(rechercheLowerCase) ||
-              livre['auteur'].toLowerCase().contains(rechercheLowerCase) ||
-              livre['matiere'].toLowerCase().contains(rechercheLowerCase) ||
-              livre['coursAssocies'].toLowerCase().contains(rechercheLowerCase);
+        livresModels = livresModels.where((livre) {
+          return livre.titre.toLowerCase().contains(rechercheLowerCase) ||
+              livre.auteur.toLowerCase().contains(rechercheLowerCase) ||
+              livre.matiere.toLowerCase().contains(rechercheLowerCase) ||
+              (livre.coursAssocies?.toLowerCase().contains(rechercheLowerCase) ?? false);
         }).toList();
       }
 
-      return livresMap
-          .map((map) => LivreModel.fromMap(map).toEntity())
-          .toList();
+      return livresModels.map((model) => model.toEntity()).toList();
     } catch (e) {
       return [];
     }
@@ -129,8 +114,8 @@ class LivresRepositoryImpl implements LivresRepository {
   @override
   Future<bool> ajouterLivre(Livre livre) async {
     try {
-      // TODO: Implémenter l'ajout d'un livre (nécessite un datasource modifiable)
-      return true;
+      final livreModel = LivreModel.fromEntity(livre);
+      return await _datasourceLocal.ajouterLivre(livreModel);
     } catch (e) {
       return false;
     }
@@ -139,8 +124,8 @@ class LivresRepositoryImpl implements LivresRepository {
   @override
   Future<bool> modifierLivre(Livre livre) async {
     try {
-      // TODO: Implémenter la modification d'un livre (nécessite un datasource modifiable)
-      return true;
+      final livreModel = LivreModel.fromEntity(livre);
+      return await _datasourceLocal.modifierLivre(livreModel);
     } catch (e) {
       return false;
     }
@@ -149,8 +134,7 @@ class LivresRepositoryImpl implements LivresRepository {
   @override
   Future<bool> supprimerLivre(String id) async {
     try {
-      // TODO: Implémenter la suppression d'un livre (nécessite un datasource modifiable)
-      return true;
+      return await _datasourceLocal.supprimerLivre(id);
     } catch (e) {
       return false;
     }
@@ -159,8 +143,12 @@ class LivresRepositoryImpl implements LivresRepository {
   @override
   Future<bool> marquerLivreEchange(String id) async {
     try {
-      // TODO: Implémenter le marquage d'un livre comme échangé
-      return true;
+      final livre = await _datasourceLocal.obtenirLivreParId(id);
+      if (livre != null) {
+        final livreModifie = livre.copyWith(estDisponible: false);
+        return await _datasourceLocal.modifierLivre(livreModifie);
+      }
+      return false;
     } catch (e) {
       return false;
     }
@@ -169,8 +157,12 @@ class LivresRepositoryImpl implements LivresRepository {
   @override
   Future<bool> marquerLivreDisponible(String id) async {
     try {
-      // TODO: Implémenter le marquage d'un livre comme disponible
-      return true;
+      final livre = await _datasourceLocal.obtenirLivreParId(id);
+      if (livre != null) {
+        final livreModifie = livre.copyWith(estDisponible: true);
+        return await _datasourceLocal.modifierLivre(livreModifie);
+      }
+      return false;
     } catch (e) {
       return false;
     }
@@ -179,13 +171,9 @@ class LivresRepositoryImpl implements LivresRepository {
   @override
   Future<List<Livre>> obtenirLivresParProprietaire(String proprietaire) async {
     try {
-      final livresMap = _datasourceLocal.obtenirTousLesLivres();
-      final livresFiltres = livresMap
-          .where((livre) => livre['proprietaire'] == proprietaire)
-          .toList();
-      return livresFiltres
-          .map((map) => LivreModel.fromMap(map).toEntity())
-          .toList();
+      // UI Design: Utiliser la nouvelle méthode qui filtre par ID
+      final livresModels = await _datasourceLocal.obtenirLivresParProprietaire(proprietaire);
+      return livresModels.map((model) => model.toEntity()).toList();
     } catch (e) {
       return [];
     }
@@ -194,13 +182,8 @@ class LivresRepositoryImpl implements LivresRepository {
   @override
   Future<List<Livre>> obtenirLivresDisponibles() async {
     try {
-      final livresMap = _datasourceLocal.obtenirTousLesLivres();
-      final livresDisponibles = livresMap
-          .where((livre) => livre['estDisponible'] == true)
-          .toList();
-      return livresDisponibles
-          .map((map) => LivreModel.fromMap(map).toEntity())
-          .toList();
+      final livresModels = await _datasourceLocal.obtenirLivresDisponibles();
+      return livresModels.map((model) => model.toEntity()).toList();
     } catch (e) {
       return [];
     }
@@ -209,15 +192,10 @@ class LivresRepositoryImpl implements LivresRepository {
   @override
   Future<List<Livre>> obtenirLivresParCours(String cours) async {
     try {
-      final livresMap = _datasourceLocal.obtenirTousLesLivres();
-      final livresCours = livresMap
-          .where((livre) => livre['coursAssocies'] == cours)
-          .toList();
-      return livresCours
-          .map((map) => LivreModel.fromMap(map).toEntity())
-          .toList();
+      final livresModels = await _datasourceLocal.obtenirLivresParCours(cours);
+      return livresModels.map((model) => model.toEntity()).toList();
     } catch (e) {
       return [];
     }
   }
-} 
+}

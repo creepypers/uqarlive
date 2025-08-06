@@ -6,7 +6,6 @@ import '../screens/admin_gestion_cantine_ecran.dart';
 import '../screens/admin_gestion_associations_ecran.dart';
 import '../screens/admin_ajouter_menu_ecran.dart';
 import '../screens/admin_modifier_horaires_ecran.dart';
-import '../screens/associations_ecran.dart';
 
 // UI Design: AppBar de navigation entre les différentes sections de gestion admin
 class WidgetBarreAppNavigationAdmin extends StatelessWidget implements PreferredSizeWidget {
@@ -169,13 +168,13 @@ class WidgetBarreAppNavigationAdmin extends StatelessWidget implements Preferred
         child: _construireOnglets(context),
       ),
       flexibleSpace: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [CouleursApp.principal, CouleursApp.accent],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: const BorderRadius.only(
+          borderRadius: BorderRadius.only(
             bottomLeft: Radius.circular(24),
             bottomRight: Radius.circular(24),
           ),
@@ -405,30 +404,30 @@ class WidgetBarreAppNavigationAdmin extends StatelessWidget implements Preferred
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Row(
+        title: const Row(
           children: [
             Icon(Icons.article, color: Colors.orange),
             SizedBox(width: 8),
             Text('Ajouter une Actualité', style: StylesTexteApp.moyenTitre),
           ],
         ),
-        content: Container(
+        content: SizedBox(
           width: double.maxFinite,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
+              const Text(
                 'Fonctionnalité en développement',
                 style: StylesTexteApp.corpsNormal,
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Container(
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: Colors.orange.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Row(
+                child: const Row(
                   children: [
                     Icon(Icons.info, color: Colors.orange),
                     SizedBox(width: 8),
@@ -447,7 +446,7 @@ class WidgetBarreAppNavigationAdmin extends StatelessWidget implements Preferred
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Fermer'),
+            child: const Text('Fermer'),
           ),
         ],
       ),
@@ -458,30 +457,30 @@ class WidgetBarreAppNavigationAdmin extends StatelessWidget implements Preferred
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Row(
+        title: const Row(
           children: [
             Icon(Icons.group_add, color: Colors.purple),
             SizedBox(width: 8),
             Text('Nouvelle Association', style: StylesTexteApp.moyenTitre),
           ],
         ),
-        content: Container(
+        content: SizedBox(
           width: double.maxFinite,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
+              const Text(
                 'Fonctionnalité en développement',
                 style: StylesTexteApp.corpsNormal,
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Container(
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: Colors.purple.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Row(
+                child: const Row(
                   children: [
                     Icon(Icons.info, color: Colors.purple),
                     SizedBox(width: 8),
@@ -500,7 +499,7 @@ class WidgetBarreAppNavigationAdmin extends StatelessWidget implements Preferred
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Fermer'),
+            child: const Text('Fermer'),
           ),
         ],
       ),
@@ -511,30 +510,30 @@ class WidgetBarreAppNavigationAdmin extends StatelessWidget implements Preferred
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Row(
+        title: const Row(
           children: [
             Icon(Icons.edit, color: Colors.indigo),
             SizedBox(width: 8),
             Text('Modifier Association', style: StylesTexteApp.moyenTitre),
           ],
         ),
-        content: Container(
+        content: SizedBox(
           width: double.maxFinite,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
+              const Text(
                 'Fonctionnalité en développement',
                 style: StylesTexteApp.corpsNormal,
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Container(
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: Colors.indigo.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Row(
+                child: const Row(
                   children: [
                     Icon(Icons.info, color: Colors.indigo),
                     SizedBox(width: 8),
@@ -553,7 +552,7 @@ class WidgetBarreAppNavigationAdmin extends StatelessWidget implements Preferred
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Fermer'),
+            child: const Text('Fermer'),
           ),
         ],
       ),

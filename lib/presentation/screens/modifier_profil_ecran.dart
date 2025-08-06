@@ -76,7 +76,7 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
         sousTitre: widget.utilisateur != null ? 'Mise à jour des informations' : 'Création d\'un nouvel utilisateur',
         afficherProfil: false,
         widgetFin: IconButton(
-          icon: Icon(Icons.arrow_back, color: CouleursApp.blanc),
+          icon: const Icon(Icons.arrow_back, color: CouleursApp.blanc),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -135,7 +135,7 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.person_outline,
                 color: CouleursApp.principal,
                 size: 24,
@@ -241,7 +241,7 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.school,
                 color: CouleursApp.accent,
                 size: 24,
@@ -306,7 +306,7 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
               elevation: 8,
             ),
             child: _isLoading
-                ? SizedBox(
+                ? const SizedBox(
                     height: 20,
                     width: 20,
                     child: CircularProgressIndicator(
@@ -314,11 +314,11 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
                       strokeWidth: 2,
                     ),
                   )
-                : Row(
+                : const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(Icons.save, size: 20),
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8),
                       Text(
                         'Sauvegarder les modifications',
                         style: TextStyle(
@@ -339,17 +339,17 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
             onPressed: _isLoading ? null : () => Navigator.pop(context),
             style: OutlinedButton.styleFrom(
               foregroundColor: CouleursApp.principal,
-              side: BorderSide(color: CouleursApp.principal),
+              side: const BorderSide(color: CouleursApp.principal),
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
             ),
-            child: Row(
+            child: const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.cancel, size: 20),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 Text(
                   'Annuler',
                   style: TextStyle(
@@ -392,11 +392,11 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: CouleursApp.principal, width: 2),
+          borderSide: const BorderSide(color: CouleursApp.principal, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.red),
+          borderSide: const BorderSide(color: Colors.red),
         ),
         disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -426,7 +426,7 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
       // Afficher confirmation
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Profil mis à jour avec succès !'),
+          content: const Text('Profil mis à jour avec succès !'),
           backgroundColor: Colors.green,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),

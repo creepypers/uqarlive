@@ -45,7 +45,7 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
       if (_controleurMotDePasse.text != _controleurConfirmerMotDePasse.text) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Les mots de passe ne correspondent pas'),
+            content: const Text('Les mots de passe ne correspondent pas'),
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -66,7 +66,7 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
         SnackBar(
           content: Row(
             children: [
-              Icon(Icons.check_circle, color: Colors.white, size: 20),
+              const Icon(Icons.check_circle, color: Colors.white, size: 20),
               const SizedBox(width: 8),
               Expanded(
                 child: Text('Bienvenue ${_controleurPrenom.text} ${_controleurNom.text} ! Vous êtes maintenant connecté(e).'),
@@ -97,12 +97,12 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text('Quitter l\'inscription'),
-          content: Text('Vos données saisies seront perdues. Continuer ?'),
+          title: const Text('Quitter l\'inscription'),
+          content: const Text('Vos données saisies seront perdues. Continuer ?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Annuler'),
+              child: const Text('Annuler'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -110,7 +110,7 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
                 Navigator.pop(context); // Retour à la connexion
               },
               style: ElevatedButton.styleFrom(backgroundColor: CouleursApp.accent),
-              child: Text('Continuer', style: TextStyle(color: CouleursApp.blanc)),
+              child: const Text('Continuer', style: TextStyle(color: CouleursApp.blanc)),
             ),
           ],
         ),
@@ -128,7 +128,7 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
           _pageActuelle++;
         });
         _controleurPage.nextPage(
-          duration: Duration(milliseconds: 300),
+          duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
         );
       }
@@ -141,7 +141,7 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
         _pageActuelle--;
       });
       _controleurPage.previousPage(
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
     }
@@ -225,7 +225,7 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
                 child: Column(
                   children: [
                     // Section supérieure avec logo et illustrations
-                    Container(
+                    SizedBox(
                       height: MediaQuery.of(context).size.height * 0.35,
                       child: Stack(
                         children: [
@@ -309,7 +309,7 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
                       padding: const EdgeInsets.all(32),
                       decoration: BoxDecoration(
                         color: CouleursApp.blanc,
-                        borderRadius: BorderRadius.only(
+                        borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(50),
                           topRight: Radius.circular(50),
                         ),
@@ -317,7 +317,7 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
                           BoxShadow(
                             color: CouleursApp.principal.withValues(alpha: 0.1),
                             blurRadius: 20,
-                            offset: Offset(0, -10),
+                            offset: const Offset(0, -10),
                           ),
                         ],
                       ),
@@ -327,7 +327,7 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             // Titre
-                            Text(
+                            const Text(
                               'Inscription',
                               style: StylesTexteApp.titre,
                               textAlign: TextAlign.left,
@@ -335,7 +335,7 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
                             const SizedBox(height: 24),
 
                             // Contenu paginé - HAUTEUR FIXE pour éviter les conflits
-                            Container(
+                            SizedBox(
                               height: 400, // Hauteur fixe pour le PageView
                               child: PageView(
                                 controller: _controleurPage,
@@ -364,7 +364,7 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
                                     child: OutlinedButton(
                                       onPressed: _pagePrecedente,
                                       style: OutlinedButton.styleFrom(
-                                        side: BorderSide(color: CouleursApp.principal),
+                                        side: const BorderSide(color: CouleursApp.principal),
                                         padding: const EdgeInsets.symmetric(vertical: 16),
                                         shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.circular(32),
@@ -409,7 +409,7 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
                                     WidgetSpan(
                                       child: GestureDetector(
                                         onTap: _retournerVersConnexion,
-                                        child: Text(
+                                        child: const Text(
                                           'Se connecter',
                                           style: TextStyle(
                                             color: CouleursApp.accent,
@@ -623,13 +623,13 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
           ),
         ],
       ),
-      child: Center(
+      child: const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Icône stylisée représentant UQAR
             Icon(Icons.school, size: 32, color: CouleursApp.principal),
-            const SizedBox(height: 4),
+            SizedBox(height: 4),
             // Petit texte "UQAR"
             Text(
               'UQAR',

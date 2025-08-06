@@ -1141,4 +1141,125 @@ Corriger l'overflow RenderFlex dans la section "Gestion du système" du dashboar
 
 ---
 
-*Dernière mise à jour : 2025-01-XX*
+---
+
+## 📅 2025-01-27 - Interface Utilisateur Dynamique et Personnalisée
+
+### 🎯 Objectif  
+Transformer l'application en interface 100% dynamique selon l'utilisateur connecté avec suppression de toutes les données hardcodées.
+
+### ✅ Améliorations UI Implémentées
+
+#### 1. **AppBar Personnalisée avec Données Réelles** 👤
+- **Initiales Dynamiques** : `WidgetBarreAppPersonnalisee` mise à jour
+  - Remplacement `'MD'` hardcodé par `'${utilisateur.prenom[0]}${utilisateur.nom[0]}'.toUpperCase()`
+  - Service d'authentification intégré pour récupération automatique
+  - Fallback `'??'` si utilisateur non connecté
+  - Paramètre `utilisateurConnecte` optionnel pour flexibilité
+
+- **Code Étudiant dans Titre** : Affichage conditionnel intelligent
+  - Détection : `titre.contains('Bienvenue')`
+  - Affichage : `'Code étudiant: ${utilisateur.codeEtudiant}'`
+  - Fallback au titre original si pas de condition
+
+#### 2. **Section Livres en Vente dans l'Accueil** 💰
+- **Nouvelle Section Dédiée** : Entre "Mes Livres" et "Mes Associations"
+  - Titre : "Livres en Vente" avec sous-titre "Livres disponibles à l'achat"
+  - **Filtrage intelligent** : `prix != null && prix > 0 && estDisponible`
+  - Collection horizontale avec hauteur 200px et cartes 140px largeur
+
+- **Interactions Utilisateur** :
+  - **Bouton "Voir tout"** : Navigation vers marketplace (index 1)
+  - **Cartes cliquables** : Navigation vers détails du livre
+  - **État vide** : Message "Aucun livre en vente pour le moment"
+  - **Chargement** : Indicateur pendant récupération des données
+
+#### 3. **Profil avec Statistiques Calculées** 📊
+- **Remplacement Valeurs Hardcodées** :
+  - **Livres échangés** : `'12'` → `'$_nombreLivresEchanges'` (calculé : `!livre.estDisponible`)
+  - **Livres en vente** : `'2'` → `'$_nombreLivresEnVente'` (calculé : `prix != null && prix > 0`)
+  - **Livres disponibles** : Formule dynamique `${_mesLivres.where((l) => l.estDisponible && (l.prix == null || l.prix == 0)).length}`
+  - **Total livres** : `'12'` → `'${_mesLivres.length}'`
+
+- **Service de Calcul Temps Réel** :
+  - Méthode `_chargerStatistiques()` appelée après chargement utilisateur
+  - Intégration `LivresRepository` pour données réelles
+  - Calculs à chaque ouverture de l'écran profil
+
+#### 4. **Gestion Complète des Livres** 📚
+- **Modal de Modification** : `_ModalModificationLivre` complètement implémentée
+  - **Pré-remplissage automatique** : Tous les champs avec données du livre sélectionné
+  - **Formulaire intelligent** : Même validation que l'ajout
+  - **État de vente** : Checkbox "Mettre en vente" pré-cochée selon `livre.prix`
+  - **Bouton adaptatif** : "Sauvegarder" au lieu de "Ajouter le livre"
+
+- **CRUD Operations Visuelles** :
+  - **Modification** : Menu contextuel → "Modifier les détails" → Modal pré-remplie
+  - **Suppression** : Confirmation + suppression réelle de la liste
+  - **Disponibilité** : Toggle immédiat "Suspendre/Remettre en échange"
+  - **Ajout** : Modal avec champs vides, lien automatique à l'utilisateur
+
+#### 5. **Corrections Layout Critiques** 🔧
+- **Problème RenderFlex Résolu** : `WidgetCarte` 
+  - **Cause** : `Column` avec `Expanded` dans `ListView` (contraintes infinies)
+  - **Solution** : Encapsulation `SizedBox(height: hauteur ?? 200)`
+  - **Résultat** : Plus d'erreurs "unbounded height constraints"
+  - **Conservation ratio** : `Expanded(flex: 5)` et `flex: 4` préservés
+
+- **Datasource Optimisé** : `LivresDatasourceLocal`
+  - **Structure** : `List<Map>` → `List<LivreModel>` pour manipulation directe
+  - **Performance** : Opérations CRUD plus efficaces
+  - **Type Safety** : Moins de conversions, plus de robustesse
+
+#### 6. **Nettoyage Code et Debug** 🧹
+- **Suppression Logs Debug** : Tous les `print()` de développement retirés
+  - `gerer_livres_ecran.dart` : Logs d'ajout, chargement, menu contextuel
+  - Code professionnel sans traces de debug
+- **Méthodes Non Utilisées** : Suppression des méthodes `_gererReservations` et `_gererLivresEnVente`
+
+### 🧩 Composants UI Améliorés
+- **WidgetBarreAppPersonnalisee** : Données utilisateur dynamiques
+- **WidgetCarte** : Layout robuste avec SizedBox pour contraintes
+- **WidgetCollection** : Support nouvelles sections dans accueil
+- **Modal Forms** : Formulaires intelligents ajout/modification
+
+### 🎨 Respect du Thème UQAR
+- **Couleurs Cohérentes** : `CouleursApp.principal` et `accent` partout
+- **Typographie** : `StylesTexteApp` utilisé pour tous les nouveaux textes
+- **Espacements** : Standards 8, 12, 16, 20, 24px respectés
+- **Design Roundy** : Coins arrondis préservés dans tous les nouveaux composants
+
+### 🔧 Innovations Techniques
+- **Service Authentification** : Centralisation données utilisateur
+- **Calculs Temps Réel** : Statistiques calculées à chaque affichage
+- **Layout Robuste** : SizedBox pour éviter contraintes infinies
+- **CRUD Visuel** : Interface complète pour gestion données utilisateur
+
+### 📱 Expérience Utilisateur Transformée
+- **100% Personnalisée** : Chaque écran adapté à l'utilisateur connecté
+- **Données Réelles** : Plus de valeurs simulées ou hardcodées
+- **Interactions Fluides** : CRUD complet avec feedback immédiat
+- **Navigation Intelligente** : Liens entre sections et détails
+
+### 🚀 Performance et Robustesse
+- **Chargement Optimisé** : Données utilisateur chargées une fois, réutilisées
+- **Gestion Erreurs** : Try-catch avec messages utilisateur appropriés
+- **Layout Stable** : Plus d'erreurs RenderFlex sur aucun écran
+- **Type Safety** : LivreModel directement manipulé dans datasource
+
+### 📊 Métriques Dynamiques Implémentées
+- **Accueil** : Section livres en vente avec nombre réel de livres
+- **Profil** : 4 statistiques calculées en temps réel
+- **Gestion Livres** : Compteur dynamique dans sous-titre AppBar
+- **AppBar** : Initiales et code permanent de l'utilisateur réel
+
+**Fichiers UI modifiés :**
+- 🔄 `presentation/widgets/widget_barre_app_personnalisee.dart` - Données utilisateur dynamiques
+- 🔄 `presentation/screens/accueil_ecran.dart` - Section livres en vente ajoutée  
+- 🔄 `presentation/screens/profil_ecran.dart` - Statistiques calculées temps réel
+- 🔄 `presentation/screens/gerer_livres_ecran.dart` - CRUD visuel complet
+- 🔄 `presentation/widgets/widget_carte.dart` - Correction layout SizedBox
+
+---
+
+*Dernière mise à jour : 2025-01-27*

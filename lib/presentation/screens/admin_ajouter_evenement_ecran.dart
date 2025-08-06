@@ -134,7 +134,7 @@ class _AdminAjouterEvenementEcranState extends State<AdminAjouterEvenementEcran>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Informations générales',
               style: StylesTexteApp.grandTitre,
             ),
@@ -146,13 +146,13 @@ class _AdminAjouterEvenementEcranState extends State<AdminAjouterEvenementEcran>
               decoration: InputDecoration(
                 labelText: 'Titre de l\'événement *',
                 hintText: 'Ex: Conférence sur l\'intelligence artificielle',
-                prefixIcon: Icon(Icons.event, color: CouleursApp.principal),
+                prefixIcon: const Icon(Icons.event, color: CouleursApp.principal),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: CouleursApp.principal, width: 2),
+                  borderSide: const BorderSide(color: CouleursApp.principal, width: 2),
                 ),
               ),
               validator: (valeur) {
@@ -172,13 +172,13 @@ class _AdminAjouterEvenementEcranState extends State<AdminAjouterEvenementEcran>
               value: _typeSelectionne,
               decoration: InputDecoration(
                 labelText: 'Type d\'événement *',
-                prefixIcon: Icon(Icons.category, color: CouleursApp.principal),
+                prefixIcon: const Icon(Icons.category, color: CouleursApp.principal),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: CouleursApp.principal, width: 2),
+                  borderSide: const BorderSide(color: CouleursApp.principal, width: 2),
                 ),
               ),
               items: _typesEvenements.map((type) => DropdownMenuItem(
@@ -200,13 +200,13 @@ class _AdminAjouterEvenementEcranState extends State<AdminAjouterEvenementEcran>
               decoration: InputDecoration(
                 labelText: 'Description *',
                 hintText: 'Décrivez l\'événement, les objectifs et le programme...',
-                prefixIcon: Icon(Icons.description, color: CouleursApp.principal),
+                prefixIcon: const Icon(Icons.description, color: CouleursApp.principal),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: CouleursApp.principal, width: 2),
+                  borderSide: const BorderSide(color: CouleursApp.principal, width: 2),
                 ),
               ),
               validator: (valeur) {
@@ -227,13 +227,13 @@ class _AdminAjouterEvenementEcranState extends State<AdminAjouterEvenementEcran>
               decoration: InputDecoration(
                 labelText: 'Lieu *',
                 hintText: 'Ex: Salle A-101, Pavillon principal',
-                prefixIcon: Icon(Icons.location_on, color: CouleursApp.principal),
+                prefixIcon: const Icon(Icons.location_on, color: CouleursApp.principal),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: CouleursApp.principal, width: 2),
+                  borderSide: const BorderSide(color: CouleursApp.principal, width: 2),
                 ),
               ),
               validator: (valeur) {
@@ -251,13 +251,13 @@ class _AdminAjouterEvenementEcranState extends State<AdminAjouterEvenementEcran>
               decoration: InputDecoration(
                 labelText: 'Organisateur *',
                 hintText: 'Ex: Association des étudiants en informatique',
-                prefixIcon: Icon(Icons.person, color: CouleursApp.principal),
+                prefixIcon: const Icon(Icons.person, color: CouleursApp.principal),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: CouleursApp.principal, width: 2),
+                  borderSide: const BorderSide(color: CouleursApp.principal, width: 2),
                 ),
               ),
               validator: (valeur) {
@@ -282,7 +282,7 @@ class _AdminAjouterEvenementEcranState extends State<AdminAjouterEvenementEcran>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Date et heure',
               style: StylesTexteApp.grandTitre,
             ),
@@ -297,7 +297,7 @@ class _AdminAjouterEvenementEcranState extends State<AdminAjouterEvenementEcran>
                     child: InputDecorator(
                       decoration: InputDecoration(
                         labelText: 'Date de début',
-                        prefixIcon: Icon(Icons.calendar_today, color: CouleursApp.principal),
+                        prefixIcon: const Icon(Icons.calendar_today, color: CouleursApp.principal),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -316,7 +316,7 @@ class _AdminAjouterEvenementEcranState extends State<AdminAjouterEvenementEcran>
                     child: InputDecorator(
                       decoration: InputDecoration(
                         labelText: 'Heure de début',
-                        prefixIcon: Icon(Icons.access_time, color: CouleursApp.principal),
+                        prefixIcon: const Icon(Icons.access_time, color: CouleursApp.principal),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -341,7 +341,7 @@ class _AdminAjouterEvenementEcranState extends State<AdminAjouterEvenementEcran>
                     child: InputDecorator(
                       decoration: InputDecoration(
                         labelText: 'Date de fin',
-                        prefixIcon: Icon(Icons.calendar_today, color: CouleursApp.principal),
+                        prefixIcon: const Icon(Icons.calendar_today, color: CouleursApp.principal),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -360,7 +360,7 @@ class _AdminAjouterEvenementEcranState extends State<AdminAjouterEvenementEcran>
                     child: InputDecorator(
                       decoration: InputDecoration(
                         labelText: 'Heure de fin',
-                        prefixIcon: Icon(Icons.access_time, color: CouleursApp.principal),
+                        prefixIcon: const Icon(Icons.access_time, color: CouleursApp.principal),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -389,7 +389,7 @@ class _AdminAjouterEvenementEcranState extends State<AdminAjouterEvenementEcran>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Inscription et participation',
               style: StylesTexteApp.grandTitre,
             ),
@@ -397,7 +397,7 @@ class _AdminAjouterEvenementEcranState extends State<AdminAjouterEvenementEcran>
             
             // Inscription requise
             SwitchListTile(
-              title: Text(
+              title: const Text(
                 'Inscription requise',
                 style: StylesTexteApp.moyenTitre,
               ),
@@ -424,13 +424,13 @@ class _AdminAjouterEvenementEcranState extends State<AdminAjouterEvenementEcran>
                 decoration: InputDecoration(
                   labelText: 'Capacité maximale',
                   hintText: 'Ex: 50',
-                  prefixIcon: Icon(Icons.people, color: CouleursApp.principal),
+                  prefixIcon: const Icon(Icons.people, color: CouleursApp.principal),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: CouleursApp.principal, width: 2),
+                    borderSide: const BorderSide(color: CouleursApp.principal, width: 2),
                   ),
                 ),
                 validator: (valeur) {
@@ -452,7 +452,7 @@ class _AdminAjouterEvenementEcranState extends State<AdminAjouterEvenementEcran>
             
             // Événement gratuit
             SwitchListTile(
-              title: Text(
+              title: const Text(
                 'Événement gratuit',
                 style: StylesTexteApp.moyenTitre,
               ),
@@ -479,14 +479,14 @@ class _AdminAjouterEvenementEcranState extends State<AdminAjouterEvenementEcran>
                 decoration: InputDecoration(
                   labelText: 'Prix de participation',
                   hintText: 'Ex: 15.00',
-                  prefixIcon: Icon(Icons.attach_money, color: CouleursApp.principal),
+                  prefixIcon: const Icon(Icons.attach_money, color: CouleursApp.principal),
                   suffixText: 'CAD',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: CouleursApp.principal, width: 2),
+                    borderSide: const BorderSide(color: CouleursApp.principal, width: 2),
                   ),
                 ),
                 validator: (valeur) {
@@ -517,13 +517,13 @@ class _AdminAjouterEvenementEcranState extends State<AdminAjouterEvenementEcran>
           child: OutlinedButton(
             onPressed: () => Navigator.pop(context),
             style: OutlinedButton.styleFrom(
-              side: BorderSide(color: CouleursApp.principal),
+              side: const BorderSide(color: CouleursApp.principal),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
-            child: Text(
+            child: const Text(
               'Annuler',
               style: StylesTexteApp.lienPrincipal,
             ),

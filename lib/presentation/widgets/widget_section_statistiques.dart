@@ -106,7 +106,7 @@ class WidgetSectionStatistiques extends StatelessWidget {
     switch (typeStyling) {
       case TypeSectionStatistiques.associationsStyle:
         return BoxDecoration(
-          gradient: LinearGradient(
+          gradient: const LinearGradient(
             colors: [CouleursApp.principal, CouleursApp.accent],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -235,7 +235,7 @@ class WidgetSectionStatistiques extends StatelessWidget {
       children: [
         Text(
           statistique.valeur,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: CouleursApp.blanc,
@@ -294,7 +294,7 @@ class WidgetSectionStatistiques extends StatelessWidget {
         if (statistique.icone != null) const SizedBox(height: 8),
         Text(
           statistique.valeur,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
             color: CouleursApp.principal,
@@ -362,7 +362,7 @@ class WidgetSectionStatistiques extends StatelessWidget {
             ),
             Text(
               statistique.valeur,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
                 color: CouleursApp.texteFonce,

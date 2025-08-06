@@ -78,7 +78,7 @@ class _EcranChargementState extends State<EcranChargement>
               ),
               const SizedBox(height: 48),
               // Indicateur de chargement
-              CircularProgressIndicator(
+              const CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(CouleursApp.accent),
                 strokeWidth: 3,
               ),
@@ -104,13 +104,13 @@ class _EcranChargementState extends State<EcranChargement>
           ),
         ],
       ),
-      child: Center(
+      child: const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Icône stylisée représentant UQAR
             Icon(Icons.school, size: 48, color: CouleursApp.principal),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             // Petit texte "UQAR"
             Text(
               'UQAR',

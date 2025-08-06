@@ -101,7 +101,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: CouleursApp.fond,
-      appBar: WidgetBarreAppNavigationAdmin(
+      appBar: const WidgetBarreAppNavigationAdmin(
         titre: 'Gestion des Comptes',
         sousTitre: 'Administration des utilisateurs',
         sectionActive: 'comptes',
@@ -147,7 +147,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
+              const Text(
                 'Statistiques Utilisateurs',
                 style: StylesTexteApp.titrePage,
               ),
@@ -204,7 +204,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
               : // UI Design: Message quand les statistiques sont masquées
               Container(
                   padding: const EdgeInsets.symmetric(vertical: 20),
-                  child: Center(
+                  child: const Center(
                     child: Text(
                       'Statistiques masquées - Cliquez sur l\'œil pour les afficher',
                       style: StylesTexteApp.corpsGris,
@@ -238,7 +238,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
               controller: _controleurRecherche,
               decoration: InputDecoration(
                 hintText: 'Rechercher par nom, email ou code...',
-                prefixIcon: Icon(Icons.search, color: CouleursApp.principal),
+                prefixIcon: const Icon(Icons.search, color: CouleursApp.principal),
                 suffixIcon: _filtreRecherche.isNotEmpty
                     ? IconButton(
                         icon: const Icon(Icons.clear),
@@ -257,7 +257,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: CouleursApp.principal, width: 2),
+                  borderSide: const BorderSide(color: CouleursApp.principal, width: 2),
                 ),
                 filled: true,
                 fillColor: CouleursApp.fond,
@@ -307,15 +307,15 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
         },
         tabs: [
           Tab(
-            icon: Icon(Icons.people),
+            icon: const Icon(Icons.people),
             text: 'Tous (${_statistiques?.totalUtilisateurs ?? 0})',
           ),
           Tab(
-            icon: Icon(Icons.school),
+            icon: const Icon(Icons.school),
             text: 'Étudiants (${_statistiques?.etudiants ?? 0})',
           ),
           Tab(
-            icon: Icon(Icons.admin_panel_settings),
+            icon: const Icon(Icons.admin_panel_settings),
             text: 'Admins (${_statistiques?.administrateurs ?? 0})',
           ),
         ],
@@ -545,7 +545,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
               color: CouleursApp.principal.withValues(alpha: 0.3),
             ),
             const SizedBox(height: 20),
-            Text(
+            const Text(
               'Aucun utilisateur trouvé',
               style: TextStyle(
                 fontSize: 18,
@@ -554,7 +554,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
               ),
             ),
             const SizedBox(height: 8),
-            Text(
+            const Text(
               'Modifiez vos critères de recherche ou ajoutez un nouvel utilisateur',
               style: StylesTexteApp.corpsGris,
               textAlign: TextAlign.center,
@@ -654,7 +654,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Confirmer la suppression', style: StylesTexteApp.moyenTitre),
+        title: const Text('Confirmer la suppression', style: StylesTexteApp.moyenTitre),
         content: Text(
           'Êtes-vous sûr de vouloir supprimer l\'utilisateur "${utilisateur.prenom} ${utilisateur.nom}" ?\n\nCette action est irréversible.',
           style: StylesTexteApp.corpsNormal,
@@ -662,7 +662,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Annuler', style: StylesTexteApp.lienPrincipal),
+            child: const Text('Annuler', style: StylesTexteApp.lienPrincipal),
           ),
           TextButton(
             onPressed: () {
@@ -699,10 +699,10 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Row(
+        title: const Row(
           children: [
             Icon(Icons.admin_panel_settings, color: Colors.orange),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             Text('Promouvoir Administrateur', style: StylesTexteApp.moyenTitre),
           ],
         ),
@@ -740,7 +740,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Annuler', style: StylesTexteApp.lienPrincipal),
+            child: const Text('Annuler', style: StylesTexteApp.lienPrincipal),
           ),
           ElevatedButton(
             onPressed: () {
@@ -751,7 +751,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
               backgroundColor: Colors.orange,
               foregroundColor: Colors.white,
             ),
-            child: Text('Promouvoir'),
+            child: const Text('Promouvoir'),
           ),
         ],
       ),
@@ -785,7 +785,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
             SnackBar(
               content: Row(
                 children: [
-                  Icon(Icons.admin_panel_settings, color: Colors.white),
+                  const Icon(Icons.admin_panel_settings, color: Colors.white),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -803,7 +803,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
+            const SnackBar(
               content: Text('Erreur lors de la promotion de l\'utilisateur'),
               backgroundColor: Colors.red,
             ),
@@ -829,7 +829,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
       builder: (context) => AlertDialog(
         title: Row(
           children: [
-            Icon(Icons.security, color: Colors.blue),
+            const Icon(Icons.security, color: Colors.blue),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
@@ -872,20 +872,20 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Fermer', style: StylesTexteApp.lienPrincipal),
+            child: const Text('Fermer', style: StylesTexteApp.lienPrincipal),
           ),
           // TODO: Ajouter la fonctionnalité de modification des privilèges
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
+                const SnackBar(
                   content: Text('Modification des privilèges - Fonctionnalité à venir'),
                   backgroundColor: CouleursApp.accent,
                 ),
               );
             },
-            child: Text('Modifier', style: StylesTexteApp.lienPrincipal),
+            child: const Text('Modifier', style: StylesTexteApp.lienPrincipal),
           ),
         ],
       ),

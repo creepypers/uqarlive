@@ -19,6 +19,61 @@
 
 ### 🆕 Recent Updates - 2025-01-27
 
+#### Écran d'Accueil Dynamique et Relations Utilisateur
+- ✅ **Écran d'Accueil Personnalisé** - `presentation/screens/accueil_ecran.dart`
+  - Affichage dynamique selon l'utilisateur connecté  
+  - Section "Mes Livres" au lieu de livres génériques
+  - Section "Mes Associations" avec statut de membre
+  - Nom d'utilisateur dynamique dans la barre d'app
+  - Gestion d'état de chargement optimisée
+
+- ✅ **Nouvelles Entités Relationnelles** 
+  - `domain/entities/membre_association.dart` - Relation utilisateur-association
+  - `domain/entities/reservation_salle.dart` - Relation utilisateur-salle
+  - `domain/repositories/membres_association_repository.dart`
+  - `domain/repositories/reservations_salle_repository.dart` 
+  - `data/models/membre_association_model.dart`
+  - `data/models/reservation_salle_model.dart`
+
+- ✅ **Entité Livre Améliorée** - `domain/entities/livre.dart`
+  - Ajout du champ `proprietaireId` pour lier au utilisateur
+  - Conservation du champ `proprietaire` pour l'affichage
+  - Méthodes copyWith et toString mises à jour
+
+#### Admin Dashboard Avancé
+- ✅ **Menu d'Actions Admin** - `presentation/screens/admin_dashboard_ecran.dart`
+  - Menu popup avec profil, privilèges et déconnexion
+  - Dialog de profil admin avec informations complètes
+  - Visualisation des privilèges avec statut graphique
+  - Déconnexion sécurisée avec confirmation
+  - Sous-titre dynamique avec nom de l'admin connecté
+
+#### Gestion des Livres Dynamique
+- ✅ **Écran de Gestion Personnalisé** - `presentation/screens/gerer_livres_ecran.dart`
+  - Affichage des livres de l'utilisateur connecté uniquement
+  - Filtrage par `proprietaireId` au lieu du nom statique
+  - Intégration du service d'authentification
+  - Mise à jour en temps réel de la liste des livres
+
+- ✅ **Ajout de Livres Amélioré**
+  - Livres automatiquement liés à l'utilisateur connecté
+  - Sauvegarde via repository et datasource
+  - Indicateurs de chargement et gestion d'erreurs
+  - Validation complète des formulaires
+  - Interface utilisateur avec feedback visuel
+
+- ✅ **Suppression et Modification**
+  - Suppression réelle via repository avec confirmation
+  - Modification de disponibilité (disponible/échangé)
+  - Mise à jour immédiate de l'interface
+  - Messages de succès et d'erreur appropriés
+
+- ✅ **Datasource et Repository Mis à Jour**
+  - `data/datasources/livres_datasource_local.dart` - Support LivreModel
+  - `data/repositories/livres_repository_impl.dart` - Nouvelles méthodes
+  - `data/models/livre_model.dart` - Support proprietaireId
+  - Méthodes asynchrones pour toutes les opérations CRUD
+
 #### Profil Dynamique et Gestion Admin
 - ✅ **Service d'Authentification Créé** - `presentation/services/authentification_service.dart`
   - Centralise la gestion de l'utilisateur connecté
@@ -304,6 +359,76 @@
 - 🧹 **Centralisation** : Une seule source de vérité pour toutes les stats
 - 📊 **Interface Moderne** : Design élégant et professionnel pour l'administration
 - 🚀 **Performance** : Calculs optimisés avec `Future.wait` pour parallélisation
+
+---
+
+## 2025-01-27 - **INTERFACE UTILISATEUR DYNAMIQUE ET PERSONNALISÉE**
+**Objectif** : Rendre l'application entièrement dynamique selon l'utilisateur connecté avec des vraies données.
+
+**Fonctionnalités ajoutées** :
+
+### 1. **Service d'Authentification Centralisé Amélioré**
+- ✅ `AuthentificationService` : Gestion centralisée de l'utilisateur connecté
+- ✅ Méthodes `obtenirInitiales()` et `obtenirNomComplet()` pour l'interface
+- ✅ Intégration avec tous les widgets et écrans nécessitant les données utilisateur
+- ✅ Singleton pattern avec injection de dépendances via ServiceLocator
+
+### 2. **AppBar Personnalisée avec Données Utilisateur**
+- ✅ `WidgetBarreAppPersonnalisee` mis à jour avec paramètre `utilisateurConnecte`
+- ✅ **Initiales dynamiques** : Affichage `${prenom[0]}${nom[0]}` au lieu de valeurs fixes
+- ✅ **Code étudiant dans titre** : Affichage du code permanent quand titre contient "Bienvenue"
+- ✅ Service d'authentification intégré pour récupération automatique des données
+- ✅ Fallback robuste avec valeurs par défaut si utilisateur non connecté
+
+### 3. **Écran d'Accueil avec Livres en Vente**
+- ✅ **Nouvelle section** : "Livres en Vente" affichant les livres avec prix
+- ✅ **Filtrage intelligent** : `prix != null && prix > 0 && estDisponible`
+- ✅ **Collection horizontale** : WidgetCollection.listeHorizontale avec cartes optimisées
+- ✅ **Navigation** : Bouton "Voir tout" vers marketplace, cartes cliquables vers détails
+- ✅ **Chargement asynchrone** : Méthode `_chargerLivresEnVente()` dédiée
+
+### 4. **Profil avec Statistiques Réelles**
+- ✅ **Import repositories** : LivresRepository pour accès aux données réelles
+- ✅ **Méthode _chargerStatistiques()** : Calcul dynamique des métriques utilisateur
+- ✅ **Statistiques calculées** :
+  - Livres échangés : `livre.estDisponible == false`
+  - Livres en vente : `livre.prix != null && livre.prix > 0`
+  - Livres disponibles : `livre.estDisponible && (livre.prix == null || livre.prix == 0)`
+  - Total de livres de l'utilisateur
+- ✅ **Suppression valeurs hardcodées** : Plus de "12 livres échangés", "2 en vente"
+
+### 5. **Gestion Complète des Livres**
+- ✅ **Modal de modification** : `_ModalModificationLivre` pour éditer les livres existants
+- ✅ **Pré-remplissage automatique** : Tous les champs remplis avec les données du livre
+- ✅ **Validation complète** : Règles identiques à l'ajout, gestion des erreurs
+- ✅ **CRUD complet** : Create, Read, Update, Delete entièrement fonctionnel
+- ✅ **Mise à jour temps réel** : Interface actualisée immédiatement après modifications
+
+### 6. **Corrections Techniques Critiques**
+- ✅ **WidgetCarte avec SizedBox** : Correction "RenderFlex unbounded height"
+- ✅ **Hauteur fixe** : `SizedBox(height: hauteur ?? 200)` pour éviter les contraintes infinies
+- ✅ **Datasource LivreModel** : Structure interne modifiée pour manipulation directe
+- ✅ **Repository complet** : Toutes les méthodes CRUD implémentées
+- ✅ **Suppression logs debug** : Code propre sans print() de développement
+
+**Fichiers créés/modifiés** :
+- 🔄 `presentation/widgets/widget_barre_app_personnalisee.dart` - Initiales et code permanent dynamiques
+- 🔄 `presentation/screens/accueil_ecran.dart` - Section livres en vente ajoutée
+- 🔄 `presentation/screens/profil_ecran.dart` - Statistiques réelles calculées
+- 🔄 `presentation/screens/gerer_livres_ecran.dart` - CRUD complet avec modification
+- 🔄 `presentation/widgets/widget_carte.dart` - Correction layout avec SizedBox
+- 🔄 `data/datasources/livres_datasource_local.dart` - Structure LivreModel directe
+- 🔄 `data/repositories/livres_repository_impl.dart` - Méthodes CRUD complètes
+- 🔄 `data/models/livre_model.dart` - Support proprietaireId étendu
+
+**Bénéfices** :
+- 🎯 **100% Dynamique** : Toute l'interface basée sur l'utilisateur connecté
+- 🔄 **Données Réelles** : Plus de valeurs simulées ou hardcodées
+- 🧹 **Architecture Clean** : Séparation couches respectée, service centralisé
+- 📊 **UX Personnalisée** : Chaque utilisateur voit ses propres données
+- 🚀 **Performance** : Chargement optimisé et gestion d'erreurs robuste
+
+---
 
 ### 🚀 Next Steps Priority
 1. **Tests** : Implémenter tests unitaires/intégration

@@ -114,7 +114,7 @@ class _AdminAjouterActualiteEcranState extends State<AdminAjouterActualiteEcran>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Contenu de l\'actualité',
               style: StylesTexteApp.grandTitre,
             ),
@@ -126,13 +126,13 @@ class _AdminAjouterActualiteEcranState extends State<AdminAjouterActualiteEcran>
               decoration: InputDecoration(
                 labelText: 'Titre *',
                 hintText: 'Ex: Nouvelle activité de l\'association',
-                prefixIcon: Icon(Icons.title, color: CouleursApp.principal),
+                prefixIcon: const Icon(Icons.title, color: CouleursApp.principal),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: CouleursApp.principal, width: 2),
+                  borderSide: const BorderSide(color: CouleursApp.principal, width: 2),
                 ),
               ),
               validator: (valeur) {
@@ -154,13 +154,13 @@ class _AdminAjouterActualiteEcranState extends State<AdminAjouterActualiteEcran>
               decoration: InputDecoration(
                 labelText: 'Contenu *',
                 hintText: 'Rédigez le contenu détaillé de l\'actualité...',
-                prefixIcon: Icon(Icons.article, color: CouleursApp.principal),
+                prefixIcon: const Icon(Icons.article, color: CouleursApp.principal),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: CouleursApp.principal, width: 2),
+                  borderSide: const BorderSide(color: CouleursApp.principal, width: 2),
                 ),
               ),
               validator: (valeur) {
@@ -181,13 +181,13 @@ class _AdminAjouterActualiteEcranState extends State<AdminAjouterActualiteEcran>
               decoration: InputDecoration(
                 labelText: 'Tags (optionnel)',
                 hintText: 'Ex: événement, culture, sport (séparés par des virgules)',
-                prefixIcon: Icon(Icons.tag, color: CouleursApp.principal),
+                prefixIcon: const Icon(Icons.tag, color: CouleursApp.principal),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: CouleursApp.principal, width: 2),
+                  borderSide: const BorderSide(color: CouleursApp.principal, width: 2),
                 ),
               ),
             ),
@@ -206,7 +206,7 @@ class _AdminAjouterActualiteEcranState extends State<AdminAjouterActualiteEcran>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Paramètres de publication',
               style: StylesTexteApp.grandTitre,
             ),
@@ -217,13 +217,13 @@ class _AdminAjouterActualiteEcranState extends State<AdminAjouterActualiteEcran>
               value: _prioriteSelectionnee,
               decoration: InputDecoration(
                 labelText: 'Priorité *',
-                prefixIcon: Icon(Icons.priority_high, color: CouleursApp.principal),
+                prefixIcon: const Icon(Icons.priority_high, color: CouleursApp.principal),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: CouleursApp.principal, width: 2),
+                  borderSide: const BorderSide(color: CouleursApp.principal, width: 2),
                 ),
               ),
               items: _priorites.map((priorite) => DropdownMenuItem<String>(
@@ -257,13 +257,13 @@ class _AdminAjouterActualiteEcranState extends State<AdminAjouterActualiteEcran>
               child: InputDecorator(
                 decoration: InputDecoration(
                   labelText: 'Date de publication',
-                  prefixIcon: Icon(Icons.calendar_today, color: CouleursApp.principal),
+                  prefixIcon: const Icon(Icons.calendar_today, color: CouleursApp.principal),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: CouleursApp.principal, width: 2),
+                    borderSide: const BorderSide(color: CouleursApp.principal, width: 2),
                   ),
                 ),
                 child: Text(
@@ -276,7 +276,7 @@ class _AdminAjouterActualiteEcranState extends State<AdminAjouterActualiteEcran>
             
             // Épingler l'actualité
             SwitchListTile(
-              title: Text(
+              title: const Text(
                 'Épingler l\'actualité',
                 style: StylesTexteApp.moyenTitre,
               ),
@@ -308,13 +308,13 @@ class _AdminAjouterActualiteEcranState extends State<AdminAjouterActualiteEcran>
           child: OutlinedButton(
             onPressed: () => Navigator.pop(context),
             style: OutlinedButton.styleFrom(
-              side: BorderSide(color: CouleursApp.principal),
+              side: const BorderSide(color: CouleursApp.principal),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
-            child: Text(
+            child: const Text(
               'Annuler',
               style: StylesTexteApp.lienPrincipal,
             ),
@@ -377,7 +377,7 @@ class _AdminAjouterActualiteEcranState extends State<AdminAjouterActualiteEcran>
         id: _modeModification ? widget.actualiteAModifier!.id : DateTime.now().millisecondsSinceEpoch.toString(),
         titre: _controleurTitre.text.trim(),
         description: _controleurContenu.text.trim().length > 100 
-            ? _controleurContenu.text.trim().substring(0, 100) + '...'
+            ? '${_controleurContenu.text.trim().substring(0, 100)}...'
             : _controleurContenu.text.trim(),
         contenu: _controleurContenu.text.trim(),
         nomAssociation: 'Administration UQAR',

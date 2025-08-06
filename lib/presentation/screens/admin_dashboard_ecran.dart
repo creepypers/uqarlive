@@ -7,9 +7,11 @@ import '../widgets/widget_barre_app_navigation_admin.dart';
 import '../widgets/widget_carte.dart';
 
 import '../services/statistiques_service.dart';
+import '../services/authentification_service.dart';
 import 'admin_gestion_comptes_ecran.dart';
 import 'admin_gestion_cantine_ecran.dart';
 import 'admin_gestion_associations_ecran.dart';
+import 'connexion_ecran.dart';
 
 class AdminDashboardEcran extends StatefulWidget {
   const AdminDashboardEcran({super.key});
@@ -20,7 +22,9 @@ class AdminDashboardEcran extends StatefulWidget {
 
 class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
   late StatistiquesService _statistiquesService;
+  late AuthentificationService _authentificationService;
   StatistiquesDashboard? _statistiquesDashboard;
+  Utilisateur? _utilisateurActuel;
   bool _chargementEnCours = true;
   bool _statistiquesVisibles = true; // UI Design: Contrôle visibilité des statistiques
 
@@ -28,6 +32,8 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
   void initState() {
     super.initState();
     _statistiquesService = ServiceLocator.obtenirService<StatistiquesService>();
+    _authentificationService = ServiceLocator.obtenirService<AuthentificationService>();
+    _utilisateurActuel = _authentificationService.utilisateurActuel;
     _chargerDonnees();
   }
 
@@ -60,8 +66,49 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
       backgroundColor: CouleursApp.fond,
       appBar: WidgetBarreAppNavigationAdmin(
         titre: 'Dashboard Admin',
-        sousTitre: 'Vue d\'ensemble du système',
+        sousTitre: _utilisateurActuel != null 
+            ? 'Connecté en tant que ${_utilisateurActuel!.prenom} ${_utilisateurActuel!.nom}'
+            : 'Vue d\'ensemble du système',
         sectionActive: 'dashboard',
+        // UI Design: Actions admin supplémentaires
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: (action) => _gererActionAdmin(action),
+            icon: const Icon(Icons.more_vert, color: CouleursApp.blanc),
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'profil',
+                child: Row(
+                  children: [
+                    Icon(Icons.person),
+                    SizedBox(width: 8),
+                    Text('Mon Profil'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'privileges',
+                child: Row(
+                  children: [
+                    Icon(Icons.admin_panel_settings, color: Colors.orange),
+                    SizedBox(width: 8),
+                    Text('Gérer mes privilèges'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'deconnexion',
+                child: Row(
+                  children: [
+                    Icon(Icons.logout, color: Colors.red),
+                    SizedBox(width: 8),
+                    Text('Se déconnecter', style: TextStyle(color: Colors.red)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
       body: _chargementEnCours
           ? const Center(child: CircularProgressIndicator())
@@ -100,7 +147,7 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
+            const Text(
               'Vue d\'ensemble',
               style: StylesTexteApp.titrePage,
             ),
@@ -163,7 +210,7 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
             : // UI Design: Message quand les statistiques sont masquées
             Container(
                 padding: const EdgeInsets.symmetric(vertical: 20),
-                child: Center(
+                child: const Center(
                   child: Text(
                     'Statistiques masquées - Cliquez sur l\'œil pour les afficher',
                     style: StylesTexteApp.corpsGris,
@@ -238,7 +285,7 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'Statistiques détaillées',
           style: StylesTexteApp.titrePage,
         ),
@@ -290,7 +337,7 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'Gestion du système',
           style: StylesTexteApp.titrePage,
         ),
@@ -377,7 +424,7 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'Activité récente',
           style: StylesTexteApp.titrePage,
         ),
@@ -390,7 +437,7 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Derniers utilisateurs inscrits',
                   style: StylesTexteApp.moyenTitre,
                 ),
@@ -456,7 +503,7 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
             ),
             child: Text(
               _obtenirLibelleTypeUtilisateur(utilisateur.typeUtilisateur),
-              style: TextStyle(
+              style: const TextStyle(
                 color: CouleursApp.principal,
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
@@ -481,7 +528,7 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
               color: CouleursApp.principal.withValues(alpha: 0.3),
             ),
             const SizedBox(height: 12),
-            Text(
+            const Text(
               'Aucune activité récente',
               style: StylesTexteApp.corpsGris,
             ),
@@ -518,6 +565,230 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
       const SnackBar(
         content: Text('Fonctionnalité en cours de développement'),
         backgroundColor: Colors.orange,
+      ),
+    );
+  }
+
+  // UI Design: Gestionnaire d'actions admin
+  void _gererActionAdmin(String action) {
+    switch (action) {
+      case 'profil':
+        _afficherProfilAdmin();
+        break;
+      case 'privileges':
+        _afficherGestionPrivileges();
+        break;
+      case 'deconnexion':
+        _confirmerDeconnexion();
+        break;
+    }
+  }
+
+  // UI Design: Afficher le profil de l'admin connecté
+  void _afficherProfilAdmin() {
+    if (_utilisateurActuel == null) return;
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            CircleAvatar(
+              backgroundColor: CouleursApp.principal,
+              child: Text(
+                '${_utilisateurActuel!.prenom[0]}${_utilisateurActuel!.nom[0]}',
+                style: const TextStyle(color: CouleursApp.blanc, fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('${_utilisateurActuel!.prenom} ${_utilisateurActuel!.nom}'),
+                  Text(
+                    'Administrateur',
+                    style: StylesTexteApp.petitGris.copyWith(color: Colors.orange),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _construireInfoProfil('Email', _utilisateurActuel!.email),
+            _construireInfoProfil('Code Étudiant', _utilisateurActuel!.codeEtudiant),
+            _construireInfoProfil('Programme', _utilisateurActuel!.programme),
+            _construireInfoProfil('Privilèges', '${_utilisateurActuel!.privileges.length} privilège(s)'),
+            _construireInfoProfil('Dernière connexion', 
+              _utilisateurActuel!.derniereConnexion != null 
+                ? _formatDate(_utilisateurActuel!.derniereConnexion!)
+                : 'Jamais'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Fermer'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _construireInfoProfil(String label, String valeur) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 80,
+            child: Text(
+              '$label:',
+              style: StylesTexteApp.corpsNormal.copyWith(fontWeight: FontWeight.w600),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              valeur,
+              style: StylesTexteApp.corpsNormal,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year} à ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
+  }
+
+  // UI Design: Afficher la gestion des privilèges
+  void _afficherGestionPrivileges() {
+    if (_utilisateurActuel == null) return;
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.admin_panel_settings, color: Colors.orange),
+            SizedBox(width: 8),
+            Text('Mes Privilèges'),
+          ],
+        ),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Privilèges attribués à votre compte:',
+                style: StylesTexteApp.corpsNormal.copyWith(fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 16),
+              ...[
+                {'code': PrivilegesUtilisateur.gestionComptes, 'nom': 'Gestion des comptes'},
+                {'code': PrivilegesUtilisateur.gestionCantine, 'nom': 'Gestion de la cantine'},
+                {'code': PrivilegesUtilisateur.gestionActualites, 'nom': 'Gestion des actualités'},
+                {'code': PrivilegesUtilisateur.gestionAssociations, 'nom': 'Gestion des associations'},
+                {'code': PrivilegesUtilisateur.gestionSalles, 'nom': 'Gestion des salles'},
+                {'code': PrivilegesUtilisateur.gestionLivres, 'nom': 'Gestion des livres'},
+                {'code': PrivilegesUtilisateur.moderationContenu, 'nom': 'Modération du contenu'},
+                {'code': PrivilegesUtilisateur.statistiques, 'nom': 'Accès aux statistiques'},
+              ].map((privilege) => Container(
+                margin: const EdgeInsets.symmetric(vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: _utilisateurActuel!.privileges.contains(privilege['code'])
+                      ? Colors.green.withValues(alpha: 0.1)
+                      : Colors.grey.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: _utilisateurActuel!.privileges.contains(privilege['code'])
+                        ? Colors.green
+                        : Colors.grey,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      _utilisateurActuel!.privileges.contains(privilege['code']!)
+                          ? Icons.check_circle
+                          : Icons.cancel,
+                      color: _utilisateurActuel!.privileges.contains(privilege['code']!)
+                          ? Colors.green
+                          : Colors.grey,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        privilege['nom']!,
+                        style: StylesTexteApp.corpsNormal,
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Fermer'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // UI Design: Confirmer la déconnexion
+  void _confirmerDeconnexion() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.logout, color: Colors.red),
+            SizedBox(width: 8),
+            Text('Déconnexion'),
+          ],
+        ),
+        content: const Text(
+          'Êtes-vous sûr de vouloir vous déconnecter de votre session administrateur ?',
+          style: StylesTexteApp.corpsNormal,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Annuler'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await _authentificationService.deconnecter();
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const ConnexionEcran()),
+                (route) => false,
+              );
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Déconnexion réussie'),
+                  backgroundColor: Colors.green,
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Se déconnecter', style: TextStyle(color: CouleursApp.blanc)),
+          ),
+        ],
       ),
     );
   }

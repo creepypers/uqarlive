@@ -7,6 +7,8 @@ import '../../data/datasources/livres_datasource_local.dart';
 import '../../data/datasources/menus_datasource_local.dart';
 import '../../data/datasources/salles_datasource_local.dart';
 import '../../data/datasources/utilisateurs_datasource_local.dart';
+import '../../data/datasources/membres_association_datasource_local.dart';
+import '../../data/datasources/reservations_salle_datasource_local.dart';
 import '../../data/repositories/actualites_repository_impl.dart';
 import '../../data/repositories/associations_repository_impl.dart';
 import '../../data/repositories/evenements_repository_impl.dart';
@@ -17,6 +19,8 @@ import '../../data/repositories/livres_repository_impl.dart';
 import '../../data/repositories/menus_repository_impl.dart';
 import '../../data/repositories/salles_repository_impl.dart';
 import '../../data/repositories/utilisateurs_repository_impl.dart';
+import '../../data/repositories/membres_association_repository_impl.dart';
+import '../../data/repositories/reservations_salle_repository_impl.dart';
 import '../../domain/repositories/actualites_repository.dart';
 import '../../domain/repositories/associations_repository.dart';
 import '../../domain/repositories/evenements_repository.dart';
@@ -25,6 +29,8 @@ import '../../domain/repositories/livres_repository.dart';
 import '../../domain/repositories/menus_repository.dart';
 import '../../domain/repositories/salles_repository.dart';
 import '../../domain/repositories/utilisateurs_repository.dart';
+import '../../domain/repositories/membres_association_repository.dart';
+import '../../domain/repositories/reservations_salle_repository.dart';
 
 final getIt = GetIt.instance;
 
@@ -53,6 +59,12 @@ class ServiceLocator {
     getIt.registerLazySingleton<UtilisateursDatasourceLocal>(
       () => UtilisateursDatasourceLocal(),
     );
+    getIt.registerLazySingleton<MembresAssociationDatasourceLocal>(
+      () => MembresAssociationDatasourceLocal(),
+    );
+    getIt.registerLazySingleton<ReservationsSalleDatasourceLocal>(
+      () => ReservationsSalleDatasourceLocal(),
+    );
 
     // Repositories
     getIt.registerLazySingleton<ActualitesRepository>(
@@ -76,6 +88,12 @@ class ServiceLocator {
     getIt.registerLazySingleton<UtilisateursRepository>(
       () => UtilisateursRepositoryImpl(getIt<UtilisateursDatasourceLocal>()),
     );
+    getIt.registerLazySingleton<MembresAssociationRepository>(
+      () => MembresAssociationRepositoryImpl(getIt<MembresAssociationDatasourceLocal>()),
+    );
+    getIt.registerLazySingleton<ReservationsSalleRepository>(
+      () => ReservationsSalleRepositoryImpl(getIt<ReservationsSalleDatasourceLocal>()),
+    );
     getIt.registerLazySingleton<EvenementsDatasourceLocal>(
       () => EvenementsDatasourceLocal(),
     );
@@ -87,6 +105,8 @@ class ServiceLocator {
     getIt.registerLazySingleton<StatistiquesService>(
       () => StatistiquesService(),
     );
+    
+    // Authentication Service
     getIt.registerLazySingleton<AuthentificationService>(
       () => AuthentificationService.instance,
     );

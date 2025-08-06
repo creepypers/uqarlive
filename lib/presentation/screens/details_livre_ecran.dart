@@ -73,7 +73,7 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
             color: CouleursApp.blanc.withValues(alpha: 0.9),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Icon(
+          child: const Icon(
             Icons.arrow_back,
             color: CouleursApp.principal,
             size: 20,
@@ -105,7 +105,7 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
       ],
       flexibleSpace: FlexibleSpaceBar(
         background: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
@@ -137,7 +137,7 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.menu_book,
                         size: 80,
                         color: CouleursApp.accent,
@@ -147,7 +147,7 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Text(
                           widget.livre.titre,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: CouleursApp.texteFonce,
@@ -178,7 +178,7 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
                       ),
                     ],
                   ),
-                  child: Text(
+                  child: const Text(
                     'ÉCHANGE',
                     style: TextStyle(
                       fontSize: 12,
@@ -267,7 +267,7 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.school,
                 color: CouleursApp.principal,
                 size: 24,
@@ -310,7 +310,7 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.person,
                 color: CouleursApp.principal,
                 size: 24,
@@ -330,7 +330,7 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
                 backgroundColor: CouleursApp.accent.withValues(alpha: 0.2),
                 child: Text(
                   widget.livre.proprietaire.split(' ').map((n) => n[0]).join(),
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: CouleursApp.principal,
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
@@ -344,7 +344,7 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
                   children: [
                     Text(
                       widget.livre.proprietaire,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: CouleursApp.texteFonce,
@@ -353,7 +353,7 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.star,
                           color: Colors.amber,
                           size: 16,
@@ -373,7 +373,7 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
               ),
               IconButton(
                 onPressed: () => _contacterProprietaire(),
-                icon: Icon(
+                icon: const Icon(
                   Icons.message,
                   color: CouleursApp.accent,
                 ),
@@ -405,7 +405,7 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.description,
                 color: CouleursApp.principal,
                 size: 24,
@@ -420,7 +420,7 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
           const SizedBox(height: 16),
           Text(
             widget.livre.description!,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 14,
               color: CouleursApp.texteFonce,
               height: 1.5,
@@ -451,7 +451,7 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.info_outline,
                 color: CouleursApp.principal,
                 size: 24,
@@ -486,11 +486,11 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
           ),
           elevation: 4,
         ),
-        child: Row(
+        child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.swap_horiz, size: 24),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             Text(
               'Proposer un échange',
               style: TextStyle(
@@ -558,7 +558,7 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
           Expanded(
             child: Text(
               valeur,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 14,
                 color: CouleursApp.texteFonce,
                 fontWeight: FontWeight.w600,
@@ -604,7 +604,7 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
       width: double.infinity,
       child: ElevatedButton.icon(
         onPressed: () => _acheterLivre(),
-        icon: Icon(Icons.shopping_cart, size: 22),
+        icon: const Icon(Icons.shopping_cart, size: 22),
         style: ElevatedButton.styleFrom(
           backgroundColor: CouleursApp.accent,
           foregroundColor: Colors.white,
@@ -616,7 +616,7 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
         ),
         label: Text(
           'Acheter - ${widget.livre.prix?.toStringAsFixed(2) ?? ''} €',
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),

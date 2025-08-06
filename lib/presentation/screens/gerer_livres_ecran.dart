@@ -8,6 +8,8 @@ import '../services/navigation_service.dart';
 import '../../core/di/service_locator.dart';
 import '../../domain/repositories/livres_repository.dart';
 import '../../domain/entities/livre.dart';
+import '../../domain/entities/utilisateur.dart';
+import '../services/authentification_service.dart';
 
 // UI Design: Écran de gestion des livres personnels de l'utilisateur
 class GererLivresEcran extends StatefulWidget {
@@ -19,6 +21,8 @@ class GererLivresEcran extends StatefulWidget {
 
 class _GererLivresEcranState extends State<GererLivresEcran> {
   late LivresRepository _livresRepository;
+  late AuthentificationService _authentificationService;
+  Utilisateur? _utilisateurActuel;
   List<Livre> _mesLivres = [];
   bool _isLoading = true;
   String _filtreActuel = 'tous'; // 'tous', 'disponibles', 'en_cours', 'echanges'
@@ -27,34 +31,60 @@ class _GererLivresEcranState extends State<GererLivresEcran> {
   void initState() {
     super.initState();
     _livresRepository = ServiceLocator.obtenirService<LivresRepository>();
+    _authentificationService = ServiceLocator.obtenirService<AuthentificationService>();
+    _utilisateurActuel = _authentificationService.utilisateurActuel;
     _chargerMesLivres();
   }
 
   Future<void> _chargerMesLivres() async {
     setState(() => _isLoading = true);
+    
     try {
-      // Filtrer les livres qui appartiennent à l'utilisateur actuel
-      final tousLesLivres = await _livresRepository.obtenirTousLesLivres();
-      _mesLivres = tousLesLivres.where((livre) => livre.proprietaire == 'Marie Dubois').toList();
+      if (_utilisateurActuel == null) {
+        // UI Design: Essayer de recharger l'utilisateur depuis le service
+        await _authentificationService.chargerUtilisateurActuel();
+        _utilisateurActuel = _authentificationService.utilisateurActuel;
+        
+        // UI Design: Si toujours null, simuler la connexion d'Alexandre Martin pour les tests
+        if (_utilisateurActuel == null) {
+          final utilisateurConnecte = await _authentificationService.authentifier('alexandre.martin@uqar.ca', 'alex123');
+          _utilisateurActuel = utilisateurConnecte;
+        }
+      }
+      
+      if (_utilisateurActuel != null) {
+        // UI Design: Utiliser le proprietaireId pour filtrer les livres de l'utilisateur connecté
+        _mesLivres = await _livresRepository.obtenirLivresParProprietaire(_utilisateurActuel!.id);
+      } else {
+        _mesLivres = [];
+        _afficherErreur('Impossible de charger l\'utilisateur. Veuillez vous reconnecter.');
+      }
+      
       setState(() => _isLoading = false);
-    } catch (e) {
+    } catch (e, stackTrace) {
       setState(() => _isLoading = false);
-      _afficherErreur('Erreur lors du chargement des livres');
+      _afficherErreur('Erreur lors du chargement des livres: $e');
     }
   }
 
   List<Livre> get _livresFiltres {
+    List<Livre> resultat;
     switch (_filtreActuel) {
       case 'disponibles':
-        return _mesLivres.where((livre) => livre.estDisponible).toList();
+        resultat = _mesLivres.where((livre) => livre.estDisponible).toList();
+        break;
       case 'en_cours':
-        return _mesLivres.where((livre) => !livre.estDisponible).toList();
+        resultat = _mesLivres.where((livre) => !livre.estDisponible).toList();
+        break;
       case 'echanges':
         // Simuler des livres échangés (on pourrait avoir un statut dans l'entité)
-        return _mesLivres.take(2).toList(); // Prendre les 2 premiers comme exemple
+        resultat = _mesLivres.take(2).toList(); // Prendre les 2 premiers comme exemple
+        break;
       default:
-        return _mesLivres;
+        resultat = _mesLivres;
     }
+    
+    return resultat;
   }
 
   @override
@@ -63,17 +93,19 @@ class _GererLivresEcranState extends State<GererLivresEcran> {
       backgroundColor: CouleursApp.fond,
       appBar: WidgetBarreAppPersonnalisee(
         titre: 'Gérer mes livres',
-        sousTitre: '${_mesLivres.length} livres au total',
+        sousTitre: _utilisateurActuel != null 
+            ? '${_mesLivres.length} livres au total'
+            : 'Chargement...',
         afficherProfil: false,
         widgetFin: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
-              icon: Icon(Icons.arrow_back, color: CouleursApp.blanc),
+              icon: const Icon(Icons.arrow_back, color: CouleursApp.blanc),
               onPressed: () => Navigator.pop(context),
             ),
             IconButton(
-              icon: Icon(Icons.add, color: CouleursApp.blanc),
+              icon: const Icon(Icons.add, color: CouleursApp.blanc),
               onPressed: _ajouterNouveauLivre,
             ),
           ],
@@ -207,10 +239,12 @@ class _GererLivresEcranState extends State<GererLivresEcran> {
   // UI Design: Modal optimisé pour éviter le problème de clavier qui se ferme
   Widget _construireModalAjoutLivre() {
     return _ModalAjoutLivre(
+      utilisateurActuel: _utilisateurActuel,
       onLivreAjoute: (livre) {
                       setState(() {
           _mesLivres.add(livre);
         });
+
         
         // Afficher message de succès
         ScaffoldMessenger.of(context).showSnackBar(
@@ -262,7 +296,7 @@ class _GererLivresEcranState extends State<GererLivresEcran> {
           
           // Actions disponibles
           ListTile(
-            leading: Icon(Icons.edit, color: CouleursApp.principal),
+            leading: const Icon(Icons.edit, color: CouleursApp.principal),
             title: const Text('Modifier les détails'),
             onTap: () {
               Navigator.pop(context);
@@ -294,16 +328,52 @@ class _GererLivresEcranState extends State<GererLivresEcran> {
   }
 
   void _modifierLivre(Livre livre) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Modification de "${livre.titre}" - À venir'),
-        backgroundColor: CouleursApp.accent,
-        behavior: SnackBarBehavior.floating,
-      ),
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _construireModalModificationLivre(livre),
     );
   }
 
-  void _basculerDisponibilite(Livre livre) {
+  // UI Design: Modal pour modifier un livre existant
+  Widget _construireModalModificationLivre(Livre livre) {
+    return _ModalModificationLivre(
+      livre: livre,
+      utilisateurActuel: _utilisateurActuel,
+      onLivreModifie: (livreModifie) {
+        setState(() {
+          final index = _mesLivres.indexWhere((l) => l.id == livre.id);
+          if (index != -1) {
+            _mesLivres[index] = livreModifie;
+          }
+        });
+        
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+            content: Text('Livre "${livreModifie.titre}" modifié avec succès !'),
+            backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+      ),
+        );
+      },
+    );
+  }
+
+  Future<void> _basculerDisponibilite(Livre livre) async {
+    try {
+      final succes = livre.estDisponible 
+          ? await _livresRepository.marquerLivreEchange(livre.id)
+          : await _livresRepository.marquerLivreDisponible(livre.id);
+      
+      if (succes) {
+        setState(() {
+          final index = _mesLivres.indexWhere((l) => l.id == livre.id);
+          if (index != -1) {
+            _mesLivres[index] = livre.copyWith(estDisponible: !livre.estDisponible);
+          }
+        });
+        
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -315,6 +385,12 @@ class _GererLivresEcranState extends State<GererLivresEcran> {
         behavior: SnackBarBehavior.floating,
       ),
     );
+      } else {
+        _afficherErreur('Erreur lors de la modification');
+      }
+    } catch (e) {
+      _afficherErreur('Erreur inattendue: $e');
+    }
   }
 
   void _supprimerLivre(Livre livre) {
@@ -322,25 +398,40 @@ class _GererLivresEcranState extends State<GererLivresEcran> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Supprimer le livre'),
-        content: Text('Êtes-vous sûr de vouloir supprimer "${livre.titre}" ?'),
+        content: Text('Êtes-vous sûr de vouloir supprimer "${livre.titre}" ?\\n\\nCette action est irréversible.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text('Annuler'),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
+              
+              try {
+                final succes = await _livresRepository.supprimerLivre(livre.id);
+                
+                if (succes) {
+                  setState(() {
+                    _mesLivres.removeWhere((l) => l.id == livre.id);
+                  });
+                  
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('"${livre.titre}" supprimé'),
-                  backgroundColor: Colors.red,
+                      content: Text('"${livre.titre}" supprimé avec succès'),
+                      backgroundColor: Colors.green,
                   behavior: SnackBarBehavior.floating,
                 ),
               );
+                } else {
+                  _afficherErreur('Erreur lors de la suppression');
+                }
+              } catch (e) {
+                _afficherErreur('Erreur inattendue: $e');
+              }
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: Text('Supprimer', style: TextStyle(color: CouleursApp.blanc)),
+            child: const Text('Supprimer', style: TextStyle(color: CouleursApp.blanc)),
           ),
         ],
       ),
@@ -363,8 +454,12 @@ class _GererLivresEcranState extends State<GererLivresEcran> {
 // UI Design: Widget modal séparé pour éviter le problème de clavier qui se ferme
 class _ModalAjoutLivre extends StatefulWidget {
   final Function(Livre) onLivreAjoute;
+  final Utilisateur? utilisateurActuel;
 
-  const _ModalAjoutLivre({required this.onLivreAjoute});
+  const _ModalAjoutLivre({
+    required this.onLivreAjoute,
+    required this.utilisateurActuel,
+  });
 
   @override
   State<_ModalAjoutLivre> createState() => _ModalAjoutLivreState();
@@ -379,10 +474,19 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
   final _coursController = TextEditingController();
   final _prixController = TextEditingController();
   
+  late LivresRepository _livresRepository;
+  
   String? _matiereSelectionnee;
   String? _anneeSelectionnee;
   String _etatSelectionne = 'Excellent';
   bool _enVente = false;
+  bool _sauvegardeEnCours = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _livresRepository = ServiceLocator.obtenirService<LivresRepository>();
+  }
 
   @override
   void dispose() {
@@ -431,7 +535,7 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
                     // Titre
                     Row(
                       children: [
-                        Icon(Icons.add_circle, color: CouleursApp.principal, size: 28),
+                        const Icon(Icons.add_circle, color: CouleursApp.principal, size: 28),
                         const SizedBox(width: 12),
                         Text(
                           'Ajouter un nouveau livre',
@@ -448,7 +552,7 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
                         labelText: 'Titre du livre *',
                         hintText: 'Ex: Calcul différentiel et intégral',
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        prefixIcon: Icon(Icons.book, color: CouleursApp.principal),
+                        prefixIcon: const Icon(Icons.book, color: CouleursApp.principal),
                       ),
                       validator: (value) {
                         if (value?.isEmpty ?? true) return 'Le titre est requis';
@@ -464,7 +568,7 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
                         labelText: 'Auteur *',
                         hintText: 'Ex: Jean Dupont',
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        prefixIcon: Icon(Icons.person, color: CouleursApp.principal),
+                        prefixIcon: const Icon(Icons.person, color: CouleursApp.principal),
                       ),
                       validator: (value) {
                         if (value?.isEmpty ?? true) return 'L\'auteur est requis';
@@ -479,7 +583,7 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
                       decoration: InputDecoration(
                         labelText: 'Matière *',
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        prefixIcon: Icon(Icons.school, color: CouleursApp.principal),
+                        prefixIcon: const Icon(Icons.school, color: CouleursApp.principal),
                       ),
                       hint: const Text('Sélectionnez une matière'),
                       items: _GererLivresEcranState._matieres
@@ -502,7 +606,7 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
                       decoration: InputDecoration(
                         labelText: 'Année d\'étude *',
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        prefixIcon: Icon(Icons.grade, color: CouleursApp.principal),
+                        prefixIcon: const Icon(Icons.grade, color: CouleursApp.principal),
                       ),
                       hint: const Text('Sélectionnez une année'),
                       items: _GererLivresEcranState._anneesEtude
@@ -525,7 +629,7 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
                       decoration: InputDecoration(
                         labelText: 'État du livre *',
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        prefixIcon: Icon(Icons.star, color: CouleursApp.principal),
+                        prefixIcon: const Icon(Icons.star, color: CouleursApp.principal),
                       ),
                       items: ['Excellent', 'Très bon', 'Bon', 'Acceptable']
                           .map((etat) => DropdownMenuItem(
@@ -545,7 +649,7 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
                         labelText: 'Description (optionnel)',
                         hintText: 'Décrivez l\'état, les annotations...',
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        prefixIcon: Icon(Icons.description, color: CouleursApp.principal),
+                        prefixIcon: const Icon(Icons.description, color: CouleursApp.principal),
                         alignLabelWithHint: true,
                       ),
                     ),
@@ -558,7 +662,7 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
                         labelText: 'Édition (optionnel)',
                         hintText: 'Ex: 3ème édition',
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        prefixIcon: Icon(Icons.edit, color: CouleursApp.principal),
+                        prefixIcon: const Icon(Icons.edit, color: CouleursApp.principal),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -570,7 +674,7 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
                         labelText: 'Cours associé (optionnel)',
                         hintText: 'Ex: MAT101 - Calcul I',
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        prefixIcon: Icon(Icons.class_, color: CouleursApp.principal),
+                        prefixIcon: const Icon(Icons.class_, color: CouleursApp.principal),
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -584,19 +688,19 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
                           activeColor: CouleursApp.accent,
                         ),
                         const SizedBox(width: 8),
-                        Text('Mettre en vente', style: TextStyle(fontWeight: FontWeight.w600)),
+                        const Text('Mettre en vente', style: TextStyle(fontWeight: FontWeight.w600)),
                       ],
                     ),
                     if (_enVente) ...[
                       const SizedBox(height: 8),
                       TextFormField(
                         controller: _prixController,
-                        keyboardType: TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
                         decoration: InputDecoration(
                           labelText: 'Prix (€) *',
                           hintText: 'Ex: 12.50',
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                          prefixIcon: Icon(Icons.euro, color: CouleursApp.accent),
+                          prefixIcon: const Icon(Icons.euro, color: CouleursApp.accent),
                         ),
                         validator: (value) {
                           if (!_enVente) return null;
@@ -619,7 +723,7 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.info_outline, color: CouleursApp.accent, size: 20),
+                          const Icon(Icons.info_outline, color: CouleursApp.accent, size: 20),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
@@ -642,7 +746,7 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
                           child: OutlinedButton(
                             onPressed: () => Navigator.pop(context),
                             style: OutlinedButton.styleFrom(
-                              side: BorderSide(color: Colors.grey),
+                              side: const BorderSide(color: Colors.grey),
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
@@ -652,13 +756,22 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: ElevatedButton(
-                            onPressed: _sauvegarderLivre,
+                            onPressed: _sauvegardeEnCours ? null : _sauvegarderLivre,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: CouleursApp.accent,
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
-                            child: Text(
+                            child: _sauvegardeEnCours
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(CouleursApp.blanc),
+                                    ),
+                                  )
+                                : const Text(
                               'Ajouter le livre',
                               style: TextStyle(
                                 color: CouleursApp.blanc,
@@ -680,8 +793,21 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
     );
   }
 
-  void _sauvegarderLivre() {
-    if (_formKey.currentState!.validate()) {
+  void _afficherErreur(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  Future<void> _sauvegarderLivre() async {
+    if (_formKey.currentState!.validate() && widget.utilisateurActuel != null) {
+      setState(() => _sauvegardeEnCours = true);
+      
+      try {
       final prix = _enVente && _prixController.text.isNotEmpty
         ? double.tryParse(_prixController.text.replaceAll(',', '.'))
         : null;
@@ -692,7 +818,8 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
         matiere: _matiereSelectionnee!,
         anneeEtude: _anneeSelectionnee!,
         etatLivre: _etatSelectionne,
-        proprietaire: 'Marie Dubois',
+        proprietaire: '${widget.utilisateurActuel!.prenom} ${widget.utilisateurActuel!.nom}',
+        proprietaireId: widget.utilisateurActuel!.id, // UI Design: Lier à l'utilisateur connecté
         description: _descriptionController.text.isNotEmpty ? _descriptionController.text : null,
         edition: _editionController.text.isNotEmpty ? _editionController.text : null,
         coursAssocies: _coursController.text.isNotEmpty ? _coursController.text : null,
@@ -701,8 +828,440 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
         prix: prix,
       );
 
+      // UI Design: Sauvegarder le livre via le repository
+      final succes = await _livresRepository.ajouterLivre(nouveauLivre);
+      
+      if (succes) {
       widget.onLivreAjoute(nouveauLivre);
       Navigator.pop(context);
+      } else {
+        setState(() => _sauvegardeEnCours = false);
+        _afficherErreur('Erreur lors de l\'ajout du livre');
+      }
+    } catch (e) {
+      setState(() => _sauvegardeEnCours = false);
+      _afficherErreur('Erreur inattendue: $e');
+    }
+    }
+  }
+}
+
+// UI Design: Widget modal pour modifier un livre existant
+class _ModalModificationLivre extends StatefulWidget {
+  final Livre livre;
+  final Function(Livre) onLivreModifie;
+  final Utilisateur? utilisateurActuel;
+
+  const _ModalModificationLivre({
+    required this.livre,
+    required this.onLivreModifie,
+    required this.utilisateurActuel,
+  });
+
+  @override
+  State<_ModalModificationLivre> createState() => _ModalModificationLivreState();
+}
+
+class _ModalModificationLivreState extends State<_ModalModificationLivre> {
+  final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _titreController;
+  late final TextEditingController _auteurController;
+  late final TextEditingController _descriptionController;
+  late final TextEditingController _editionController;
+  late final TextEditingController _coursController;
+  late final TextEditingController _prixController;
+  
+  late LivresRepository _livresRepository;
+  
+  late String? _matiereSelectionnee;
+  late String? _anneeSelectionnee;
+  late String _etatSelectionne;
+  late bool _enVente;
+  bool _sauvegardeEnCours = false;
+
+  static const List<String> _matieres = [
+    'Mathématiques', 'Informatique', 'Physique', 'Chimie', 'Biologie',
+    'Histoire', 'Géographie', 'Français', 'Anglais', 'Philosophie',
+    'Économie', 'Gestion', 'Droit', 'Psychologie', 'Sociologie'
+  ];
+
+  static const List<String> _anneesEtude = [
+    '1ère année', '2ème année', '3ème année', '4ème année', '5ème année'
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _livresRepository = ServiceLocator.obtenirService<LivresRepository>();
+    
+    // UI Design: Pré-remplir les champs avec les données du livre existant
+    _titreController = TextEditingController(text: widget.livre.titre);
+    _auteurController = TextEditingController(text: widget.livre.auteur);
+    _descriptionController = TextEditingController(text: widget.livre.description ?? '');
+    _editionController = TextEditingController(text: widget.livre.edition ?? '');
+    _coursController = TextEditingController(text: widget.livre.coursAssocies ?? '');
+    _prixController = TextEditingController(text: widget.livre.prix?.toString() ?? '');
+    
+    _matiereSelectionnee = widget.livre.matiere;
+    _anneeSelectionnee = widget.livre.anneeEtude;
+    _etatSelectionne = widget.livre.etatLivre;
+    _enVente = widget.livre.prix != null;
+  }
+
+  @override
+  void dispose() {
+    _titreController.dispose();
+    _auteurController.dispose();
+    _descriptionController.dispose();
+    _editionController.dispose();
+    _coursController.dispose();
+    _prixController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: CouleursApp.fond,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+      child: DraggableScrollableSheet(
+        initialChildSize: 0.9,
+        minChildSize: 0.5,
+        maxChildSize: 0.95,
+        expand: false,
+        builder: (context, scrollController) => Padding(
+          padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+            top: 20,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+          ),
+          child: Form(
+            key: _formKey,
+            child: ListView(
+              controller: scrollController,
+              children: [
+                // En-tête
+                Row(
+                  children: [
+                    const Icon(Icons.edit, color: CouleursApp.principal, size: 28),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Modifier le livre',
+                      style: StylesTexteApp.titre.copyWith(fontSize: 20),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+
+                // Champs obligatoires
+                Text(
+                  'Informations de base',
+                  style: StylesTexteApp.titre.copyWith(fontSize: 16),
+                ),
+                const SizedBox(height: 12),
+
+                TextFormField(
+                  controller: _titreController,
+                  decoration: InputDecoration(
+                    labelText: 'Titre du livre *',
+                    hintText: 'Ex: Calcul différentiel et intégral',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    prefixIcon: const Icon(Icons.book, color: CouleursApp.principal),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Le titre est obligatoire';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                TextFormField(
+                  controller: _auteurController,
+                  decoration: InputDecoration(
+                    labelText: 'Auteur *',
+                    hintText: 'Ex: Jean Dupont',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    prefixIcon: const Icon(Icons.person, color: CouleursApp.principal),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'L\'auteur est obligatoire';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                DropdownButtonFormField<String>(
+                  value: _matiereSelectionnee,
+                  decoration: InputDecoration(
+                    labelText: 'Matière *',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    prefixIcon: const Icon(Icons.school, color: CouleursApp.principal),
+                  ),
+                  hint: const Text('Sélectionnez une matière'),
+                  items: _matieres.map((matiere) => DropdownMenuItem(
+                    value: matiere,
+                    child: Text(matiere),
+                  )).toList(),
+                  onChanged: (value) => setState(() => _matiereSelectionnee = value),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'La matière est obligatoire';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                DropdownButtonFormField<String>(
+                  value: _anneeSelectionnee,
+                  decoration: InputDecoration(
+                    labelText: 'Année d\'étude *',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    prefixIcon: const Icon(Icons.grade, color: CouleursApp.principal),
+                  ),
+                  hint: const Text('Sélectionnez une année'),
+                  items: _anneesEtude.map((annee) => DropdownMenuItem(
+                    value: annee,
+                    child: Text(annee),
+                  )).toList(),
+                  onChanged: (value) => setState(() => _anneeSelectionnee = value),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'L\'année d\'étude est obligatoire';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                DropdownButtonFormField<String>(
+                  value: _etatSelectionne,
+                  decoration: InputDecoration(
+                    labelText: 'État du livre *',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    prefixIcon: const Icon(Icons.star, color: CouleursApp.principal),
+                  ),
+                  items: ['Excellent', 'Très bon', 'Bon', 'Acceptable']
+                      .map((etat) => DropdownMenuItem(
+                            value: etat,
+                            child: Text(etat),
+                          ))
+                      .toList(),
+                  onChanged: (value) => setState(() => _etatSelectionne = value!),
+                ),
+                const SizedBox(height: 24),
+
+                // Champs optionnels
+                Text(
+                  'Informations supplémentaires',
+                  style: StylesTexteApp.titre.copyWith(fontSize: 16),
+                ),
+                const SizedBox(height: 12),
+
+                TextFormField(
+                  controller: _descriptionController,
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                    labelText: 'Description (optionnel)',
+                    hintText: 'Décrivez l\'état, les annotations...',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    prefixIcon: const Icon(Icons.description, color: CouleursApp.principal),
+                    alignLabelWithHint: true,
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                TextFormField(
+                  controller: _editionController,
+                  decoration: InputDecoration(
+                    labelText: 'Édition (optionnel)',
+                    hintText: 'Ex: 3ème édition',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    prefixIcon: const Icon(Icons.edit, color: CouleursApp.principal),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                TextFormField(
+                  controller: _coursController,
+                  decoration: InputDecoration(
+                    labelText: 'Cours associés (optionnel)',
+                    hintText: 'Ex: MAT101 - Calcul I',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    prefixIcon: const Icon(Icons.class_, color: CouleursApp.principal),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Option vente
+                Row(
+                  children: [
+                    Checkbox(
+                      value: _enVente,
+                      onChanged: (value) => setState(() {
+                        _enVente = value ?? false;
+                        if (!_enVente) _prixController.clear();
+                      }),
+                    ),
+                    const SizedBox(width: 8),
+                    const Text('Mettre en vente', style: TextStyle(fontWeight: FontWeight.w600)),
+                  ],
+                ),
+
+                if (_enVente) ...[
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: _prixController,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    decoration: InputDecoration(
+                      labelText: 'Prix (€) *',
+                      hintText: 'Ex: 12.50',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                      prefixIcon: const Icon(Icons.euro, color: CouleursApp.accent),
+                    ),
+                    validator: (value) {
+                      if (_enVente && (value == null || value.isEmpty)) {
+                        return 'Le prix est obligatoire si le livre est en vente';
+                      }
+                      if (_enVente && double.tryParse(value!.replaceAll(',', '.')) == null) {
+                        return 'Le prix doit être un nombre valide';
+                      }
+                      return null;
+                    },
+                  ),
+                ],
+
+                const SizedBox(height: 20),
+
+                // Conseil
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: CouleursApp.accent.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Row(
+                    children: [
+                      Icon(Icons.info_outline, color: CouleursApp.accent, size: 20),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Assurez-vous que les informations sont exactes pour faciliter les échanges.',
+                          style: TextStyle(fontSize: 12, color: CouleursApp.texteFonce),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Boutons d'action
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Colors.grey),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        child: const Text('Annuler'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: _sauvegardeEnCours ? null : _sauvegarderModifications,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: CouleursApp.accent,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        child: _sauvegardeEnCours
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(CouleursApp.blanc),
+                                ),
+                              )
+                            : const Text(
+                                'Sauvegarder',
+                                style: TextStyle(
+                                  color: CouleursApp.blanc,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _afficherErreur(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  Future<void> _sauvegarderModifications() async {
+    if (_formKey.currentState!.validate() && widget.utilisateurActuel != null) {
+      setState(() => _sauvegardeEnCours = true);
+      
+      try {
+        final prix = _enVente && _prixController.text.isNotEmpty
+            ? double.tryParse(_prixController.text.replaceAll(',', '.'))
+            : null;
+            
+        final livreModifie = widget.livre.copyWith(
+          titre: _titreController.text,
+          auteur: _auteurController.text,
+          matiere: _matiereSelectionnee!,
+          anneeEtude: _anneeSelectionnee!,
+          etatLivre: _etatSelectionne,
+          description: _descriptionController.text.isNotEmpty ? _descriptionController.text : null,
+          edition: _editionController.text.isNotEmpty ? _editionController.text : null,
+          coursAssocies: _coursController.text.isNotEmpty ? _coursController.text : null,
+          prix: prix,
+        );
+
+        // UI Design: Sauvegarder les modifications via le repository
+        final succes = await _livresRepository.modifierLivre(livreModifie);
+        
+        if (succes) {
+          widget.onLivreModifie(livreModifie);
+          Navigator.pop(context);
+        } else {
+          setState(() => _sauvegardeEnCours = false);
+          _afficherErreur('Erreur lors de la modification du livre');
+        }
+      } catch (e) {
+        setState(() => _sauvegardeEnCours = false);
+        _afficherErreur('Erreur inattendue: $e');
+      }
     }
   }
 } 

@@ -102,7 +102,7 @@ class WidgetBarreAppAdmin extends StatelessWidget implements PreferredSizeWidget
         const SizedBox(width: 8),
       ],
       flexibleSpace: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [CouleursApp.principal, CouleursApp.accent],
             begin: Alignment.topLeft,

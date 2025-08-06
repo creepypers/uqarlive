@@ -4,7 +4,7 @@ import '../models/salle_model.dart';
 class SallesDatasourceLocal {
   // Liste des 7 salles de révision
   static final List<SalleModel> _salles = [
-    SalleModel(
+    const SalleModel(
       id: '1',
       nom: 'Salle de Révision A',
       description: 'Salle calme avec vue sur le fleuve, idéale pour les études individuelles',
@@ -15,7 +15,7 @@ class SallesDatasourceLocal {
       estDisponible: true,
       tarifParHeure: 5.0,
     ),
-    SalleModel(
+    const SalleModel(
       id: '2',
       nom: 'Salle de Révision B',
       description: 'Espace spacieux pour les groupes d\'étude et projets collaboratifs',
@@ -26,7 +26,7 @@ class SallesDatasourceLocal {
       estDisponible: true,
       tarifParHeure: 8.0,
     ),
-    SalleModel(
+    const SalleModel(
       id: '3',
       nom: 'Salle de Révision C',
       description: 'Salle insonorisée parfaite pour les présentations orales',
@@ -37,7 +37,7 @@ class SallesDatasourceLocal {
       estDisponible: true,
       tarifParHeure: 7.0,
     ),
-    SalleModel(
+    const SalleModel(
       id: '4',
       nom: 'Salle de Révision D',
       description: 'Petite salle cosy pour études concentrées en solo ou en duo',
@@ -48,7 +48,7 @@ class SallesDatasourceLocal {
       estDisponible: true,
       tarifParHeure: 3.0,
     ),
-    SalleModel(
+    const SalleModel(
       id: '5',
       nom: 'Salle de Révision E',
       description: 'Salle moderne avec équipements high-tech pour projets numériques',
@@ -59,7 +59,7 @@ class SallesDatasourceLocal {
       estDisponible: true,
       tarifParHeure: 10.0,
     ),
-    SalleModel(
+    const SalleModel(
       id: '6',
       nom: 'Salle de Révision F',
       description: 'Grande salle modulable pour événements étudiants et conférences',
@@ -70,7 +70,7 @@ class SallesDatasourceLocal {
       estDisponible: true,
       tarifParHeure: 15.0,
     ),
-    SalleModel(
+    const SalleModel(
       id: '7',
       nom: 'Salle de Révision G',
       description: 'Salle zen avec ambiance relaxante pour études de longue durée',

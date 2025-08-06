@@ -81,7 +81,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: CouleursApp.fond,
-      appBar: WidgetBarreAppNavigationAdmin(
+      appBar: const WidgetBarreAppNavigationAdmin(
         titre: 'Gestion Associations',
         sousTitre: 'Gérer les associations, actualités et événements',
         sectionActive: 'associations',
@@ -140,7 +140,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
+              const Text(
                 'Associations',
                 style: StylesTexteApp.titrePage,
               ),
@@ -196,7 +196,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
+              const Text(
                 'Actualités',
                 style: StylesTexteApp.titrePage,
               ),
@@ -230,7 +230,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
                     ),
                     child: ListTile(
                       contentPadding: const EdgeInsets.all(16),
-                      leading: CircleAvatar(
+                      leading: const CircleAvatar(
                         backgroundColor: CouleursApp.principal,
                         child: Icon(
                           Icons.newspaper,
@@ -301,7 +301,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
+              const Text(
                 'Événements',
                 style: StylesTexteApp.titrePage,
               ),
@@ -369,7 +369,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
                                 // Lieu et date
                                 Row(
                                   children: [
-                                    Icon(Icons.location_on, size: 16, color: Colors.grey),
+                                    const Icon(Icons.location_on, size: 16, color: Colors.grey),
                                     const SizedBox(width: 4),
                                     Flexible(
                                       child: Text(
@@ -383,7 +383,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
                                 const SizedBox(height: 4),
                                 Row(
                                   children: [
-                                    Icon(Icons.access_time, size: 16, color: Colors.grey),
+                                    const Icon(Icons.access_time, size: 16, color: Colors.grey),
                                     const SizedBox(width: 4),
                                     Text(
                                       _formaterDate(evenement.dateDebut),
@@ -459,7 +459,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
             const SizedBox(height: 20),
             Text(
               message,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
                 color: CouleursApp.texteFonce,
@@ -467,7 +467,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
-            Text(
+            const Text(
               'Cliquez sur "Ajouter" pour créer le premier élément',
               style: StylesTexteApp.corpsGris,
               textAlign: TextAlign.center,
@@ -546,7 +546,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
             ),
             const SizedBox(height: 20),
             ListTile(
-              leading: Icon(Icons.edit, color: CouleursApp.principal),
+              leading: const Icon(Icons.edit, color: CouleursApp.principal),
               title: const Text('Modifier'),
               onTap: () {
                 Navigator.pop(context);
@@ -554,7 +554,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
               },
             ),
             ListTile(
-              leading: Icon(Icons.visibility, color: CouleursApp.accent),
+              leading: const Icon(Icons.visibility, color: CouleursApp.accent),
               title: const Text('Voir les détails'),
               onTap: () {
                 Navigator.pop(context);
@@ -594,7 +594,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Confirmer la suppression', style: StylesTexteApp.moyenTitre),
+        title: const Text('Confirmer la suppression', style: StylesTexteApp.moyenTitre),
         content: Text(
           'Êtes-vous sûr de vouloir supprimer l\'association "${association.nom}" ?',
           style: StylesTexteApp.corpsNormal,
@@ -602,7 +602,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Annuler', style: StylesTexteApp.lienPrincipal),
+            child: const Text('Annuler', style: StylesTexteApp.lienPrincipal),
           ),
           TextButton(
             onPressed: () {
@@ -662,7 +662,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Confirmer la suppression', style: StylesTexteApp.moyenTitre),
+        title: const Text('Confirmer la suppression', style: StylesTexteApp.moyenTitre),
         content: Text(
           'Êtes-vous sûr de vouloir supprimer l\'actualité "${actualite.titre}" ?',
           style: StylesTexteApp.corpsNormal,
@@ -670,7 +670,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Annuler', style: StylesTexteApp.lienPrincipal),
+            child: const Text('Annuler', style: StylesTexteApp.lienPrincipal),
           ),
           TextButton(
             onPressed: () {
@@ -767,7 +767,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Confirmer la suppression', style: StylesTexteApp.moyenTitre),
+        title: const Text('Confirmer la suppression', style: StylesTexteApp.moyenTitre),
         content: Text(
           'Êtes-vous sûr de vouloir supprimer l\'événement "${evenement.titre}" ?',
           style: StylesTexteApp.corpsNormal,
@@ -775,7 +775,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Annuler', style: StylesTexteApp.lienPrincipal),
+            child: const Text('Annuler', style: StylesTexteApp.lienPrincipal),
           ),
           TextButton(
             onPressed: () {

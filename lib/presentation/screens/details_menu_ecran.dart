@@ -27,11 +27,11 @@ class DetailsMenuEcran extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
-              icon: Icon(Icons.arrow_back, color: CouleursApp.blanc),
+              icon: const Icon(Icons.arrow_back, color: CouleursApp.blanc),
               onPressed: () => Navigator.pop(context),
             ),
             IconButton(
-              icon: Icon(Icons.favorite_border, color: CouleursApp.blanc),
+              icon: const Icon(Icons.favorite_border, color: CouleursApp.blanc),
               onPressed: () => _ajouterAuxFavoris(context),
             ),
           ],
@@ -118,7 +118,7 @@ class DetailsMenuEcran extends StatelessWidget {
                   children: [
                     Text(
                       menu.nom,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: CouleursApp.blanc,
@@ -166,7 +166,7 @@ class DetailsMenuEcran extends StatelessWidget {
                 ),
                 child: Text(
                   badge,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: CouleursApp.blanc,
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
@@ -180,7 +180,7 @@ class DetailsMenuEcran extends StatelessWidget {
                     color: Colors.red.withValues(alpha: 0.8),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Text(
+                  child: const Text(
                     'ÉPUISÉ',
                     style: TextStyle(
                       color: CouleursApp.blanc,
@@ -310,7 +310,7 @@ class DetailsMenuEcran extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.star,
                 color: Colors.orange,
                 size: 24,
@@ -338,7 +338,7 @@ class DetailsMenuEcran extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 '${menu.note?.toStringAsFixed(1)} / 5.0',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: CouleursApp.texteFonce,
@@ -362,7 +362,7 @@ class DetailsMenuEcran extends StatelessWidget {
             const SizedBox(width: 6),
             Text(
               titre,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: CouleursApp.texteFonce,

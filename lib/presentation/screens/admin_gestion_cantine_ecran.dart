@@ -66,7 +66,7 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: CouleursApp.fond,
-      appBar: WidgetBarreAppNavigationAdmin(
+      appBar: const WidgetBarreAppNavigationAdmin(
         titre: 'Gestion Cantine',
         sousTitre: 'Menus et horaires',
         sectionActive: 'cantine',
@@ -161,7 +161,7 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
+            const Text(
               'Horaires d\'Ouverture',
               style: StylesTexteApp.grandTitre,
             ),
@@ -206,7 +206,7 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
                             color: CouleursApp.gris.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: Text(
+                          child: const Text(
                             'Fermé',
                             style: StylesTexteApp.corpsGris,
                           ),
@@ -221,7 +221,7 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
                             const SizedBox(width: 8),
                             IconButton(
                               onPressed: () => _modifierHoraireJour(jour),
-                              icon: Icon(
+                              icon: const Icon(
                                 Icons.edit,
                                 size: 16,
                                 color: CouleursApp.accent,
@@ -252,7 +252,7 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
+            const Text(
               'Menus Disponibles',
               style: StylesTexteApp.grandTitre,
             ),
@@ -267,7 +267,7 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
           Center(
             child: Column(
               children: [
-                Icon(
+                const Icon(
                   Icons.restaurant_menu,
                   size: 64,
                   color: CouleursApp.gris,
@@ -290,7 +290,7 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
               actionsPersonnalisees: [
                 IconButton(
                   onPressed: () => _modifierMenu(menu),
-                  icon: Icon(Icons.edit, color: CouleursApp.accent, size: 20),
+                  icon: const Icon(Icons.edit, color: CouleursApp.accent, size: 20),
                   constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
                 ),
                 IconButton(
@@ -318,7 +318,7 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'Actions Rapides',
           style: StylesTexteApp.grandTitre,
         ),

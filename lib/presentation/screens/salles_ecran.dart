@@ -81,7 +81,7 @@ class _SallesEcranState extends State<SallesEcran> {
         titre: 'Salles de Révision',
         sousTitre: '${_salles.length} salles disponibles',
         widgetFin: IconButton(
-          icon: Icon(Icons.filter_list, color: CouleursApp.blanc),
+          icon: const Icon(Icons.filter_list, color: CouleursApp.blanc),
           onPressed: () => _ouvrirFiltres(),
         ),
       ),
@@ -153,10 +153,10 @@ class _SallesEcranState extends State<SallesEcran> {
         decoration: InputDecoration(
           hintText: 'Rechercher une salle...',
           border: InputBorder.none,
-          icon: Icon(Icons.search, color: CouleursApp.principal),
+          icon: const Icon(Icons.search, color: CouleursApp.principal),
           suffixIcon: _recherche.isNotEmpty
             ? IconButton(
-                icon: Icon(Icons.clear, color: CouleursApp.principal),
+                icon: const Icon(Icons.clear, color: CouleursApp.principal),
                 onPressed: () {
                   setState(() {
                     _recherche = '';
@@ -336,7 +336,7 @@ class _SallesEcranState extends State<SallesEcran> {
                 ),
                 child: Text(
                   equipement,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 12,
                     color: CouleursApp.principal,
                     fontWeight: FontWeight.w500,
@@ -426,7 +426,7 @@ class _SallesEcranState extends State<SallesEcran> {
               // En-tête
               Row(
                 children: [
-                  Icon(Icons.schedule, color: CouleursApp.principal, size: 24),
+                  const Icon(Icons.schedule, color: CouleursApp.principal, size: 24),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -434,7 +434,7 @@ class _SallesEcranState extends State<SallesEcran> {
                       children: [
                         Text(
                           estModification ? 'Modifier les heures' : 'Sélectionner les heures',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                             color: CouleursApp.texteFonce,
@@ -445,14 +445,14 @@ class _SallesEcranState extends State<SallesEcran> {
                   ),
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: Icon(Icons.close, color: CouleursApp.texteFonce),
+                    icon: const Icon(Icons.close, color: CouleursApp.texteFonce),
                   ),
                 ],
               ),
               const SizedBox(height: 20),
               
               // Instructions
-              Text(
+              const Text(
                 'Cliquez sur les heures que vous souhaitez réserver :',
                 style: TextStyle(
                   fontSize: 14,
@@ -511,7 +511,7 @@ class _SallesEcranState extends State<SallesEcran> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             if (estSelectionne)
-                              Icon(
+                              const Icon(
                                 Icons.check,
                                 color: CouleursApp.blanc,
                                 size: 16,
@@ -589,14 +589,14 @@ class _SallesEcranState extends State<SallesEcran> {
             Text('Durée : ${heuresSelectionnees.length} heure${heuresSelectionnees.length > 1 ? 's' : ''}'),
             Text(
               estModification ? 'Confirmer cette modification ?' : 'Confirmer cette réservation ?',
-              style: TextStyle(fontWeight: FontWeight.w600),
+              style: const TextStyle(fontWeight: FontWeight.w600),
             ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Annuler'),
+            child: const Text('Annuler'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -611,7 +611,7 @@ class _SallesEcranState extends State<SallesEcran> {
               backgroundColor: CouleursApp.accent,
               foregroundColor: CouleursApp.blanc,
             ),
-            child: Text('Confirmer'),
+            child: const Text('Confirmer'),
           ),
         ],
       ),
@@ -755,12 +755,12 @@ class _SallesEcranState extends State<SallesEcran> {
             // En-tête
             Row(
               children: [
-                Icon(Icons.event_seat, color: CouleursApp.principal, size: 24),
+                const Icon(Icons.event_seat, color: CouleursApp.principal, size: 24),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     'Ma réservation - ${salle.nom}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: CouleursApp.texteFonce,
@@ -769,7 +769,7 @@ class _SallesEcranState extends State<SallesEcran> {
                 ),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
-                  icon: Icon(Icons.close, color: CouleursApp.texteFonce),
+                  icon: const Icon(Icons.close, color: CouleursApp.texteFonce),
                 ),
               ],
             ),
@@ -787,7 +787,7 @@ class _SallesEcranState extends State<SallesEcran> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'Réservation actuelle :',
                       style: TextStyle(
                         fontSize: 14,
@@ -807,7 +807,7 @@ class _SallesEcranState extends State<SallesEcran> {
             
             // Actions
             ListTile(
-              leading: Icon(Icons.edit, color: CouleursApp.accent),
+              leading: const Icon(Icons.edit, color: CouleursApp.accent),
               title: const Text('Modifier le créneau'),
               subtitle: const Text('Changer les heures de réservation'),
               onTap: () {
@@ -876,7 +876,7 @@ class _SallesEcranState extends State<SallesEcran> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Êtes-vous sûr de vouloir annuler votre réservation pour :'),
+            const Text('Êtes-vous sûr de vouloir annuler votre réservation pour :'),
             const SizedBox(height: 8),
             Text('• Salle : ${salle.nom}'),
             if (salle.heureDebut != null && salle.heureFin != null) ...[
@@ -895,7 +895,7 @@ class _SallesEcranState extends State<SallesEcran> {
               await _annulerReservation(salle);
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: Text('Oui, annuler', style: TextStyle(color: CouleursApp.blanc)),
+            child: const Text('Oui, annuler', style: TextStyle(color: CouleursApp.blanc)),
           ),
         ],
       ),

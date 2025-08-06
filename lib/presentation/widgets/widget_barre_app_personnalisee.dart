@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/di/service_locator.dart';
+import '../../domain/entities/utilisateur.dart';
 import '../screens/profil_ecran.dart';
+import '../services/authentification_service.dart';
 
 // UI Design: Barre d'application personnalisée réutilisable avec design UQAR
 class WidgetBarreAppPersonnalisee extends StatelessWidget implements PreferredSizeWidget {
@@ -12,6 +15,7 @@ class WidgetBarreAppPersonnalisee extends StatelessWidget implements PreferredSi
   final double hauteurBarre;
   final bool afficherProfil;
   final bool afficherBoutonRetour;
+  final Utilisateur? utilisateurConnecte;
 
   const WidgetBarreAppPersonnalisee({
     super.key,
@@ -23,14 +27,19 @@ class WidgetBarreAppPersonnalisee extends StatelessWidget implements PreferredSi
     this.hauteurBarre = 80,
     this.afficherProfil = true,
     this.afficherBoutonRetour = false,
+    this.utilisateurConnecte,
   });
 
   @override
   Widget build(BuildContext context) {
+    // UI Design: Obtenir l'utilisateur connecté pour afficher ses initiales
+    final authentificationService = ServiceLocator.obtenirService<AuthentificationService>();
+    final utilisateur = utilisateurConnecte ?? authentificationService.utilisateurActuel;
+    
     // UI Design: AppBar UQAR modernisée avec hiérarchie visuelle, dégradé, ombre et bordure
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           colors: [
             CouleursApp.principal,
             CouleursApp.accent,
@@ -68,7 +77,7 @@ class WidgetBarreAppPersonnalisee extends StatelessWidget implements PreferredSi
         ),
       ),
         leading: afficherBoutonRetour ? IconButton(
-          icon: Icon(Icons.arrow_back, color: CouleursApp.blanc),
+          icon: const Icon(Icons.arrow_back, color: CouleursApp.blanc),
           onPressed: () => Navigator.of(context).pop(),
         ) : afficherProfil ? Padding(
         padding: const EdgeInsets.only(left: 16.0, top: 8.0, bottom: 8.0),
@@ -90,8 +99,10 @@ class WidgetBarreAppPersonnalisee extends StatelessWidget implements PreferredSi
             ),
             child: Center(
               child: Text(
-                'MD', // Initiales Marie Dubois
-                style: TextStyle(
+                utilisateur != null 
+                    ? '${utilisateur.prenom[0]}${utilisateur.nom[0]}'.toUpperCase()
+                    : '??',
+                style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                   color: CouleursApp.blanc,
@@ -133,7 +144,7 @@ class WidgetBarreAppPersonnalisee extends StatelessWidget implements PreferredSi
                           Shadow(
                             color: Colors.black.withOpacity(0.08),
                             blurRadius: 2,
-                            offset: Offset(0, 1),
+                            offset: const Offset(0, 1),
                           ),
                         ],
                     ),

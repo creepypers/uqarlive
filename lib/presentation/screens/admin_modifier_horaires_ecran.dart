@@ -37,7 +37,7 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
           SnackBar(
             content: Row(
               children: [
-                Icon(Icons.check_circle, color: CouleursApp.blanc),
+                const Icon(Icons.check_circle, color: CouleursApp.blanc),
                 const SizedBox(width: 8),
                 Text('Horaires mis à jour pour $_jourSelectionne'),
               ],
@@ -52,11 +52,11 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Row(
+            content: const Row(
               children: [
                 Icon(Icons.error, color: CouleursApp.blanc),
-                const SizedBox(width: 8),
-                const Text('Erreur lors de la mise à jour des horaires'),
+                SizedBox(width: 8),
+                Text('Erreur lors de la mise à jour des horaires'),
               ],
             ),
             backgroundColor: Colors.red,
@@ -86,7 +86,7 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
+            colorScheme: const ColorScheme.light(
               primary: CouleursApp.principal,
               onPrimary: CouleursApp.blanc,
               surface: CouleursApp.blanc,
@@ -112,7 +112,7 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: CouleursApp.fond,
-      appBar: WidgetBarreAppNavigationAdmin(
+      appBar: const WidgetBarreAppNavigationAdmin(
         titre: 'Modifier les Horaires',
         sousTitre: 'Gestion des horaires de la cantine',
         sectionActive: 'cantine',
@@ -154,7 +154,7 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
               color: CouleursApp.principal.withOpacity(0.2),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Icon(
+            child: const Icon(
               Icons.access_time,
               color: CouleursApp.principal,
               size: 28,
@@ -172,7 +172,7 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
+                const Text(
                   'Modifiez les horaires d\'ouverture et de fermeture de la cantine',
                   style: StylesTexteApp.corpsGris,
                 ),
@@ -201,7 +201,7 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'Sélectionner un jour',
             style: StylesTexteApp.petitTitre,
           ),
@@ -211,7 +211,7 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
           DropdownButtonFormField<String>(
             value: _jourSelectionne,
             decoration: InputDecoration(
-              prefixIcon: Icon(Icons.calendar_today, color: CouleursApp.principal),
+              prefixIcon: const Icon(Icons.calendar_today, color: CouleursApp.principal),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
                 borderSide: BorderSide(color: CouleursApp.principal.withOpacity(0.3)),
@@ -222,7 +222,7 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: CouleursApp.principal, width: 2),
+                borderSide: const BorderSide(color: CouleursApp.principal, width: 2),
               ),
             ),
             items: const [
@@ -246,7 +246,7 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
           const SizedBox(height: 24),
           
           // Horaires
-          Text(
+          const Text(
             'Horaires',
             style: StylesTexteApp.petitTitre,
           ),
@@ -257,10 +257,10 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
             title: const Text('Heure d\'ouverture'),
             subtitle: Text(
               _formatterHeure(_horairesJourSelectionne['ouverture']!),
-              style: TextStyle(color: CouleursApp.principal, fontWeight: FontWeight.bold),
+              style: const TextStyle(color: CouleursApp.principal, fontWeight: FontWeight.bold),
             ),
-            leading: Icon(Icons.wb_sunny, color: CouleursApp.principal),
-            trailing: Icon(Icons.edit, color: CouleursApp.principal),
+            leading: const Icon(Icons.wb_sunny, color: CouleursApp.principal),
+            trailing: const Icon(Icons.edit, color: CouleursApp.principal),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
               side: BorderSide(color: CouleursApp.principal.withOpacity(0.3)),
@@ -274,10 +274,10 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
             title: const Text('Heure de fermeture'),
             subtitle: Text(
               _formatterHeure(_horairesJourSelectionne['fermeture']!),
-              style: TextStyle(color: CouleursApp.principal, fontWeight: FontWeight.bold),
+              style: const TextStyle(color: CouleursApp.principal, fontWeight: FontWeight.bold),
             ),
-            leading: Icon(Icons.nights_stay, color: CouleursApp.principal),
-            trailing: Icon(Icons.edit, color: CouleursApp.principal),
+            leading: const Icon(Icons.nights_stay, color: CouleursApp.principal),
+            trailing: const Icon(Icons.edit, color: CouleursApp.principal),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
               side: BorderSide(color: CouleursApp.principal.withOpacity(0.3)),
@@ -306,7 +306,7 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
               elevation: 8,
             ),
             child: _isLoading
-                ? SizedBox(
+                ? const SizedBox(
                     height: 20,
                     width: 20,
                     child: CircularProgressIndicator(
@@ -314,12 +314,12 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
                       strokeWidth: 2,
                     ),
                   )
-                : Row(
+                : const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(Icons.save, size: 20),
-                      const SizedBox(width: 8),
-                      const Text(
+                      SizedBox(width: 8),
+                      Text(
                         'Sauvegarder les modifications',
                         style: TextStyle(
                           fontSize: 16,
@@ -337,18 +337,18 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
             onPressed: _isLoading ? null : () => Navigator.pop(context),
             style: OutlinedButton.styleFrom(
               foregroundColor: CouleursApp.principal,
-              side: BorderSide(color: CouleursApp.principal, width: 2),
+              side: const BorderSide(color: CouleursApp.principal, width: 2),
               padding: const EdgeInsets.symmetric(vertical: 18),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(24),
               ),
             ),
-            child: Row(
+            child: const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.cancel, size: 20),
-                const SizedBox(width: 8),
-                const Text(
+                SizedBox(width: 8),
+                Text(
                   'Annuler',
                   style: TextStyle(
                     fontSize: 16,

@@ -126,7 +126,7 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Informations Générales',
               style: StylesTexteApp.grandTitre,
             ),
@@ -138,13 +138,13 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
               decoration: InputDecoration(
                 labelText: 'Nom de l\'association *',
                 hintText: 'Ex: Association des étudiants en informatique',
-                prefixIcon: Icon(Icons.groups, color: CouleursApp.principal),
+                prefixIcon: const Icon(Icons.groups, color: CouleursApp.principal),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: CouleursApp.principal, width: 2),
+                  borderSide: const BorderSide(color: CouleursApp.principal, width: 2),
                 ),
               ),
               validator: (valeur) {
@@ -164,13 +164,13 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
               value: _categorieSelectionnee,
               decoration: InputDecoration(
                 labelText: 'Catégorie *',
-                prefixIcon: Icon(Icons.category, color: CouleursApp.principal),
+                prefixIcon: const Icon(Icons.category, color: CouleursApp.principal),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: CouleursApp.principal, width: 2),
+                  borderSide: const BorderSide(color: CouleursApp.principal, width: 2),
                 ),
               ),
               items: _categories.map((categorie) => DropdownMenuItem(
@@ -198,13 +198,13 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
               decoration: InputDecoration(
                 labelText: 'Description *',
                 hintText: 'Décrivez les objectifs et activités de l\'association...',
-                prefixIcon: Icon(Icons.description, color: CouleursApp.principal),
+                prefixIcon: const Icon(Icons.description, color: CouleursApp.principal),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: CouleursApp.principal, width: 2),
+                  borderSide: const BorderSide(color: CouleursApp.principal, width: 2),
                 ),
               ),
               validator: (valeur) {
@@ -232,7 +232,7 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Informations de Contact',
               style: StylesTexteApp.grandTitre,
             ),
@@ -245,13 +245,13 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
               decoration: InputDecoration(
                 labelText: 'Email *',
                 hintText: 'contact@association.ca',
-                prefixIcon: Icon(Icons.email, color: CouleursApp.principal),
+                prefixIcon: const Icon(Icons.email, color: CouleursApp.principal),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: CouleursApp.principal, width: 2),
+                  borderSide: const BorderSide(color: CouleursApp.principal, width: 2),
                 ),
               ),
               validator: (valeur) {
@@ -273,13 +273,13 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
               decoration: InputDecoration(
                 labelText: 'Téléphone *',
                 hintText: '(418) 555-0123',
-                prefixIcon: Icon(Icons.phone, color: CouleursApp.principal),
+                prefixIcon: const Icon(Icons.phone, color: CouleursApp.principal),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: CouleursApp.principal, width: 2),
+                  borderSide: const BorderSide(color: CouleursApp.principal, width: 2),
                 ),
               ),
               validator: (valeur) {
@@ -298,13 +298,13 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
               decoration: InputDecoration(
                 labelText: 'Site Web (optionnel)',
                 hintText: 'https://www.association.ca',
-                prefixIcon: Icon(Icons.web, color: CouleursApp.principal),
+                prefixIcon: const Icon(Icons.web, color: CouleursApp.principal),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: CouleursApp.principal, width: 2),
+                  borderSide: const BorderSide(color: CouleursApp.principal, width: 2),
                 ),
               ),
             ),
@@ -323,7 +323,7 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Paramètres',
               style: StylesTexteApp.grandTitre,
             ),
@@ -336,14 +336,14 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
               decoration: InputDecoration(
                 labelText: 'Cotisation annuelle (optionnel)',
                 hintText: 'Ex: 5000',
-                prefixIcon: Icon(Icons.attach_money, color: CouleursApp.principal),
+                prefixIcon: const Icon(Icons.attach_money, color: CouleursApp.principal),
                 suffixText: 'CAD',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: CouleursApp.principal, width: 2),
+                  borderSide: const BorderSide(color: CouleursApp.principal, width: 2),
                 ),
               ),
               validator: (valeur) {
@@ -360,7 +360,7 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
             
             // Statut actif
             SwitchListTile(
-              title: Text(
+              title: const Text(
                 'Association active',
                 style: StylesTexteApp.moyenTitre,
               ),
@@ -392,13 +392,13 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
           child: OutlinedButton(
             onPressed: () => Navigator.pop(context),
             style: OutlinedButton.styleFrom(
-              side: BorderSide(color: CouleursApp.principal),
+              side: const BorderSide(color: CouleursApp.principal),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
-            child: Text(
+            child: const Text(
               'Annuler',
               style: StylesTexteApp.lienPrincipal,
             ),

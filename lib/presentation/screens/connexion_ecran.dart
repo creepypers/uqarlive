@@ -4,7 +4,6 @@ import 'inscription_ecran.dart';
 import 'accueil_ecran.dart';
 import 'admin_dashboard_ecran.dart';
 import '../../core/di/service_locator.dart';
-import '../../domain/repositories/utilisateurs_repository.dart';
 import '../services/authentification_service.dart';
 
 
@@ -109,11 +108,11 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
   void _afficherErreurConnexion() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Row(
+        content: const Row(
           children: [
-            const Icon(Icons.error, color: Colors.white, size: 20),
-            const SizedBox(width: 8),
-            const Text('Email ou mot de passe incorrect'),
+            Icon(Icons.error, color: Colors.white, size: 20),
+            SizedBox(width: 8),
+            Text('Email ou mot de passe incorrect'),
           ],
         ),
         backgroundColor: Colors.red,
@@ -207,18 +206,18 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Mot de passe oublié'),
-        content: Text('Un email de réinitialisation sera envoyé à votre adresse.'),
+        title: const Text('Mot de passe oublié'),
+        content: const Text('Un email de réinitialisation sera envoyé à votre adresse.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Annuler'),
+            child: const Text('Annuler'),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
+                const SnackBar(
                   content: Text('Email de réinitialisation envoyé'),
                   backgroundColor: Colors.green,
                   behavior: SnackBarBehavior.floating,
@@ -226,7 +225,7 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
               );
             },
             style: ElevatedButton.styleFrom(backgroundColor: CouleursApp.accent),
-            child: Text('Envoyer', style: TextStyle(color: CouleursApp.blanc)),
+            child: const Text('Envoyer', style: TextStyle(color: CouleursApp.blanc)),
           ),
         ],
       ),
@@ -237,12 +236,12 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Déconnexion'),
-        content: Text('Êtes-vous sûr de vouloir vous déconnecter ?'),
+        title: const Text('Déconnexion'),
+        content: const Text('Êtes-vous sûr de vouloir vous déconnecter ?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Annuler'),
+            child: const Text('Annuler'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -253,7 +252,7 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
                 (route) => false,
               );
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
+                const SnackBar(
                   content: Text('Déconnexion réussie'),
                   backgroundColor: Colors.green,
                   behavior: SnackBarBehavior.floating,
@@ -261,7 +260,7 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
               );
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: Text('Se déconnecter', style: TextStyle(color: CouleursApp.blanc)),
+            child: const Text('Se déconnecter', style: TextStyle(color: CouleursApp.blanc)),
           ),
         ],
       ),
@@ -399,7 +398,7 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             // Titre "Connexion"
-                            Text(
+                            const Text(
                               'Connexion',
                               style: StylesTexteApp.titre,
                               textAlign: TextAlign.left,
@@ -428,7 +427,7 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
                               alignment: Alignment.centerRight,
                               child: TextButton(
                                 onPressed: _gererMotDePasseOublie,
-                                child: Text(
+                                child: const Text(
                                   'Mot de passe oublié?',
                                   style: TextStyle(
                                     color: CouleursApp.accent,
@@ -533,13 +532,13 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
           ),
         ],
       ),
-      child: Center(
+      child: const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Icône stylisée représentant UQAR
             Icon(Icons.school, size: 32, color: CouleursApp.principal),
-            const SizedBox(height: 4),
+            SizedBox(height: 4),
             // Petit texte "UQAR"
             Text(
               'UQAR',
@@ -559,7 +558,7 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
     return ElevatedButton(
       onPressed: _gererConnexion,
       style: DecorationsApp.boutonPrincipal,
-      child: Text(
+      child: const Text(
         'Se connecter',
         style: StylesTexteApp.bouton,
       ),
@@ -581,7 +580,7 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
              WidgetSpan(
                child: GestureDetector(
                  onTap: _gererCreerCompte,
-                 child: Text(
+                 child: const Text(
                    'S\'inscrire',
                    style: TextStyle(
                      color: CouleursApp.accent,

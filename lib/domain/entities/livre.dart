@@ -6,7 +6,8 @@ class Livre {
   final String matiere;
   final String anneeEtude;
   final String etatLivre;
-  final String proprietaire;
+  final String proprietaire; // Nom du propriétaire pour affichage
+  final String proprietaireId; // ID de l'utilisateur propriétaire
   final String? description;
   final String? edition;
   final String? coursAssocies;
@@ -24,6 +25,7 @@ class Livre {
     required this.anneeEtude,
     required this.etatLivre,
     required this.proprietaire,
+    required this.proprietaireId,
     this.description,
     this.edition,
     this.coursAssocies,
@@ -46,6 +48,7 @@ class Livre {
     String? anneeEtude,
     String? etatLivre,
     String? proprietaire,
+    String? proprietaireId,
     String? description,
     String? edition,
     String? coursAssocies,
@@ -63,6 +66,7 @@ class Livre {
       anneeEtude: anneeEtude ?? this.anneeEtude,
       etatLivre: etatLivre ?? this.etatLivre,
       proprietaire: proprietaire ?? this.proprietaire,
+      proprietaireId: proprietaireId ?? this.proprietaireId,
       description: description ?? this.description,
       edition: edition ?? this.edition,
       coursAssocies: coursAssocies ?? this.coursAssocies,
@@ -76,7 +80,7 @@ class Livre {
 
   @override
   String toString() {
-    return 'Livre(id: $id, titre: $titre, auteur: $auteur, matiere: $matiere, anneeEtude: $anneeEtude, etatLivre: $etatLivre, proprietaire: $proprietaire)';
+    return 'Livre(id: $id, titre: $titre, auteur: $auteur, matiere: $matiere, anneeEtude: $anneeEtude, etatLivre: $etatLivre, proprietaire: $proprietaire, proprietaireId: $proprietaireId)';
   }
 
   @override

@@ -213,7 +213,7 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
                         fontSize: 14,
                       ),
                     ),
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.arrow_drop_down,
                       color: CouleursApp.principal,
                     ),
@@ -226,7 +226,7 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
                         value: value,
                         child: Text(
                           value,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: CouleursApp.texteFonce,
                             fontSize: 14,
                           ),
@@ -259,7 +259,7 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
                         fontSize: 14,
                       ),
                     ),
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.arrow_drop_down,
                       color: CouleursApp.principal,
                     ),
@@ -272,7 +272,7 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
                         value: value,
               child: Text(
                           value,
-                style: TextStyle(
+                style: const TextStyle(
                   color: CouleursApp.texteFonce,
                   fontSize: 14,
                 ),

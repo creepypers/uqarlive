@@ -144,7 +144,7 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
               color: Colors.green.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Icon(
+            child: const Icon(
               Icons.add_circle,
               color: Colors.green,
               size: 28,
@@ -160,7 +160,7 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
                   style: StylesTexteApp.moyenTitre.copyWith(color: Colors.green),
                 ),
                 const SizedBox(height: 4),
-                Text(
+                const Text(
                   'Ajoutez un nouveau menu à la carte de la cantine',
                   style: StylesTexteApp.corpsGris,
                 ),
@@ -198,14 +198,14 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
                   color: CouleursApp.principal.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.restaurant,
                   color: CouleursApp.principal,
                   size: 24,
                 ),
               ),
               const SizedBox(width: 12),
-              Text(
+              const Text(
                 'Informations du menu',
                 style: StylesTexteApp.moyenTitre,
               ),
@@ -241,7 +241,7 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
             value: _categorieSelectionnee,
             decoration: InputDecoration(
               labelText: 'Catégorie *',
-              prefixIcon: Icon(Icons.category, color: CouleursApp.principal),
+              prefixIcon: const Icon(Icons.category, color: CouleursApp.principal),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
                 borderSide: BorderSide(color: CouleursApp.principal.withValues(alpha: 0.3)),
@@ -252,7 +252,7 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: CouleursApp.principal, width: 2),
+                borderSide: const BorderSide(color: CouleursApp.principal, width: 2),
               ),
               filled: true,
               fillColor: CouleursApp.blanc,
@@ -337,14 +337,14 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
                   color: CouleursApp.accent.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.settings,
                   color: CouleursApp.accent,
                   size: 24,
                 ),
               ),
               const SizedBox(width: 12),
-              Text(
+              const Text(
                 'Options et disponibilité',
                 style: StylesTexteApp.moyenTitre,
               ),
@@ -354,8 +354,8 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
           
           // Disponibilité
           SwitchListTile(
-            title: Text('Menu disponible'),
-            subtitle: Text('Le menu peut être commandé'),
+            title: const Text('Menu disponible'),
+            subtitle: const Text('Le menu peut être commandé'),
             value: _estDisponible,
             onChanged: (valeur) {
               setState(() => _estDisponible = valeur);
@@ -366,15 +366,15 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
           const SizedBox(height: 20),
           
           // Options alimentaires
-          Text(
+          const Text(
             'Options alimentaires',
             style: StylesTexteApp.petitTitre,
           ),
           const SizedBox(height: 12),
           
           SwitchListTile(
-            title: Text('Végétarien'),
-            subtitle: Text('Menu sans viande'),
+            title: const Text('Végétarien'),
+            subtitle: const Text('Menu sans viande'),
             value: _estVegetarien,
             onChanged: (valeur) {
               setState(() => _estVegetarien = valeur);
@@ -384,8 +384,8 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
           ),
           
           SwitchListTile(
-            title: Text('Vegan'),
-            subtitle: Text('Sans produits animaux'),
+            title: const Text('Vegan'),
+            subtitle: const Text('Sans produits animaux'),
             value: _estVegan,
             onChanged: (valeur) {
               setState(() => _estVegan = valeur);
@@ -417,7 +417,7 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
               elevation: 8,
             ),
             child: _isLoading
-                ? SizedBox(
+                ? const SizedBox(
                     height: 20,
                     width: 20,
                     child: CircularProgressIndicator(
@@ -428,7 +428,7 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
                 : Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.add_circle, size: 20),
+                      const Icon(Icons.add_circle, size: 20),
                       const SizedBox(width: 8),
                       Text(
                         widget.menuAModifier != null ? 'Modifier le menu' : 'Ajouter le menu',
@@ -450,20 +450,20 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
             onPressed: _isLoading ? null : () => Navigator.pop(context),
             style: OutlinedButton.styleFrom(
               foregroundColor: CouleursApp.principal,
-              side: BorderSide(color: CouleursApp.principal, width: 2),
+              side: const BorderSide(color: CouleursApp.principal, width: 2),
               padding: const EdgeInsets.symmetric(vertical: 18),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(24),
               ),
             ),
-            child: Row(
+            child: const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.cancel, size: 20),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 Text(
                   'Annuler',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -503,7 +503,7 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: CouleursApp.principal, width: 2),
+          borderSide: const BorderSide(color: CouleursApp.principal, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),

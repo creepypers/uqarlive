@@ -164,7 +164,7 @@ class _CantineEcranState extends State<CantineEcran> {
                   color: CouleursApp.blanc.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.search,
                   color: CouleursApp.blanc,
                   size: 24,
@@ -217,7 +217,7 @@ class _CantineEcranState extends State<CantineEcran> {
       titre: 'Horaires & Infos',
       iconeTitre: Icons.restaurant,
       statistiques: [
-        {
+        const {
           'valeur': '11h30 - 14h00',
           'label': 'Ouverture',
           'icone': Icons.access_time,
@@ -254,7 +254,7 @@ class _CantineEcranState extends State<CantineEcran> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.today,
                 color: CouleursApp.principal,
                 size: 24,

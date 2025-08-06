@@ -6,6 +6,15 @@ import '../services/navigation_service.dart';
 import '../services/authentification_service.dart';
 import '../../core/di/service_locator.dart';
 import '../../domain/entities/utilisateur.dart';
+import '../../domain/entities/livre.dart';
+import '../../domain/entities/association.dart';
+import '../../domain/repositories/livres_repository.dart';
+import '../../domain/repositories/associations_repository.dart';
+
+import '../../domain/repositories/membres_association_repository.dart';
+import '../../domain/entities/reservation_salle.dart';
+import '../../domain/repositories/reservations_salle_repository.dart';
+
 import 'modifier_profil_ecran.dart';
 import 'gerer_livres_ecran.dart';
 import 'salles_ecran.dart';
@@ -22,32 +31,127 @@ class ProfilEcran extends StatefulWidget {
 
 class _ProfilEcranState extends State<ProfilEcran> {
   late AuthentificationService _authentificationService;
+  late LivresRepository _livresRepository;
+  late AssociationsRepository _associationsRepository;
+  late MembresAssociationRepository _membresAssociationRepository;
+  late ReservationsSalleRepository _reservationsSalleRepository;
+
   Utilisateur? _utilisateurActuel;
+  List<Livre> _mesLivres = [];
+
+  List<Association> _mesAssociations = [];
+  List<ReservationSalle> _mesReservations = [];
+  int _nombreLivresEnVente = 0;
+  int _nombreLivresEchanges = 0;
+  int _nombreAssociations = 0;
   bool _chargementEnCours = true;
 
   @override
   void initState() {
     super.initState();
     _authentificationService = ServiceLocator.obtenirService<AuthentificationService>();
+    _livresRepository = ServiceLocator.obtenirService<LivresRepository>();
+    _associationsRepository = ServiceLocator.obtenirService<AssociationsRepository>();
+    _membresAssociationRepository = ServiceLocator.obtenirService<MembresAssociationRepository>();
+    _reservationsSalleRepository = ServiceLocator.obtenirService<ReservationsSalleRepository>();
+
     _chargerUtilisateurActuel();
   }
 
   Future<void> _chargerUtilisateurActuel() async {
     setState(() => _chargementEnCours = true);
     await _authentificationService.chargerUtilisateurActuel();
-    setState(() {
-      _utilisateurActuel = _authentificationService.utilisateurActuel;
-      _chargementEnCours = false;
-    });
+    _utilisateurActuel = _authentificationService.utilisateurActuel;
+    
+    if (_utilisateurActuel != null) {
+              await Future.wait([
+          _chargerStatistiques(),
+          _chargerMesAssociations(),
+          _chargerMesReservations(),
+        ]);
+    }
+    
+    setState(() => _chargementEnCours = false);
+  }
+
+  // UI Design: Charger les vraies statistiques de l'utilisateur
+  Future<void> _chargerStatistiques() async {
+    if (_utilisateurActuel == null) return;
+    
+    try {
+      // Charger tous les livres de l'utilisateur
+      _mesLivres = await _livresRepository.obtenirLivresParProprietaire(_utilisateurActuel!.id);
+      
+      // Calculer les statistiques
+      _nombreLivresEnVente = _mesLivres.where((livre) => livre.prix != null && livre.prix! > 0).length;
+      _nombreLivresEchanges = _mesLivres.where((livre) => !livre.estDisponible).length;
+      
+      // Le nombre d'associations sera calculé lors du chargement des vraies associations
+      _nombreAssociations = _mesAssociations.length;
+    } catch (e) {
+      // Gérer l'erreur si nécessaire
+    }
+  }
+
+  // UI Design: Charger les vraies associations de l'utilisateur
+  Future<void> _chargerMesAssociations() async {
+    if (_utilisateurActuel == null) return;
+    
+    try {
+      // Récupérer les memberships de l'utilisateur
+      final memberships = await _membresAssociationRepository.obtenirMembresParUtilisateur(_utilisateurActuel!.id);
+      
+      // Récupérer les détails des associations pour chaque membership
+      final List<Association> associations = [];
+      for (final membership in memberships) {
+        try {
+          final toutesAssociations = await _associationsRepository.obtenirAssociationsPopulaires(limite: 50);
+          final association = toutesAssociations.firstWhere(
+            (assoc) => assoc.id == membership.associationId,
+            orElse: () => throw Exception('Association non trouvée'),
+          );
+          associations.add(association);
+        } catch (e) {
+          // Ignorer si l'association n'est pas trouvée
+        }
+      }
+      
+      _mesAssociations = associations;
+      _nombreAssociations = _mesAssociations.length;
+    } catch (e) {
+      _mesAssociations = [];
+      _nombreAssociations = 0;
+    }
+  }
+
+  // UI Design: Méthode retirée - utilisation directe de _mesLivres dans l'interface
+
+  // UI Design: Charger les vraies réservations de salles de l'utilisateur
+  Future<void> _chargerMesReservations() async {
+    if (_utilisateurActuel == null) return;
+    
+    try {
+      // Récupérer les vraies réservations de l'utilisateur
+      _mesReservations = await _reservationsSalleRepository.obtenirReservationsParUtilisateur(_utilisateurActuel!.id);
+      
+      // Filtrer pour ne garder que les réservations futures et actuelles
+      final maintenant = DateTime.now();
+      _mesReservations = _mesReservations.where((reservation) => 
+        reservation.dateReservation.isAfter(maintenant.subtract(const Duration(days: 1)))
+      ).toList();
+      
+    } catch (e) {
+      _mesReservations = [];
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     // UI Design: Affichage d'un indicateur de chargement si les données ne sont pas encore disponibles
     if (_chargementEnCours || _utilisateurActuel == null) {
-      return Scaffold(
+      return const Scaffold(
         backgroundColor: CouleursApp.fond,
-        body: const Center(child: CircularProgressIndicator()),
+        body: Center(child: CircularProgressIndicator()),
       );
     }
 
@@ -59,6 +163,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
         hauteurBarre: 140,
         afficherProfil: false,
         afficherBoutonRetour: true,
+        utilisateurConnecte: _utilisateurActuel, // UI Design: Passer l'utilisateur connecté pour les initiales
         widgetFin: Container(
           width: 74,
           height: 74,
@@ -68,7 +173,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
               color: CouleursApp.blanc,
               width: 3,
             ),
-            gradient: LinearGradient(
+            gradient: const LinearGradient(
               colors: [
                 CouleursApp.accent,
                 CouleursApp.principal,
@@ -87,7 +192,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
           child: Center(
             child: Text(
               _authentificationService.obtenirInitiales(), // UI Design: Initiales dynamiques
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: CouleursApp.blanc,
@@ -124,8 +229,8 @@ class _ProfilEcranState extends State<ProfilEcran> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    _construireStatistique('12', 'Livres\néchangés', Icons.swap_horiz, CouleursApp.principal),
-                    _construireStatistique('3', 'Associations\nrejointes', Icons.groups, CouleursApp.accent),
+                    _construireStatistique('$_nombreLivresEchanges', 'Livres\néchangés', Icons.swap_horiz, CouleursApp.principal),
+                    _construireStatistique('$_nombreAssociations', 'Associations\nrejointes', Icons.groups, CouleursApp.accent),
                     _construireStatistique(
                       _calculerDureeInscription(),
                       'Mois\nà l\'UQAR', 
@@ -165,6 +270,54 @@ class _ProfilEcranState extends State<ProfilEcran> {
     );
   }
 
+  // UI Design: Formatter la date pour l'affichage
+  String _formaterDate(DateTime date) {
+    final maintenant = DateTime.now();
+    final difference = date.difference(maintenant).inDays;
+    
+    if (difference == 0) return 'Aujourd\'hui';
+    if (difference == 1) return 'Demain';
+    if (difference == 2) return 'Après-demain';
+    
+    return '${date.day}/${date.month}';
+  }
+
+  // UI Design: Obtenir le nom de la salle à partir de son ID
+  String _obtenirNomSalle(String salleId) {
+    final nomsDesalles = {
+      'salle_001': 'Salle A-101',
+      'salle_002': 'Salle A-102', 
+      'salle_003': 'Salle C-302',
+      'salle_004': 'Salle B-201',
+      'salle_005': 'Laboratoire B-205',
+      'salle_006': 'Amphithéâtre',
+      'salle_007': 'Salle de conférence',
+    };
+    return nomsDesalles[salleId] ?? 'Salle inconnue';
+  }
+
+  // UI Design: Obtenir la couleur du statut de réservation
+  Color _obtenirCouleurStatutReservation(String statut) {
+    switch (statut) {
+      case 'Confirmée':
+        return Colors.green;
+      case 'En attente':
+        return Colors.orange;
+      case 'Annulée':
+        return Colors.red;
+      case 'Terminée':
+        return Colors.grey;
+      default:
+        return Colors.blue;
+    }
+  }
+
+  // UI Design: Formatter l'heure pour l'affichage
+  String _formaterHeure(DateTime dateTime) {
+    return '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+  }
+
+
   // Actions - OPTIMISÉES
   void _ouvrirModifierProfil(BuildContext context) {
     Navigator.push(
@@ -179,12 +332,12 @@ class _ProfilEcranState extends State<ProfilEcran> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Déconnexion'),
-        content: Text('Êtes-vous sûr de vouloir vous déconnecter ?'),
+        title: const Text('Déconnexion'),
+        content: const Text('Êtes-vous sûr de vouloir vous déconnecter ?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Annuler'),
+            child: const Text('Annuler'),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -199,7 +352,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
                 (route) => false,
               );
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
+                const SnackBar(
                   content: Text('Déconnexion réussie'),
                   backgroundColor: Colors.green,
                   behavior: SnackBarBehavior.floating,
@@ -207,7 +360,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
               );
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: Text('Se déconnecter', style: TextStyle(color: CouleursApp.blanc)),
+            child: const Text('Se déconnecter', style: TextStyle(color: CouleursApp.blanc)),
           ),
         ],
       ),
@@ -270,7 +423,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
         children: [
           Row(
             children: [
-              Icon(Icons.menu_book, color: CouleursApp.principal, size: 24),
+              const Icon(Icons.menu_book, color: CouleursApp.principal, size: 24),
               const SizedBox(width: 12),
               Text('Mes Livres', style: StylesTexteApp.titre.copyWith(fontSize: 18)),
             ],
@@ -279,10 +432,10 @@ class _ProfilEcranState extends State<ProfilEcran> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _construireInfoLivre('5', 'Disponibles', CouleursApp.accent),
-              _construireInfoLivre('2', 'En cours', Colors.orange),
-              _construireInfoLivre('12', 'Terminés', Colors.green),
-              _construireInfoLivre('2', 'En vente', CouleursApp.principal),
+              _construireInfoLivre('${_mesLivres.where((l) => l.estDisponible && (l.prix == null || l.prix == 0)).length}', 'Disponibles', CouleursApp.accent),
+              _construireInfoLivre('$_nombreLivresEchanges', 'En cours', Colors.orange),
+              _construireInfoLivre('${_mesLivres.length}', 'Total', Colors.green),
+              _construireInfoLivre('$_nombreLivresEnVente', 'Vendus', Colors.orange),
             ],
           ),
           const SizedBox(height: 20),
@@ -298,12 +451,12 @@ class _ProfilEcranState extends State<ProfilEcran> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
+                const Row(
                   children: [
-                    Icon(Icons.sell, color: CouleursApp.principal, size: 20),
-                    const SizedBox(width: 8),
+                    Icon(Icons.menu_book, color: CouleursApp.principal, size: 20),
+                    SizedBox(width: 8),
                     Text(
-                      'Mes Livres en Vente',
+                      'Mes Livres Récents',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -314,10 +467,32 @@ class _ProfilEcranState extends State<ProfilEcran> {
                 ),
                 const SizedBox(height: 12),
                 
-                // Liste des livres en vente (simulés)
-                _construireLivreEnVente('Calcul Différentiel', '12,50 €', 'En vente'),
-                const SizedBox(height: 8),
-                _construireLivreEnVente('Physique Générale', '18,00 €', 'Vendu'),
+                // Liste des livres récents (tous types)
+                if (_mesLivres.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      'Aucun livre ajouté',
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontStyle: FontStyle.italic,
+                        fontSize: 12,
+                      ),
+                    ),
+                  )
+                else
+                  ..._mesLivres.take(3).map((livre) => Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: _construireLivreEnVente(
+                      livre.titre,
+                      livre.prix != null && livre.prix! > 0 
+                        ? '${livre.prix!.toStringAsFixed(2)} €' 
+                        : 'Gratuit',
+                      livre.estDisponible 
+                        ? (livre.prix != null && livre.prix! > 0 ? 'En vente' : 'Disponible')
+                        : 'Vendu',
+                    ),
+                  )).toList(),
                 
                 const SizedBox(height: 12),
           SizedBox(
@@ -328,11 +503,11 @@ class _ProfilEcranState extends State<ProfilEcran> {
                   MaterialPageRoute(builder: (context) => const GererLivresEcran()),
                 ),
               style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: CouleursApp.principal),
+                      side: const BorderSide(color: CouleursApp.principal),
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
-              child: Text(
+              child: const Text(
                       'Ajouter un livre',
                       style: TextStyle(
                         color: CouleursApp.principal,
@@ -387,17 +562,37 @@ class _ProfilEcranState extends State<ProfilEcran> {
         children: [
           Row(
             children: [
-              Icon(Icons.event_seat, color: CouleursApp.accent, size: 24),
+              const Icon(Icons.event_seat, color: CouleursApp.accent, size: 24),
               const SizedBox(width: 12),
               Text('Mes Réservations', style: StylesTexteApp.titre.copyWith(fontSize: 18)),
             ],
           ),
           const SizedBox(height: 16),
           
-          // Liste des réservations (simulées)
-          _construireReservation('Salle 302A', 'Aujourd\'hui 14h-16h', 'Confirmée', Colors.green),
-          const SizedBox(height: 12),
-          _construireReservation('Salle 105B', 'Demain 10h-12h', 'En attente', Colors.orange),
+          // Liste des vraies réservations
+          if (_mesReservations.isEmpty)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text(
+                  'Aucune réservation en cours',
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ),
+            )
+          else
+            ..._mesReservations.map((reservation) => Padding(
+              padding: const EdgeInsets.only(bottom: 12.0),
+              child: _construireReservation(
+                _obtenirNomSalle(reservation.salleId),
+                '${_formaterDate(reservation.dateReservation)} ${_formaterHeure(reservation.heureDebut)}-${_formaterHeure(reservation.heureFin)}',
+                reservation.statut,
+                _obtenirCouleurStatutReservation(reservation.statut),
+              ),
+            )).toList(),
           
           const SizedBox(height: 16),
           SizedBox(
@@ -408,11 +603,11 @@ class _ProfilEcranState extends State<ProfilEcran> {
                 MaterialPageRoute(builder: (context) => const SallesEcran()),
               ),
               style: OutlinedButton.styleFrom(
-                side: BorderSide(color: CouleursApp.accent),
+                side: const BorderSide(color: CouleursApp.accent),
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
-              child: Text(
+              child: const Text(
                 'Réserver une salle',
                 style: TextStyle(
                   color: CouleursApp.accent,
@@ -430,7 +625,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
   Widget _construireReservation(String salle, String creneau, String statut, Color couleurStatut) {
     return Row(
       children: [
-        Icon(Icons.meeting_room, color: CouleursApp.accent, size: 20),
+        const Icon(Icons.meeting_room, color: CouleursApp.accent, size: 20),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
@@ -438,7 +633,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
             children: [
               Text(
                 salle,
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: CouleursApp.texteFonce),
+                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: CouleursApp.texteFonce),
               ),
               Text(
                 creneau,
@@ -478,7 +673,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
   Widget _construireLivreEnVente(String titre, String prix, String statut) {
     return Row(
       children: [
-        Icon(Icons.menu_book, color: CouleursApp.principal, size: 20),
+        const Icon(Icons.menu_book, color: CouleursApp.principal, size: 20),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
@@ -486,11 +681,11 @@ class _ProfilEcranState extends State<ProfilEcran> {
             children: [
               Text(
                 titre,
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: CouleursApp.texteFonce),
+                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: CouleursApp.texteFonce),
               ),
               Text(
                 prix,
-                style: TextStyle(fontSize: 12, color: CouleursApp.accent, fontWeight: FontWeight.w600),
+                style: const TextStyle(fontSize: 12, color: CouleursApp.accent, fontWeight: FontWeight.w600),
               ),
             ],
           ),
@@ -498,14 +693,20 @@ class _ProfilEcranState extends State<ProfilEcran> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: statut == 'En vente' ? Colors.green.withOpacity(0.1) : Colors.grey.withOpacity(0.1),
+            color: statut == 'En vente' ? Colors.green.withOpacity(0.1) :
+                statut == 'Vendu' ? Colors.orange.withOpacity(0.1) :
+                statut == 'Disponible' ? Colors.blue.withOpacity(0.1) :
+                Colors.grey.withOpacity(0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(
             statut,
             style: TextStyle(
               fontSize: 11,
-              color: statut == 'En vente' ? Colors.green : Colors.grey,
+              color: statut == 'En vente' ? Colors.green :
+                     statut == 'Vendu' ? Colors.orange :
+                     statut == 'Disponible' ? Colors.blue :
+                     Colors.grey,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -518,43 +719,6 @@ class _ProfilEcranState extends State<ProfilEcran> {
     );
   }
 
-  // Actions pour les réservations
-  void _gererReservations(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Gérer mes réservations', style: StylesTexteApp.titre.copyWith(fontSize: 18)),
-            const SizedBox(height: 20),
-            ListTile(
-              leading: Icon(Icons.list, color: CouleursApp.accent),
-              title: const Text('Voir toutes mes réservations'),
-              onTap: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Affichage de toutes les réservations - À venir')),
-                );
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.add, color: CouleursApp.principal),
-              title: const Text('Nouvelle réservation'),
-              onTap: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Redirection vers les salles - À venir')),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   void _gererReservation(String salle) {
     showModalBottomSheet(
@@ -568,7 +732,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
             Text('Réservation - $salle', style: StylesTexteApp.titre.copyWith(fontSize: 18)),
             const SizedBox(height: 20),
             ListTile(
-              leading: Icon(Icons.edit, color: CouleursApp.accent),
+              leading: const Icon(Icons.edit, color: CouleursApp.accent),
               title: const Text('Modifier la réservation'),
               onTap: () {
                 Navigator.pop(context);
@@ -599,12 +763,12 @@ class _ProfilEcranState extends State<ProfilEcran> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Annuler la réservation'),
+        title: const Text('Annuler la réservation'),
         content: Text('Êtes-vous sûr de vouloir annuler votre réservation pour $salle ?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Non'),
+            child: const Text('Non'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -618,50 +782,14 @@ class _ProfilEcranState extends State<ProfilEcran> {
               );
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: Text('Oui, annuler', style: TextStyle(color: CouleursApp.blanc)),
+            child: const Text('Oui, annuler', style: TextStyle(color: CouleursApp.blanc)),
           ),
         ],
       ),
     );
   }
 
-  // Actions pour les livres en vente
-  void _gererLivresEnVente(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Gérer mes ventes', style: StylesTexteApp.titre.copyWith(fontSize: 18)),
-            const SizedBox(height: 20),
-            ListTile(
-              leading: Icon(Icons.list, color: CouleursApp.principal),
-              title: const Text('Voir tous mes livres en vente'),
-              onTap: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Affichage de tous les livres en vente - À venir')),
-                );
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.add, color: CouleursApp.accent),
-              title: const Text('Mettre un livre en vente'),
-              onTap: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Redirection vers mes livres - À venir')),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+
 
   void _gererLivreEnVente(String titre) {
     showModalBottomSheet(
@@ -675,7 +803,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
             Text('Livre - $titre', style: StylesTexteApp.titre.copyWith(fontSize: 18)),
             const SizedBox(height: 20),
             ListTile(
-              leading: Icon(Icons.edit, color: CouleursApp.accent),
+              leading: const Icon(Icons.edit, color: CouleursApp.accent),
               title: const Text('Modifier le prix'),
               onTap: () {
                 Navigator.pop(context);
@@ -701,7 +829,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Modifier le prix'),
+        title: const Text('Modifier le prix'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -709,7 +837,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
             const SizedBox(height: 16),
             TextFormField(
               controller: prixController,
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
               decoration: InputDecoration(
                 labelText: 'Nouveau prix (€)',
                 hintText: 'Ex: 12.50',
@@ -721,7 +849,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Annuler'),
+            child: const Text('Annuler'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -735,7 +863,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
               );
             },
             style: ElevatedButton.styleFrom(backgroundColor: CouleursApp.accent),
-            child: Text('Confirmer', style: TextStyle(color: CouleursApp.blanc)),
+            child: const Text('Confirmer', style: TextStyle(color: CouleursApp.blanc)),
           ),
         ],
       ),
@@ -746,12 +874,12 @@ class _ProfilEcranState extends State<ProfilEcran> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Retirer de la vente'),
+        title: const Text('Retirer de la vente'),
         content: Text('Êtes-vous sûr de vouloir retirer "$titre" de la vente ?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Annuler'),
+            child: const Text('Annuler'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -765,7 +893,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
               );
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-            child: Text('Oui, retirer', style: TextStyle(color: CouleursApp.blanc)),
+            child: const Text('Oui, retirer', style: TextStyle(color: CouleursApp.blanc)),
           ),
         ],
       ),
@@ -793,28 +921,55 @@ class _ProfilEcranState extends State<ProfilEcran> {
         children: [
           Row(
             children: [
-              Icon(Icons.groups, color: CouleursApp.principal, size: 24),
+              const Icon(Icons.groups, color: CouleursApp.principal, size: 24),
               const SizedBox(width: 12),
               Text('Mes Associations', style: StylesTexteApp.titre.copyWith(fontSize: 18)),
             ],
           ),
           const SizedBox(height: 16),
-          _construireAssociation('AEI', 'Membre actif', Icons.school, CouleursApp.principal),
-          const SizedBox(height: 12),
-          _construireAssociation('Club Photo', 'Membre', Icons.camera_alt, CouleursApp.accent),
-          const SizedBox(height: 12),
-          _construireAssociation('AGE', 'Membre', Icons.groups_2, CouleursApp.principal),
+          // Affichage des vraies associations
+          if (_mesAssociations.isEmpty)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text(
+                  'Aucune association rejointe',
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ),
+            )
+          else
+            ...List.generate(_mesAssociations.length, (index) {
+              final association = _mesAssociations[index];
+              final couleurs = [CouleursApp.principal, CouleursApp.accent, Colors.purple, Colors.orange, Colors.green];
+              final couleur = couleurs[index % couleurs.length];
+              final icones = [Icons.school, Icons.camera_alt, Icons.groups_2, Icons.sports, Icons.science];
+              final icone = icones[index % icones.length];
+              
+              return Padding(
+                padding: EdgeInsets.only(bottom: index < _mesAssociations.length - 1 ? 12.0 : 0),
+                child: _construireAssociation(
+                  association.nom,
+                  'Membre', // Rôle par défaut (pourrait être récupéré du membership)
+                  icone,
+                  couleur,
+                ),
+              );
+            }),
           const SizedBox(height: 16),
           SizedBox(
             width: double.infinity,
             child: OutlinedButton(
               onPressed: () => NavigationService.gererNavigationNavBar(context, 3),
               style: OutlinedButton.styleFrom(
-                side: BorderSide(color: CouleursApp.accent),
+                side: const BorderSide(color: CouleursApp.accent),
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
-              child: Text(
+              child: const Text(
                 'Explorer les associations',
                 style: TextStyle(color: CouleursApp.accent, fontWeight: FontWeight.w600),
               ),
@@ -837,7 +992,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
             children: [
               Text(
                 nom,
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: CouleursApp.texteFonce),
+                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: CouleursApp.texteFonce),
               ),
               Text(
                 statut,
@@ -872,7 +1027,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),
-              child: Text(
+              child: const Text(
                 'Modifier le profil',
                 style: TextStyle(
                   color: CouleursApp.blanc,
