@@ -1,4 +1,5 @@
 import '../models/actualite_model.dart';
+import '../../domain/entities/actualite.dart';
 
 // UI Design: Source de données locale simulée pour les actualités d'associations
 class ActualitesDatasourceLocal {
@@ -219,5 +220,43 @@ class ActualitesDatasourceLocal {
       return true;
     }
     return false;
+  }
+
+  // Clean Architecture: Ajouter une actualité
+  Future<ActualiteModel> ajouterActualite(Actualite actualite) async {
+    await Future.delayed(const Duration(milliseconds: 200));
+    final model = ActualiteModel.fromEntity(actualite);
+    _actualitesSimulees.add(model.toMap());
+    return model;
+  }
+
+  // Clean Architecture: Mettre à jour une actualité
+  Future<ActualiteModel> mettreAJourActualite(Actualite actualite) async {
+    await Future.delayed(const Duration(milliseconds: 200));
+    final index = _actualitesSimulees.indexWhere((a) => a['id'] == actualite.id);
+    final model = ActualiteModel.fromEntity(actualite);
+    if (index != -1) {
+      _actualitesSimulees[index] = model.toMap();
+    } else {
+      _actualitesSimulees.add(model.toMap());
+    }
+    return model;
+  }
+
+  // Clean Architecture: Supprimer une actualité
+  Future<bool> supprimerActualite(String id) async {
+    await Future.delayed(const Duration(milliseconds: 150));
+    final before = _actualitesSimulees.length;
+    _actualitesSimulees.removeWhere((a) => a['id'] == id);
+    return _actualitesSimulees.length < before;
+  }
+
+  // Clean Architecture: Récupérer par priorité
+  Future<List<ActualiteModel>> obtenirActualitesParPriorite(String priorite) async {
+    await Future.delayed(const Duration(milliseconds: 250));
+    return _actualitesSimulees
+        .where((data) => (data['priorite'] ?? 'normale') == priorite)
+        .map((data) => ActualiteModel.fromMap(data))
+        .toList();
   }
 } 

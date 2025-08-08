@@ -8,7 +8,7 @@ class EvenementsRepositoryImpl implements EvenementsRepository {
   EvenementsRepositoryImpl(this._datasource);
 
   @override
-  Future<List<Evenement>> obtenirTousLesEvenements() {
+  Future<List<Evenement>> obtenirEvenements() {
     return _datasource.obtenirTousLesEvenements();
   }
 
@@ -27,69 +27,49 @@ class EvenementsRepositoryImpl implements EvenementsRepository {
     return _datasource.obtenirEvenementParId(id);
   }
 
-  @override
   Future<List<Evenement>> rechercherEvenements(String terme) {
     return _datasource.rechercherEvenements(terme);
   }
 
-  @override
-  Future<List<Evenement>> obtenirEvenements() async {
-    return await obtenirTousLesEvenements();
-  }
+  
 
   @override
   Future<List<Evenement>> obtenirEvenementsParAssociation(String associationId) async {
-    // TODO: Implémenter dans le datasource
-    await Future.delayed(const Duration(milliseconds: 500)); // Simulation
-    return [];
+    return _datasource.obtenirEvenementsParAssociation(associationId);
   }
 
   @override
   Future<Evenement> ajouterEvenement(Evenement evenement) async {
-    // TODO: Implémenter dans le datasource
-    await Future.delayed(const Duration(milliseconds: 500)); // Simulation
-    return evenement;
+    return _datasource.ajouterEvenement(evenement);
   }
 
   @override
   Future<Evenement> mettreAJourEvenement(Evenement evenement) async {
-    // TODO: Implémenter dans le datasource
-    await Future.delayed(const Duration(milliseconds: 500)); // Simulation
-    return evenement;
+    return _datasource.mettreAJourEvenement(evenement);
   }
 
   @override
   Future<bool> supprimerEvenement(String id) async {
-    // TODO: Implémenter dans le datasource
-    await Future.delayed(const Duration(milliseconds: 500)); // Simulation
-    return true;
+    return _datasource.supprimerEvenement(id);
   }
 
   @override
   Future<List<Evenement>> obtenirEvenementsParPeriode(DateTime debut, DateTime fin) async {
-    // TODO: Implémenter dans le datasource
-    await Future.delayed(const Duration(milliseconds: 500)); // Simulation
-    return [];
+    return _datasource.obtenirEvenementsParPeriode(debut, fin);
   }
 
   @override
   Future<bool> peutSInscrire(String evenementId, String utilisateurId) async {
-    // TODO: Implémenter dans le datasource
-    await Future.delayed(const Duration(milliseconds: 500)); // Simulation
-    return true;
+    return _datasource.peutSInscrire(evenementId, utilisateurId);
   }
 
   @override
   Future<bool> inscrireUtilisateur(String evenementId, String utilisateurId) async {
-    // TODO: Implémenter dans le datasource
-    await Future.delayed(const Duration(milliseconds: 500)); // Simulation
-    return true;
+    return _datasource.inscrireUtilisateur(evenementId, utilisateurId);
   }
 
   @override
   Future<bool> desinscrireUtilisateur(String evenementId, String utilisateurId) async {
-    // TODO: Implémenter dans le datasource
-    await Future.delayed(const Duration(milliseconds: 500)); // Simulation
-    return true;
+    return _datasource.desinscrireUtilisateur(evenementId, utilisateurId);
   }
 } 

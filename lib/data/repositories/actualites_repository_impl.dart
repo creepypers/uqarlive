@@ -9,7 +9,7 @@ class ActualitesRepositoryImpl implements ActualitesRepository {
   ActualitesRepositoryImpl(this._datasourceLocal);
 
   @override
-  Future<List<Actualite>> obtenirToutesLesActualites() async {
+  Future<List<Actualite>> obtenirActualites() async {
     try {
       final models = await _datasourceLocal.obtenirToutesLesActualites();
       return models.map((model) => model.toEntity()).toList();
@@ -38,7 +38,6 @@ class ActualitesRepositoryImpl implements ActualitesRepository {
     }
   }
 
-  @override
   Future<List<Actualite>> rechercherActualites(String terme) async {
     try {
       final models = await _datasourceLocal.rechercherActualites(terme);
@@ -58,7 +57,6 @@ class ActualitesRepositoryImpl implements ActualitesRepository {
     }
   }
 
-  @override
   Future<bool> likerActualite(String id) async {
     try {
       return await _datasourceLocal.likerActualite(id);
@@ -67,7 +65,6 @@ class ActualitesRepositoryImpl implements ActualitesRepository {
     }
   }
 
-  @override
   Future<bool> marquerCommeVue(String id) async {
     try {
       return await _datasourceLocal.marquerCommeVue(id);
@@ -77,35 +74,41 @@ class ActualitesRepositoryImpl implements ActualitesRepository {
   }
 
   @override
-  Future<List<Actualite>> obtenirActualites() async {
-    return await obtenirToutesLesActualites();
-  }
-
-  @override
   Future<Actualite> ajouterActualite(Actualite actualite) async {
-    // TODO: Implémenter dans le datasource
-    await Future.delayed(const Duration(milliseconds: 500)); // Simulation
-    return actualite;
+    try {
+      final model = await _datasourceLocal.ajouterActualite(actualite);
+      return model.toEntity();
+    } catch (e) {
+      throw Exception('Erreur lors de l\'ajout de l\'actualité: $e');
+    }
   }
 
   @override
   Future<Actualite> mettreAJourActualite(Actualite actualite) async {
-    // TODO: Implémenter dans le datasource
-    await Future.delayed(const Duration(milliseconds: 500)); // Simulation
-    return actualite;
+    try {
+      final model = await _datasourceLocal.mettreAJourActualite(actualite);
+      return model.toEntity();
+    } catch (e) {
+      throw Exception('Erreur lors de la mise à jour de l\'actualité: $e');
+    }
   }
 
   @override
   Future<bool> supprimerActualite(String id) async {
-    // TODO: Implémenter dans le datasource
-    await Future.delayed(const Duration(milliseconds: 500)); // Simulation
-    return true;
+    try {
+      return await _datasourceLocal.supprimerActualite(id);
+    } catch (e) {
+      throw Exception('Erreur lors de la suppression de l\'actualité: $e');
+    }
   }
 
   @override
   Future<List<Actualite>> obtenirActualitesParPriorite(String priorite) async {
-    // TODO: Implémenter dans le datasource
-    await Future.delayed(const Duration(milliseconds: 500)); // Simulation
-    return [];
+    try {
+      final models = await _datasourceLocal.obtenirActualitesParPriorite(priorite);
+      return models.map((m) => m.toEntity()).toList();
+    } catch (e) {
+      throw Exception('Erreur lors de la récupération des actualités par priorité: $e');
+    }
   }
 } 

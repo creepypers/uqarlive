@@ -88,4 +88,73 @@ class EvenementsDatasourceLocal {
       event.organisateur.toLowerCase().contains(termeMin)
     ).toList();
   }
+
+  // Clean Architecture: Récupérer par association (simulation via organisateur)
+  Future<List<Evenement>> obtenirEvenementsParAssociation(String associationIdOuNom) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    // Hypothèse: on identifie l'association via le champ organisateur (nom)
+    return _evenements.where((e) => e.organisateur == associationIdOuNom).toList();
+  }
+
+  // Clean Architecture: Ajouter un événement
+  Future<Evenement> ajouterEvenement(Evenement evenement) async {
+    await Future.delayed(const Duration(milliseconds: 200));
+    _evenements.add(evenement);
+    return evenement;
+  }
+
+  // Clean Architecture: Mettre à jour un événement
+  Future<Evenement> mettreAJourEvenement(Evenement evenement) async {
+    await Future.delayed(const Duration(milliseconds: 200));
+    final index = _evenements.indexWhere((e) => e.id == evenement.id);
+    if (index != -1) {
+      _evenements[index] = evenement;
+    } else {
+      _evenements.add(evenement);
+    }
+    return evenement;
+  }
+
+  // Clean Architecture: Supprimer un événement
+  Future<bool> supprimerEvenement(String id) async {
+    await Future.delayed(const Duration(milliseconds: 150));
+    final before = _evenements.length;
+    _evenements.removeWhere((e) => e.id == id);
+    return _evenements.length < before;
+  }
+
+  // Clean Architecture: Récupérer par période
+  Future<List<Evenement>> obtenirEvenementsParPeriode(DateTime debut, DateTime fin) async {
+    await Future.delayed(const Duration(milliseconds: 250));
+    return _evenements.where((e) => !e.dateDebut.isAfter(fin) && !e.dateFin.isBefore(debut)).toList();
+  }
+
+  // Clean Architecture: Gestion des inscriptions
+  Future<bool> peutSInscrire(String evenementId, String utilisateurId) async {
+    await Future.delayed(const Duration(milliseconds: 120));
+    final ev = _evenements.firstWhere((e) => e.id == evenementId, orElse: () => throw Exception('Événement introuvable'));
+    if (!ev.inscriptionRequise) return true;
+    if (ev.capaciteMaximale == null) return true;
+    return ev.nombreInscrits < ev.capaciteMaximale!;
+  }
+
+  Future<bool> inscrireUtilisateur(String evenementId, String utilisateurId) async {
+    await Future.delayed(const Duration(milliseconds: 150));
+    final index = _evenements.indexWhere((e) => e.id == evenementId);
+    if (index == -1) return false;
+    final ev = _evenements[index];
+    if (ev.capaciteMaximale != null && ev.nombreInscrits >= ev.capaciteMaximale!) return false;
+    _evenements[index] = ev.copyWith(nombreInscrits: ev.nombreInscrits + 1);
+    return true;
+  }
+
+  Future<bool> desinscrireUtilisateur(String evenementId, String utilisateurId) async {
+    await Future.delayed(const Duration(milliseconds: 150));
+    final index = _evenements.indexWhere((e) => e.id == evenementId);
+    if (index == -1) return false;
+    final ev = _evenements[index];
+    if (ev.nombreInscrits <= 0) return false;
+    _evenements[index] = ev.copyWith(nombreInscrits: ev.nombreInscrits - 1);
+    return true;
+  }
 } 
