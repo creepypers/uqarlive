@@ -147,16 +147,27 @@ class _ProfilEcranState extends State<ProfilEcran> {
 
   @override
   Widget build(BuildContext context) {
+    // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
+    final mediaQuery = MediaQuery.of(context);
+    final screenHeight = mediaQuery.size.height;
+    final screenWidth = mediaQuery.size.width;
+    final padding = mediaQuery.padding;
+    final viewInsets = mediaQuery.viewInsets;
+    
     // UI Design: Affichage d'un indicateur de chargement si les données ne sont pas encore disponibles
     if (_chargementEnCours || _utilisateurActuel == null) {
-      return const Scaffold(
+      return Scaffold(
         backgroundColor: CouleursApp.fond,
-        body: Center(child: CircularProgressIndicator()),
+        resizeToAvoidBottomInset: true, // UI Design: Éviter les débordements avec le clavier
+        body: SafeArea(
+          child: const Center(child: CircularProgressIndicator()),
+        ),
       );
     }
 
     return Scaffold(
       backgroundColor: CouleursApp.fond,
+      resizeToAvoidBottomInset: true, // UI Design: Éviter les débordements avec le clavier
       appBar: WidgetBarreAppPersonnalisee(
         titre: '${_utilisateurActuel!.prenom} ${_utilisateurActuel!.nom}', // UI Design: Nom dynamique
         sousTitre: '${_utilisateurActuel!.codeEtudiant}\n${_utilisateurActuel!.programme}', // UI Design: Informations dynamiques
@@ -203,15 +214,20 @@ class _ProfilEcranState extends State<ProfilEcran> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
+          padding: EdgeInsets.only(
+            bottom: padding.bottom + viewInsets.bottom + 16, // UI Design: Padding adaptatif pour éviter les débordements
+            left: 16,
+            right: 16,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 16),
+              SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
               
               // Section statistiques dynamiques - UI Design: Basées sur l'utilisateur connecté
               Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-                padding: const EdgeInsets.all(20),
+                margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.02), // UI Design: Marges adaptatives
+                padding: EdgeInsets.all(screenWidth * 0.04), // UI Design: Padding adaptatif
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
@@ -240,25 +256,23 @@ class _ProfilEcranState extends State<ProfilEcran> {
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
               
               // Section mes livres - VERSION OPTIMISÉE
               _construireSectionLivres(context),
-              const SizedBox(height: 24),
+              SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
               
               // Section mes réservations - NOUVELLE
               _construireSectionReservations(context),
-              const SizedBox(height: 24),
-              
-
+              SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
               
               // Section mes associations - VERSION OPTIMISÉE
               _construireSectionAssociations(context),
-              const SizedBox(height: 24),
+              SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
               
               // Section actions - BOUTONS PRINCIPAUX
               _construireSectionActions(context),
-              const SizedBox(height: 20),
+              SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
             ],
           ),
         ),
@@ -371,42 +385,51 @@ class _ProfilEcranState extends State<ProfilEcran> {
 
   // UI Design: Helper pour créer une statistique
   Widget _construireStatistique(String valeur, String label, IconData icone, Color couleur) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-            color: couleur.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(12),
+    return Flexible( // UI Design: Widget flexible pour éviter les débordements
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+              color: couleur.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icone, size: 24, color: couleur),
           ),
-          child: Icon(icone, size: 24, color: couleur),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          valeur,
-                  style: TextStyle(
-            fontSize: 20,
-                    fontWeight: FontWeight.bold,
-            color: couleur,
-          ),
-        ),
+          const SizedBox(height: 8),
           Text(
-          label,
-            style: TextStyle(
-            fontSize: 11,
-            color: CouleursApp.texteFonce.withValues(alpha: 0.7),
+            valeur,
+                    style: TextStyle(
+              fontSize: 20,
+                      fontWeight: FontWeight.bold,
+              color: couleur,
+            ),
+            overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+            maxLines: 1,
           ),
-          textAlign: TextAlign.center,
-        ),
-      ],
+            Text(
+            label,
+              style: TextStyle(
+              fontSize: 11,
+              color: CouleursApp.texteFonce.withValues(alpha: 0.7),
+            ),
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+            maxLines: 2,
+          ),
+        ],
+      ),
     );
   }
 
   // UI Design: Section mes livres - FONCTIONNELLE
   Widget _construireSectionLivres(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(20),
+      margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.02), // UI Design: Marges adaptatives
+      padding: EdgeInsets.all(screenWidth * 0.04), // UI Design: Padding adaptatif
       decoration: BoxDecoration(
         color: CouleursApp.blanc,
         borderRadius: BorderRadius.circular(16),
@@ -425,7 +448,14 @@ class _ProfilEcranState extends State<ProfilEcran> {
             children: [
               const Icon(Icons.menu_book, color: CouleursApp.principal, size: 24),
               const SizedBox(width: 12),
-              Text('Mes Livres', style: StylesTexteApp.titre.copyWith(fontSize: 18)),
+              Expanded( // UI Design: Widget flexible pour éviter les débordements
+                child: Text(
+                  'Mes Livres', 
+                  style: StylesTexteApp.titre.copyWith(fontSize: 18),
+                  overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                  maxLines: 1,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 16),
@@ -455,12 +485,16 @@ class _ProfilEcranState extends State<ProfilEcran> {
                   children: [
                     Icon(Icons.menu_book, color: CouleursApp.principal, size: 20),
                     SizedBox(width: 8),
-                    Text(
-                      'Mes Livres Récents',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: CouleursApp.principal,
+                    Expanded( // UI Design: Widget flexible pour éviter les débordements
+                      child: Text(
+                        'Mes Livres Récents',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: CouleursApp.principal,
+                        ),
+                        overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                        maxLines: 1,
                       ),
                     ),
                   ],
@@ -495,19 +529,19 @@ class _ProfilEcranState extends State<ProfilEcran> {
                   )).toList(),
                 
                 const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton(
-                              onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const GererLivresEcran()),
-                ),
-              style: OutlinedButton.styleFrom(
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const GererLivresEcran()),
+                    ),
+                    style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: CouleursApp.principal),
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              ),
-              child: const Text(
+                    ),
+                    child: const Text(
                       'Ajouter un livre',
                       style: TextStyle(
                         color: CouleursApp.principal,
@@ -516,7 +550,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
                       ),
                     ),
                   ),
-              ),
+                ),
               ],
             ),
           ),
@@ -527,25 +561,35 @@ class _ProfilEcranState extends State<ProfilEcran> {
 
   // UI Design: Helper pour info livre
   Widget _construireInfoLivre(String nombre, String type, Color couleur) {
-    return Column(
-      children: [
-        Text(
-          nombre,
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: couleur),
-        ),
-        Text(
-          type,
-          style: TextStyle(fontSize: 12, color: CouleursApp.texteFonce.withValues(alpha: 0.6)),
-        ),
-      ],
+    return Flexible( // UI Design: Widget flexible pour éviter les débordements
+      child: Column(
+        children: [
+          Text(
+            nombre,
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: couleur),
+            overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+            maxLines: 1,
+          ),
+          Text(
+            type,
+            style: TextStyle(fontSize: 12, color: CouleursApp.texteFonce.withValues(alpha: 0.6)),
+            overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+            maxLines: 1,
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 
   // UI Design: Section mes réservations - NOUVELLE
   Widget _construireSectionReservations(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(20),
+      margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.02), // UI Design: Marges adaptatives
+      padding: EdgeInsets.all(screenWidth * 0.04), // UI Design: Padding adaptatif
       decoration: BoxDecoration(
         color: CouleursApp.blanc,
         borderRadius: BorderRadius.circular(16),
@@ -564,7 +608,14 @@ class _ProfilEcranState extends State<ProfilEcran> {
             children: [
               const Icon(Icons.event_seat, color: CouleursApp.accent, size: 24),
               const SizedBox(width: 12),
-              Text('Mes Réservations', style: StylesTexteApp.titre.copyWith(fontSize: 18)),
+              Expanded( // UI Design: Widget flexible pour éviter les débordements
+                child: Text(
+                  'Mes Réservations', 
+                  style: StylesTexteApp.titre.copyWith(fontSize: 18),
+                  overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                  maxLines: 1,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 16),
@@ -634,10 +685,14 @@ class _ProfilEcranState extends State<ProfilEcran> {
               Text(
                 salle,
                 style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: CouleursApp.texteFonce),
+                overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                maxLines: 1,
               ),
               Text(
                 creneau,
                 style: TextStyle(fontSize: 12, color: CouleursApp.texteFonce.withValues(alpha: 0.6)),
+                overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                maxLines: 1,
               ),
             ],
           ),
@@ -655,19 +710,19 @@ class _ProfilEcranState extends State<ProfilEcran> {
               color: couleurStatut,
               fontWeight: FontWeight.w600,
             ),
+            overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+            maxLines: 1,
           ),
         ),
-                 Builder(
-           builder: (context) => IconButton(
-             icon: Icon(Icons.more_vert, color: CouleursApp.texteFonce.withValues(alpha: 0.5), size: 18),
-             onPressed: () => _gererReservation(salle),
-           ),
-         ),
+        Builder(
+          builder: (context) => IconButton(
+            icon: Icon(Icons.more_vert, color: CouleursApp.texteFonce.withValues(alpha: 0.5), size: 18),
+            onPressed: () => _gererReservation(salle),
+          ),
+        ),
       ],
     );
   }
-
-
 
   // UI Design: Helper pour un livre en vente
   Widget _construireLivreEnVente(String titre, String prix, String statut) {
@@ -682,10 +737,14 @@ class _ProfilEcranState extends State<ProfilEcran> {
               Text(
                 titre,
                 style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: CouleursApp.texteFonce),
+                overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                maxLines: 1,
               ),
               Text(
                 prix,
                 style: const TextStyle(fontSize: 12, color: CouleursApp.accent, fontWeight: FontWeight.w600),
+                overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                maxLines: 1,
               ),
             ],
           ),
@@ -709,11 +768,13 @@ class _ProfilEcranState extends State<ProfilEcran> {
                      Colors.grey,
               fontWeight: FontWeight.w600,
             ),
+            overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+            maxLines: 1,
           ),
         ),
         IconButton(
           icon: Icon(Icons.more_vert, color: CouleursApp.texteFonce.withValues(alpha: 0.5), size: 18),
-                     onPressed: () => _gererLivreEnVente(titre),
+          onPressed: () => _gererLivreEnVente(titre),
         ),
       ],
     );
@@ -902,9 +963,12 @@ class _ProfilEcranState extends State<ProfilEcran> {
 
   // UI Design: Section mes associations - FONCTIONNELLE
   Widget _construireSectionAssociations(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(20),
+      margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.02), // UI Design: Marges adaptatives
+      padding: EdgeInsets.all(screenWidth * 0.04), // UI Design: Padding adaptatif
       decoration: BoxDecoration(
         color: CouleursApp.blanc,
         borderRadius: BorderRadius.circular(16),
@@ -923,7 +987,14 @@ class _ProfilEcranState extends State<ProfilEcran> {
             children: [
               const Icon(Icons.groups, color: CouleursApp.principal, size: 24),
               const SizedBox(width: 12),
-              Text('Mes Associations', style: StylesTexteApp.titre.copyWith(fontSize: 18)),
+              Expanded( // UI Design: Widget flexible pour éviter les débordements
+                child: Text(
+                  'Mes Associations', 
+                  style: StylesTexteApp.titre.copyWith(fontSize: 18),
+                  overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                  maxLines: 1,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 16),
@@ -993,10 +1064,14 @@ class _ProfilEcranState extends State<ProfilEcran> {
               Text(
                 nom,
                 style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: CouleursApp.texteFonce),
+                overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                maxLines: 1,
               ),
               Text(
                 statut,
                 style: TextStyle(fontSize: 12, color: CouleursApp.texteFonce.withValues(alpha: 0.6)),
+                overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                maxLines: 1,
               ),
             ],
           ),
@@ -1014,8 +1089,11 @@ class _ProfilEcranState extends State<ProfilEcran> {
 
   // UI Design: Section actions - BOUTONS PRINCIPAUX
   Widget _construireSectionActions(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02), // UI Design: Marges adaptatives
       child: Column(
         children: [
           SizedBox(
@@ -1023,7 +1101,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
             child: ElevatedButton(
               onPressed: () => _ouvrirModifierProfil(context),
               style: ElevatedButton.styleFrom(
-        backgroundColor: CouleursApp.accent,
+                backgroundColor: CouleursApp.accent,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),

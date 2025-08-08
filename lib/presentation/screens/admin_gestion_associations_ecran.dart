@@ -79,54 +79,78 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
 
   @override
   Widget build(BuildContext context) {
+    // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
+    final mediaQuery = MediaQuery.of(context);
+    final screenHeight = mediaQuery.size.height;
+    final screenWidth = mediaQuery.size.width;
+    final padding = mediaQuery.padding;
+    final viewInsets = mediaQuery.viewInsets;
+    
     return Scaffold(
       backgroundColor: CouleursApp.fond,
+      resizeToAvoidBottomInset: true, // UI Design: Éviter les débordements avec le clavier
       appBar: const WidgetBarreAppNavigationAdmin(
         titre: 'Gestion Associations',
         sousTitre: 'Gérer les associations, actualités et événements',
         sectionActive: 'associations',
       ),
-      body: _chargementEnCours 
-        ? const Center(child: CircularProgressIndicator())
-        : Column(
-            children: [
-              // UI Design: Barre d'onglets avec thème UQAR
-              Container(
-                color: CouleursApp.blanc,
-                child: TabBar(
-                  controller: _tabController,
-                  labelColor: CouleursApp.principal,
-                  unselectedLabelColor: Colors.grey,
-                  indicatorColor: CouleursApp.principal,
-                  tabs: const [
-                    Tab(
-                      icon: Icon(Icons.groups),
-                      text: 'Associations',
+      body: SafeArea(
+        child: _chargementEnCours 
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
+              children: [
+                // UI Design: Barre d'onglets avec thème UQAR
+                Container(
+                  color: CouleursApp.blanc,
+                  child: TabBar(
+                    controller: _tabController,
+                    labelColor: CouleursApp.principal,
+                    unselectedLabelColor: Colors.grey,
+                    indicatorColor: CouleursApp.principal,
+                    labelStyle: TextStyle(
+                      fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
+                      fontWeight: FontWeight.w600,
                     ),
-                    Tab(
-                      icon: Icon(Icons.newspaper),
-                      text: 'Actualités',
+                    unselectedLabelStyle: TextStyle(
+                      fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
+                      fontWeight: FontWeight.normal,
                     ),
-                    Tab(
-                      icon: Icon(Icons.event),
-                      text: 'Événements',
-                    ),
-                  ],
+                    tabs: [
+                      Tab(
+                        icon: Icon(Icons.groups, size: screenWidth * 0.06), // UI Design: Taille adaptative
+                        text: 'Associations',
+                      ),
+                      Tab(
+                        icon: Icon(Icons.newspaper, size: screenWidth * 0.06), // UI Design: Taille adaptative
+                        text: 'Actualités',
+                      ),
+                      Tab(
+                        icon: Icon(Icons.event, size: screenWidth * 0.06), // UI Design: Taille adaptative
+                        text: 'Événements',
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              // UI Design: Contenu des onglets
-              Expanded(
-                child: TabBarView(
-                  controller: _tabController,
-                  children: [
-                    _construireOngletAssociations(),
-                    _construireOngletActualites(),
-                    _construireOngletEvenements(),
-                  ],
+                // UI Design: Contenu des onglets
+                Expanded(
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      _construireOngletAssociations(),
+                      _construireOngletActualites(),
+                      _construireOngletEvenements(),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _ajouterAssociation(),
+        backgroundColor: CouleursApp.principal,
+        foregroundColor: CouleursApp.blanc,
+        child: Icon(Icons.add, size: screenWidth * 0.06), // UI Design: Taille adaptative
+      ),
     );
   }
 

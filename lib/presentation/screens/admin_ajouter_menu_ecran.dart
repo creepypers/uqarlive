@@ -80,10 +80,18 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
 
   @override
   Widget build(BuildContext context) {
+    // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
+    final mediaQuery = MediaQuery.of(context);
+    final screenHeight = mediaQuery.size.height;
+    final screenWidth = mediaQuery.size.width;
+    final padding = mediaQuery.padding;
+    final viewInsets = mediaQuery.viewInsets;
+    
     final estModification = widget.menuAModifier != null;
     
     return Scaffold(
       backgroundColor: CouleursApp.fond,
+      resizeToAvoidBottomInset: true, // UI Design: Éviter les débordements avec le clavier
       appBar: WidgetBarreAppNavigationAdmin(
         titre: estModification ? 'Modifier le Menu' : 'Ajouter un Menu',
         sousTitre: estModification 
@@ -93,11 +101,15 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Form(
-              key: _formKey,
-              child: Column(
+          padding: EdgeInsets.only(
+            left: screenWidth * 0.04, // UI Design: Padding adaptatif
+            right: screenWidth * 0.04,
+            top: screenHeight * 0.02,
+            bottom: viewInsets.bottom + padding.bottom + screenHeight * 0.025, // UI Design: Padding adaptatif pour éviter les débordements
+          ),
+          child: Form(
+            key: _formKey,
+            child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Section d'information
@@ -120,7 +132,6 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
             ),
           ),
         ),
-      ),
     );
   }
 

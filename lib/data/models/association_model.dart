@@ -150,6 +150,7 @@ class AssociationModel extends Association {
   // Méthode copyWith pour AssociationModel
   @override
   AssociationModel copyWith({
+    String? chefId,
     String? id,
     String? nom,
     String? description,

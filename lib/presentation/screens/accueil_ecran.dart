@@ -133,16 +133,27 @@ class _AccueilEcranState extends State<AccueilEcran> {
 
   @override
   Widget build(BuildContext context) {
+    // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
+    final mediaQuery = MediaQuery.of(context);
+    final screenHeight = mediaQuery.size.height;
+    final screenWidth = mediaQuery.size.width;
+    final padding = mediaQuery.padding;
+    final viewInsets = mediaQuery.viewInsets;
+    
     // UI Design: Affichage du chargement si les données utilisateur ne sont pas encore chargées
     if (_chargementUtilisateur || _utilisateurActuel == null) {
-      return const Scaffold(
+      return Scaffold(
         backgroundColor: CouleursApp.fond,
-        body: Center(child: CircularProgressIndicator()),
+        resizeToAvoidBottomInset: true, // UI Design: Éviter les débordements avec le clavier
+        body: SafeArea(
+          child: const Center(child: CircularProgressIndicator()),
+        ),
       );
     }
 
     return Scaffold(
       backgroundColor: CouleursApp.fond,
+      resizeToAvoidBottomInset: true, // UI Design: Éviter les débordements avec le clavier
       appBar: WidgetBarreAppPersonnalisee(
         titre: 'Bienvenue',
         sousTitre: _utilisateurActuel != null 
@@ -150,68 +161,78 @@ class _AccueilEcranState extends State<AccueilEcran> {
             : 'Utilisateur',
         utilisateurConnecte: _utilisateurActuel,
         widgetFin: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: CouleursApp.blanc.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(20),
+          padding: EdgeInsets.symmetric(
+            horizontal: screenWidth * 0.04, // UI Design: Padding adaptatif
+            vertical: screenWidth * 0.02,
+          ),
+          decoration: BoxDecoration(
+            color: CouleursApp.blanc.withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.ac_unit,
+                color: CouleursApp.blanc,
+                size: screenWidth * 0.05, // UI Design: Taille adaptative
               ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
+              SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  const Icon(
-                    Icons.ac_unit,
-                    color: CouleursApp.blanc,
-                    size: 20,
+                  Text(
+                    '-5°C',
+                    style: TextStyle(
+                      color: CouleursApp.blanc,
+                      fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
+                      fontWeight: FontWeight.bold,
+                    ),
+                    overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                    maxLines: 1,
                   ),
-                  const SizedBox(width: 8),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      const Text(
-                        '-5°C',
-                        style: TextStyle(
-                          color: CouleursApp.blanc,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        'Rimouski',
-                        style: TextStyle(
-                          color: CouleursApp.blanc.withValues(alpha: 0.8),
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
+                  Text(
+                    'Rimouski',
+                    style: TextStyle(
+                      color: CouleursApp.blanc.withValues(alpha: 0.8),
+                      fontSize: screenWidth * 0.03, // UI Design: Taille adaptative
+                    ),
+                    overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                    maxLines: 1,
                   ),
                 ],
               ),
-            ),
+            ],
+          ),
+        ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Section actualités des assos
-                _construireSectionActualites(),
-                const SizedBox(height: 24),
-                
-                // Section mes livres
-                _construireSectionMesLivres(),
-                const SizedBox(height: 24),
-                
-                // Section mes associations
-                _construireSectionMesAssociations(),
-                const SizedBox(height: 24),
-                
-                // Section cantine
-                _construireSectionCantine(),
-                const SizedBox(height: 20),
-              ],
-            ),
+          padding: EdgeInsets.only(
+            bottom: viewInsets.bottom + padding.bottom, // UI Design: Padding adaptatif pour éviter les débordements
+            left: screenWidth * 0.04, // UI Design: Padding adaptatif
+            right: screenWidth * 0.04,
+            top: screenHeight * 0.02, // UI Design: Espacement adaptatif
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Section actualités des assos
+              _construireSectionActualites(),
+              SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
+              
+              // Section mes livres
+              _construireSectionMesLivres(),
+              SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
+              
+              // Section mes associations
+              _construireSectionMesAssociations(),
+              SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
+              
+              // Section cantine
+              _construireSectionCantine(),
+              SizedBox(height: screenHeight * 0.025), // UI Design: Espacement adaptatif
+            ],
           ),
         ),
       ),
@@ -224,63 +245,80 @@ class _AccueilEcranState extends State<AccueilEcran> {
 
   // UI Design: Section mes livres avec WidgetCollection optimisé
   Widget _construireSectionMesLivres() {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Mes Livres',
-                  style: StylesTexteApp.titre.copyWith(fontSize: 22),
-                ),
-                Text(
-                  'Vos livres universitaires',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+            Expanded( // UI Design: Widget flexible pour éviter les débordements
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Mes Livres',
+                    style: StylesTexteApp.titre.copyWith(
+                      fontSize: screenWidth * 0.055, // UI Design: Taille adaptative
+                    ),
+                    overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                    maxLines: 1,
                   ),
-                ),
-              ],
+                  Text(
+                    'Vos livres universitaires',
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
+                      color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                    ),
+                    overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                    maxLines: 1,
+                  ),
+                ],
+              ),
             ),
             GestureDetector(
               onTap: () {
                 NavigationService.gererNavigationNavBar(context, 1); // Index 1 = Livres/Marketplace
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenWidth * 0.04, // UI Design: Padding adaptatif
+                  vertical: screenWidth * 0.02,
+                ),
                 decoration: BoxDecoration(
                   color: CouleursApp.accent.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: CouleursApp.accent.withValues(alpha: 0.3)),
                 ),
-              child: const Text(
-                'Voir tout',
+                child: Text(
+                  'Voir tout',
                   style: TextStyle(
                     color: CouleursApp.accent,
                     fontWeight: FontWeight.w500,
-                    fontSize: 12,
+                    fontSize: screenWidth * 0.03, // UI Design: Taille adaptative
                   ),
+                  overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                  maxLines: 1,
                 ),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
         WidgetCollection<Livre>.listeHorizontale(
           elements: _mesLivres,
           enChargement: _chargementLivres,
-          hauteur: 200, // UI Design: Augmente la hauteur pour s'assurer que les cartes sont visibles
-          espacementHorizontal: 12, // UI Design: Espacement entre les cartes
+          hauteur: screenHeight * 0.25, // UI Design: Hauteur adaptative
+          espacementHorizontal: screenWidth * 0.03, // UI Design: Espacement adaptatif
           constructeurElement: (context, livre, index) {
             return WidgetCarte.livre(
               livre: livre,
               modeListe: true,
-              largeur: 160, // UI Design: Légèrement plus large pour plus de lisibilité
-              hauteur: 190, // UI Design: Augmente de 180 à 190 pour plus d'espace et éviter l'overflow
+              largeur: screenWidth * 0.4, // UI Design: Largeur adaptative
+              hauteur: screenHeight * 0.24, // UI Design: Hauteur adaptative
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
@@ -292,7 +330,7 @@ class _AccueilEcranState extends State<AccueilEcran> {
           },
           messageEtatVide: 'Vous n\'avez pas encore ajouté de livres',
           iconeEtatVide: Icons.menu_book_outlined,
-          padding: const EdgeInsets.symmetric(horizontal: 16), // UI Design: Padding pour éviter les débordements
+          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Padding adaptatif
         ),
       ],
     );
@@ -300,34 +338,49 @@ class _AccueilEcranState extends State<AccueilEcran> {
 
   // UI Design: Section livres en vente avec WidgetCollection
   Widget _construireSectionLivresEnVente() {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Livres en Vente',
-                  style: StylesTexteApp.titre.copyWith(fontSize: 22),
-                ),
-                Text(
-                  'Livres disponibles à l\'achat',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+            Expanded( // UI Design: Widget flexible pour éviter les débordements
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Livres en Vente',
+                    style: StylesTexteApp.titre.copyWith(
+                      fontSize: screenWidth * 0.055, // UI Design: Taille adaptative
+                    ),
+                    overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                    maxLines: 1,
                   ),
-                ),
-              ],
+                  Text(
+                    'Livres disponibles à l\'achat',
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
+                      color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                    ),
+                    overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                    maxLines: 1,
+                  ),
+                ],
+              ),
             ),
             GestureDetector(
               onTap: () {
                 NavigationService.gererNavigationNavBar(context, 1); // Index 1 = Marketplace
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenWidth * 0.03, // UI Design: Padding adaptatif
+                  vertical: screenWidth * 0.015,
+                ),
                 decoration: BoxDecoration(
                   color: CouleursApp.accent.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
@@ -339,15 +392,17 @@ class _AccueilEcranState extends State<AccueilEcran> {
                       'Voir tout',
                       style: TextStyle(
                         color: CouleursApp.accent,
-                        fontSize: 12,
+                        fontSize: screenWidth * 0.03, // UI Design: Taille adaptative
                         fontWeight: FontWeight.w600,
                       ),
+                      overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                      maxLines: 1,
                     ),
-                    const SizedBox(width: 4),
+                    SizedBox(width: screenWidth * 0.01), // UI Design: Espacement adaptatif
                     Icon(
                       Icons.arrow_forward_ios,
                       color: CouleursApp.accent,
-                      size: 12,
+                      size: screenWidth * 0.03, // UI Design: Taille adaptative
                     ),
                   ],
                 ),
@@ -355,19 +410,19 @@ class _AccueilEcranState extends State<AccueilEcran> {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
         
         WidgetCollection<Livre>.listeHorizontale(
           elements: _livresEnVente,
           enChargement: _chargementLivresVente,
-          hauteur: 200,
+          hauteur: screenHeight * 0.25, // UI Design: Hauteur adaptative
           constructeurElement: (context, livre, index) => SizedBox(
-            width: 140,
+            width: screenWidth * 0.35, // UI Design: Largeur adaptative
             child: WidgetCarte.livre(
               livre: livre,
               modeListe: true,
-              hauteur: 185,
-              largeur: 140,
+              hauteur: screenHeight * 0.23, // UI Design: Hauteur adaptative
+              largeur: screenWidth * 0.35, // UI Design: Largeur adaptative
               onTap: () => _naviguerVersDetailsLivre(livre),
             ),
           ),
@@ -380,27 +435,39 @@ class _AccueilEcranState extends State<AccueilEcran> {
 
   // UI Design: Section mes associations avec design moderne
   Widget _construireSectionMesAssociations() {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Mes Associations',
-                  style: StylesTexteApp.titre.copyWith(fontSize: 22),
-                ),
-                Text(
-                  'Vos associations et clubs',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+            Expanded( // UI Design: Widget flexible pour éviter les débordements
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Mes Associations',
+                    style: StylesTexteApp.titre.copyWith(
+                      fontSize: screenWidth * 0.055, // UI Design: Taille adaptative
+                    ),
+                    overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                    maxLines: 1,
                   ),
-                ),
-              ],
+                  Text(
+                    'Vos associations et clubs',
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
+                      color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                    ),
+                    overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                    maxLines: 1,
+                  ),
+                ],
+              ),
             ),
             GestureDetector(
               onTap: () {
@@ -412,66 +479,77 @@ class _AccueilEcranState extends State<AccueilEcran> {
                 );
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenWidth * 0.04, // UI Design: Padding adaptatif
+                  vertical: screenWidth * 0.02,
+                ),
                 decoration: BoxDecoration(
                   color: CouleursApp.principal.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: CouleursApp.principal.withValues(alpha: 0.3)),
                 ),
-                child: const Text(
+                child: Text(
                   'Explorer',
                   style: TextStyle(
                     color: CouleursApp.principal,
                     fontWeight: FontWeight.w500,
-                    fontSize: 12,
+                    fontSize: screenWidth * 0.03, // UI Design: Taille adaptative
                   ),
+                  overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                  maxLines: 1,
                 ),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
         _chargementAssociations
             ? const Center(child: CircularProgressIndicator())
             : _mesAssociations.isEmpty
                 ? Container(
-                    padding: const EdgeInsets.all(40),
+                    padding: EdgeInsets.all(screenWidth * 0.1), // UI Design: Padding adaptatif
                     child: Column(
                       children: [
                         Icon(
                           Icons.groups_outlined,
-                          size: 60,
+                          size: screenWidth * 0.15, // UI Design: Taille adaptative
                           color: CouleursApp.principal.withValues(alpha: 0.3),
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
                         Text(
                           'Aucune association',
                           style: StylesTexteApp.moyenTitre.copyWith(
                             color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                            fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
                           ),
+                          overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                          maxLines: 1,
                         ),
-                        const SizedBox(height: 8),
+                        SizedBox(height: screenHeight * 0.01), // UI Design: Espacement adaptatif
                         Text(
                           'Rejoignez des associations pour enrichir votre expérience étudiante',
                           style: StylesTexteApp.corpsNormal.copyWith(
                             color: CouleursApp.texteFonce.withValues(alpha: 0.5),
+                            fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
                           ),
                           textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                          maxLines: 2,
                         ),
                       ],
                     ),
                   )
                 : SizedBox(
-                    height: 120,
+                    height: screenHeight * 0.15, // UI Design: Hauteur adaptative
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Padding adaptatif
                       itemCount: _mesAssociations.length,
                       itemBuilder: (context, index) {
                         final association = _mesAssociations[index];
                         return Container(
-                          width: 200,
-                          margin: const EdgeInsets.only(right: 12),
+                          width: screenWidth * 0.5, // UI Design: Largeur adaptative
+                          margin: EdgeInsets.only(right: screenWidth * 0.03), // UI Design: Marge adaptative
                           decoration: BoxDecoration(
                             color: CouleursApp.blanc,
                             borderRadius: BorderRadius.circular(12),
@@ -494,61 +572,68 @@ class _AccueilEcranState extends State<AccueilEcran> {
                               );
                             },
                             child: Padding(
-                              padding: const EdgeInsets.all(16),
+                              padding: EdgeInsets.all(screenWidth * 0.04), // UI Design: Padding adaptatif
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Row(
                                     children: [
                                       Container(
-                                        padding: const EdgeInsets.all(8),
+                                        padding: EdgeInsets.all(screenWidth * 0.02), // UI Design: Padding adaptatif
                                         decoration: BoxDecoration(
                                           color: CouleursApp.principal.withValues(alpha: 0.1),
                                           borderRadius: BorderRadius.circular(8),
                                         ),
-                                        child: const Icon(
+                                        child: Icon(
                                           Icons.groups,
                                           color: CouleursApp.principal,
-                                          size: 20,
+                                          size: screenWidth * 0.05, // UI Design: Taille adaptative
                                         ),
                                       ),
-                                      const SizedBox(width: 8),
+                                      SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
                                       Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: screenWidth * 0.02, // UI Design: Padding adaptatif
+                                          vertical: screenWidth * 0.01,
+                                        ),
                                         decoration: BoxDecoration(
                                           color: Colors.green.withValues(alpha: 0.1),
                                           borderRadius: BorderRadius.circular(6),
                                         ),
-                                        child: const Text(
+                                        child: Text(
                                           'Membre',
                                           style: TextStyle(
                                             color: Colors.green,
-                                            fontSize: 10,
+                                            fontSize: screenWidth * 0.025, // UI Design: Taille adaptative
                                             fontWeight: FontWeight.w600,
                                           ),
+                                          overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                                          maxLines: 1,
                                         ),
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(height: 12),
+                                  SizedBox(height: screenHeight * 0.015), // UI Design: Espacement adaptatif
                                   Text(
                                     association.nom,
-                                    style: const TextStyle(
-                                      fontSize: 14,
+                                    style: TextStyle(
+                                      fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
                                       fontWeight: FontWeight.w600,
                                       color: CouleursApp.texteFonce,
                                     ),
                                     maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
+                                    overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
                                   ),
-                                  const SizedBox(height: 4),
+                                  SizedBox(height: screenHeight * 0.005), // UI Design: Espacement adaptatif
                                   Text(
                                     association.typeAssociation.toUpperCase(),
-                                    style: const TextStyle(
-                                      fontSize: 11,
+                                    style: TextStyle(
+                                      fontSize: screenWidth * 0.028, // UI Design: Taille adaptative
                                       color: CouleursApp.principal,
                                       fontWeight: FontWeight.w500,
                                     ),
+                                    overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                                    maxLines: 1,
                                   ),
                                 ],
                               ),
@@ -564,27 +649,39 @@ class _AccueilEcranState extends State<AccueilEcran> {
 
   // UI Design: Section actualités des associations avec design moderne
   Widget _construireSectionActualites() {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-                        Text(
-                  'Actualités',
-                  style: StylesTexteApp.titre.copyWith(fontSize: 22),
-                ),
-                Text(
-                  'Nouvelles de vos associations',
-          style: TextStyle(
-            fontSize: 14,
-            color: CouleursApp.texteFonce.withValues(alpha: 0.6),
-          ),
-        ),
-              ],
+            Expanded( // UI Design: Widget flexible pour éviter les débordements
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Actualités',
+                    style: StylesTexteApp.titre.copyWith(
+                      fontSize: screenWidth * 0.055, // UI Design: Taille adaptative
+                    ),
+                    overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                    maxLines: 1,
+                  ),
+                  Text(
+                    'Nouvelles de vos associations',
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
+                      color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                    ),
+                    overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                    maxLines: 1,
+                  ),
+                ],
+              ),
             ),
             GestureDetector(
               onTap: () {
@@ -596,31 +693,36 @@ class _AccueilEcranState extends State<AccueilEcran> {
                 );
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenWidth * 0.04, // UI Design: Padding adaptatif
+                  vertical: screenWidth * 0.02,
+                ),
                 decoration: BoxDecoration(
                   color: CouleursApp.principal.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: CouleursApp.principal.withValues(alpha: 0.3)),
                 ),
-                child: const Text(
+                child: Text(
                   'Voir tout',
                   style: TextStyle(
                     color: CouleursApp.principal,
                     fontWeight: FontWeight.w500,
-                    fontSize: 12,
+                    fontSize: screenWidth * 0.03, // UI Design: Taille adaptative
                   ),
+                  overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                  maxLines: 1,
                 ),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
         // UI Design: Liste horizontale d'actualités simulées
         SizedBox(
-          height: 150,
+          height: screenHeight * 0.19, // UI Design: Hauteur adaptative
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Padding adaptatif
             itemCount: 3, // Afficher 3 actualités sur l'accueil
             itemBuilder: (context, index) {
               final actualites = [
@@ -646,8 +748,8 @@ class _AccueilEcranState extends State<AccueilEcran> {
               
               final actualite = actualites[index];
               return Container(
-                width: 180,
-                margin: const EdgeInsets.only(right: 12),
+                width: screenWidth * 0.45, // UI Design: Largeur adaptative
+                margin: EdgeInsets.only(right: screenWidth * 0.03), // UI Design: Marge adaptative
                 decoration: BoxDecoration(
                   color: CouleursApp.blanc,
                   borderRadius: BorderRadius.circular(12),
@@ -663,59 +765,66 @@ class _AccueilEcranState extends State<AccueilEcran> {
                   ],
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(12),
+                  padding: EdgeInsets.all(screenWidth * 0.03), // UI Design: Padding adaptatif
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Badge priorité si haute
                       if (actualite['priorite'] == 'haute') ...[
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: screenWidth * 0.02, // UI Design: Padding adaptatif
+                            vertical: screenWidth * 0.01,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.red,
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Text(
+                          child: Text(
                             'URGENT',
                             style: TextStyle(
                               color: CouleursApp.blanc,
-                              fontSize: 10,
+                              fontSize: screenWidth * 0.025, // UI Design: Taille adaptative
                               fontWeight: FontWeight.bold,
                             ),
+                            overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                            maxLines: 1,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        SizedBox(height: screenHeight * 0.01), // UI Design: Espacement adaptatif
                       ],
                       // Titre
                       Text(
                         actualite['titre']!,
-                        style: const TextStyle(
-                          fontSize: 14,
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
                           fontWeight: FontWeight.w600,
                           color: CouleursApp.texteFonce,
                         ),
                         maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                        overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
                       ),
                       const Spacer(),
                       // Association et date
                       Text(
                         actualite['association']!,
-                        style: const TextStyle(
-                          fontSize: 12,
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.03, // UI Design: Taille adaptative
                           color: CouleursApp.principal,
                           fontWeight: FontWeight.w500,
                         ),
                         maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                        overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: screenHeight * 0.005), // UI Design: Espacement adaptatif
                       Text(
                         actualite['date']!,
                         style: TextStyle(
-                          fontSize: 11,
+                          fontSize: screenWidth * 0.028, // UI Design: Taille adaptative
                           color: CouleursApp.texteFonce.withValues(alpha: 0.6),
                         ),
+                        overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                        maxLines: 1,
                       ),
                     ],
                   ),
@@ -730,118 +839,142 @@ class _AccueilEcranState extends State<AccueilEcran> {
 
   // UI Design: Section cantine avec WidgetCarte moderne
   Widget _construireSectionCantine() {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
+      children: [
+        Text(
           'Cantine UQAR',
-              style: StylesTexteApp.titre.copyWith(fontSize: 22),
+          style: StylesTexteApp.titre.copyWith(
+            fontSize: screenWidth * 0.055, // UI Design: Taille adaptative
+          ),
+          overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+          maxLines: 1,
         ),
-        const SizedBox(height: 4),
+        SizedBox(height: screenHeight * 0.005), // UI Design: Espacement adaptatif
         Text(
           'Découvrez les menus du jour',
           style: TextStyle(
-            fontSize: 14,
+            fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
             color: CouleursApp.texteFonce.withValues(alpha: 0.6),
           ),
+          overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+          maxLines: 1,
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
         GestureDetector(
           onTap: () {
             NavigationService.gererNavigationNavBar(context, 0); // Index 0 = Cantine
           },
           child: Container(
-            padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
+            padding: EdgeInsets.all(screenWidth * 0.05), // UI Design: Padding adaptatif
+            decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [CouleursApp.accent, CouleursApp.accent.withValues(alpha: 0.8)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
                   color: CouleursApp.accent.withValues(alpha: 0.3),
                   blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
             child: Row(
-        children: [
-                Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Row(
-                  children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
                           Icon(
                             Icons.restaurant_menu,
                             color: CouleursApp.blanc,
-                            size: 24,
+                            size: screenWidth * 0.06, // UI Design: Taille adaptative
                           ),
-                          SizedBox(width: 8),
+                          SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
                           Text(
                             'Menu du Jour',
                             style: TextStyle(
                               color: CouleursApp.blanc,
-                              fontSize: 18,
+                              fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
                               fontWeight: FontWeight.bold,
                             ),
+                            overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                            maxLines: 1,
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
+                      SizedBox(height: screenHeight * 0.01), // UI Design: Espacement adaptatif
                       Text(
                         'Pâtes à la sauce marinara, salade césar, dessert du jour',
                         style: TextStyle(
                           color: CouleursApp.blanc.withValues(alpha: 0.9),
-                          fontSize: 14,
+                          fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
                         ),
+                        overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                        maxLines: 2,
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: screenHeight * 0.015), // UI Design: Espacement adaptatif
                       Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: screenWidth * 0.02, // UI Design: Padding adaptatif
+                              vertical: screenWidth * 0.01,
+                            ),
                             decoration: BoxDecoration(
                               color: CouleursApp.blanc.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: const Text(
+                            child: Text(
                               '12.99\$',
                               style: TextStyle(
                                 color: CouleursApp.blanc,
-                                fontSize: 12,
+                                fontSize: screenWidth * 0.03, // UI Design: Taille adaptative
                                 fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                          const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
+                              ),
+                              overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                              maxLines: 1,
+                            ),
+                          ),
+                          SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: screenWidth * 0.02, // UI Design: Padding adaptatif
+                              vertical: screenWidth * 0.01,
+                            ),
+                            decoration: BoxDecoration(
                               color: Colors.green.withValues(alpha: 0.8),
                               borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Text(
+                            ),
+                            child: Text(
                               'VÉG',
-                        style: TextStyle(
+                              style: TextStyle(
                                 color: CouleursApp.blanc,
-                          fontSize: 10,
+                                fontSize: screenWidth * 0.025, // UI Design: Taille adaptative
                                 fontWeight: FontWeight.bold,
-                        ),
+                              ),
+                              overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                              maxLines: 1,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
                     ],
                   ),
                 ),
-                const Icon(
+                Icon(
                   Icons.arrow_forward_ios,
                   color: CouleursApp.blanc,
-                  size: 20,
+                  size: screenWidth * 0.05, // UI Design: Taille adaptative
                 ),
               ],
             ),

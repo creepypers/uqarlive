@@ -17,8 +17,16 @@ class DetailsMenuEcran extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
+    final mediaQuery = MediaQuery.of(context);
+    final screenHeight = mediaQuery.size.height;
+    final screenWidth = mediaQuery.size.width;
+    final padding = mediaQuery.padding;
+    final viewInsets = mediaQuery.viewInsets;
+    
     return Scaffold(
       backgroundColor: CouleursApp.fond,
+      resizeToAvoidBottomInset: true, // UI Design: Éviter les débordements avec le clavier
       appBar: WidgetBarreAppPersonnalisee(
         titre: menu.nom,
         sousTitre: _obtenirNomCategorie(menu.categorie),
@@ -27,11 +35,11 @@ class DetailsMenuEcran extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
-              icon: const Icon(Icons.arrow_back, color: CouleursApp.blanc),
+              icon: Icon(Icons.arrow_back, color: CouleursApp.blanc, size: screenWidth * 0.06), // UI Design: Taille adaptative
               onPressed: () => Navigator.pop(context),
             ),
             IconButton(
-              icon: const Icon(Icons.favorite_border, color: CouleursApp.blanc),
+              icon: Icon(Icons.favorite_border, color: CouleursApp.blanc, size: screenWidth * 0.06), // UI Design: Taille adaptative
               onPressed: () => _ajouterAuxFavoris(context),
             ),
           ],
@@ -39,25 +47,28 @@ class DetailsMenuEcran extends StatelessWidget {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
+          padding: EdgeInsets.only(
+            bottom: viewInsets.bottom + padding.bottom + screenHeight * 0.025, // UI Design: Padding adaptatif pour éviter les débordements
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Section En-tête avec image et prix
-              _construireEnTete(),
-              const SizedBox(height: 16),
+              _construireEnTete(context),
+              SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
               
               // Section Informations nutritionnelles
               _construireSectionNutrition(),
-              const SizedBox(height: 24),
+              SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
               
               // Section Ingrédients et allergènes
-              _construireSectionIngredients(),
-              const SizedBox(height: 24),
+              _construireSectionIngredients(context),
+              SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
               
               // Section Note et avis si disponible
               if (menu.note != null) ...[
-                _construireSectionNote(),
-                const SizedBox(height: 24),
+                _construireSectionNote(context),
+                SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
               ],
             ],
           ),
@@ -71,10 +82,14 @@ class DetailsMenuEcran extends StatelessWidget {
   }
 
   // UI Design: En-tête avec image et informations principales
-  Widget _construireEnTete() {
+  Widget _construireEnTete(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
     return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(20),
+      margin: EdgeInsets.all(screenWidth * 0.04), // UI Design: Marge adaptative
+      padding: EdgeInsets.all(screenWidth * 0.05), // UI Design: Padding adaptatif
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -99,18 +114,18 @@ class DetailsMenuEcran extends StatelessWidget {
             children: [
               // Icône catégorie
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(screenWidth * 0.04), // UI Design: Padding adaptatif
                 decoration: BoxDecoration(
                   color: CouleursApp.blanc.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Icon(
                   _obtenirIconeCategorie(menu.categorie),
-                  size: 40,
+                  size: screenWidth * 0.1, // UI Design: Taille adaptative
                   color: CouleursApp.blanc,
                 ),
               ),
-              const SizedBox(width: 16),
+              SizedBox(width: screenWidth * 0.04), // UI Design: Espacement adaptatif
               // Informations
               Expanded(
                 child: Column(
@@ -118,26 +133,33 @@ class DetailsMenuEcran extends StatelessWidget {
                   children: [
                     Text(
                       menu.nom,
-                      style: const TextStyle(
-                        fontSize: 20,
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.05, // UI Design: Taille adaptative
                         fontWeight: FontWeight.bold,
                         color: CouleursApp.blanc,
                       ),
+                      overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                      maxLines: 2,
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: screenHeight * 0.005), // UI Design: Espacement adaptatif
                     Text(
                       menu.description,
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
                         color: CouleursApp.blanc.withValues(alpha: 0.9),
                       ),
+                      overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                      maxLines: 2,
                     ),
                   ],
                 ),
               ),
               // Prix
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenWidth * 0.03, // UI Design: Padding adaptatif
+                  vertical: screenWidth * 0.02,
+                ),
                 decoration: BoxDecoration(
                   color: CouleursApp.blanc,
                   borderRadius: BorderRadius.circular(16),
@@ -145,48 +167,60 @@ class DetailsMenuEcran extends StatelessWidget {
                 child: Text(
                   '${menu.prix.toStringAsFixed(2)} \$',
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
                     fontWeight: FontWeight.bold,
                     color: _obtenirCouleurCategorie(menu.categorie),
                   ),
+                  overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                  maxLines: 1,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
           // Badges
           Row(
             children: [
               ...menu.badges.map((badge) => Container(
-                margin: const EdgeInsets.only(right: 8),
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                margin: EdgeInsets.only(right: screenWidth * 0.02), // UI Design: Espacement adaptatif
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenWidth * 0.02, // UI Design: Padding adaptatif
+                  vertical: screenWidth * 0.01,
+                ),
                 decoration: BoxDecoration(
                   color: CouleursApp.blanc.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   badge,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: CouleursApp.blanc,
-                    fontSize: 10,
+                    fontSize: screenWidth * 0.025, // UI Design: Taille adaptative
                     fontWeight: FontWeight.bold,
                   ),
+                  overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                  maxLines: 1,
                 ),
               )),
               if (!menu.estDisponible)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: screenWidth * 0.02, // UI Design: Padding adaptatif
+                    vertical: screenWidth * 0.01,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.red.withValues(alpha: 0.8),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Text(
+                  child: Text(
                     'ÉPUISÉ',
                     style: TextStyle(
                       color: CouleursApp.blanc,
-                      fontSize: 10,
+                      fontSize: screenWidth * 0.025, // UI Design: Taille adaptative
                       fontWeight: FontWeight.bold,
                     ),
+                    overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                    maxLines: 1,
                   ),
                 ),
             ],
@@ -223,10 +257,14 @@ class DetailsMenuEcran extends StatelessWidget {
   }
 
   // UI Design: Section ingrédients et allergènes
-  Widget _construireSectionIngredients() {
+  Widget _construireSectionIngredients(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(20),
+      margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Marge adaptative
+      padding: EdgeInsets.all(screenWidth * 0.05), // UI Design: Padding adaptatif
       decoration: BoxDecoration(
         color: CouleursApp.blanc,
         borderRadius: BorderRadius.circular(16),
@@ -246,16 +284,20 @@ class DetailsMenuEcran extends StatelessWidget {
               Icon(
                 Icons.restaurant_menu,
                 color: _obtenirCouleurCategorie(menu.categorie),
-                size: 24,
+                size: screenWidth * 0.06, // UI Design: Taille adaptative
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
               Text(
                 'Ingrédients & Allergènes',
-                style: StylesTexteApp.titre.copyWith(fontSize: 18),
+                style: StylesTexteApp.titre.copyWith(
+                  fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
+                ),
+                overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                maxLines: 1,
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
           
           // Ingrédients
           _construireInfoSection(
@@ -263,25 +305,28 @@ class DetailsMenuEcran extends StatelessWidget {
             menu.ingredients.join(', '),
             Icons.grain,
             Colors.brown,
+            context,
           ),
           
           if (menu.allergenes != null) ...[
-            const SizedBox(height: 16),
+            SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
             _construireInfoSection(
               'Allergènes',
               menu.allergenes!,
               Icons.warning,
               Colors.red,
+              context,
             ),
           ],
           
           if (menu.nutritionInfo != null) ...[
-            const SizedBox(height: 16),
+            SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
             _construireInfoSection(
               'Informations nutritionnelles',
               menu.nutritionInfo!,
               Icons.info,
               CouleursApp.accent,
+              context,
             ),
           ],
         ],
@@ -290,10 +335,14 @@ class DetailsMenuEcran extends StatelessWidget {
   }
 
   // UI Design: Section note et avis
-  Widget _construireSectionNote() {
+  Widget _construireSectionNote(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(20),
+      margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Marge adaptative
+      padding: EdgeInsets.all(screenWidth * 0.05), // UI Design: Padding adaptatif
       decoration: BoxDecoration(
         color: CouleursApp.blanc,
         borderRadius: BorderRadius.circular(16),
@@ -310,19 +359,23 @@ class DetailsMenuEcran extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.star,
                 color: Colors.orange,
-                size: 24,
+                size: screenWidth * 0.06, // UI Design: Taille adaptative
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
               Text(
                 'Évaluation',
-                style: StylesTexteApp.titre.copyWith(fontSize: 18),
+                style: StylesTexteApp.titre.copyWith(
+                  fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
+                ),
+                overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                maxLines: 1,
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
           Row(
             children: [
               // Note
@@ -331,18 +384,20 @@ class DetailsMenuEcran extends StatelessWidget {
                   return Icon(
                     index < (menu.note?.round() ?? 0) ? Icons.star : Icons.star_border,
                     color: Colors.orange,
-                    size: 20,
+                    size: screenWidth * 0.05, // UI Design: Taille adaptative
                   );
                 }),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
               Text(
                 '${menu.note?.toStringAsFixed(1)} / 5.0',
-                style: const TextStyle(
-                  fontSize: 16,
+                style: TextStyle(
+                  fontSize: screenWidth * 0.04, // UI Design: Taille adaptative
                   fontWeight: FontWeight.w600,
                   color: CouleursApp.texteFonce,
                 ),
+                overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                maxLines: 1,
               ),
             ],
           ),
@@ -352,32 +407,40 @@ class DetailsMenuEcran extends StatelessWidget {
   }
 
   // Helper: Construire une section d'information
-  Widget _construireInfoSection(String titre, String contenu, IconData icone, Color couleur) {
+  Widget _construireInfoSection(String titre, String contenu, IconData icone, Color couleur, BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Icon(icone, color: couleur, size: 16),
-            const SizedBox(width: 6),
+            Icon(icone, color: couleur, size: screenWidth * 0.04), // UI Design: Taille adaptative
+            SizedBox(width: screenWidth * 0.015), // UI Design: Espacement adaptatif
             Text(
               titre,
-              style: const TextStyle(
-                fontSize: 14,
+              style: TextStyle(
+                fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
                 fontWeight: FontWeight.w600,
                 color: CouleursApp.texteFonce,
               ),
+              overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+              maxLines: 1,
             ),
           ],
         ),
-        const SizedBox(height: 6),
+        SizedBox(height: screenHeight * 0.008), // UI Design: Espacement adaptatif
         Text(
           contenu,
           style: TextStyle(
-            fontSize: 13,
+            fontSize: screenWidth * 0.033, // UI Design: Taille adaptative
             color: CouleursApp.texteFonce.withValues(alpha: 0.8),
             height: 1.3,
           ),
+          overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+          maxLines: 4,
         ),
       ],
     );

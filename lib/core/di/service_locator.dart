@@ -9,18 +9,24 @@ import '../../data/datasources/salles_datasource_local.dart';
 import '../../data/datasources/utilisateurs_datasource_local.dart';
 import '../../data/datasources/membres_association_datasource_local.dart';
 import '../../data/datasources/reservations_salle_datasource_local.dart';
+import '../../data/datasources/transactions_datasource_local.dart';
+import '../../data/datasources/demandes_adhesion_datasource_local.dart';
 import '../../data/repositories/actualites_repository_impl.dart';
 import '../../data/repositories/associations_repository_impl.dart';
 import '../../data/repositories/evenements_repository_impl.dart';
 import '../../data/repositories/horaires_repository_impl.dart';
 import '../../presentation/services/statistiques_service.dart';
 import '../../presentation/services/authentification_service.dart';
+import '../../presentation/services/transactions_service.dart';
+import '../../presentation/services/adhesions_service.dart';
 import '../../data/repositories/livres_repository_impl.dart';
 import '../../data/repositories/menus_repository_impl.dart';
 import '../../data/repositories/salles_repository_impl.dart';
 import '../../data/repositories/utilisateurs_repository_impl.dart';
 import '../../data/repositories/membres_association_repository_impl.dart';
 import '../../data/repositories/reservations_salle_repository_impl.dart';
+import '../../data/repositories/transactions_repository_impl.dart';
+import '../../data/repositories/demandes_adhesion_repository_impl.dart';
 import '../../domain/repositories/actualites_repository.dart';
 import '../../domain/repositories/associations_repository.dart';
 import '../../domain/repositories/evenements_repository.dart';
@@ -31,6 +37,8 @@ import '../../domain/repositories/salles_repository.dart';
 import '../../domain/repositories/utilisateurs_repository.dart';
 import '../../domain/repositories/membres_association_repository.dart';
 import '../../domain/repositories/reservations_salle_repository.dart';
+import '../../domain/repositories/transactions_repository.dart';
+import '../../domain/repositories/demandes_adhesion_repository.dart';
 
 final getIt = GetIt.instance;
 
@@ -65,6 +73,12 @@ class ServiceLocator {
     getIt.registerLazySingleton<ReservationsSalleDatasourceLocal>(
       () => ReservationsSalleDatasourceLocal(),
     );
+    getIt.registerLazySingleton<TransactionsDatasourceLocal>(
+      () => TransactionsDatasourceLocal(),
+    );
+    getIt.registerLazySingleton<DemandesAdhesionDatasourceLocal>(
+      () => DemandesAdhesionDatasourceLocal(),
+    );
 
     // Repositories
     getIt.registerLazySingleton<ActualitesRepository>(
@@ -94,6 +108,12 @@ class ServiceLocator {
     getIt.registerLazySingleton<ReservationsSalleRepository>(
       () => ReservationsSalleRepositoryImpl(getIt<ReservationsSalleDatasourceLocal>()),
     );
+    getIt.registerLazySingleton<TransactionsRepository>(
+      () => TransactionsRepositoryImpl(getIt<TransactionsDatasourceLocal>()),
+    );
+    getIt.registerLazySingleton<DemandesAdhesionRepository>(
+      () => DemandesAdhesionRepositoryImpl(getIt<DemandesAdhesionDatasourceLocal>()),
+    );
     getIt.registerLazySingleton<EvenementsDatasourceLocal>(
       () => EvenementsDatasourceLocal(),
     );
@@ -106,9 +126,15 @@ class ServiceLocator {
       () => StatistiquesService(),
     );
     
-    // Authentication Service
+    // Services
     getIt.registerLazySingleton<AuthentificationService>(
       () => AuthentificationService.instance,
+    );
+    getIt.registerLazySingleton<TransactionsService>(
+      () => TransactionsService.instance,
+    );
+    getIt.registerLazySingleton<AdhesionsService>(
+      () => AdhesionsService.instance,
     );
   }
 

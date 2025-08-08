@@ -16,6 +16,9 @@ abstract class MembresAssociationRepository {
   Future<bool> changerRole(String membreId, String nouveauRole);
   Future<List<MembreAssociation>> obtenirMembresBureau(String associationId);
   
+  // UI Design: Vérifications
+  Future<bool> estMembreActif(String utilisateurId, String associationId);
+  
   // UI Design: Statistiques
   Future<int> compterMembresActifs(String associationId);
   Future<Map<String, int>> obtenirStatistiquesAdhesions(String utilisateurId);

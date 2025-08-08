@@ -5,12 +5,13 @@ class AssociationsDatasourceLocal {
   List<Map<String, dynamic>> obtenirToutesLesAssociations() {
     return [
       {
-        'id': '1',
-        'nom': 'AÉUQAR',
-        'description': 'Association générale des étudiants de l\'UQAR',
+        'id': 'asso_001',
+        'nom': 'AEI',
+        'description': 'Association des étudiants en informatique',
         'typeAssociation': 'etudiante',
-        'president': 'Marie-Claude Dubois',
-        'vicePresident': 'Alexandre Tremblay',
+        'president': 'Alexandre Martin',
+        'vicePresident': 'Marie Dubois',
+        'chefId': 'etud_001', // Alexandre Martin
         'nombreMembres': 3200,
         'email': 'aeuqar@uqar.ca',
         'telephone': '418-723-1986',
@@ -43,12 +44,13 @@ class AssociationsDatasourceLocal {
         ],
       },
       {
-        'id': '2',
-        'nom': 'Radio UQAR',
-        'description': 'Radio étudiante communautaire de l\'UQAR',
+        'id': 'asso_002',
+        'nom': 'Club Photo UQAR',
+        'description': 'Club de photographie pour étudiants passionnés',
         'typeAssociation': 'culturelle',
-        'president': 'Émile Gagnon',
-        'vicePresident': 'Sophie Pelletier',
+        'president': 'Sophie Gagnon',
+        'vicePresident': 'Martin Côté',
+        'chefId': 'etud_006', // Sophie Gagnon
         'nombreMembres': 85,
         'email': 'radio@uqar.ca',
         'telephone': '418-724-1446',
@@ -81,12 +83,13 @@ class AssociationsDatasourceLocal {
         ],
       },
       {
-        'id': '3',
+        'id': 'asso_003',
         'nom': 'Sport UQAR',
         'description': 'Association sportive et récréative',
         'typeAssociation': 'sportive',
         'president': 'Maxime Leblanc',
         'vicePresident': 'Catherine Roy',
+        'chefId': 'etud_007', // Maxime Leblanc
         'nombreMembres': 520,
         'email': 'sport@uqar.ca',
         'telephone': '418-723-1986',
@@ -119,12 +122,13 @@ class AssociationsDatasourceLocal {
         ],
       },
       {
-        'id': '4',
-        'nom': 'Génie UQAR',
-        'description': 'Association des étudiants en génie',
+        'id': 'asso_004',
+        'nom': 'AGE',
+        'description': 'Association générale des étudiants',
         'typeAssociation': 'academique',
-        'president': 'Vincent Michaud',
-        'vicePresident': 'Amélie Fortin',
+        'president': 'Alexandre Martin',
+        'vicePresident': 'Vincent Michaud',
+        'chefId': 'etud_001', // Alexandre Martin
         'nombreMembres': 180,
         'email': 'genie@uqar.ca',
         'telephone': '418-724-1525',

@@ -69,21 +69,32 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
 
   @override
   Widget build(BuildContext context) {
+    // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
+    final mediaQuery = MediaQuery.of(context);
+    final screenHeight = mediaQuery.size.height;
+    final screenWidth = mediaQuery.size.width;
+    final padding = mediaQuery.padding;
+    final viewInsets = mediaQuery.viewInsets;
+    
     return Scaffold(
       backgroundColor: CouleursApp.fond,
+      resizeToAvoidBottomInset: true, // UI Design: Éviter les débordements avec le clavier
       appBar: WidgetBarreAppPersonnalisee(
         titre: widget.utilisateur != null ? 'Modifier le profil' : 'Créer un utilisateur',
         sousTitre: widget.utilisateur != null ? 'Mise à jour des informations' : 'Création d\'un nouvel utilisateur',
         afficherProfil: false,
         widgetFin: IconButton(
-          icon: const Icon(Icons.arrow_back, color: CouleursApp.blanc),
+          icon: Icon(Icons.arrow_back, color: CouleursApp.blanc, size: screenWidth * 0.06), // UI Design: Taille adaptative
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
+          padding: EdgeInsets.only(
+            bottom: viewInsets.bottom + padding.bottom + screenHeight * 0.025, // UI Design: Padding adaptatif pour éviter les débordements
+          ),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(screenWidth * 0.04), // UI Design: Padding adaptatif
             child: Form(
               key: _formKey,
               child: Column(
@@ -91,15 +102,15 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
                 children: [
                   // Section informations personnelles
                   _construireSectionInfosPersonnelles(),
-                  const SizedBox(height: 24),
+                  SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
                   
                   // Section informations académiques
                   _construireSectionInfosAcademiques(),
-                  const SizedBox(height: 32),
+                  SizedBox(height: screenHeight * 0.04), // UI Design: Espacement adaptatif
                   
                   // Boutons d'action
                   _construireBoutonsAction(),
-                  const SizedBox(height: 20),
+                  SizedBox(height: screenHeight * 0.025), // UI Design: Espacement adaptatif
                 ],
               ),
             ),
@@ -113,12 +124,14 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
     );
   }
 
-
-
   // UI Design: Section informations personnelles
   Widget _construireSectionInfosPersonnelles() {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(screenWidth * 0.05), // UI Design: Padding adaptatif
       decoration: BoxDecoration(
         color: CouleursApp.blanc,
         borderRadius: BorderRadius.circular(16),
@@ -135,19 +148,23 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
         children: [
           Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.person_outline,
                 color: CouleursApp.principal,
-                size: 24,
+                size: screenWidth * 0.06, // UI Design: Taille adaptative
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
               Text(
                 'Informations personnelles',
-                style: StylesTexteApp.titre.copyWith(fontSize: 18),
+                style: StylesTexteApp.titre.copyWith(
+                  fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
+                ),
+                overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                maxLines: 1,
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: screenHeight * 0.025), // UI Design: Espacement adaptatif
           
           // Nom et Prénom
           Row(
@@ -165,7 +182,7 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
                   },
                 ),
               ),
-              const SizedBox(width: 16),
+              SizedBox(width: screenWidth * 0.04), // UI Design: Espacement adaptatif
               Expanded(
                 child: _construireChampTexte(
                   controller: _prenomController,
@@ -181,7 +198,7 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
           
           // Email
           _construireChampTexte(
@@ -199,7 +216,7 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
               return null;
             },
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
           
           // Téléphone
           _construireChampTexte(
@@ -223,8 +240,12 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
 
   // UI Design: Section informations académiques
   Widget _construireSectionInfosAcademiques() {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(screenWidth * 0.05), // UI Design: Padding adaptatif
       decoration: BoxDecoration(
         color: CouleursApp.blanc,
         borderRadius: BorderRadius.circular(16),
@@ -241,19 +262,23 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
         children: [
           Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.school,
                 color: CouleursApp.accent,
-                size: 24,
+                size: screenWidth * 0.06, // UI Design: Taille adaptative
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
               Text(
                 'Informations académiques',
-                style: StylesTexteApp.titre.copyWith(fontSize: 18),
+                style: StylesTexteApp.titre.copyWith(
+                  fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
+                ),
+                overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                maxLines: 1,
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: screenHeight * 0.025), // UI Design: Espacement adaptatif
           
           // Code permanent
           _construireChampTexte(
@@ -268,7 +293,7 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
               return null;
             },
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
           
           // Programme d'études
           _construireChampTexte(
@@ -289,6 +314,10 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
 
   // UI Design: Boutons d'action
   Widget _construireBoutonsAction() {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
     return Column(
       children: [
         // Bouton sauvegarder
@@ -299,38 +328,40 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
             style: ElevatedButton.styleFrom(
               backgroundColor: CouleursApp.principal,
               foregroundColor: CouleursApp.blanc,
-              padding: const EdgeInsets.symmetric(vertical: 16),
+              padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02), // UI Design: Padding adaptatif
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
               elevation: 8,
             ),
             child: _isLoading
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
+                ? SizedBox(
+                    height: screenWidth * 0.05, // UI Design: Taille adaptative
+                    width: screenWidth * 0.05, // UI Design: Taille adaptative
                     child: CircularProgressIndicator(
                       color: CouleursApp.blanc,
                       strokeWidth: 2,
                     ),
                   )
-                : const Row(
+                : Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.save, size: 20),
-                      SizedBox(width: 8),
+                      Icon(Icons.save, size: screenWidth * 0.05), // UI Design: Taille adaptative
+                      SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
                       Text(
                         'Sauvegarder les modifications',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: screenWidth * 0.04, // UI Design: Taille adaptative
                           fontWeight: FontWeight.bold,
                         ),
+                        overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                        maxLines: 1,
                       ),
                     ],
                   ),
           ),
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: screenHeight * 0.015), // UI Design: Espacement adaptatif
         
         // Bouton annuler
         SizedBox(
@@ -340,22 +371,24 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
             style: OutlinedButton.styleFrom(
               foregroundColor: CouleursApp.principal,
               side: const BorderSide(color: CouleursApp.principal),
-              padding: const EdgeInsets.symmetric(vertical: 16),
+              padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02), // UI Design: Padding adaptatif
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
             ),
-            child: const Row(
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.cancel, size: 20),
-                SizedBox(width: 8),
+                Icon(Icons.cancel, size: screenWidth * 0.05), // UI Design: Taille adaptative
+                SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
                 Text(
                   'Annuler',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: screenWidth * 0.04, // UI Design: Taille adaptative
                     fontWeight: FontWeight.bold,
                   ),
+                  overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                  maxLines: 1,
                 ),
               ],
             ),
@@ -374,14 +407,19 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
     String? Function(String?)? validator,
     bool enabled = true,
   }) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
       enabled: enabled,
       validator: validator,
+      style: TextStyle(fontSize: screenWidth * 0.04), // UI Design: Taille adaptative
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon: Icon(icone, color: enabled ? CouleursApp.principal : Colors.grey),
+        labelStyle: TextStyle(fontSize: screenWidth * 0.04), // UI Design: Taille adaptative
+        prefixIcon: Icon(icone, color: enabled ? CouleursApp.principal : Colors.grey, size: screenWidth * 0.05), // UI Design: Taille adaptative
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: CouleursApp.principal.withValues(alpha: 0.3)),
@@ -404,6 +442,10 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
         ),
         filled: true,
         fillColor: enabled ? CouleursApp.blanc : Colors.grey.withValues(alpha: 0.1),
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: screenWidth * 0.04, // UI Design: Padding adaptatif
+          vertical: screenWidth * 0.03, // UI Design: Padding adaptatif
+        ),
       ),
     );
   }

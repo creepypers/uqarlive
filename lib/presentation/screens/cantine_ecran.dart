@@ -128,8 +128,16 @@ class _CantineEcranState extends State<CantineEcran> {
 
   @override
   Widget build(BuildContext context) {
+    // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
+    final mediaQuery = MediaQuery.of(context);
+    final screenHeight = mediaQuery.size.height;
+    final screenWidth = mediaQuery.size.width;
+    final padding = mediaQuery.padding;
+    final viewInsets = mediaQuery.viewInsets;
+    
     return Scaffold(
       backgroundColor: CouleursApp.fond,
+      resizeToAvoidBottomInset: true, // UI Design: Éviter les débordements avec le clavier
       appBar: WidgetBarreAppPersonnalisee(
         titre: 'Cantine UQAR',
         sousTitre: 'Menus & Horaires',
@@ -139,7 +147,7 @@ class _CantineEcranState extends State<CantineEcran> {
             GestureDetector(
               onTap: _toggleVegetarien,
               child: Container(
-                padding: const EdgeInsets.all(10),
+                padding: EdgeInsets.all(screenWidth * 0.025), // UI Design: Padding adaptatif
                 decoration: BoxDecoration(
                   color: _afficheVegetarienUniquement 
                     ? Colors.green.withValues(alpha: 0.2)
@@ -149,25 +157,25 @@ class _CantineEcranState extends State<CantineEcran> {
                 child: Icon(
                   _afficheVegetarienUniquement ? Icons.eco : Icons.eco_outlined,
                   color: _afficheVegetarienUniquement ? Colors.green : CouleursApp.blanc,
-                  size: 24,
+                  size: screenWidth * 0.06, // UI Design: Taille adaptative
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
             GestureDetector(
               onTap: () {
                 // TODO: Implémenter la recherche
               },
               child: Container(
-                padding: const EdgeInsets.all(10),
+                padding: EdgeInsets.all(screenWidth * 0.025), // UI Design: Padding adaptatif
                 decoration: BoxDecoration(
                   color: CouleursApp.blanc.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.search,
                   color: CouleursApp.blanc,
-                  size: 24,
+                  size: screenWidth * 0.06, // UI Design: Taille adaptative
                 ),
               ),
             ),
@@ -176,26 +184,29 @@ class _CantineEcranState extends State<CantineEcran> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
+          padding: EdgeInsets.only(
+            bottom: viewInsets.bottom + padding.bottom + screenHeight * 0.025, // UI Design: Padding adaptatif pour éviter les débordements
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Section infos cantine
               _construireSectionInfos(),
-              const SizedBox(height: 16),
+              SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
               
               // Section menus du jour
               if (_menusDuJour.isNotEmpty) ...[
                 _construireSectionMenusDuJour(),
-                const SizedBox(height: 24),
+                SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
               ],
               
               // Filtres et catégories
               _construireFiltres(),
-              const SizedBox(height: 16),
+              SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
               
               // Grille des menus
               _construireGrilleMenus(),
-              const SizedBox(height: 20),
+              SizedBox(height: screenHeight * 0.025), // UI Design: Espacement adaptatif
             ],
           ),
         ),
@@ -247,40 +258,48 @@ class _CantineEcranState extends State<CantineEcran> {
 
   // UI Design: Section menus du jour avec WidgetCollection optimisé
   Widget _construireSectionMenusDuJour() {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Padding adaptatif
           child: Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.today,
                 color: CouleursApp.principal,
-                size: 24,
+                size: screenWidth * 0.06, // UI Design: Taille adaptative
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
               Text(
                 'Menus du Jour',
-                style: StylesTexteApp.titre.copyWith(fontSize: 18),
+                style: StylesTexteApp.titre.copyWith(
+                  fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
+                ),
+                overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                maxLines: 1,
               ),
             ],
           ),
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: screenHeight * 0.015), // UI Design: Espacement adaptatif
         WidgetCollection<Menu>.listeHorizontale(
           elements: _menusDuJour,
-          hauteur: 190,
+          hauteur: screenHeight * 0.24, // UI Design: Hauteur adaptative
           constructeurElement: (context, menu, index) {
             return WidgetCarte.menu(
               menu: menu,
               modeListe: true,
-              largeur: 200,
-              hauteur: 185,
+              largeur: screenWidth * 0.5, // UI Design: Largeur adaptative
+              hauteur: screenHeight * 0.23, // UI Design: Hauteur adaptative
               onTap: () => _ouvrirDetailsMenu(menu), // Ajout navigation
             );
           },
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Padding adaptatif
           messageEtatVide: 'Aucun menu du jour disponible',
           iconeEtatVide: Icons.restaurant_menu_outlined,
         ),
@@ -290,22 +309,30 @@ class _CantineEcranState extends State<CantineEcran> {
 
   // UI Design: Filtres et catégories
   Widget _construireFiltres() {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Padding adaptatif
           child: Text(
             'Catégories',
-            style: StylesTexteApp.titre.copyWith(fontSize: 18),
+            style: StylesTexteApp.titre.copyWith(
+              fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
+            ),
+            overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+            maxLines: 1,
           ),
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: screenHeight * 0.015), // UI Design: Espacement adaptatif
         SizedBox(
-          height: 40,
+          height: screenHeight * 0.05, // UI Design: Hauteur adaptative
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Padding adaptatif
             itemCount: _categories.length,
             itemBuilder: (context, index) {
               final categorie = _categories[index];
@@ -314,8 +341,11 @@ class _CantineEcranState extends State<CantineEcran> {
               return GestureDetector(
                 onTap: () => _changerCategorie(categorie),
                 child: Container(
-                  margin: const EdgeInsets.only(right: 12),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  margin: EdgeInsets.only(right: screenWidth * 0.03), // UI Design: Marge adaptative
+                  padding: EdgeInsets.symmetric(
+                    horizontal: screenWidth * 0.04, // UI Design: Padding adaptatif
+                    vertical: screenHeight * 0.01,
+                  ),
                   decoration: BoxDecoration(
                     color: estSelectionne 
                         ? CouleursApp.principal 
@@ -335,8 +365,10 @@ class _CantineEcranState extends State<CantineEcran> {
                           ? CouleursApp.blanc 
                           : CouleursApp.principal,
                       fontWeight: FontWeight.w600,
-                      fontSize: 14,
+                      fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
                     ),
+                    overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                    maxLines: 1,
                   ),
                 ),
               );
@@ -349,19 +381,23 @@ class _CantineEcranState extends State<CantineEcran> {
 
   // UI Design: Grille des menus avec WidgetCollection
   Widget _construireGrilleMenus() {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
     return WidgetCollection<Menu>.grille(
       elements: _tousLesMenus,
       enChargement: _chargementMenus,
       nombreColonnes: 2,
-      espacementColonnes: 16,
-      espacementLignes: 16,
+      espacementColonnes: screenWidth * 0.04, // UI Design: Espacement adaptatif
+      espacementLignes: screenHeight * 0.02, // UI Design: Espacement adaptatif
       constructeurElement: (context, menu, index) {
         return WidgetCarte.menu(
           menu: menu,
           onTap: () => _ouvrirDetailsMenu(menu),
         );
       },
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Padding adaptatif
       messageEtatVide: _afficheVegetarienUniquement 
         ? 'Aucun menu végétarien disponible'
         : 'Aucun menu disponible dans cette catégorie',

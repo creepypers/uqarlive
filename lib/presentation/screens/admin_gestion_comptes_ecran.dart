@@ -99,37 +99,50 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
 
   @override
   Widget build(BuildContext context) {
+    // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
+    final mediaQuery = MediaQuery.of(context);
+    final screenHeight = mediaQuery.size.height;
+    final screenWidth = mediaQuery.size.width;
+    final padding = mediaQuery.padding;
+    final viewInsets = mediaQuery.viewInsets;
+    
     return Scaffold(
       backgroundColor: CouleursApp.fond,
-      appBar: const WidgetBarreAppNavigationAdmin(
+      resizeToAvoidBottomInset: true, // UI Design: Éviter les débordements avec le clavier
+      appBar: WidgetBarreAppNavigationAdmin(
         titre: 'Gestion des Comptes',
         sousTitre: 'Administration des utilisateurs',
         sectionActive: 'comptes',
       ),
-      body: _chargementEnCours
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                _construireStatistiques(),
-                _construireBarreRecherche(),
-                _construireOnglets(),
-                Expanded(
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: [
-                      _construireListeUtilisateurs('tous'),
-                      _construireListeUtilisateurs('etudiants'),
-                      _construireListeUtilisateurs('admins'),
-                    ],
+      body: SafeArea(
+        child: _chargementEnCours
+            ? const Center(child: CircularProgressIndicator())
+            : Column(
+                children: [
+                  _construireStatistiques(),
+                  _construireBarreRecherche(),
+                  _construireOnglets(),
+                  Expanded(
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: [
+                        _construireListeUtilisateurs('tous'),
+                        _construireListeUtilisateurs('etudiants'),
+                        _construireListeUtilisateurs('admins'),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
+      ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _afficherModalNouvelUtilisateur,
         backgroundColor: CouleursApp.principal,
-        icon: const Icon(Icons.person_add, color: Colors.white),
-        label: const Text('Nouveau', style: TextStyle(color: Colors.white)),
+        icon: Icon(Icons.person_add, color: Colors.white, size: screenWidth * 0.06), // UI Design: Taille adaptative
+        label: Text(
+          'Nouveau', 
+          style: TextStyle(color: Colors.white, fontSize: screenWidth * 0.04), // UI Design: Taille adaptative
+        ),
       ),
     );
   }
@@ -138,18 +151,26 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
   Widget _construireStatistiques() {
     if (_statistiques == null) return const SizedBox.shrink();
     
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
     return Container(
       color: CouleursApp.blanc,
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(screenWidth * 0.04), // UI Design: Padding adaptatif
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Statistiques Utilisateurs',
-                style: StylesTexteApp.titrePage,
+                style: StylesTexteApp.titrePage.copyWith(
+                  fontSize: screenWidth * 0.055, // UI Design: Taille adaptative
+                ),
+                overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                maxLines: 1,
               ),
               // UI Design: Bouton pour masquer/afficher les statistiques
               IconButton(
@@ -161,13 +182,14 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
                 icon: Icon(
                   _statistiquesVisibles ? Icons.visibility_off : Icons.visibility,
                   color: CouleursApp.principal,
+                  size: screenWidth * 0.06, // UI Design: Taille adaptative
                 ),
                 tooltip: _statistiquesVisibles ? 'Masquer les statistiques' : 'Afficher les statistiques',
               ),
             ],
           ),
-          const SizedBox(height: 16),
-                    // UI Design: Affichage conditionnel des statistiques
+          SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
+          // UI Design: Affichage conditionnel des statistiques
           _statistiquesVisibles
               ? WidgetSectionStatistiques(
                   statistiques: [
@@ -203,12 +225,16 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
                 )
               : // UI Design: Message quand les statistiques sont masquées
               Container(
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  child: const Center(
+                  padding: EdgeInsets.symmetric(vertical: screenHeight * 0.025), // UI Design: Padding adaptatif
+                  child: Center(
                     child: Text(
                       'Statistiques masquées - Cliquez sur l\'œil pour les afficher',
-                      style: StylesTexteApp.corpsGris,
+                      style: StylesTexteApp.corpsGris.copyWith(
+                        fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
+                      ),
                       textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                      maxLines: 2,
                     ),
                   ),
                 ),
@@ -219,8 +245,12 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
 
   // UI Design: Barre de recherche améliorée
   Widget _construireBarreRecherche() {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(screenWidth * 0.04), // UI Design: Padding adaptatif
       decoration: BoxDecoration(
         color: CouleursApp.blanc,
         boxShadow: [
@@ -236,12 +266,14 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
           Expanded(
             child: TextField(
               controller: _controleurRecherche,
+              style: TextStyle(fontSize: screenWidth * 0.04), // UI Design: Taille adaptative
               decoration: InputDecoration(
                 hintText: 'Rechercher par nom, email ou code...',
-                prefixIcon: const Icon(Icons.search, color: CouleursApp.principal),
+                hintStyle: TextStyle(fontSize: screenWidth * 0.04), // UI Design: Taille adaptative
+                prefixIcon: Icon(Icons.search, color: CouleursApp.principal, size: screenWidth * 0.06), // UI Design: Taille adaptative
                 suffixIcon: _filtreRecherche.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.clear),
+                        icon: Icon(Icons.clear, size: screenWidth * 0.06), // UI Design: Taille adaptative
                         onPressed: () {
                           _controleurRecherche.clear();
                           setState(() {
@@ -261,6 +293,10 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
                 ),
                 filled: true,
                 fillColor: CouleursApp.fond,
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: screenWidth * 0.04, // UI Design: Padding adaptatif
+                  vertical: screenHeight * 0.015, // UI Design: Padding adaptatif
+                ),
               ),
               onChanged: (valeur) {
                 setState(() {
@@ -270,9 +306,12 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
               },
             ),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: screenWidth * 0.03), // UI Design: Espacement adaptatif
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: EdgeInsets.symmetric(
+              horizontal: screenWidth * 0.03, // UI Design: Padding adaptatif
+              vertical: screenWidth * 0.02,
+            ),
             decoration: BoxDecoration(
               color: CouleursApp.principal.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
@@ -282,7 +321,10 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
               style: StylesTexteApp.corpsNormal.copyWith(
                 color: CouleursApp.principal,
                 fontWeight: FontWeight.w600,
+                fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
               ),
+              overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+              maxLines: 1,
             ),
           ),
         ],
@@ -292,6 +334,9 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
 
   // UI Design: Onglets pour filtrer par type d'utilisateur
   Widget _construireOnglets() {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    
     return Container(
       color: CouleursApp.blanc,
       child: TabBar(
@@ -299,6 +344,8 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
         labelColor: CouleursApp.principal,
         unselectedLabelColor: Colors.grey,
         indicatorColor: CouleursApp.principal,
+        labelStyle: TextStyle(fontSize: screenWidth * 0.035), // UI Design: Taille adaptative
+        unselectedLabelStyle: TextStyle(fontSize: screenWidth * 0.035), // UI Design: Taille adaptative
         onTap: (index) {
           setState(() {
             _ongletActif = ['tous', 'etudiants', 'admins'][index];
@@ -307,15 +354,15 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
         },
         tabs: [
           Tab(
-            icon: const Icon(Icons.people),
+            icon: Icon(Icons.people, size: screenWidth * 0.06), // UI Design: Taille adaptative
             text: 'Tous (${_statistiques?.totalUtilisateurs ?? 0})',
           ),
           Tab(
-            icon: const Icon(Icons.school),
+            icon: Icon(Icons.school, size: screenWidth * 0.06), // UI Design: Taille adaptative
             text: 'Étudiants (${_statistiques?.etudiants ?? 0})',
           ),
           Tab(
-            icon: const Icon(Icons.admin_panel_settings),
+            icon: Icon(Icons.admin_panel_settings, size: screenWidth * 0.06), // UI Design: Taille adaptative
             text: 'Admins (${_statistiques?.administrateurs ?? 0})',
           ),
         ],
@@ -325,6 +372,10 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
 
   // UI Design: Liste des utilisateurs avec design moderne
   Widget _construireListeUtilisateurs(String typeFiltre) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
     final utilisateursFiltres = _utilisateurs.where((u) {
       final rechercheOk = _filtreRecherche.isEmpty ||
           u.nom.toLowerCase().contains(_filtreRecherche.toLowerCase()) ||
@@ -344,7 +395,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(screenWidth * 0.04), // UI Design: Padding adaptatif
       itemCount: utilisateursFiltres.length,
       itemBuilder: (context, index) {
         final utilisateur = utilisateursFiltres[index];
@@ -355,31 +406,35 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
 
   // UI Design: Carte utilisateur modernisée
   Widget _construireCarteUtilisateur(Utilisateur utilisateur) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: EdgeInsets.only(bottom: screenHeight * 0.015), // UI Design: Marge adaptative
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 2,
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
         onTap: () => _afficherDetailsUtilisateur(utilisateur),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(screenWidth * 0.04), // UI Design: Padding adaptatif
           child: Row(
             children: [
               // Avatar utilisateur
               CircleAvatar(
-                radius: 30,
+                radius: screenWidth * 0.075, // UI Design: Taille adaptative
                 backgroundColor: _obtenirCouleurTypeUtilisateur(utilisateur.typeUtilisateur),
                 child: Text(
                   '${utilisateur.prenom[0]}${utilisateur.nom[0]}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
-                    fontSize: 18,
+                    fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              const SizedBox(width: 16),
+              SizedBox(width: screenWidth * 0.04), // UI Design: Espacement adaptatif
               // Informations utilisateur
               Expanded(
                 child: Column(
@@ -390,24 +445,34 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
                         Expanded(
                           child: Text(
                             '${utilisateur.prenom} ${utilisateur.nom}',
-                            style: StylesTexteApp.moyenTitre,
-                            overflow: TextOverflow.ellipsis,
+                            style: StylesTexteApp.moyenTitre.copyWith(
+                              fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
+                            ),
+                            overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                            maxLines: 1,
                           ),
                         ),
                         _construireBadgeStatut(utilisateur),
                       ],
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: screenHeight * 0.005), // UI Design: Espacement adaptatif
                     Text(
                       utilisateur.email,
-                      style: StylesTexteApp.corpsNormal.copyWith(color: Colors.grey[600]),
-                      overflow: TextOverflow.ellipsis,
+                      style: StylesTexteApp.corpsNormal.copyWith(
+                        color: Colors.grey[600],
+                        fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
+                      ),
+                      overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                      maxLines: 1,
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: screenHeight * 0.005), // UI Design: Espacement adaptatif
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: screenWidth * 0.02, // UI Design: Padding adaptatif
+                            vertical: screenWidth * 0.01,
+                          ),
                           decoration: BoxDecoration(
                             color: _obtenirCouleurTypeUtilisateur(utilisateur.typeUtilisateur).withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
@@ -416,15 +481,21 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
                             _obtenirLibelleTypeUtilisateur(utilisateur.typeUtilisateur),
                             style: TextStyle(
                               color: _obtenirCouleurTypeUtilisateur(utilisateur.typeUtilisateur),
-                              fontSize: 12,
+                              fontSize: screenWidth * 0.03, // UI Design: Taille adaptative
                               fontWeight: FontWeight.w600,
                             ),
+                            overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                            maxLines: 1,
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
                         Text(
                           utilisateur.codeEtudiant,
-                          style: StylesTexteApp.petitGris,
+                          style: StylesTexteApp.petitGris.copyWith(
+                            fontSize: screenWidth * 0.03, // UI Design: Taille adaptative
+                          ),
+                          overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                          maxLines: 1,
                         ),
                       ],
                     ),
@@ -434,43 +505,47 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
               // Menu actions
               PopupMenuButton<String>(
                 onSelected: (action) => _gererActionUtilisateur(utilisateur, action),
+                icon: Icon(Icons.more_vert, size: screenWidth * 0.06), // UI Design: Taille adaptative
                 itemBuilder: (context) => [
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: 'modifier',
                     child: Row(
                       children: [
-                        Icon(Icons.edit),
-                        SizedBox(width: 8),
-                        Text('Modifier'),
+                        Icon(Icons.edit, size: screenWidth * 0.05), // UI Design: Taille adaptative
+                        SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
+                        Text(
+                          'Modifier',
+                          style: TextStyle(fontSize: screenWidth * 0.035), // UI Design: Taille adaptative
+                        ),
                       ],
                     ),
                   ),
                   // UI Design: Option pour attribuer des privilèges admin (seulement pour les étudiants)
                   if (utilisateur.typeUtilisateur == TypeUtilisateur.etudiant)
-                    const PopupMenuItem(
+                    PopupMenuItem(
                       value: 'attribuer_admin',
                       child: Row(
                         children: [
-                          Icon(Icons.admin_panel_settings, color: Colors.orange),
-                          SizedBox(width: 8),
+                          Icon(Icons.admin_panel_settings, color: Colors.orange, size: screenWidth * 0.05), // UI Design: Taille adaptative
+                          SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
                           Text(
                             'Promouvoir Admin',
-                            style: TextStyle(color: Colors.orange),
+                            style: TextStyle(color: Colors.orange, fontSize: screenWidth * 0.035), // UI Design: Taille adaptative
                           ),
                         ],
                       ),
                     ),
                   // UI Design: Option pour gérer les privilèges (seulement pour les admins)
                   if (utilisateur.typeUtilisateur == TypeUtilisateur.administrateur)
-                    const PopupMenuItem(
+                    PopupMenuItem(
                       value: 'gerer_privileges',
                       child: Row(
                         children: [
-                          Icon(Icons.security, color: Colors.blue),
-                          SizedBox(width: 8),
+                          Icon(Icons.security, color: Colors.blue, size: screenWidth * 0.05), // UI Design: Taille adaptative
+                          SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
                           Text(
                             'Gérer privilèges',
-                            style: TextStyle(color: Colors.blue),
+                            style: TextStyle(color: Colors.blue, fontSize: screenWidth * 0.035), // UI Design: Taille adaptative
                           ),
                         ],
                       ),
@@ -482,24 +557,29 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
                         Icon(
                           utilisateur.estActif ? Icons.block : Icons.check_circle,
                           color: utilisateur.estActif ? Colors.red : Colors.green,
+                          size: screenWidth * 0.05, // UI Design: Taille adaptative
                         ),
-                        const SizedBox(width: 8),
+                        SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
                         Text(
                           utilisateur.estActif ? 'Suspendre' : 'Activer',
                           style: TextStyle(
                             color: utilisateur.estActif ? Colors.red : Colors.green,
+                            fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: 'supprimer',
                     child: Row(
                       children: [
-                        Icon(Icons.delete, color: Colors.red),
-                        SizedBox(width: 8),
-                        Text('Supprimer', style: TextStyle(color: Colors.red)),
+                        Icon(Icons.delete, color: Colors.red, size: screenWidth * 0.05), // UI Design: Taille adaptative
+                        SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
+                        Text(
+                          'Supprimer', 
+                          style: TextStyle(color: Colors.red, fontSize: screenWidth * 0.035), // UI Design: Taille adaptative
+                        ),
                       ],
                     ),
                   ),
@@ -514,61 +594,86 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
 
   // UI Design: Badge de statut utilisateur
   Widget _construireBadgeStatut(Utilisateur utilisateur) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      padding: EdgeInsets.symmetric(
+        horizontal: screenWidth * 0.015, // UI Design: Padding adaptatif
+        vertical: screenWidth * 0.01,
+      ),
       decoration: BoxDecoration(
         color: utilisateur.estActif ? Colors.green : Colors.red,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
         utilisateur.estActif ? 'Actif' : 'Suspendu',
-        style: const TextStyle(
+        style: TextStyle(
           color: Colors.white,
-          fontSize: 10,
+          fontSize: screenWidth * 0.025, // UI Design: Taille adaptative
           fontWeight: FontWeight.bold,
         ),
+        overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+        maxLines: 1,
       ),
     );
   }
 
   // UI Design: Message vide avec call-to-action
   Widget _construireMessageVide() {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(40),
+        padding: EdgeInsets.all(screenWidth * 0.1), // UI Design: Padding adaptatif
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               Icons.people_outline,
-              size: 80,
+              size: screenWidth * 0.2, // UI Design: Taille adaptative
               color: CouleursApp.principal.withValues(alpha: 0.3),
             ),
-            const SizedBox(height: 20),
-            const Text(
+            SizedBox(height: screenHeight * 0.025), // UI Design: Espacement adaptatif
+            Text(
               'Aucun utilisateur trouvé',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
                 fontWeight: FontWeight.w600,
                 color: CouleursApp.texteFonce,
               ),
+              overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+              maxLines: 1,
             ),
-            const SizedBox(height: 8),
-            const Text(
+            SizedBox(height: screenHeight * 0.01), // UI Design: Espacement adaptatif
+            Text(
               'Modifiez vos critères de recherche ou ajoutez un nouvel utilisateur',
-              style: StylesTexteApp.corpsGris,
+              style: StylesTexteApp.corpsGris.copyWith(
+                fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
+              ),
               textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+              maxLines: 2,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: screenHeight * 0.025), // UI Design: Espacement adaptatif
             ElevatedButton.icon(
               onPressed: _afficherModalNouvelUtilisateur,
-              icon: const Icon(Icons.add),
-              label: const Text('Ajouter un utilisateur'),
+              icon: Icon(Icons.add, size: screenWidth * 0.05), // UI Design: Taille adaptative
+              label: Text(
+                'Ajouter un utilisateur',
+                style: TextStyle(fontSize: screenWidth * 0.04), // UI Design: Taille adaptative
+              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: CouleursApp.principal,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
+                ),
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenWidth * 0.05, // UI Design: Padding adaptatif
+                  vertical: screenHeight * 0.015, // UI Design: Padding adaptatif
                 ),
               ),
             ),

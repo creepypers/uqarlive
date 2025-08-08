@@ -75,8 +75,16 @@ class _AdminAjouterActualiteEcranState extends State<AdminAjouterActualiteEcran>
 
   @override
   Widget build(BuildContext context) {
+    // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
+    final mediaQuery = MediaQuery.of(context);
+    final screenHeight = mediaQuery.size.height;
+    final screenWidth = mediaQuery.size.width;
+    final padding = mediaQuery.padding;
+    final viewInsets = mediaQuery.viewInsets;
+    
     return Scaffold(
       backgroundColor: CouleursApp.fond,
+      resizeToAvoidBottomInset: true, // UI Design: Éviter les débordements avec le clavier
       appBar: WidgetBarreAppNavigationAdmin(
         titre: _modeModification ? 'Modifier Actualité' : 'Ajouter Actualité',
         sousTitre: _modeModification 
@@ -84,24 +92,31 @@ class _AdminAjouterActualiteEcranState extends State<AdminAjouterActualiteEcran>
           : 'Créer une nouvelle actualité d\'association',
         sectionActive: 'associations',
       ),
-      body: _enChargement
-        ? const Center(child: CircularProgressIndicator())
-        : SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Form(
-              key: _cleFormulaire,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _construireSectionContenu(),
-                  const SizedBox(height: 24),
-                  _construireSectionParametres(),
-                  const SizedBox(height: 32),
-                  _construireBoutonsAction(),
-                ],
+      body: SafeArea(
+        child: _enChargement
+          ? Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              padding: EdgeInsets.only(
+                left: screenWidth * 0.04, // UI Design: Padding adaptatif
+                right: screenWidth * 0.04,
+                top: screenHeight * 0.02,
+                bottom: viewInsets.bottom + padding.bottom + screenHeight * 0.025, // UI Design: Padding adaptatif pour éviter les débordements
+              ),
+              child: Form(
+                key: _cleFormulaire,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _construireSectionContenu(),
+                    SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
+                    _construireSectionParametres(),
+                    SizedBox(height: screenHeight * 0.04), // UI Design: Espacement adaptatif
+                    _construireBoutonsAction(),
+                  ],
+                ),
               ),
             ),
-          ),
+      ),
     );
   }
 

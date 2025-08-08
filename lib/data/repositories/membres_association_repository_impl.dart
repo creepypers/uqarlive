@@ -81,6 +81,13 @@ class MembresAssociationRepositoryImpl implements MembresAssociationRepository {
   }
 
   @override
+  Future<bool> estMembreActif(String utilisateurId, String associationId) async {
+    final models = await _datasourceLocal.obtenirMembresParUtilisateur(utilisateurId);
+    return models.any((membre) => 
+        membre.associationId == associationId && membre.estActif);
+  }
+
+  @override
   Future<int> compterMembresActifs(String associationId) async {
     final models = await _datasourceLocal.obtenirMembresParAssociation(associationId);
     return models.length;

@@ -75,13 +75,21 @@ class _SallesEcranState extends State<SallesEcran> {
 
   @override
   Widget build(BuildContext context) {
+    // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
+    final mediaQuery = MediaQuery.of(context);
+    final screenHeight = mediaQuery.size.height;
+    final screenWidth = mediaQuery.size.width;
+    final padding = mediaQuery.padding;
+    final viewInsets = mediaQuery.viewInsets;
+    
     return Scaffold(
       backgroundColor: CouleursApp.fond,
+      resizeToAvoidBottomInset: true, // UI Design: Éviter les débordements avec le clavier
       appBar: WidgetBarreAppPersonnalisee(
         titre: 'Salles de Révision',
         sousTitre: '${_salles.length} salles disponibles',
         widgetFin: IconButton(
-          icon: const Icon(Icons.filter_list, color: CouleursApp.blanc),
+          icon: Icon(Icons.filter_list, color: CouleursApp.blanc, size: screenWidth * 0.06), // UI Design: Taille adaptative
           onPressed: () => _ouvrirFiltres(),
         ),
       ),
@@ -90,9 +98,9 @@ class _SallesEcranState extends State<SallesEcran> {
           children: [
             // Barre de recherche et filtres (toujours affichées)
             _construireBarreRecherche(),
-            const SizedBox(height: 8),
+            SizedBox(height: screenHeight * 0.01), // UI Design: Espacement adaptatif
             _construireFiltresRapides(),
-            const SizedBox(height: 16),
+            SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
             
             // Liste des salles avec gestion de l'état de chargement - SCROLLABLE
             Expanded(
@@ -111,10 +119,13 @@ class _SallesEcranState extends State<SallesEcran> {
                   onTapDetails: () => _voirDetailsSalle(salle),
                   onTapReserver: () => _reserverSalle(salle),
                 ),
-                espacementVertical: 8,
+                espacementVertical: screenHeight * 0.01, // UI Design: Espacement adaptatif
                 messageEtatVide: 'Aucune salle trouvée\nEssayez de modifier vos filtres',
                 iconeEtatVide: Icons.meeting_room_outlined,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenWidth * 0.04, // UI Design: Padding adaptatif
+                  vertical: screenHeight * 0.01,
+                ),
               ),
             ),
           ],
@@ -129,9 +140,13 @@ class _SallesEcranState extends State<SallesEcran> {
 
   // UI Design: Barre de recherche
   Widget _construireBarreRecherche() {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
     return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      margin: EdgeInsets.all(screenWidth * 0.04), // UI Design: Marge adaptative
+      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Padding adaptatif
       decoration: BoxDecoration(
         color: CouleursApp.blanc,
         borderRadius: BorderRadius.circular(16),
@@ -144,6 +159,7 @@ class _SallesEcranState extends State<SallesEcran> {
         ],
       ),
       child: TextField(
+        style: TextStyle(fontSize: screenWidth * 0.04), // UI Design: Taille adaptative
         onChanged: (value) {
           setState(() {
             _recherche = value;
@@ -152,11 +168,15 @@ class _SallesEcranState extends State<SallesEcran> {
         },
         decoration: InputDecoration(
           hintText: 'Rechercher une salle...',
+          hintStyle: TextStyle(
+            fontSize: screenWidth * 0.04, // UI Design: Taille adaptative
+            color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+          ),
           border: InputBorder.none,
-          icon: const Icon(Icons.search, color: CouleursApp.principal),
+          icon: Icon(Icons.search, color: CouleursApp.principal, size: screenWidth * 0.06), // UI Design: Taille adaptative
           suffixIcon: _recherche.isNotEmpty
             ? IconButton(
-                icon: const Icon(Icons.clear, color: CouleursApp.principal),
+                icon: Icon(Icons.clear, color: CouleursApp.principal, size: screenWidth * 0.06), // UI Design: Taille adaptative
                 onPressed: () {
                   setState(() {
                     _recherche = '';
@@ -172,19 +192,23 @@ class _SallesEcranState extends State<SallesEcran> {
 
   // UI Design: Filtres rapides
   Widget _construireFiltresRapides() {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
     return Container(
-      height: 40,
-      margin: const EdgeInsets.symmetric(horizontal: 16),
+      height: screenHeight * 0.05, // UI Design: Hauteur adaptative
+      margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Marge adaptative
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
           _construireBoutonFiltre('toutes', 'Toutes (${_salles.length})'),
-          const SizedBox(width: 8),
+          SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
           _construireBoutonFiltre(
             'disponibles', 
             'Disponibles (${_salles.where((s) => s.estDisponible).length})'
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
           _construireBoutonFiltre(
             'reservees', 
             'Réservées (${_salles.where((s) => !s.estDisponible).length})'
@@ -195,6 +219,10 @@ class _SallesEcranState extends State<SallesEcran> {
   }
 
   Widget _construireBoutonFiltre(String filtre, String label) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
     final estActif = _filtreActuel == filtre;
     return GestureDetector(
       onTap: () {
@@ -204,7 +232,10 @@ class _SallesEcranState extends State<SallesEcran> {
         });
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: EdgeInsets.symmetric(
+          horizontal: screenWidth * 0.04, // UI Design: Padding adaptatif
+          vertical: screenHeight * 0.01,
+        ),
         decoration: BoxDecoration(
           color: estActif ? CouleursApp.principal : CouleursApp.blanc,
           borderRadius: BorderRadius.circular(20),
@@ -217,8 +248,10 @@ class _SallesEcranState extends State<SallesEcran> {
           style: TextStyle(
             color: estActif ? CouleursApp.blanc : CouleursApp.principal,
             fontWeight: estActif ? FontWeight.bold : FontWeight.normal,
-            fontSize: 12,
+            fontSize: screenWidth * 0.03, // UI Design: Taille adaptative
           ),
+          overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+          maxLines: 1,
         ),
       ),
     );
@@ -258,8 +291,12 @@ class _SallesEcranState extends State<SallesEcran> {
   }
 
   Widget _construireDetailsSalle(Salle salle) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
     return Container(
-      height: MediaQuery.of(context).size.height * 0.8,
+      height: screenHeight * 0.8, // UI Design: Hauteur adaptative
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.only(
@@ -267,66 +304,85 @@ class _SallesEcranState extends State<SallesEcran> {
           topRight: Radius.circular(20),
         ),
       ),
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(screenWidth * 0.05), // UI Design: Padding adaptatif
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Handle
           Center(
             child: Container(
-              width: 40,
-              height: 4,
+              width: screenWidth * 0.1, // UI Design: Largeur adaptative
+              height: screenHeight * 0.005, // UI Design: Hauteur adaptative
               decoration: BoxDecoration(
                 color: Colors.grey.shade300,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: screenHeight * 0.025), // UI Design: Espacement adaptatif
           
           // Titre
           Text(
             salle.nom,
-            style: StylesTexteApp.titre.copyWith(fontSize: 24),
+            style: StylesTexteApp.titre.copyWith(
+              fontSize: screenWidth * 0.06, // UI Design: Taille adaptative
+            ),
+            overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+            maxLines: 1,
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: screenHeight * 0.01), // UI Design: Espacement adaptatif
           Text(
             '${salle.batiment} • ${salle.etage}',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: screenWidth * 0.04, // UI Design: Taille adaptative
               color: CouleursApp.texteFonce.withValues(alpha: 0.6),
             ),
+            overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+            maxLines: 1,
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: screenHeight * 0.025), // UI Design: Espacement adaptatif
           
           // Description
           Text(
             'Description',
-            style: StylesTexteApp.titre.copyWith(fontSize: 18),
+            style: StylesTexteApp.titre.copyWith(
+              fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
+            ),
+            overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+            maxLines: 1,
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: screenHeight * 0.01), // UI Design: Espacement adaptatif
           Text(
             salle.description,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
               color: CouleursApp.texteFonce.withValues(alpha: 0.8),
               height: 1.5,
             ),
+            overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+            maxLines: 3,
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: screenHeight * 0.025), // UI Design: Espacement adaptatif
           
           // Équipements
           Text(
             'Équipements disponibles',
-            style: StylesTexteApp.titre.copyWith(fontSize: 18),
+            style: StylesTexteApp.titre.copyWith(
+              fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
+            ),
+            overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+            maxLines: 1,
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: screenHeight * 0.015), // UI Design: Espacement adaptatif
           Wrap(
-            spacing: 8,
-            runSpacing: 8,
+            spacing: screenWidth * 0.02, // UI Design: Espacement adaptatif
+            runSpacing: screenWidth * 0.02, // UI Design: Espacement adaptatif
             children: salle.equipements.map((equipement) {
               return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenWidth * 0.03, // UI Design: Padding adaptatif
+                  vertical: screenWidth * 0.02,
+                ),
                 decoration: BoxDecoration(
                   color: CouleursApp.principal.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
@@ -336,11 +392,13 @@ class _SallesEcranState extends State<SallesEcran> {
                 ),
                 child: Text(
                   equipement,
-                  style: const TextStyle(
-                    fontSize: 12,
+                  style: TextStyle(
+                    fontSize: screenWidth * 0.03, // UI Design: Taille adaptative
                     color: CouleursApp.principal,
                     fontWeight: FontWeight.w500,
                   ),
+                  overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                  maxLines: 1,
                 ),
               );
             }).toList(),
@@ -350,18 +408,18 @@ class _SallesEcranState extends State<SallesEcran> {
           // Bouton réserver
           SizedBox(
             width: double.infinity,
-                                  child: ElevatedButton(
-                        onPressed: salle.estDisponible 
-                          ? () {
-                              Navigator.pop(context);
-                              _choisirCreneauEtReserver(salle);
-                            }
+            child: ElevatedButton(
+              onPressed: salle.estDisponible 
+                ? () {
+                    Navigator.pop(context);
+                    _choisirCreneauEtReserver(salle);
+                  }
                 : (salle.reserveePar == 'DUBM12345678') // Si c'est ma réservation
                   ? () {
                       Navigator.pop(context);
                       _gererMaReservation(salle);
                     }
-                          : null,
+                  : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: salle.estDisponible 
                   ? CouleursApp.accent 
@@ -369,7 +427,7 @@ class _SallesEcranState extends State<SallesEcran> {
                     ? CouleursApp.principal // Ma réservation
                   : Colors.grey,
                 foregroundColor: CouleursApp.blanc,
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02), // UI Design: Padding adaptatif
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -380,10 +438,12 @@ class _SallesEcranState extends State<SallesEcran> {
                   : (salle.reserveePar == 'DUBM12345678')
                     ? 'Modifier ma réservation'
                   : 'Salle indisponible',
-                style: const TextStyle(
-                  fontSize: 16,
+                style: TextStyle(
+                  fontSize: screenWidth * 0.04, // UI Design: Taille adaptative
                   fontWeight: FontWeight.bold,
                 ),
+                overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                maxLines: 1,
               ),
             ),
           ),
@@ -408,158 +468,173 @@ class _SallesEcranState extends State<SallesEcran> {
 
   // UI Design: Modal de sélection des heures - SCROLLABLE pour éviter overflow
   Widget _construireModalCreneaux(Salle salle, {bool estModification = false}) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
     final heuresDisponibles = _genererHeuresDisponibles();
     
     return StatefulBuilder(
       builder: (context, setState) {
         return Container(
           constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.8,
+            maxHeight: screenHeight * 0.8, // UI Design: Hauteur adaptative
           ),
           child: SingleChildScrollView(
             child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // En-tête
-              Row(
+              padding: EdgeInsets.all(screenWidth * 0.05), // UI Design: Padding adaptatif
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.schedule, color: CouleursApp.principal, size: 24),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          estModification ? 'Modifier les heures' : 'Sélectionner les heures',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: CouleursApp.texteFonce,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close, color: CouleursApp.texteFonce),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              
-              // Instructions
-              const Text(
-                'Cliquez sur les heures que vous souhaitez réserver :',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: CouleursApp.texteFonce,
-                ),
-              ),
-              const SizedBox(height: 12),
-              
-                  // Grille d'heures sélectionnables - OPTIMISÉE pour éviter overflow
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3, // 3 carrés par ligne pour plus d'espace
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 8,
-                      childAspectRatio: 1.8, // Plus large pour éviter l'overflow
-                ),
-                itemCount: heuresDisponibles.length,
-                itemBuilder: (context, index) {
-                  final heure = heuresDisponibles[index];
-                  final heureValeur = heure['valeur'] as int;
-                  final estDisponible = heure['disponible'] as bool;
-                  final estSelectionne = _heuresSelectionnees.contains(heureValeur);
-                  
-                  return InkWell(
-                    onTap: estDisponible ? () {
-                      setState(() {
-                        if (estSelectionne) {
-                          _heuresSelectionnees.remove(heureValeur);
-                        } else {
-                          _heuresSelectionnees.add(heureValeur);
-                        }
-                      });
-                    } : null,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: !estDisponible 
-                          ? Colors.grey.withValues(alpha: 0.3)
-                          : estSelectionne 
-                            ? CouleursApp.accent
-                            : CouleursApp.principal.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: !estDisponible 
-                            ? Colors.grey.withValues(alpha: 0.5)
-                            : estSelectionne 
-                              ? CouleursApp.accent
-                              : CouleursApp.principal.withValues(alpha: 0.4),
-                          width: estSelectionne ? 2 : 1,
-                        ),
-                      ),
-                      child: Center(
+                  // En-tête
+                  Row(
+                    children: [
+                      Icon(Icons.schedule, color: CouleursApp.principal, size: screenWidth * 0.06), // UI Design: Taille adaptative
+                      SizedBox(width: screenWidth * 0.03), // UI Design: Espacement adaptatif
+                      Expanded(
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            if (estSelectionne)
-                              const Icon(
-                                Icons.check,
-                                color: CouleursApp.blanc,
-                                size: 16,
-                              ),
-                            const SizedBox(height: 2),
                             Text(
-                              heure['heure'] as String,
+                              estModification ? 'Modifier les heures' : 'Sélectionner les heures',
                               style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: !estDisponible 
-                                  ? Colors.grey
-                                  : estSelectionne 
-                                    ? CouleursApp.blanc
-                                    : CouleursApp.principal,
+                                fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
+                                fontWeight: FontWeight.bold,
+                                color: CouleursApp.texteFonce,
                               ),
+                              overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                              maxLines: 1,
                             ),
                           ],
                         ),
                       ),
+                      IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: Icon(Icons.close, color: CouleursApp.texteFonce, size: screenWidth * 0.06), // UI Design: Taille adaptative
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: screenHeight * 0.025), // UI Design: Espacement adaptatif
+                  
+                  // Instructions
+                  Text(
+                    'Cliquez sur les heures que vous souhaitez réserver :',
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
+                      fontWeight: FontWeight.w600,
+                      color: CouleursApp.texteFonce,
                     ),
-                  );
-                },
-              ),
-              const SizedBox(height: 20),
-              
-              // Bouton de confirmation
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _heuresSelectionnees.isNotEmpty 
-                          ? () => _confirmerReservationHeures(salle, _heuresSelectionnees.toList(), estModification)
-                    : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: CouleursApp.accent,
-                    foregroundColor: CouleursApp.blanc,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                    maxLines: 2,
                   ),
-                  child: Text(
-                    _heuresSelectionnees.isEmpty 
-                      ? 'Sélectionnez au moins une heure'
-                      : 'Réserver ${_heuresSelectionnees.length} heure${_heuresSelectionnees.length > 1 ? 's' : ''}',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  SizedBox(height: screenHeight * 0.015), // UI Design: Espacement adaptatif
+                  
+                  // Grille d'heures sélectionnables - OPTIMISÉE pour éviter overflow
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3, // 3 carrés par ligne pour plus d'espace
+                      crossAxisSpacing: screenWidth * 0.02, // UI Design: Espacement adaptatif
+                      mainAxisSpacing: screenHeight * 0.01, // UI Design: Espacement adaptatif
+                      childAspectRatio: 1.8, // Plus large pour éviter l'overflow
+                    ),
+                    itemCount: heuresDisponibles.length,
+                    itemBuilder: (context, index) {
+                      final heure = heuresDisponibles[index];
+                      final heureValeur = heure['valeur'] as int;
+                      final estDisponible = heure['disponible'] as bool;
+                      final estSelectionne = _heuresSelectionnees.contains(heureValeur);
+                      
+                      return InkWell(
+                        onTap: estDisponible ? () {
+                          setState(() {
+                            if (estSelectionne) {
+                              _heuresSelectionnees.remove(heureValeur);
+                            } else {
+                              _heuresSelectionnees.add(heureValeur);
+                            }
+                          });
+                        } : null,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: !estDisponible 
+                              ? Colors.grey.withValues(alpha: 0.3)
+                              : estSelectionne 
+                                ? CouleursApp.accent
+                                : CouleursApp.principal.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: !estDisponible 
+                                ? Colors.grey.withValues(alpha: 0.5)
+                                : estSelectionne 
+                                  ? CouleursApp.accent
+                                  : CouleursApp.principal.withValues(alpha: 0.4),
+                              width: estSelectionne ? 2 : 1,
+                            ),
+                          ),
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                if (estSelectionne)
+                                  Icon(
+                                    Icons.check,
+                                    color: CouleursApp.blanc,
+                                    size: screenWidth * 0.04, // UI Design: Taille adaptative
+                                  ),
+                                SizedBox(height: screenHeight * 0.002), // UI Design: Espacement adaptatif
+                                Text(
+                                  heure['heure'] as String,
+                                  style: TextStyle(
+                                    fontSize: screenWidth * 0.03, // UI Design: Taille adaptative
+                                    fontWeight: FontWeight.w600,
+                                    color: !estDisponible 
+                                      ? Colors.grey
+                                      : estSelectionne 
+                                        ? CouleursApp.blanc
+                                        : CouleursApp.principal,
+                                  ),
+                                  overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                                  maxLines: 1,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                ),
-              ),
-                  const SizedBox(height: 20), // Espace en bas pour le scroll
-            ],
+                  SizedBox(height: screenHeight * 0.025), // UI Design: Espacement adaptatif
+                  
+                  // Bouton de confirmation
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _heuresSelectionnees.isNotEmpty 
+                        ? () => _confirmerReservationHeures(salle, _heuresSelectionnees.toList(), estModification)
+                        : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: CouleursApp.accent,
+                        foregroundColor: CouleursApp.blanc,
+                        padding: EdgeInsets.symmetric(vertical: screenHeight * 0.015), // UI Design: Padding adaptatif
+                      ),
+                      child: Text(
+                        _heuresSelectionnees.isEmpty 
+                          ? 'Sélectionnez au moins une heure'
+                          : 'Réserver ${_heuresSelectionnees.length} heure${_heuresSelectionnees.length > 1 ? 's' : ''}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: screenWidth * 0.04, // UI Design: Taille adaptative
+                        ),
+                        overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                        maxLines: 1,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: screenHeight * 0.025), // UI Design: Espace en bas pour le scroll
+                ],
               ),
             ),
           ),

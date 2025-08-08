@@ -64,34 +64,48 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
 
   @override
   Widget build(BuildContext context) {
+    // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
+    final mediaQuery = MediaQuery.of(context);
+    final screenHeight = mediaQuery.size.height;
+    final screenWidth = mediaQuery.size.width;
+    final padding = mediaQuery.padding;
+    final viewInsets = mediaQuery.viewInsets;
+    
     return Scaffold(
       backgroundColor: CouleursApp.fond,
+      resizeToAvoidBottomInset: true, // UI Design: Éviter les débordements avec le clavier
       appBar: const WidgetBarreAppNavigationAdmin(
         titre: 'Gestion Cantine',
         sousTitre: 'Menus et horaires',
         sectionActive: 'cantine',
       ),
-      body: _chargementEnCours
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _construireStatutCantine(),
-                  const SizedBox(height: 24),
-                  _construireGestionHoraires(),
-                  const SizedBox(height: 24),
-                  _construireGestionMenus(),
-                  const SizedBox(height: 24),
-                  _construireActionsRapides(),
-                ],
+      body: SafeArea(
+        child: _chargementEnCours
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                padding: EdgeInsets.only(
+                  left: screenWidth * 0.04, // UI Design: Padding adaptatif
+                  right: screenWidth * 0.04,
+                  top: screenHeight * 0.02,
+                  bottom: viewInsets.bottom + padding.bottom + screenHeight * 0.025, // UI Design: Padding adaptatif pour éviter les débordements
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _construireStatutCantine(),
+                    SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
+                    _construireGestionHoraires(),
+                    SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
+                    _construireGestionMenus(),
+                  ],
+                ),
               ),
-            ),
+        ),
+
       floatingActionButton: FloatingActionButton(
         onPressed: _ajouterNouveauMenu,
         backgroundColor: CouleursApp.principal,
-        child: const Icon(Icons.add, color: Colors.white),
+        child: Icon(Icons.add, color: Colors.white, size: screenWidth * 0.06), // UI Design: Taille adaptative
       ),
     );
   }
@@ -116,7 +130,7 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
           couleurIcone: estOuverte ? Colors.green : Colors.orange,
         ),
         ElementStatistique(
-          valeur: '${heureActuelle.hour}:${heureActuelle.minute.toString().padLeft(2, '0')}',
+          valeur: '${heureActuelle.hour}h${heureActuelle.minute.toString().padLeft(2, '0')}',
           label: 'Heure',
           icone: Icons.access_time,
           couleurIcone: estOuverte ? Colors.green : Colors.orange,
@@ -128,7 +142,7 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
           couleurIcone: estOuverte ? Colors.green : Colors.orange,
         ),
         ElementStatistique(
-          valeur: estOuverte ? 'Forcer Fermeture' : 'Forcer Ouverture',
+          valeur: estOuverte ? 'Fermer' : 'Ouvrir',
           label: 'Action',
           icone: estOuverte ? Icons.close : Icons.play_arrow,
           couleurIcone: estOuverte ? Colors.red : Colors.green,
@@ -161,17 +175,23 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'Horaires d\'Ouverture',
-              style: StylesTexteApp.grandTitre,
+            Expanded( // UI Design: Utiliser Expanded pour le titre
+              child: const Text(
+                'Horaires d\'Ouverture',
+                style: StylesTexteApp.grandTitre,
+              ),
             ),
-            ElevatedButton.icon(
-              onPressed: _modifierTousLesHoraires,
-              icon: const Icon(Icons.edit, size: 16),
-              label: const Text('Modifier'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: CouleursApp.accent,
-                foregroundColor: CouleursApp.blanc,
+            const SizedBox(width: 8), // UI Design: Espacement
+            Flexible( // UI Design: Utiliser Flexible pour le bouton
+              child: ElevatedButton.icon(
+                onPressed: _modifierTousLesHoraires,
+                icon: const Icon(Icons.edit, size: 16),
+                label: const Text('Modifier'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: CouleursApp.accent,
+                  foregroundColor: CouleursApp.blanc,
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), // UI Design: Padding réduit
+                ),
               ),
             ),
           ],
@@ -197,6 +217,8 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
                         child: Text(
                           jour,
                           style: StylesTexteApp.moyenTitre,
+                          maxLines: 1, // UI Design: Limiter à une ligne
+                          overflow: TextOverflow.ellipsis, // UI Design: Gérer le débordement
                         ),
                       ),
                       if (estFerme)
@@ -212,26 +234,40 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
                           ),
                         )
                       else
-                        Row(
-                          children: [
-                            Text(
-                              '${horaire['ouverture']} - ${horaire['fermeture']}',
-                              style: StylesTexteApp.corpsNormal,
-                            ),
-                            const SizedBox(width: 8),
-                            IconButton(
-                              onPressed: () => _modifierHoraireJour(jour),
-                              icon: const Icon(
-                                Icons.edit,
-                                size: 16,
-                                color: CouleursApp.accent,
+                        Expanded( // UI Design: Utiliser Expanded pour éviter le débordement
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end, // UI Design: Aligner à droite
+                            children: [
+                              Flexible( // UI Design: Utiliser Flexible pour le texte
+                                child: Text(
+                                  '${horaire['ouverture']} - ${horaire['fermeture']}',
+                                  style: StylesTexteApp.corpsNormal,
+                                  maxLines: 1, // UI Design: Limiter à une ligne
+                                  overflow: TextOverflow.ellipsis, // UI Design: Gérer le débordement
+                                ),
                               ),
-                              constraints: const BoxConstraints(
-                                minWidth: 32,
-                                minHeight: 32,
+                              const SizedBox(width: 4), // UI Design: Espacement réduit
+                              SizedBox( // UI Design: Utiliser SizedBox pour contraindre le bouton
+                                width: 32,
+                                height: 32,
+                                child: IconButton(
+                                  onPressed: () => _modifierHoraireJour(jour),
+                                  icon: const Icon(
+                                    Icons.edit,
+                                    size: 16,
+                                    color: CouleursApp.accent,
+                                  ),
+                                  padding: EdgeInsets.zero, // UI Design: Supprimer le padding
+                                  constraints: const BoxConstraints(
+                                    minWidth: 32,
+                                    minHeight: 32,
+                                    maxWidth: 32,
+                                    maxHeight: 32,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                     ],
                   ),
@@ -385,6 +421,8 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
               titre,
               style: StylesTexteApp.petitBlanc.copyWith(fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
+              maxLines: 2, // UI Design: Limiter à 2 lignes
+              overflow: TextOverflow.ellipsis, // UI Design: Gérer le débordement
             ),
           ),
         ],
@@ -407,7 +445,34 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
   }
 
   String _prochainCreneauOuverture() {
-    return _horairesDatasource.obtenirStatutCantineFormatte();
+    final maintenant = DateTime.now();
+    final jourActuel = _obtenirJourSemaine(maintenant.weekday);
+    final heureActuelle = TimeOfDay.now();
+    
+    // Si la cantine est ouverte aujourd'hui
+    if (_estCantineOuverte(jourActuel, heureActuelle)) {
+      final horaires = _horairesDatasource.obtenirHorairesCantine(jourActuel);
+      final heureFermeture = horaires['fermeture']!;
+      return 'Ferme à ${_formatterHeure(heureFermeture)}';
+    }
+    
+    // Si la cantine est fermée, trouver la prochaine ouverture
+    final joursSemaine = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+    final indexJourActuel = joursSemaine.indexOf(jourActuel);
+    
+    // Chercher le prochain jour d'ouverture
+    for (int i = 1; i <= 7; i++) {
+      final indexProchainJour = (indexJourActuel + i) % 7;
+      final prochainJour = joursSemaine[indexProchainJour];
+      final horairesProchainJour = _horairesDatasource.obtenirHorairesCantine(prochainJour);
+      
+      if (horairesProchainJour['ouverture'] != null) {
+        final heureOuverture = horairesProchainJour['ouverture']!;
+        return 'Lundi à ${_formatterHeure(heureOuverture)}'; // UI Design: Simplifier pour l'affichage
+      }
+    }
+    
+    return 'Fermé ce week-end';
   }
 
   // UI Design: Convertir les horaires TimeOfDay en String pour l'affichage

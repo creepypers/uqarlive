@@ -110,27 +110,42 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
 
   @override
   Widget build(BuildContext context) {
+    // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
+    final mediaQuery = MediaQuery.of(context);
+    final screenHeight = mediaQuery.size.height;
+    final screenWidth = mediaQuery.size.width;
+    final padding = mediaQuery.padding;
+    final viewInsets = mediaQuery.viewInsets;
+    
     return Scaffold(
       backgroundColor: CouleursApp.fond,
+      resizeToAvoidBottomInset: true, // UI Design: Éviter les débordements avec le clavier
       appBar: const WidgetBarreAppNavigationAdmin(
-        titre: 'Modifier les Horaires',
-        sousTitre: 'Gestion des horaires de la cantine',
+        titre: 'Modifier Horaires',
+        sousTitre: 'Gérer les horaires de la cantine',
         sectionActive: 'cantine',
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
+        child: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              padding: EdgeInsets.only(
+                left: screenWidth * 0.04, // UI Design: Padding adaptatif
+                right: screenWidth * 0.04,
+                top: screenHeight * 0.02,
+                bottom: viewInsets.bottom + padding.bottom + screenHeight * 0.025, // UI Design: Padding adaptatif pour éviter les débordements
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _construireSectionInformation(),
-                  const SizedBox(height: 24),
+                  SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
                   _construireSectionHoraires(),
-                  const SizedBox(height: 32),
-              _construireBoutonsSauvegarde(),
+                  SizedBox(height: screenHeight * 0.04), // UI Design: Espacement adaptatif
+                  _construireBoutonsSauvegarde(),
                 ],
-          ),
-        ),
+              ),
+            ),
       ),
     );
   }

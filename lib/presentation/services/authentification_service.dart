@@ -23,9 +23,6 @@ class AuthentificationService {
   // UI Design: Vérifier si un utilisateur est connecté
   bool get estConnecte => _utilisateurActuel != null;
   
-  // UI Design: Vérifier si l'utilisateur connecté est admin
-  bool get estAdmin => _utilisateurActuel?.estAdmin ?? false;
-
   // UI Design: Authentifier un utilisateur
   Future<Utilisateur?> authentifier(String email, String motDePasse) async {
     try {
@@ -73,6 +70,66 @@ class AuthentificationService {
   // UI Design: Vérifier si l'utilisateur connecté a un privilège spécifique
   bool aPrivilege(String privilege) {
     return _utilisateurActuel?.aPrivilege(privilege) ?? false;
+  }
+
+  // UI Design: Vérifier si l'utilisateur connecté est admin
+  bool get estAdministrateur {
+    return aPrivilege('admin') || _utilisateurActuel?.typeUtilisateur == TypeUtilisateur.administrateur;
+  }
+
+  // UI Design: Modifier les privilèges d'un utilisateur (admin seulement)
+  Future<bool> modifierPrivileges(String utilisateurId, List<String> nouveauxPrivileges) async {
+    // Vérifier que l'utilisateur connecté est admin
+    if (!estAdministrateur) {
+      return false;
+    }
+
+    try {
+      final utilisateur = await _utilisateursRepository.obtenirUtilisateurParId(utilisateurId);
+      if (utilisateur == null) return false;
+
+      // Vérifier qu'on ne retire pas les privilèges admin du dernier admin
+      if (utilisateur.aPrivilege('admin') && !nouveauxPrivileges.contains('admin')) {
+        final tousUtilisateurs = await _utilisateursRepository.obtenirTousLesUtilisateurs();
+        final admins = tousUtilisateurs.where((u) => u.aPrivilege('admin') || u.typeUtilisateur == 'admin').toList();
+        if (admins.length <= 1) {
+          return false; // Ne pas retirer le dernier admin
+        }
+      }
+
+      final utilisateurModifie = utilisateur.copyWith(privileges: nouveauxPrivileges);
+      return await _utilisateursRepository.modifierUtilisateur(utilisateurModifie);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // UI Design: Promouvoir un utilisateur admin (admin seulement)
+  Future<bool> promouvoirAdmin(String utilisateurId) async {
+    if (!estAdministrateur) return false;
+
+    final utilisateur = await _utilisateursRepository.obtenirUtilisateurParId(utilisateurId);
+    if (utilisateur == null) return false;
+
+    final nouveauxPrivileges = List<String>.from(utilisateur.privileges);
+    if (!nouveauxPrivileges.contains('admin')) {
+      nouveauxPrivileges.add('admin');
+    }
+
+    return await modifierPrivileges(utilisateurId, nouveauxPrivileges);
+  }
+
+  // UI Design: Rétrograder un admin (admin seulement, sauf dernier admin)
+  Future<bool> retrograderAdmin(String utilisateurId) async {
+    if (!estAdministrateur) return false;
+
+    final utilisateur = await _utilisateursRepository.obtenirUtilisateurParId(utilisateurId);
+    if (utilisateur == null) return false;
+
+    final nouveauxPrivileges = List<String>.from(utilisateur.privileges)
+        ..remove('admin');
+
+    return await modifierPrivileges(utilisateurId, nouveauxPrivileges);
   }
 
   // UI Design: Obtenir les initiales de l'utilisateur pour l'avatar

@@ -6,6 +6,7 @@ class Association {
   final String typeAssociation; // "etudiante", "culturelle", "sportive", "academique"
   final String? president;
   final String? vicePresident;
+  final String? chefId; // ID du chef/président de l'association
   final int nombreMembres;
   final String? email;
   final String? telephone;
@@ -30,6 +31,7 @@ class Association {
     required this.typeAssociation,
     this.president,
     this.vicePresident,
+    this.chefId,
     required this.nombreMembres,
     this.email,
     this.telephone,
@@ -88,6 +90,7 @@ class Association {
     String? typeAssociation,
     String? president,
     String? vicePresident,
+    String? chefId,
     int? nombreMembres,
     String? email,
     String? telephone,
@@ -112,6 +115,7 @@ class Association {
       typeAssociation: typeAssociation ?? this.typeAssociation,
       president: president ?? this.president,
       vicePresident: vicePresident ?? this.vicePresident,
+      chefId: chefId ?? this.chefId,
       nombreMembres: nombreMembres ?? this.nombreMembres,
       email: email ?? this.email,
       telephone: telephone ?? this.telephone,

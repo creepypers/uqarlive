@@ -89,27 +89,38 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
 
   @override
   Widget build(BuildContext context) {
+    // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
+    final mediaQuery = MediaQuery.of(context);
+    final screenHeight = mediaQuery.size.height;
+    final screenWidth = mediaQuery.size.width;
+    final padding = mediaQuery.padding;
+    final viewInsets = mediaQuery.viewInsets;
+    
     return Scaffold(
       backgroundColor: CouleursApp.fond,
+      resizeToAvoidBottomInset: true, // UI Design: Éviter les débordements avec le clavier
       appBar: _construireAppBar(),
       body: SafeArea(
         child: SingleChildScrollView(
+          padding: EdgeInsets.only(
+            bottom: viewInsets.bottom + padding.bottom + screenHeight * 0.025, // UI Design: Padding adaptatif pour éviter les débordements
+          ),
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(screenWidth * 0.04), // UI Design: Padding adaptatif
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Section filtres
                 _construireSectionFiltres(),
-                const SizedBox(height: 20),
+                SizedBox(height: screenHeight * 0.025), // UI Design: Espacement adaptatif
                 
                 // Statistiques échange de livres
                 _construireStatistiquesEchangeLivres(),
-                const SizedBox(height: 24),
+                SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
                 
                 // Grille de livres disponibles
                 _construireGrilleLivres(),
-                const SizedBox(height: 20),
+                SizedBox(height: screenHeight * 0.025), // UI Design: Espacement adaptatif
               ],
             ),
           ),
@@ -135,18 +146,26 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
 
   // UI Design: Section filtres spécialisée pour les livres
   Widget _construireSectionFiltres() {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Filtres de Livres',
-          style: StylesTexteApp.titre.copyWith(fontSize: 22),
+          style: StylesTexteApp.titre.copyWith(
+            fontSize: screenWidth * 0.055, // UI Design: Taille adaptative
+          ),
+          overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+          maxLines: 1,
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
         
         // Filtres par matière (chips horizontaux)
         SizedBox(
-          height: 50,
+          height: screenHeight * 0.06, // UI Design: Hauteur adaptative
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: _matieres.length,
@@ -155,7 +174,7 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
               final estSelectionne = _matiereSelectionnee == matiere;
               
               return Container(
-                margin: const EdgeInsets.only(right: 12),
+                margin: EdgeInsets.only(right: screenWidth * 0.03), // UI Design: Marge adaptative
                 child: FilterChip(
                   label: Text(
                     matiere,
@@ -164,7 +183,10 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
                           ? CouleursApp.blanc 
                           : CouleursApp.principal,
                       fontWeight: estSelectionne ? FontWeight.bold : FontWeight.w500,
+                      fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
                     ),
+                    overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                    maxLines: 1,
                   ),
                   selected: estSelectionne,
                   backgroundColor: CouleursApp.blanc,
@@ -187,14 +209,14 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
           ),
         ),
         
-        const SizedBox(height: 16),
+        SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
         
         // Filtres état et année avec DropdownButton natifs stylisés
         Row(
           children: [
             Expanded(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Padding adaptatif
                 decoration: BoxDecoration(
                   color: CouleursApp.blanc,
                   borderRadius: BorderRadius.circular(12),
@@ -210,12 +232,15 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
                       'État du Livre',
                       style: TextStyle(
                         color: CouleursApp.texteFonce.withValues(alpha: 0.6),
-                        fontSize: 14,
+                        fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
                       ),
+                      overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                      maxLines: 1,
                     ),
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.arrow_drop_down,
                       color: CouleursApp.principal,
+                      size: screenWidth * 0.06, // UI Design: Taille adaptative
                     ),
                     onChanged: (String? newValue) {
                       setState(() => _filtreEtat = newValue!);
@@ -226,10 +251,12 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
                         value: value,
                         child: Text(
                           value,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: CouleursApp.texteFonce,
-                            fontSize: 14,
+                            fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
                           ),
+                          overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                          maxLines: 1,
                         ),
                       );
                     }).toList(),
@@ -237,48 +264,53 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
                 ),
               ),
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: screenWidth * 0.04), // UI Design: Espacement adaptatif
             Expanded(
               child: Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: CouleursApp.blanc,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: CouleursApp.principal.withValues(alpha: 0.3),
-        ),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
+                padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Padding adaptatif
+                decoration: BoxDecoration(
+                  color: CouleursApp.blanc,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: CouleursApp.principal.withValues(alpha: 0.3),
+                  ),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
                     value: _filtreAnnee,
-          isExpanded: true,
+                    isExpanded: true,
                     hint: Text(
                       'Année d\'Étude',
                       style: TextStyle(
                         color: CouleursApp.texteFonce.withValues(alpha: 0.6),
-                        fontSize: 14,
+                        fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
                       ),
+                      overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                      maxLines: 1,
                     ),
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.arrow_drop_down,
                       color: CouleursApp.principal,
+                      size: screenWidth * 0.06, // UI Design: Taille adaptative
                     ),
                     onChanged: (String? newValue) {
                       setState(() => _filtreAnnee = newValue!);
                       _chargerLivres();
                     },
                     items: _anneesEtude.map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
+                      return DropdownMenuItem<String>(
                         value: value,
-              child: Text(
+                        child: Text(
                           value,
-                style: const TextStyle(
-                  color: CouleursApp.texteFonce,
-                  fontSize: 14,
-                ),
-              ),
-            );
-          }).toList(),
+                          style: TextStyle(
+                            color: CouleursApp.texteFonce,
+                            fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
+                          ),
+                          overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                          maxLines: 1,
+                        ),
+                      );
+                    }).toList(),
                   ),
                 ),
               ),
@@ -321,34 +353,46 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
 
   // UI Design: Grille de livres disponibles pour l'échange avec WidgetCarte optimisé
   Widget _construireGrilleLivres() {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Text(
-              'Livres Disponibles',
-              style: StylesTexteApp.titre.copyWith(fontSize: 22),
+            Expanded(
+              child: Text(
+                'Livres Disponibles',
+                style: StylesTexteApp.titre.copyWith(
+                  fontSize: screenWidth * 0.055, // UI Design: Taille adaptative
+                ),
+                overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                maxLines: 1,
+              ),
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: screenWidth * 0.04), // UI Design: Espacement adaptatif
             Text(
               '(${_livresDisponibles.length})',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
                 color: CouleursApp.principal.withValues(alpha: 0.7),
                 fontWeight: FontWeight.w500,
               ),
+              overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+              maxLines: 1,
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
         WidgetCollection<Livre>.grille(
           elements: _livresDisponibles,
           enChargement: _chargementLivres,
           ratioAspect: 0.75, // UI Design: Ajuste de 1.05 à 0.75 pour éviter l'overflow (hauteur plus grande que largeur)
           nombreColonnes: 2,
-          espacementColonnes: 16,
-          espacementLignes: 16,
+          espacementColonnes: screenWidth * 0.04, // UI Design: Espacement adaptatif
+          espacementLignes: screenHeight * 0.02, // UI Design: Espacement adaptatif
           constructeurElement: (context, livre, index) {
             return WidgetCarte.livre(
               livre: livre,
@@ -363,7 +407,7 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
           },
           messageEtatVide: 'Aucun livre disponible pour l\'échange',
           iconeEtatVide: Icons.menu_book_outlined,
-          padding: const EdgeInsets.symmetric(horizontal: 16), // UI Design: Padding pour éviter les débordements
+          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Padding adaptatif
         ),
       ],
     );

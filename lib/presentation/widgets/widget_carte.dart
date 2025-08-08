@@ -199,28 +199,33 @@ class WidgetCarte extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
+    // UI Design: Calculer les dimensions adaptatives
+    final largeurAdaptative = largeur ?? (modeListe ? screenWidth * 0.4 : screenWidth * 0.45);
+    final hauteurAdaptative = hauteur ?? (modeListe ? screenHeight * 0.25 : screenHeight * 0.3);
+    final tailleIconeAdaptative = tailleIcone ?? (modeListe ? screenWidth * 0.1 : screenWidth * 0.12);
+    
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: largeur,
-        height: hauteur,
-        margin: modeListe ? const EdgeInsets.only(right: 16) : null,
+        width: largeurAdaptative,
+        height: hauteurAdaptative,
+        margin: EdgeInsets.symmetric(
+          horizontal: screenWidth * 0.02, // UI Design: Marge adaptative
+          vertical: screenHeight * 0.01,
+        ),
         decoration: BoxDecoration(
-          color: CouleursApp.blanc,
-          borderRadius: BorderRadius.circular(16),
-          border:
-              modeListe && hauteur != null && hauteur! <= 115
-                  ? Border.all(
-                    color: CouleursApp.principal.withValues(alpha: 0.2),
-                  )
-                  : null,
+          color: couleurFond ?? CouleursApp.blanc,
+          borderRadius: BorderRadius.circular(screenWidth * 0.03), // UI Design: Rayon adaptatif
           boxShadow: [
             BoxShadow(
-              color: CouleursApp.principal.withValues(
-                alpha: modeListe ? 0.08 : 0.1,
-              ),
-              blurRadius: modeListe ? 8 : 12,
-              offset: Offset(0, modeListe ? 2 : 4),
+              color: CouleursApp.principal.withValues(alpha: 0.08),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
           ],
         ),

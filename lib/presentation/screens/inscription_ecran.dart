@@ -177,8 +177,16 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
 
   @override
   Widget build(BuildContext context) {
+    // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
+    final mediaQuery = MediaQuery.of(context);
+    final screenHeight = mediaQuery.size.height;
+    final screenWidth = mediaQuery.size.width;
+    final padding = mediaQuery.padding;
+    final viewInsets = mediaQuery.viewInsets;
+    
     return Scaffold(
       backgroundColor: CouleursApp.blanc,
+      resizeToAvoidBottomInset: true, // UI Design: Éviter les débordements avec le clavier
       body: Stack(
         children: [
           // Background divisé en 2 parties
@@ -216,17 +224,18 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
           // Contenu par-dessus le background  
           SafeArea(
             child: SingleChildScrollView(
+              padding: EdgeInsets.only(
+                bottom: viewInsets.bottom + padding.bottom + screenHeight * 0.025, // UI Design: Padding adaptatif pour éviter les débordements
+              ),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                  minHeight: MediaQuery.of(context).size.height - 
-                            MediaQuery.of(context).padding.top - 
-                            MediaQuery.of(context).padding.bottom,
+                  minHeight: screenHeight - padding.top - padding.bottom,
                 ),
                 child: Column(
                   children: [
                     // Section supérieure avec logo et illustrations
                     SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.35,
+                      height: screenHeight * 0.35, // UI Design: Hauteur adaptative
                       child: Stack(
                         children: [
                           // Logo et nom de l'application au centre
@@ -236,24 +245,26 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
                               children: [
                                 // Logo UqarLive
                                 _construireLogoUqarLive(),
-                                const SizedBox(height: 16),
+                                SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
                                 // Nom de l'application
                                 Text(
                                   'UqarLive',
                                   style: StylesTexteApp.titre.copyWith(
-                                    fontSize: 32,
+                                    fontSize: screenWidth * 0.08, // UI Design: Taille adaptative
                                     color: CouleursApp.blanc,
                                     fontWeight: FontWeight.bold,
                                   ),
+                                  overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                                  maxLines: 1,
                                 ),
-                                const SizedBox(height: 8),
+                                SizedBox(height: screenHeight * 0.01), // UI Design: Espacement adaptatif
                                 // Indicateur de page
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Container(
-                                      width: 8,
-                                      height: 8,
+                                      width: screenWidth * 0.02, // UI Design: Taille adaptative
+                                      height: screenWidth * 0.02, // UI Design: Taille adaptative
                                       decoration: BoxDecoration(
                                         color: _pageActuelle == 0
                                             ? CouleursApp.blanc
@@ -261,10 +272,10 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
                                         shape: BoxShape.circle,
                                       ),
                                     ),
-                                    const SizedBox(width: 8),
+                                    SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
                                     Container(
-                                      width: 8,
-                                      height: 8,
+                                      width: screenWidth * 0.02, // UI Design: Taille adaptative
+                                      height: screenWidth * 0.02, // UI Design: Taille adaptative
                                       decoration: BoxDecoration(
                                         color: _pageActuelle == 1
                                             ? CouleursApp.blanc
@@ -279,24 +290,24 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
                           ),
                           // Illustration de feuilles stylisées
                           Positioned(
-                            top: 40,
-                            left: 20,
-                            child: _construireIllustrationFeuille(50, 35),
+                            top: screenHeight * 0.05, // UI Design: Position adaptative
+                            left: screenWidth * 0.05, // UI Design: Position adaptative
+                            child: _construireIllustrationFeuille(screenWidth * 0.12, screenHeight * 0.04), // UI Design: Taille adaptative
                           ),
                           Positioned(
-                            top: 60,
-                            right: 30,
-                            child: _construireIllustrationFeuille(60, 45),
+                            top: screenHeight * 0.07, // UI Design: Position adaptative
+                            right: screenWidth * 0.075, // UI Design: Position adaptative
+                            child: _construireIllustrationFeuille(screenWidth * 0.15, screenHeight * 0.055), // UI Design: Taille adaptative
                           ),
                           Positioned(
-                            bottom: 20,
-                            left: 40,
-                            child: _construireIllustrationFeuille(70, 55),
+                            bottom: screenHeight * 0.025, // UI Design: Position adaptative
+                            left: screenWidth * 0.1, // UI Design: Position adaptative
+                            child: _construireIllustrationFeuille(screenWidth * 0.175, screenHeight * 0.068), // UI Design: Taille adaptative
                           ),
                           Positioned(
-                            bottom: 40,
-                            right: 20,
-                            child: _construireIllustrationFeuille(80, 65),
+                            bottom: screenHeight * 0.05, // UI Design: Position adaptative
+                            right: screenWidth * 0.05, // UI Design: Position adaptative
+                            child: _construireIllustrationFeuille(screenWidth * 0.2, screenHeight * 0.08), // UI Design: Taille adaptative
                           ),
                         ],
                       ),
@@ -305,13 +316,13 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
                     // Section inférieure avec formulaire paginé superposé sur le dégradé
                     Container(
                       width: double.infinity,
-                      margin: const EdgeInsets.only(top: 20),
-                      padding: const EdgeInsets.all(32),
+                      margin: EdgeInsets.only(top: screenHeight * 0.025), // UI Design: Marge adaptative
+                      padding: EdgeInsets.all(screenWidth * 0.08), // UI Design: Padding adaptatif
                       decoration: BoxDecoration(
                         color: CouleursApp.blanc,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(50),
-                          topRight: Radius.circular(50),
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(screenWidth * 0.125), // UI Design: Rayon adaptatif
+                          topRight: Radius.circular(screenWidth * 0.125), // UI Design: Rayon adaptatif
                         ),
                         boxShadow: [
                           BoxShadow(
@@ -327,16 +338,20 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             // Titre
-                            const Text(
+                            Text(
                               'Inscription',
-                              style: StylesTexteApp.titre,
+                              style: StylesTexteApp.titre.copyWith(
+                                fontSize: screenWidth * 0.055, // UI Design: Taille adaptative
+                              ),
                               textAlign: TextAlign.left,
+                              overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                              maxLines: 1,
                             ),
-                            const SizedBox(height: 24),
+                            SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
 
-                            // Contenu paginé - HAUTEUR FIXE pour éviter les conflits
+                            // Contenu paginé - HAUTEUR ADAPTATIVE pour éviter les conflits
                             SizedBox(
-                              height: 400, // Hauteur fixe pour le PageView
+                              height: screenHeight * 0.5, // UI Design: Hauteur adaptative
                               child: PageView(
                                 controller: _controleurPage,
                                 onPageChanged: (index) {
@@ -353,7 +368,7 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
                               ),
                             ),
 
-                            const SizedBox(height: 24),
+                            SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
 
                             // Boutons de navigation
                             Row(
@@ -365,7 +380,7 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
                                       onPressed: _pagePrecedente,
                                       style: OutlinedButton.styleFrom(
                                         side: const BorderSide(color: CouleursApp.principal),
-                                        padding: const EdgeInsets.symmetric(vertical: 16),
+                                        padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02), // UI Design: Padding adaptatif
                                         shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.circular(32),
                                         ),
@@ -374,12 +389,15 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
                                         'Précédent',
                                         style: StylesTexteApp.bouton.copyWith(
                                           color: CouleursApp.principal,
+                                          fontSize: screenWidth * 0.04, // UI Design: Taille adaptative
                                         ),
+                                        overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                                        maxLines: 1,
                                       ),
                                     ),
                                   ),
 
-                                if (_pageActuelle > 0) const SizedBox(width: 16),
+                                if (_pageActuelle > 0) SizedBox(width: screenWidth * 0.04), // UI Design: Espacement adaptatif
 
                                 // Bouton Suivant/S'inscrire
                                 Expanded(
@@ -388,13 +406,17 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
                                     style: DecorationsApp.boutonPrincipal,
                                     child: Text(
                                       _pageActuelle == 1 ? 'S\'inscrire' : 'Suivant',
-                                      style: StylesTexteApp.bouton,
+                                      style: StylesTexteApp.bouton.copyWith(
+                                        fontSize: screenWidth * 0.04, // UI Design: Taille adaptative
+                                      ),
+                                      overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                                      maxLines: 1,
                                     ),
                                   ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 16),
+                            SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
 
                             // Lien "Déjà un compte ?" - STYLE COHÉRENT AVEC CONNEXION
                             Center(
@@ -403,20 +425,22 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
                                   text: 'Déjà un compte? ',
                                   style: TextStyle(
                                     color: CouleursApp.texteFonce.withValues(alpha: 0.7),
-                                    fontSize: 14,
+                                    fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
                                   ),
                                   children: [
                                     WidgetSpan(
                                       child: GestureDetector(
                                         onTap: _retournerVersConnexion,
-                                        child: const Text(
+                                        child: Text(
                                           'Se connecter',
                                           style: TextStyle(
                                             color: CouleursApp.accent,
-                                            fontSize: 14,
+                                            fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
                                             fontWeight: FontWeight.w600,
                                             decoration: TextDecoration.underline,
                                           ),
+                                          overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                                          maxLines: 1,
                                         ),
                                       ),
                                     ),
@@ -424,7 +448,7 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 20),
+                            SizedBox(height: screenHeight * 0.025), // UI Design: Espacement adaptatif
                           ],
                         ),
                       ),
@@ -440,6 +464,10 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
   }
 
   Widget _construirePage1() {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -447,12 +475,14 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
           Text(
             'Informations personnelles',
             style: StylesTexteApp.champ.copyWith(
-              fontSize: 16,
+              fontSize: screenWidth * 0.04, // UI Design: Taille adaptative
               fontWeight: FontWeight.w600,
               color: CouleursApp.texteFonce,
             ),
+            overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+            maxLines: 1,
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
 
           // Champ prénom
           _construireChampTexte(
@@ -460,7 +490,7 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
             placeholderTexte: 'Prénom',
             icone: Icons.person_outline,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
 
           // Champ nom
           _construireChampTexte(
@@ -468,7 +498,7 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
             placeholderTexte: 'Nom',
             icone: Icons.person_outline,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
 
           // Champ code permanent
           _construireChampTexte(
@@ -476,11 +506,11 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
             placeholderTexte: 'Code permanent',
             icone: Icons.badge_outlined,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
 
           // Aide pour le code permanent
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: EdgeInsets.all(screenWidth * 0.03), // UI Design: Padding adaptatif
             decoration: BoxDecoration(
               color: CouleursApp.accent.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
@@ -488,9 +518,11 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
             child: Text(
               'Format: 4 lettres + 8 chiffres (ex: ABCD12345678)',
               style: StylesTexteApp.champ.copyWith(
-                fontSize: 12,
+                fontSize: screenWidth * 0.03, // UI Design: Taille adaptative
                 color: CouleursApp.texteFonce.withValues(alpha: 0.7),
               ),
+              overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+              maxLines: 2,
             ),
           ),
         ],
@@ -499,6 +531,10 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
   }
 
   Widget _construirePage2() {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -506,12 +542,14 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
           Text(
             'Informations de compte',
             style: StylesTexteApp.champ.copyWith(
-              fontSize: 16,
+              fontSize: screenWidth * 0.04, // UI Design: Taille adaptative
               fontWeight: FontWeight.w600,
               color: CouleursApp.texteFonce,
             ),
+            overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+            maxLines: 1,
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
 
           // Champ nom d'utilisateur
           _construireChampTexte(
@@ -519,7 +557,7 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
             placeholderTexte: 'Nom d\'utilisateur',
             icone: Icons.account_circle_outlined,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
 
           // Champ email
           _construireChampTexte(
@@ -527,7 +565,7 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
             placeholderTexte: 'Email',
             icone: Icons.email_outlined,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
 
           // Champ mot de passe
           _construireChampTexte(
@@ -536,7 +574,7 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
             icone: Icons.lock_outline,
             estMotDePasse: true,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
 
           // Champ confirmer mot de passe
           _construireChampTexte(
@@ -556,25 +594,33 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
     required IconData icone,
     bool estMotDePasse = false,
   }) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
     return Container(
       decoration: DecorationsApp.champTexte,
       child: TextFormField(
         controller: controleur,
         obscureText: estMotDePasse,
-        style: StylesTexteApp.champ,
+        style: StylesTexteApp.champ.copyWith(
+          fontSize: screenWidth * 0.04, // UI Design: Taille adaptative
+        ),
         decoration: InputDecoration(
           hintText: placeholderTexte,
           hintStyle: StylesTexteApp.champ.copyWith(
             color: CouleursApp.texteFonce.withValues(alpha: 0.5),
+            fontSize: screenWidth * 0.04, // UI Design: Taille adaptative
           ),
           prefixIcon: Icon(
             icone,
             color: CouleursApp.texteFonce.withValues(alpha: 0.5),
+            size: screenWidth * 0.05, // UI Design: Taille adaptative
           ),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 20,
-            vertical: 20,
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: screenWidth * 0.05, // UI Design: Padding adaptatif
+            vertical: screenHeight * 0.025, // UI Design: Padding adaptatif
           ),
         ),
         validator: (valeur) {
@@ -609,12 +655,16 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
   }
 
   Widget _construireLogoUqarLive() {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
     return Container(
-      width: 80,
-      height: 80,
+      width: screenWidth * 0.2, // UI Design: Taille adaptative
+      height: screenWidth * 0.2, // UI Design: Taille adaptative
       decoration: BoxDecoration(
         color: CouleursApp.blanc,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(screenWidth * 0.05), // UI Design: Rayon adaptatif
         boxShadow: [
           BoxShadow(
             color: CouleursApp.principal.withOpacity(0.3),
@@ -623,21 +673,27 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
           ),
         ],
       ),
-      child: const Center(
+      child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Icône stylisée représentant UQAR
-            Icon(Icons.school, size: 32, color: CouleursApp.principal),
-            SizedBox(height: 4),
+            Icon(
+              Icons.school, 
+              size: screenWidth * 0.08, // UI Design: Taille adaptative
+              color: CouleursApp.principal
+            ),
+            SizedBox(height: screenHeight * 0.005), // UI Design: Espacement adaptatif
             // Petit texte "UQAR"
             Text(
               'UQAR',
               style: TextStyle(
-                fontSize: 10,
+                fontSize: screenWidth * 0.025, // UI Design: Taille adaptative
                 fontWeight: FontWeight.bold,
                 color: CouleursApp.principal,
               ),
+              overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+              maxLines: 1,
             ),
           ],
         ),
