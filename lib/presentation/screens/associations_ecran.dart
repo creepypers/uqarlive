@@ -183,28 +183,197 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
     );
   }
 
-  // UI Design: Section avec statistiques des associations - NOUVEAU WIDGET RÉUTILISABLE
+  // UI Design: Section statistiques de vie étudiante UQAR modernisée
   Widget _construireSectionStatistiques() {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
     final totalAssociations = _toutesLesAssociations.length;
     final totalMembres = _toutesLesAssociations.fold(0, (sum, assoc) => sum + assoc.nombreMembres);
     final associationsActives = _toutesLesAssociations.where((a) => a.estActive).length;
+    final tauxActivite = totalAssociations > 0 ? (associationsActives / totalAssociations * 100).round() : 0;
 
-    return WidgetSectionStatistiques.associations(
-      titre: 'Vie Étudiante UQAR',
-      statistiques: [
-        {
-          'valeur': '$totalAssociations',
-          'label': 'Associations',
-        },
-        {
-          'valeur': '${(totalMembres / 1000).toStringAsFixed(1)}k',
-          'label': 'Membres',
-        },
-        {
-          'valeur': '$associationsActives',
-          'label': 'Actives',
-        },
-      ],
+    return Container(
+      margin: EdgeInsets.all(screenWidth * 0.04),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // En-tête avec titre et icône
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(screenWidth * 0.025),
+                decoration: BoxDecoration(
+                  color: CouleursApp.principal.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.school,
+                  color: CouleursApp.principal,
+                  size: screenWidth * 0.06,
+                ),
+              ),
+              SizedBox(width: screenWidth * 0.03),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Vie Étudiante UQAR',
+                      style: StylesTexteApp.titre.copyWith(
+                        fontSize: screenWidth * 0.055,
+                        fontWeight: FontWeight.w700,
+                        color: CouleursApp.texteFonce,
+                      ),
+                    ),
+                    Text(
+                      'Statistiques de la communauté',
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.035,
+                        color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: screenHeight * 0.025),
+          
+          // Grille de statistiques modernes
+          Row(
+            children: [
+              Expanded(
+                child: _construireCarteStatistiqueModerne(
+                  'Associations',
+                  totalAssociations.toString(),
+                  Icons.groups,
+                  CouleursApp.principal,
+                  'Total des associations',
+                ),
+              ),
+              SizedBox(width: screenWidth * 0.03),
+              Expanded(
+                child: _construireCarteStatistiqueModerne(
+                  'Membres',
+                  '${(totalMembres / 1000).toStringAsFixed(1)}k',
+                  Icons.people,
+                  CouleursApp.accent,
+                  'Étudiants impliqués',
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: screenHeight * 0.02),
+          Row(
+            children: [
+              Expanded(
+                child: _construireCarteStatistiqueModerne(
+                  'Actives',
+                  associationsActives.toString(),
+                  Icons.check_circle,
+                  Colors.green,
+                  'Associations actives',
+                ),
+              ),
+              SizedBox(width: screenWidth * 0.03),
+              Expanded(
+                child: _construireCarteStatistiqueModerne(
+                  'Taux',
+                  '$tauxActivite%',
+                  Icons.trending_up,
+                  Colors.orange,
+                  'Taux d\'activité',
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // UI Design: Carte statistique moderne avec animations
+  Widget _construireCarteStatistiqueModerne(String titre, String valeur, IconData icone, Color couleur, String description) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    
+    return Container(
+      padding: EdgeInsets.all(screenWidth * 0.04),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            couleur.withValues(alpha: 0.1),
+            couleur.withValues(alpha: 0.05),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: couleur.withValues(alpha: 0.2),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: couleur.withValues(alpha: 0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(screenWidth * 0.02),
+                decoration: BoxDecoration(
+                  color: couleur.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  icone,
+                  color: couleur,
+                  size: screenWidth * 0.05,
+                ),
+              ),
+              SizedBox(width: screenWidth * 0.02),
+              Expanded(
+                child: Text(
+                  titre,
+                  style: TextStyle(
+                    fontSize: screenWidth * 0.035,
+                    color: CouleursApp.texteFonce.withValues(alpha: 0.7),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: screenWidth * 0.02),
+          Text(
+            valeur,
+            style: TextStyle(
+              fontSize: screenWidth * 0.06,
+              fontWeight: FontWeight.bold,
+              color: couleur,
+            ),
+          ),
+          SizedBox(height: screenWidth * 0.01),
+          Text(
+            description,
+            style: TextStyle(
+              fontSize: screenWidth * 0.03,
+              color: CouleursApp.texteFonce.withValues(alpha: 0.5),
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
     );
   }
 

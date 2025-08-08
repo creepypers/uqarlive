@@ -1,26 +1,28 @@
+// Clean Architecture: Interface du repository pour les actualités
 import '../entities/actualite.dart';
 
-// UI Design: Interface du repository pour les actualités d'associations
 abstract class ActualitesRepository {
+  /// Récupère toutes les actualités
+  Future<List<Actualite>> obtenirActualites();
   
-  // UI Design: Récupérer toutes les actualités
-  Future<List<Actualite>> obtenirToutesLesActualites();
+  /// Récupère les actualités d'une association spécifique
+  Future<List<Actualite>> obtenirActualitesParAssociation(String associationId);
   
-  // UI Design: Récupérer les actualités épinglées (prioritaires)
-  Future<List<Actualite>> obtenirActualitesEpinglees();
-  
-  // UI Design: Récupérer les actualités d'une association spécifique
-  Future<List<Actualite>> obtenirActualitesParAssociation(String nomAssociation);
-  
-  // UI Design: Rechercher des actualités par terme
-  Future<List<Actualite>> rechercherActualites(String terme);
-  
-  // UI Design: Récupérer une actualité par son ID
+  /// Récupère une actualité par son ID
   Future<Actualite?> obtenirActualiteParId(String id);
   
-  // UI Design: Liker une actualité
-  Future<bool> likerActualite(String id);
+  /// Ajoute une nouvelle actualité
+  Future<Actualite> ajouterActualite(Actualite actualite);
   
-  // UI Design: Marquer une actualité comme vue
-  Future<bool> marquerCommeVue(String id);
+  /// Met à jour une actualité existante
+  Future<Actualite> mettreAJourActualite(Actualite actualite);
+  
+  /// Supprime une actualité
+  Future<bool> supprimerActualite(String id);
+  
+  /// Récupère les actualités épinglées
+  Future<List<Actualite>> obtenirActualitesEpinglees();
+  
+  /// Récupère les actualités par priorité
+  Future<List<Actualite>> obtenirActualitesParPriorite(String priorite);
 } 

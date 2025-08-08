@@ -45,7 +45,7 @@ class _GestionPrivilegesAdminEcranState extends State<GestionPrivilegesAdminEcra
   Widget build(BuildContext context) {
     // Vérifier que l'utilisateur connecté est admin
     if (!_authentificationService.estAdministrateur) {
-      return Scaffold(
+      return const Scaffold(
         backgroundColor: CouleursApp.fond,
         appBar: WidgetBarreAppPersonnalisee(
           titre: 'Accès Refusé',
@@ -53,7 +53,7 @@ class _GestionPrivilegesAdminEcranState extends State<GestionPrivilegesAdminEcra
           afficherBoutonRetour: true,
           hauteurBarre: 120,
         ),
-        body: const Center(
+        body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -71,7 +71,7 @@ class _GestionPrivilegesAdminEcranState extends State<GestionPrivilegesAdminEcra
 
     return Scaffold(
       backgroundColor: CouleursApp.fond,
-      appBar: WidgetBarreAppPersonnalisee(
+      appBar: const WidgetBarreAppPersonnalisee(
         titre: 'Gestion Privilèges',
         sousTitre: 'Administration système',
         afficherBoutonRetour: true,
@@ -118,11 +118,11 @@ class _GestionPrivilegesAdminEcranState extends State<GestionPrivilegesAdminEcra
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          const Row(
             children: [
-              const Icon(Icons.admin_panel_settings, color: CouleursApp.principal, size: 24),
-              const SizedBox(width: 12),
-              const Text(
+              Icon(Icons.admin_panel_settings, color: CouleursApp.principal, size: 24),
+              SizedBox(width: 12),
+              Text(
                 'Statistiques Utilisateurs',
                 style: TextStyle(
                   fontSize: 18,
@@ -182,11 +182,11 @@ class _GestionPrivilegesAdminEcranState extends State<GestionPrivilegesAdminEcra
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
+        const Row(
           children: [
-            const Icon(Icons.people, color: CouleursApp.principal, size: 24),
-            const SizedBox(width: 12),
-            const Text(
+            Icon(Icons.people, color: CouleursApp.principal, size: 24),
+            SizedBox(width: 12),
+            Text(
               'Gestion des Utilisateurs',
               style: TextStyle(
                 fontSize: 18,

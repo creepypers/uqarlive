@@ -20,7 +20,7 @@ class _TableauBordChefAssociationEcranState extends State<TableauBordChefAssocia
   late final AdhesionsService _adhesionsService;
   late final AuthentificationService _authentificationService;
   List<Association> _mesAssociations = [];
-  Map<String, int> _demandesEnAttente = {};
+  final Map<String, int> _demandesEnAttente = {};
   bool _chargementEnCours = true;
 
   @override
@@ -118,7 +118,7 @@ class _TableauBordChefAssociationEcranState extends State<TableauBordChefAssocia
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: CouleursApp.fond,
-      appBar: WidgetBarreAppPersonnalisee(
+      appBar: const WidgetBarreAppPersonnalisee(
         titre: 'Gestion Associations',
         sousTitre: 'Tableau de bord chef',
         afficherBoutonRetour: true,
@@ -165,11 +165,11 @@ class _TableauBordChefAssociationEcranState extends State<TableauBordChefAssocia
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          const Row(
             children: [
-              const Icon(Icons.dashboard, color: CouleursApp.principal, size: 24),
-              const SizedBox(width: 12),
-              const Text(
+              Icon(Icons.dashboard, color: CouleursApp.principal, size: 24),
+              SizedBox(width: 12),
+              Text(
                 'Résumé',
                 style: TextStyle(
                   fontSize: 18,
@@ -244,11 +244,11 @@ class _TableauBordChefAssociationEcranState extends State<TableauBordChefAssocia
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
+        const Row(
           children: [
-            const Icon(Icons.business, color: CouleursApp.principal, size: 24),
-            const SizedBox(width: 12),
-            const Text(
+            Icon(Icons.business, color: CouleursApp.principal, size: 24),
+            SizedBox(width: 12),
+            Text(
               'Mes Associations',
               style: TextStyle(
                 fontSize: 18,
@@ -390,7 +390,7 @@ class _TableauBordChefAssociationEcranState extends State<TableauBordChefAssocia
                 child: OutlinedButton.icon(
                   onPressed: () => _ouvrirGestionDemandes(association),
                   icon: const Icon(Icons.group_add, size: 18),
-                  label: Text('Demandes (${demandesCount})'),
+                  label: Text('Demandes ($demandesCount)'),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: demandesCount > 0 ? Colors.orange : Colors.grey,
                     side: BorderSide(color: demandesCount > 0 ? Colors.orange : Colors.grey),
@@ -422,11 +422,11 @@ class _TableauBordChefAssociationEcranState extends State<TableauBordChefAssocia
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
+        const Row(
           children: [
-            const Icon(Icons.flash_on, color: CouleursApp.principal, size: 24),
-            const SizedBox(width: 12),
-            const Text(
+            Icon(Icons.flash_on, color: CouleursApp.principal, size: 24),
+            SizedBox(width: 12),
+            Text(
               'Actions Rapides',
               style: TextStyle(
                 fontSize: 18,
@@ -501,7 +501,7 @@ class _TableauBordChefAssociationEcranState extends State<TableauBordChefAssocia
             Text(
               titre,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
                 color: CouleursApp.texteFonce,

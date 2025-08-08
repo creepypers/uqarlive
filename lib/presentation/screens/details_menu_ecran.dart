@@ -58,7 +58,7 @@ class DetailsMenuEcran extends StatelessWidget {
               SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
               
               // Section Informations nutritionnelles
-              _construireSectionNutrition(),
+              _construireSectionNutrition(context),
               SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
               
               // Section Ingrédients et allergènes
@@ -230,29 +230,196 @@ class DetailsMenuEcran extends StatelessWidget {
     );
   }
 
-  // UI Design: Section informations nutritionnelles
-  Widget _construireSectionNutrition() {
-    return WidgetSectionStatistiques.marketplace(
-      statistiques: [
-        ElementStatistique(
-          valeur: menu.calories != null ? '${menu.calories}' : 'N/A',
-          label: 'Calories\n(kcal)',
-          icone: Icons.local_fire_department,
-          couleurIcone: Colors.orange,
+  // UI Design: Section informations nutritionnelles modernisée
+  Widget _construireSectionNutrition(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
+    return Container(
+      margin: EdgeInsets.all(screenWidth * 0.04),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // En-tête avec titre et icône
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(screenWidth * 0.025),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.monitor_heart,
+                  color: Colors.orange,
+                  size: screenWidth * 0.06,
+                ),
+              ),
+              SizedBox(width: screenWidth * 0.03),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Informations nutritionnelles',
+                      style: StylesTexteApp.titre.copyWith(
+                        fontSize: screenWidth * 0.055,
+                        fontWeight: FontWeight.w700,
+                        color: CouleursApp.texteFonce,
+                      ),
+                    ),
+                    Text(
+                      'Données nutritionnelles de ${menu.nom}',
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.035,
+                        color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: screenHeight * 0.025),
+          
+          // Grille de statistiques modernes
+          Row(
+            children: [
+              Expanded(
+                child: _construireCarteStatistiqueMenu(
+                  menu.calories != null ? '${menu.calories}' : 'N/A',
+                  'Calories\n(kcal)',
+                  Icons.local_fire_department,
+                  Colors.orange,
+                  'Énergie',
+                  context,
+                ),
+              ),
+              SizedBox(width: screenWidth * 0.03),
+              Expanded(
+                child: _construireCarteStatistiqueMenu(
+                  menu.estVegetarien ? 'Oui' : 'Non',
+                  'Végétarien',
+                  Icons.eco,
+                  Colors.green,
+                  'Option végé',
+                  context,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: screenHeight * 0.02),
+          Row(
+            children: [
+              Expanded(
+                child: _construireCarteStatistiqueMenu(
+                  menu.estVegan ? 'Oui' : 'Non',
+                  'Vegan',
+                  Icons.nature,
+                  Colors.green.shade700,
+                  '100% végé',
+                  context,
+                ),
+              ),
+              SizedBox(width: screenWidth * 0.03),
+              Expanded(
+                child: _construireCarteStatistiqueMenu(
+                  '${menu.prix.toStringAsFixed(2)} \$',
+                  'Prix',
+                  Icons.attach_money,
+                  _obtenirCouleurCategorie(menu.categorie),
+                  'Coût',
+                  context,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // UI Design: Carte statistique moderne pour menu
+  Widget _construireCarteStatistiqueMenu(String valeur, String label, IconData icone, Color couleur, String description, BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    
+    return Container(
+      padding: EdgeInsets.all(screenWidth * 0.04),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            couleur.withValues(alpha: 0.15),
+            couleur.withValues(alpha: 0.05),
+          ],
         ),
-        ElementStatistique(
-          valeur: menu.estVegetarien ? 'Oui' : 'Non',
-          label: 'Végétarien',
-          icone: Icons.eco,
-          couleurIcone: Colors.green,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: couleur.withValues(alpha: 0.3),
+          width: 1.5,
         ),
-        ElementStatistique(
-          valeur: menu.estVegan ? 'Oui' : 'Non',
-          label: 'Vegan',
-          icone: Icons.nature,
-          couleurIcone: Colors.green.shade700,
-        ),
-      ],
+        boxShadow: [
+          BoxShadow(
+            color: couleur.withValues(alpha: 0.15),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(screenWidth * 0.025),
+                decoration: BoxDecoration(
+                  color: couleur.withValues(alpha: 0.25),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  icone,
+                  color: couleur,
+                  size: screenWidth * 0.055,
+                ),
+              ),
+              SizedBox(width: screenWidth * 0.025),
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: screenWidth * 0.038,
+                    color: CouleursApp.texteFonce.withValues(alpha: 0.8),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: screenWidth * 0.025),
+          Text(
+            valeur,
+            style: TextStyle(
+              fontSize: screenWidth * 0.065,
+              fontWeight: FontWeight.bold,
+              color: couleur,
+            ),
+          ),
+          SizedBox(height: screenWidth * 0.015),
+          Text(
+            description,
+            style: TextStyle(
+              fontSize: screenWidth * 0.032,
+              color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
     );
   }
 

@@ -134,6 +134,15 @@ class UtilisateursDatasourceLocal {
   }
 
   Future<UtilisateurModel?> obtenirUtilisateurActuel() async {
+    // Pour les tests, charger automatiquement Alexandre Martin
+    if (_utilisateurActuel == null) {
+      try {
+        _utilisateurActuel = _utilisateurs.firstWhere((u) => u.id == 'etud_001');
+        print('DEBUG: Utilisateur automatiquement chargé: ${_utilisateurActuel?.prenom} ${_utilisateurActuel?.nom} (${_utilisateurActuel?.id})');
+      } catch (e) {
+        print('DEBUG: Erreur lors du chargement automatique: $e');
+      }
+    }
     return _utilisateurActuel;
   }
 

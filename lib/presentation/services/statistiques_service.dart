@@ -35,8 +35,8 @@ class StatistiquesService {
       final results = await Future.wait([
         _utilisateursRepository.obtenirTousLesUtilisateurs(),
         _associationsRepository.obtenirToutesLesAssociations(),
-        _actualitesRepository.obtenirToutesLesActualites(),
-        _evenementsRepository.obtenirTousLesEvenements(),
+        _actualitesRepository.obtenirActualites(),
+        _evenementsRepository.obtenirEvenements(),
         _livresRepository.obtenirTousLesLivres(),
         _menusRepository.obtenirTousLesMenus(),
         _sallesRepository.obtenirToutesLesSalles(),
@@ -105,8 +105,8 @@ class StatistiquesService {
   // UI Design: Statistiques détaillées pour le dashboard
   Future<StatistiquesDashboard> obtenirStatistiquesDashboard() async {
     final stats = await obtenirStatistiquesGlobales();
-    final actualites = await _actualitesRepository.obtenirToutesLesActualites();
-    final evenements = await _evenementsRepository.obtenirTousLesEvenements();
+    final actualites = await _actualitesRepository.obtenirActualites();
+    final evenements = await _evenementsRepository.obtenirEvenements();
     final utilisateurs = await _utilisateursRepository.obtenirTousLesUtilisateurs();
 
     return StatistiquesDashboard(

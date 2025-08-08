@@ -356,7 +356,7 @@ class _WidgetEtatVide extends StatelessWidget {
           const SizedBox(height: 20),
           Text(
             titre,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: CouleursApp.texteFonce,

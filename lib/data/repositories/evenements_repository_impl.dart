@@ -31,4 +31,65 @@ class EvenementsRepositoryImpl implements EvenementsRepository {
   Future<List<Evenement>> rechercherEvenements(String terme) {
     return _datasource.rechercherEvenements(terme);
   }
+
+  @override
+  Future<List<Evenement>> obtenirEvenements() async {
+    return await obtenirTousLesEvenements();
+  }
+
+  @override
+  Future<List<Evenement>> obtenirEvenementsParAssociation(String associationId) async {
+    // TODO: Implémenter dans le datasource
+    await Future.delayed(const Duration(milliseconds: 500)); // Simulation
+    return [];
+  }
+
+  @override
+  Future<Evenement> ajouterEvenement(Evenement evenement) async {
+    // TODO: Implémenter dans le datasource
+    await Future.delayed(const Duration(milliseconds: 500)); // Simulation
+    return evenement;
+  }
+
+  @override
+  Future<Evenement> mettreAJourEvenement(Evenement evenement) async {
+    // TODO: Implémenter dans le datasource
+    await Future.delayed(const Duration(milliseconds: 500)); // Simulation
+    return evenement;
+  }
+
+  @override
+  Future<bool> supprimerEvenement(String id) async {
+    // TODO: Implémenter dans le datasource
+    await Future.delayed(const Duration(milliseconds: 500)); // Simulation
+    return true;
+  }
+
+  @override
+  Future<List<Evenement>> obtenirEvenementsParPeriode(DateTime debut, DateTime fin) async {
+    // TODO: Implémenter dans le datasource
+    await Future.delayed(const Duration(milliseconds: 500)); // Simulation
+    return [];
+  }
+
+  @override
+  Future<bool> peutSInscrire(String evenementId, String utilisateurId) async {
+    // TODO: Implémenter dans le datasource
+    await Future.delayed(const Duration(milliseconds: 500)); // Simulation
+    return true;
+  }
+
+  @override
+  Future<bool> inscrireUtilisateur(String evenementId, String utilisateurId) async {
+    // TODO: Implémenter dans le datasource
+    await Future.delayed(const Duration(milliseconds: 500)); // Simulation
+    return true;
+  }
+
+  @override
+  Future<bool> desinscrireUtilisateur(String evenementId, String utilisateurId) async {
+    // TODO: Implémenter dans le datasource
+    await Future.delayed(const Duration(milliseconds: 500)); // Simulation
+    return true;
+  }
 } 

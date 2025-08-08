@@ -101,11 +101,11 @@ class _GestionDemandesAssociationEcranState extends State<GestionDemandesAssocia
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          const Row(
             children: [
-              const Icon(Icons.analytics, color: CouleursApp.principal, size: 24),
-              const SizedBox(width: 12),
-              const Text(
+              Icon(Icons.analytics, color: CouleursApp.principal, size: 24),
+              SizedBox(width: 12),
+              Text(
                 'Statistiques',
                 style: TextStyle(
                   fontSize: 18,
@@ -269,11 +269,11 @@ class _GestionDemandesAssociationEcranState extends State<GestionDemandesAssocia
         children: [
           Row(
             children: [
-              CircleAvatar(
+              const CircleAvatar(
                 backgroundColor: CouleursApp.principal,
                 child: Text(
                   'U', // TODO: Récupérer vraies initiales
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                 ),
               ),
               const SizedBox(width: 12),

@@ -2,7 +2,7 @@ import '../models/membre_association_model.dart';
 
 class MembresAssociationDatasourceLocal {
   // Simulation de données locales pour les membres d'associations
-  static List<MembreAssociationModel> _membresAssociation = [
+  static final List<MembreAssociationModel> _membresAssociation = [
     // Alexandre Martin (etud_001) est membre de 3 associations
     MembreAssociationModel(
       id: 'membre_001',

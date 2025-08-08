@@ -61,7 +61,7 @@ class _GererLivresEcranState extends State<GererLivresEcran> {
       }
       
       setState(() => _isLoading = false);
-    } catch (e, stackTrace) {
+    } catch (e) {
       setState(() => _isLoading = false);
       _afficherErreur('Erreur lors du chargement des livres: $e');
     }

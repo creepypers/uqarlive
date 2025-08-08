@@ -235,9 +235,7 @@ class WidgetSectionStatistiques extends StatelessWidget {
       spacing: screenWidth * 0.02, // UI Design: Espacement adaptatif
       runSpacing: screenHeight * 0.01, // UI Design: Espacement adaptatif
       alignment: WrapAlignment.spaceEvenly,
-      children: statistiques.map((stat) => Flexible(
-        child: _construireStatistiqueAssociation(_extraireStatistique(stat), context),
-      )).toList(),
+      children: statistiques.map((stat) => _construireStatistiqueAssociation(_extraireStatistique(stat), context)).toList(),
     );
   }
 
@@ -287,23 +285,19 @@ class WidgetSectionStatistiques extends StatelessWidget {
         final index = entry.key;
         final stat = entry.value;
         
-        return Flexible(
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Expanded( // UI Design: Utiliser Expanded pour éviter le débordement
-                child: _construireStatistiqueMarketplace(_extraireStatistique(stat)),
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _construireStatistiqueMarketplace(_extraireStatistique(stat)),
+            // Ajouter séparateur sauf pour le dernier élément
+            if (index < statistiques.length - 1)
+              Container(
+                height: 40,
+                width: 1,
+                color: CouleursApp.principal.withValues(alpha: 0.3),
+                margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.02), // UI Design: Marge adaptative
               ),
-              // Ajouter séparateur sauf pour le dernier élément
-              if (index < statistiques.length - 1)
-                Container(
-                  height: 40,
-                  width: 1,
-                  color: CouleursApp.principal.withValues(alpha: 0.3),
-                  margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.02), // UI Design: Marge adaptative
-                ),
-            ],
-          ),
+          ],
         );
       }).toList(),
     );

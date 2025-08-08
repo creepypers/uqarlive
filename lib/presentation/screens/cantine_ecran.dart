@@ -126,6 +126,8 @@ class _CantineEcranState extends State<CantineEcran> {
     await _changerCategorie(_categorieSelectionnee);
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité

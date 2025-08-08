@@ -189,8 +189,8 @@ class WidgetCarte extends StatelessWidget {
       badges: badges,
       piedDePage: _construirePiedPageSalle(capacite, equipements, heureLibre, onTapDetails, onTapReserver),
       onTap: onTapDetails,
-      largeur: largeur,
-      hauteur: hauteur ?? 185, // UI Design: Réduit de 220 à 185 pour éviter overflow
+      largeur: largeur ?? double.infinity, // UI Design: S'étendre sur toute la largeur disponible
+      hauteur: hauteur ?? 185, // UI Design: Hauteur fixe pour éviter l'overflow
       modeListe: false,
       tailleIcone: 45,
       modeHorizontal: false,
@@ -467,44 +467,54 @@ class WidgetCarte extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    titre,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: CouleursApp.texteFonce,
-                      height: 1.1,
+                  Flexible(
+                    child: Text(
+                      titre,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: CouleursApp.texteFonce,
+                        height: 1.1,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 2),
-                  Text(
-                    sousTitre,
-                    style: TextStyle(
-                      fontSize: 9,
-                      color: CouleursApp.texteFonce.withValues(alpha: 0.6),
-                      height: 1.1,
+                  Flexible(
+                    child: Text(
+                      sousTitre,
+                      style: TextStyle(
+                        fontSize: 9,
+                        color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                        height: 1.1,
+                      ),
+                      maxLines: texteSupplementaire != null ? 1 : 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    maxLines: texteSupplementaire != null ? 1 : 2,
-                    overflow: TextOverflow.ellipsis,
                   ),
                   if (texteSupplementaire != null) ...[
                     const SizedBox(height: 2),
-                    Text(
-                      texteSupplementaire!,
-                      style: const TextStyle(
-                        fontSize: 9,
-                        color: CouleursApp.principal,
-                        fontWeight: FontWeight.w500,
-                        height: 1.1,
+                    Flexible(
+                      child: Text(
+                        texteSupplementaire!,
+                        style: const TextStyle(
+                          fontSize: 9,
+                          color: CouleursApp.principal,
+                          fontWeight: FontWeight.w500,
+                          height: 1.1,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                   const Spacer(),
-                  if (piedDePage != null) piedDePage!,
+                  if (piedDePage != null) 
+                    SizedBox(
+                      height: 18, // UI Design: Hauteur fixe pour le pied de page
+                      child: piedDePage!,
+                    ),
                 ],
               ),
             ),

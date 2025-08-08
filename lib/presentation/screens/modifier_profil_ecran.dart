@@ -338,7 +338,7 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
                 ? SizedBox(
                     height: screenWidth * 0.05, // UI Design: Taille adaptative
                     width: screenWidth * 0.05, // UI Design: Taille adaptative
-                    child: CircularProgressIndicator(
+                    child: const CircularProgressIndicator(
                       color: CouleursApp.blanc,
                       strokeWidth: 2,
                     ),

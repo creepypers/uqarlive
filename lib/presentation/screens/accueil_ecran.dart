@@ -142,11 +142,11 @@ class _AccueilEcranState extends State<AccueilEcran> {
     
     // UI Design: Affichage du chargement si les données utilisateur ne sont pas encore chargées
     if (_chargementUtilisateur || _utilisateurActuel == null) {
-      return Scaffold(
+      return const Scaffold(
         backgroundColor: CouleursApp.fond,
         resizeToAvoidBottomInset: true, // UI Design: Éviter les débordements avec le clavier
         body: SafeArea(
-          child: const Center(child: CircularProgressIndicator()),
+          child: Center(child: CircularProgressIndicator()),
         ),
       );
     }

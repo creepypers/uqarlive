@@ -167,6 +167,7 @@ class AssociationsDatasourceLocal {
         'typeAssociation': 'culturelle',
         'president': 'Juliette Beaulieu',
         'vicePresident': 'Thomas Côté',
+        'chefId': 'etud_008', // Juliette Beaulieu
         'nombreMembres': 45,
         'email': 'theatre@uqar.ca',
         'telephone': null,
@@ -205,6 +206,7 @@ class AssociationsDatasourceLocal {
         'typeAssociation': 'etudiante',
         'president': 'Laurence Giguère',
         'vicePresident': 'Gabriel Morin',
+        'chefId': 'etud_009', // Laurence Giguère
         'nombreMembres': 120,
         'email': 'eco@uqar.ca',
         'telephone': null,
@@ -243,6 +245,7 @@ class AssociationsDatasourceLocal {
         'typeAssociation': 'etudiante',
         'president': 'Maria Santos',
         'vicePresident': 'Ahmed Ben Ali',
+        'chefId': 'etud_010', // Maria Santos
         'nombreMembres': 280,
         'email': 'international@uqar.ca',
         'telephone': '418-723-1544',
@@ -281,6 +284,7 @@ class AssociationsDatasourceLocal {
         'typeAssociation': 'academique',
         'president': 'Isabelle Dufour',
         'vicePresident': 'Marc-André Bouchard',
+        'chefId': 'etud_011', // Isabelle Dufour
         'nombreMembres': 380,
         'email': 'aelies@uqar.ca',
         'telephone': null,

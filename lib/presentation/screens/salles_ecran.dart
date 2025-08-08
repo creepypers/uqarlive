@@ -5,9 +5,13 @@ import '../widgets/widget_barre_app_personnalisee.dart';
 import '../widgets/widget_carte.dart';
 import '../widgets/widget_collection.dart';
 import '../services/navigation_service.dart';
+import '../services/authentification_service.dart';
 import '../../core/di/service_locator.dart';
 import '../../domain/repositories/salles_repository.dart';
+import '../../domain/repositories/reservations_salle_repository.dart';
 import '../../domain/entities/salle.dart';
+import '../../domain/entities/reservation_salle.dart';
+import '../../data/models/salle_model.dart';
 
 // UI Design: Page de gestion et réservation des salles de révision
 class SallesEcran extends StatefulWidget {
@@ -19,8 +23,11 @@ class SallesEcran extends StatefulWidget {
 
 class _SallesEcranState extends State<SallesEcran> {
   late SallesRepository _sallesRepository;
+  late ReservationsSalleRepository _reservationsSalleRepository;
+  late AuthentificationService _authentificationService;
   List<Salle> _salles = [];
   List<Salle> _sallesFiltrees = [];
+  List<ReservationSalle> _mesReservations = [];
   bool _isLoading = true;
   String _filtreActuel = 'toutes'; // 'toutes', 'disponibles', 'reservees'
   String _recherche = '';
@@ -30,6 +37,8 @@ class _SallesEcranState extends State<SallesEcran> {
     super.initState();
     // UI Design: Injection de dépendances via ServiceLocator - Clean Architecture
     _sallesRepository = ServiceLocator.obtenirService<SallesRepository>();
+    _reservationsSalleRepository = ServiceLocator.obtenirService<ReservationsSalleRepository>();
+    _authentificationService = ServiceLocator.obtenirService<AuthentificationService>();
     _chargerSalles();
   }
 
@@ -37,6 +46,12 @@ class _SallesEcranState extends State<SallesEcran> {
     setState(() => _isLoading = true);
     try {
       final salles = await _sallesRepository.obtenirToutesLesSalles();
+      final utilisateur = _authentificationService.utilisateurActuel;
+      
+      if (utilisateur != null) {
+        _mesReservations = await _reservationsSalleRepository.obtenirReservationsParUtilisateur(utilisateur.id);
+      }
+      
       setState(() {
         _salles = salles;
         _appliquerFiltres();
@@ -54,10 +69,26 @@ class _SallesEcranState extends State<SallesEcran> {
     // Filtrer par statut
     switch (_filtreActuel) {
       case 'disponibles':
-        sallesFiltrees = sallesFiltrees.where((s) => s.estDisponible).toList();
+        // Une salle est disponible si elle n'a pas de réservation active
+        sallesFiltrees = sallesFiltrees.where((salle) {
+          final reservationsPourCetteSalle = _mesReservations.where(
+            (reservation) => reservation.salleId == salle.id && 
+                           reservation.statut != 'annulee' &&
+                           reservation.statut != 'terminee'
+          ).toList();
+          return reservationsPourCetteSalle.isEmpty;
+        }).toList();
         break;
       case 'reservees':
-        sallesFiltrees = sallesFiltrees.where((s) => !s.estDisponible).toList();
+        // Une salle est réservée si elle a une réservation active de l'utilisateur
+        sallesFiltrees = sallesFiltrees.where((salle) {
+          final reservationsPourCetteSalle = _mesReservations.where(
+            (reservation) => reservation.salleId == salle.id && 
+                           reservation.statut != 'annulee' &&
+                           reservation.statut != 'terminee'
+          ).toList();
+          return reservationsPourCetteSalle.isNotEmpty;
+        }).toList();
         break;
     }
 
@@ -71,6 +102,32 @@ class _SallesEcranState extends State<SallesEcran> {
     }
 
     setState(() => _sallesFiltrees = sallesFiltrees);
+  }
+
+  // UI Design: Helper pour déterminer si une salle est disponible
+  bool _estSalleDisponible(Salle salle) {
+    final reservationsActives = _mesReservations.where(
+      (reservation) => reservation.salleId == salle.id && 
+                      reservation.statut != 'annulee' &&
+                      reservation.statut != 'terminee'
+    ).toList();
+    return reservationsActives.isEmpty;
+  }
+
+  // UI Design: Helper pour obtenir l'heure libre d'une salle
+  String? _obtenirHeureLibre(Salle salle) {
+    final reservationsActives = _mesReservations.where(
+      (reservation) => reservation.salleId == salle.id && 
+                      reservation.statut != 'annulee' &&
+                      reservation.statut != 'terminee'
+    ).toList();
+    
+    if (reservationsActives.isNotEmpty) {
+      // Retourner l'heure de fin de la première réservation active
+      final premiereReservation = reservationsActives.first;
+      return '${premiereReservation.heureFin.hour.toString().padLeft(2, '0')}:${premiereReservation.heureFin.minute.toString().padLeft(2, '0')}';
+    }
+    return null;
   }
 
   @override
@@ -113,9 +170,9 @@ class _SallesEcranState extends State<SallesEcran> {
                   localisation: '${salle.batiment} • ${salle.etage}',
                   capacite: salle.capaciteMax,
                   tarif: salle.tarifParHeure,
-                  estDisponible: salle.estDisponible,
+                  estDisponible: _estSalleDisponible(salle),
                   equipements: salle.equipements,
-                  heureLibre: salle.estDisponible ? null : '14h30',
+                  heureLibre: _obtenirHeureLibre(salle),
                   onTapDetails: () => _voirDetailsSalle(salle),
                   onTapReserver: () => _reserverSalle(salle),
                 ),
@@ -196,6 +253,17 @@ class _SallesEcranState extends State<SallesEcran> {
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
     
+    // Calculer les vraies statistiques basées sur les réservations
+    final reservationsActives = _mesReservations.where(
+      (reservation) => reservation.statut != 'annulee' && reservation.statut != 'terminee'
+    ).toList();
+    
+    final sallesReservees = _salles.where((salle) {
+      return reservationsActives.any((reservation) => reservation.salleId == salle.id);
+    }).length;
+    
+    final sallesDisponibles = _salles.length - sallesReservees;
+    
     return Container(
       height: screenHeight * 0.05, // UI Design: Hauteur adaptative
       margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Marge adaptative
@@ -204,15 +272,9 @@ class _SallesEcranState extends State<SallesEcran> {
         children: [
           _construireBoutonFiltre('toutes', 'Toutes (${_salles.length})'),
           SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
-          _construireBoutonFiltre(
-            'disponibles', 
-            'Disponibles (${_salles.where((s) => s.estDisponible).length})'
-          ),
+          _construireBoutonFiltre('disponibles', 'Disponibles ($sallesDisponibles)'),
           SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
-          _construireBoutonFiltre(
-            'reservees', 
-            'Réservées (${_salles.where((s) => !s.estDisponible).length})'
-          ),
+          _construireBoutonFiltre('reservees', 'Réservées ($sallesReservees)'),
         ],
       ),
     );
@@ -409,21 +471,21 @@ class _SallesEcranState extends State<SallesEcran> {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: salle.estDisponible 
+              onPressed: _estSalleDisponible(salle) 
                 ? () {
                     Navigator.pop(context);
                     _choisirCreneauEtReserver(salle);
                   }
-                : (salle.reserveePar == 'DUBM12345678') // Si c'est ma réservation
+                : _utilisateurADejaReservation() && _obtenirReservationActive()?.salleId == salle.id
                   ? () {
                       Navigator.pop(context);
                       _gererMaReservation(salle);
                     }
                   : null,
               style: ElevatedButton.styleFrom(
-                backgroundColor: salle.estDisponible 
+                backgroundColor: _estSalleDisponible(salle) 
                   ? CouleursApp.accent 
-                  : (salle.reserveePar == 'DUBM12345678')
+                  : _utilisateurADejaReservation() && _obtenirReservationActive()?.salleId == salle.id
                     ? CouleursApp.principal // Ma réservation
                   : Colors.grey,
                 foregroundColor: CouleursApp.blanc,
@@ -433,9 +495,9 @@ class _SallesEcranState extends State<SallesEcran> {
                 ),
               ),
               child: Text(
-                salle.estDisponible 
+                _estSalleDisponible(salle) 
                   ? 'Réserver cette salle'
-                  : (salle.reserveePar == 'DUBM12345678')
+                  : _utilisateurADejaReservation() && _obtenirReservationActive()?.salleId == salle.id
                     ? 'Modifier ma réservation'
                   : 'Salle indisponible',
                 style: TextStyle(
@@ -694,10 +756,17 @@ class _SallesEcranState extends State<SallesEcran> {
   }
 
   Future<void> _modifierReservationAvecHeures(Salle salle, List<int> heuresSelectionnees) async {
-    // Réinitialiser la sélection
-    setState(() {
-      _heuresSelectionnees.clear();
-    });
+    final utilisateur = _authentificationService.utilisateurActuel;
+    if (utilisateur == null) {
+      _afficherErreur('Vous devez être connecté pour modifier');
+      return;
+    }
+
+    // Trouver la réservation existante pour cette salle
+    final reservationExistante = _mesReservations.firstWhere(
+      (reservation) => reservation.salleId == salle.id,
+      orElse: () => throw Exception('Aucune réservation trouvée pour cette salle'),
+    );
 
     // Pour simplifier, on utilise la première et dernière heure comme début et fin
     heuresSelectionnees.sort();
@@ -708,35 +777,104 @@ class _SallesEcranState extends State<SallesEcran> {
     final dateReservation = DateTime(maintenant.year, maintenant.month, maintenant.day, heureDebut);
     final dateFin = DateTime(maintenant.year, maintenant.month, maintenant.day, heureFin);
     
-    // D'abord annuler l'ancienne réservation, puis créer la nouvelle
-    final annulationSuccess = await _sallesRepository.annulerReservation(salle.id);
-    if (!annulationSuccess) {
-      _afficherErreur('Erreur lors de la modification');
-      return;
-    }
-    
-    final success = await _sallesRepository.reserverSalle(
-      salle.id,
-      'DUBM12345678', // ID utilisateur actuel
-      DateTime.now(),
-      dateReservation,
-      dateFin,
-    );
-
-    if (success) {
-      final heuresTexte = heuresSelectionnees.map((h) => '${h}h').join(', ');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('${salle.nom} modifiée pour $heuresTexte'),
-          backgroundColor: CouleursApp.accent,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        ),
+    try {
+      // D'abord annuler l'ancienne réservation
+      final annulationSuccess = await _reservationsSalleRepository.annulerReservation(reservationExistante.id);
+      if (!annulationSuccess) {
+        _afficherErreur('Erreur lors de la modification');
+        return;
+      }
+      
+      // Créer la nouvelle réservation
+      final nouvelleReservation = ReservationSalle(
+        id: 'res_${DateTime.now().millisecondsSinceEpoch}',
+        utilisateurId: utilisateur.id,
+        salleId: salle.id,
+        dateReservation: dateReservation,
+        heureDebut: dateReservation,
+        heureFin: dateFin,
+        motif: reservationExistante.motif,
+        description: reservationExistante.description ?? 'Réservation modifiée',
+        statut: 'en_attente',
+        nombrePersonnes: reservationExistante.nombrePersonnes,
+        coutTotal: salle.tarifParHeure * (heureFin - heureDebut),
+        dateCreation: DateTime.now(),
       );
-      _chargerSalles(); // Recharger les salles
-    } else {
-      _afficherErreur('Erreur lors de la modification');
+
+      final success = await _reservationsSalleRepository.creerReservation(nouvelleReservation);
+
+      if (success) {
+        final heuresTexte = heuresSelectionnees.map((h) => '${h}h').join(', ');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${salle.nom} modifiée pour $heuresTexte'),
+            backgroundColor: CouleursApp.accent,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        );
+        _chargerSalles(); // Recharger les salles
+      } else {
+        _afficherErreur('Erreur lors de la modification');
+      }
+    } catch (e) {
+      _afficherErreur('Erreur lors de la modification: $e');
     }
+  }
+
+  // UI Design: Vérifier si l'utilisateur a déjà une réservation active
+  bool _utilisateurADejaReservation() {
+    final reservationsActives = _mesReservations.where(
+      (reservation) => reservation.statut != 'annulee' && 
+                      reservation.statut != 'terminee' &&
+                      reservation.heureDebut.isAfter(DateTime.now())
+    ).toList();
+    return reservationsActives.isNotEmpty;
+  }
+
+
+
+  // UI Design: Helper pour obtenir le nom d'une salle
+  String _obtenirNomSalle(String salleId) {
+    final salle = _salles.firstWhere(
+      (s) => s.id == salleId,
+      orElse: () => SalleModel(
+        id: '', 
+        nom: 'Salle inconnue', 
+        capaciteMax: 0, 
+        tarifParHeure: 0,
+        description: '',
+        batiment: '',
+        etage: '',
+        equipements: [],
+        estDisponible: true,
+      ),
+    );
+    return salle.nom;
+  }
+
+  // UI Design: Vérifier si une salle est disponible pour un créneau donné
+  bool _estSalleDisponiblePourCreneau(String salleId, DateTime debut, DateTime fin) {
+    // Vérifier les réservations existantes pour cette salle
+    final reservationsConflictuelles = _mesReservations.where((reservation) {
+      return reservation.salleId == salleId &&
+             reservation.statut != 'annulee' &&
+             reservation.statut != 'terminee' &&
+             ((reservation.heureDebut.isBefore(fin) && reservation.heureFin.isAfter(debut)) ||
+              (reservation.heureDebut.isAtSameMomentAs(debut) || reservation.heureFin.isAtSameMomentAs(fin)));
+    }).toList();
+    
+    return reservationsConflictuelles.isEmpty;
+  }
+
+  // UI Design: Obtenir la réservation active de l'utilisateur
+  ReservationSalle? _obtenirReservationActive() {
+    final reservationsActives = _mesReservations.where(
+      (reservation) => reservation.statut != 'annulee' && 
+                      reservation.statut != 'terminee' &&
+                      reservation.heureDebut.isAfter(DateTime.now())
+    ).toList();
+    return reservationsActives.isNotEmpty ? reservationsActives.first : null;
   }
 
   Future<void> _reserverSalleAvecHeures(Salle salle, List<int> heuresSelectionnees) async {
@@ -745,6 +883,19 @@ class _SallesEcranState extends State<SallesEcran> {
       _heuresSelectionnees.clear();
     });
 
+    final utilisateur = _authentificationService.utilisateurActuel;
+    if (utilisateur == null) {
+      _afficherErreur('Vous devez être connecté pour réserver');
+      return;
+    }
+
+    // Vérifier si l'utilisateur a déjà une réservation active
+    if (_utilisateurADejaReservation()) {
+      final reservationActive = _obtenirReservationActive();
+      _afficherErreur('Vous avez déjà une réservation active pour ${_obtenirNomSalle(reservationActive?.salleId ?? '')}. Vous ne pouvez avoir qu\'une seule réservation à la fois. Annulez-la d\'abord pour en créer une nouvelle.');
+      return;
+    }
+
     // Pour simplifier, on utilise la première et dernière heure comme début et fin
     heuresSelectionnees.sort();
     final heureDebut = heuresSelectionnees.first;
@@ -754,52 +905,119 @@ class _SallesEcranState extends State<SallesEcran> {
     final dateReservation = DateTime(maintenant.year, maintenant.month, maintenant.day, heureDebut);
     final dateFin = DateTime(maintenant.year, maintenant.month, maintenant.day, heureFin);
     
-    final success = await _sallesRepository.reserverSalle(
-      salle.id,
-      'DUBM12345678', // ID utilisateur actuel
-      DateTime.now(),
-      dateReservation,
-      dateFin,
-    );
-
-    if (success) {
-      final heuresTexte = heuresSelectionnees.map((h) => '${h}h').join(', ');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('${salle.nom} réservée pour $heuresTexte (Gratuit)'),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        ),
+    // Vérifier que la réservation est pour aujourd'hui et que l'heure n'est pas passée
+    if (dateReservation.isBefore(DateTime.now())) {
+      _afficherErreur('Vous ne pouvez réserver que pour des créneaux futurs aujourd\'hui');
+      return;
+    }
+    
+    // Vérifier si la salle est disponible pour ce créneau
+    if (!_estSalleDisponiblePourCreneau(salle.id, dateReservation, dateFin)) {
+      _afficherErreur('Cette salle n\'est pas disponible pour le créneau sélectionné');
+      return;
+    }
+    
+    try {
+      final reservation = ReservationSalle(
+        id: 'res_${DateTime.now().millisecondsSinceEpoch}',
+        utilisateurId: utilisateur.id,
+        salleId: salle.id,
+        dateReservation: dateReservation,
+        heureDebut: dateReservation,
+        heureFin: dateFin,
+        motif: 'etude_groupe',
+        description: 'Réservation via l\'application',
+        statut: 'en_attente',
+        nombrePersonnes: 1,
+        coutTotal: salle.tarifParHeure * (heureFin - heureDebut),
+        dateCreation: DateTime.now(),
       );
-      _chargerSalles(); // Recharger les salles
-    } else {
-      _afficherErreur('Erreur lors de la réservation');
+
+      final success = await _reservationsSalleRepository.creerReservation(reservation);
+
+      if (success) {
+        final heuresTexte = heuresSelectionnees.map((h) => '${h}h').join(', ');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${salle.nom} réservée pour $heuresTexte'),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        );
+        _chargerSalles(); // Recharger les salles
+      } else {
+        _afficherErreur('Erreur lors de la réservation');
+      }
+    } catch (e) {
+      _afficherErreur('Erreur lors de la réservation: $e');
     }
   }
 
   Future<void> _reserverSalle(Salle salle) async {
-    // Simuler une réservation
-    final success = await _sallesRepository.reserverSalle(
-      salle.id,
-      'DUBM12345678', // ID utilisateur actuel
-      DateTime.now(),
-      DateTime.now().add(const Duration(hours: 1)),
-      DateTime.now().add(const Duration(hours: 3)),
-    );
+    final utilisateur = _authentificationService.utilisateurActuel;
+    if (utilisateur == null) {
+      _afficherErreur('Vous devez être connecté pour réserver');
+      return;
+    }
 
-    if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Salle "${salle.nom}" réservée avec succès !'),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        ),
+    // Vérifier si l'utilisateur a déjà une réservation active
+    if (_utilisateurADejaReservation()) {
+      final reservationActive = _obtenirReservationActive();
+      _afficherErreur('Vous avez déjà une réservation active pour ${_obtenirNomSalle(reservationActive?.salleId ?? '')}. Vous ne pouvez avoir qu\'une seule réservation à la fois. Annulez-la d\'abord pour en créer une nouvelle.');
+      return;
+    }
+
+    try {
+      final maintenant = DateTime.now();
+      final dateReservation = DateTime(maintenant.year, maintenant.month, maintenant.day);
+      final heureDebut = DateTime(maintenant.year, maintenant.month, maintenant.day, 14); // 14h
+      final heureFin = DateTime(maintenant.year, maintenant.month, maintenant.day, 16); // 16h
+      
+      // Vérifier que la réservation est pour aujourd'hui et que l'heure n'est pas passée
+      if (heureDebut.isBefore(DateTime.now())) {
+        _afficherErreur('Vous ne pouvez réserver que pour des créneaux futurs aujourd\'hui');
+        return;
+      }
+
+      // Vérifier si la salle est disponible pour ce créneau
+      if (!_estSalleDisponiblePourCreneau(salle.id, heureDebut, heureFin)) {
+        _afficherErreur('Cette salle n\'est pas disponible pour le créneau sélectionné');
+        return;
+      }
+
+      final reservation = ReservationSalle(
+        id: 'res_${DateTime.now().millisecondsSinceEpoch}',
+        utilisateurId: utilisateur.id,
+        salleId: salle.id,
+        dateReservation: dateReservation,
+        heureDebut: heureDebut,
+        heureFin: heureFin,
+        motif: 'etude_groupe',
+        description: 'Réservation via l\'application',
+        statut: 'en_attente',
+        nombrePersonnes: 1,
+        coutTotal: salle.tarifParHeure * 2, // 2 heures
+        dateCreation: DateTime.now(),
       );
-      _chargerSalles(); // Recharger les salles
-    } else {
-      _afficherErreur('Erreur lors de la réservation');
+
+      final success = await _reservationsSalleRepository.creerReservation(reservation);
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Salle "${salle.nom}" réservée avec succès !'),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        );
+        _chargerSalles(); // Recharger les salles
+      } else {
+        _afficherErreur('Erreur lors de la réservation');
+      }
+    } catch (e) {
+      _afficherErreur('Erreur lors de la réservation: $e');
     }
   }
 
@@ -816,6 +1034,12 @@ class _SallesEcranState extends State<SallesEcran> {
 
   // UI Design: Gérer ma réservation existante
   void _gererMaReservation(Salle salle) {
+    final reservationActive = _obtenirReservationActive();
+    if (reservationActive == null) {
+      _afficherErreur('Aucune réservation active trouvée');
+      return;
+    }
+
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -851,34 +1075,33 @@ class _SallesEcranState extends State<SallesEcran> {
             const SizedBox(height: 20),
             
             // Informations de la réservation
-            if (salle.heureDebut != null && salle.heureFin != null) ...[
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: CouleursApp.principal.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: CouleursApp.principal.withOpacity(0.3)),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Réservation actuelle :',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: CouleursApp.principal,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text('Date : ${_formaterDate(salle.dateReservation!)}'),
-                    Text('Heure : ${_formaterHeure(salle.heureDebut!)} - ${_formaterHeure(salle.heureFin!)}'),
-                    Text('Durée : ${_calculerDuree(salle.heureDebut!, salle.heureFin!)}'),
-                  ],
-                ),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: CouleursApp.principal.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: CouleursApp.principal.withOpacity(0.3)),
               ),
-              const SizedBox(height: 20),
-            ],
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Réservation actuelle :',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: CouleursApp.principal,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text('Date : ${_formaterDate(reservationActive.dateReservation)}'),
+                  Text('Heure : ${_formaterHeure(reservationActive.heureDebut)} - ${_formaterHeure(reservationActive.heureFin)}'),
+                  Text('Durée : ${_calculerDuree(reservationActive.heureDebut, reservationActive.heureFin)}'),
+                  Text('Statut : ${reservationActive.statut}'),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
             
             // Actions
             ListTile(
@@ -947,30 +1170,22 @@ class _SallesEcranState extends State<SallesEcran> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Annuler la réservation'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Êtes-vous sûr de vouloir annuler votre réservation pour :'),
-            const SizedBox(height: 8),
-            Text('• Salle : ${salle.nom}'),
-            if (salle.heureDebut != null && salle.heureFin != null) ...[
-              Text('• Créneau : ${_formaterHeure(salle.heureDebut!)} - ${_formaterHeure(salle.heureFin!)}'),
-            ],
-          ],
-        ),
+        content: Text('Êtes-vous sûr de vouloir annuler votre réservation pour ${salle.nom} ?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Non, garder'),
+            child: const Text('Annuler'),
           ),
           ElevatedButton(
-            onPressed: () async {
+            onPressed: () {
               Navigator.pop(context);
-              await _annulerReservation(salle);
+              _annulerReservationActive();
             },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Oui, annuler', style: TextStyle(color: CouleursApp.blanc)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Confirmer'),
           ),
         ],
       ),
@@ -993,6 +1208,108 @@ class _SallesEcranState extends State<SallesEcran> {
       _chargerSalles(); // Recharger les salles
     } else {
       _afficherErreur('Erreur lors de l\'annulation');
+    }
+  }
+
+  // UI Design: Annuler la réservation active de l'utilisateur
+  Future<void> _annulerReservationActive() async {
+    final reservationActive = _obtenirReservationActive();
+    if (reservationActive == null) {
+      _afficherErreur('Aucune réservation active à annuler');
+      return;
+    }
+
+    try {
+      final success = await _reservationsSalleRepository.annulerReservation(reservationActive.id);
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Réservation annulée avec succès'),
+            backgroundColor: Colors.orange,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        );
+        _chargerSalles(); // Recharger les salles
+      } else {
+        _afficherErreur('Erreur lors de l\'annulation');
+      }
+    } catch (e) {
+      _afficherErreur('Erreur lors de l\'annulation: $e');
+    }
+  }
+
+  // UI Design: Modifier la réservation active
+  Future<void> _modifierReservationActive(Salle nouvelleSalle, List<int> heuresSelectionnees) async {
+    final reservationActive = _obtenirReservationActive();
+    if (reservationActive == null) {
+      _afficherErreur('Aucune réservation active à modifier');
+      return;
+    }
+
+    final utilisateur = _authentificationService.utilisateurActuel;
+    if (utilisateur == null) {
+      _afficherErreur('Vous devez être connecté pour modifier');
+      return;
+    }
+
+    // Pour simplifier, on utilise la première et dernière heure comme début et fin
+    heuresSelectionnees.sort();
+    final heureDebut = heuresSelectionnees.first;
+    final heureFin = heuresSelectionnees.last + 1; // +1 pour inclure l'heure complète
+    
+    final maintenant = DateTime.now();
+    final dateReservation = DateTime(maintenant.year, maintenant.month, maintenant.day, heureDebut);
+    final dateFin = DateTime(maintenant.year, maintenant.month, maintenant.day, heureFin);
+    
+    // Vérifier si la nouvelle salle est disponible pour ce créneau
+    if (!_estSalleDisponiblePourCreneau(nouvelleSalle.id, dateReservation, dateFin)) {
+      _afficherErreur('Cette salle n\'est pas disponible pour le créneau sélectionné');
+      return;
+    }
+    
+    try {
+      // D'abord annuler l'ancienne réservation
+      final annulationSuccess = await _reservationsSalleRepository.annulerReservation(reservationActive.id);
+      if (!annulationSuccess) {
+        _afficherErreur('Erreur lors de la modification');
+        return;
+      }
+      
+      // Créer la nouvelle réservation
+      final nouvelleReservation = ReservationSalle(
+        id: 'res_${DateTime.now().millisecondsSinceEpoch}',
+        utilisateurId: utilisateur.id,
+        salleId: nouvelleSalle.id,
+        dateReservation: dateReservation,
+        heureDebut: dateReservation,
+        heureFin: dateFin,
+        motif: reservationActive.motif,
+        description: reservationActive.description ?? 'Réservation modifiée',
+        statut: 'en_attente',
+        nombrePersonnes: reservationActive.nombrePersonnes,
+        coutTotal: nouvelleSalle.tarifParHeure * (heureFin - heureDebut),
+        dateCreation: DateTime.now(),
+      );
+
+      final success = await _reservationsSalleRepository.creerReservation(nouvelleReservation);
+
+      if (success) {
+        final heuresTexte = heuresSelectionnees.map((h) => '${h}h').join(', ');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Réservation modifiée pour ${nouvelleSalle.nom} à $heuresTexte'),
+            backgroundColor: CouleursApp.accent,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        );
+        _chargerSalles(); // Recharger les salles
+      } else {
+        _afficherErreur('Erreur lors de la modification');
+      }
+    } catch (e) {
+      _afficherErreur('Erreur lors de la modification: $e');
     }
   }
 } 

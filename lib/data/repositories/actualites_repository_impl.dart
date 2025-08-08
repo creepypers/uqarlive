@@ -75,4 +75,37 @@ class ActualitesRepositoryImpl implements ActualitesRepository {
       throw Exception('Erreur lors du marquage comme vue: $e');
     }
   }
+
+  @override
+  Future<List<Actualite>> obtenirActualites() async {
+    return await obtenirToutesLesActualites();
+  }
+
+  @override
+  Future<Actualite> ajouterActualite(Actualite actualite) async {
+    // TODO: Implémenter dans le datasource
+    await Future.delayed(const Duration(milliseconds: 500)); // Simulation
+    return actualite;
+  }
+
+  @override
+  Future<Actualite> mettreAJourActualite(Actualite actualite) async {
+    // TODO: Implémenter dans le datasource
+    await Future.delayed(const Duration(milliseconds: 500)); // Simulation
+    return actualite;
+  }
+
+  @override
+  Future<bool> supprimerActualite(String id) async {
+    // TODO: Implémenter dans le datasource
+    await Future.delayed(const Duration(milliseconds: 500)); // Simulation
+    return true;
+  }
+
+  @override
+  Future<List<Actualite>> obtenirActualitesParPriorite(String priorite) async {
+    // TODO: Implémenter dans le datasource
+    await Future.delayed(const Duration(milliseconds: 500)); // Simulation
+    return [];
+  }
 } 

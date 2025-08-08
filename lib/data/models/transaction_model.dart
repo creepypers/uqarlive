@@ -111,6 +111,7 @@ class TransactionModel extends Transaction {
   }
 
   // UI Design: Méthode copyWith
+  @override
   TransactionModel copyWith({
     String? id,
     String? livreId,

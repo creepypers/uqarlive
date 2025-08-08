@@ -12,8 +12,8 @@ import '../widgets/widget_barre_app_navigation_admin.dart';
 import '../widgets/widget_carte.dart';
 import '../widgets/widget_collection.dart';
 import 'admin_ajouter_association_ecran.dart';
-import 'admin_ajouter_actualite_ecran.dart';
-import 'admin_ajouter_evenement_ecran.dart';
+import 'ajouter_actualite_ecran.dart';
+import 'ajouter_evenement_ecran.dart';
 
 class AdminGestionAssociationsEcran extends StatefulWidget {
   const AdminGestionAssociationsEcran({super.key});
@@ -55,8 +55,8 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
       setState(() => _chargementEnCours = true);
       
       final associations = await _associationsRepository.obtenirToutesLesAssociations();
-      final actualites = await _actualitesRepository.obtenirToutesLesActualites();
-      final evenements = await _evenementsRepository.obtenirTousLesEvenements();
+      final actualites = await _actualitesRepository.obtenirActualites();
+      final evenements = await _evenementsRepository.obtenirEvenements();
       
       setState(() {
         _associations = associations;
@@ -517,29 +517,23 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
   }
 
   Future<void> _ajouterActualite() async {
-    final resultat = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const AdminAjouterActualiteEcran(),
+    // TODO: Implémenter l'ajout d'actualité pour admin
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Fonctionnalité d\'ajout d\'actualité en développement'),
+        backgroundColor: Colors.orange,
       ),
     );
-    
-    if (resultat == true) {
-      _chargerDonnees(); // Recharger les données après ajout
-    }
   }
 
   Future<void> _ajouterEvenement() async {
-    final resultat = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const AdminAjouterEvenementEcran(),
+    // TODO: Implémenter l'ajout d'événement pour admin
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Fonctionnalité d\'ajout d\'événement en développement'),
+        backgroundColor: Colors.orange,
       ),
     );
-    
-    if (resultat == true) {
-      _chargerDonnees(); // Recharger les données après ajout
-    }
   }
 
   void _ouvrirDetailsAssociation(Association association) {
@@ -668,18 +662,13 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
   }
 
   Future<void> _modifierActualite(Actualite actualite) async {
-    final resultat = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => AdminAjouterActualiteEcran(
-          actualiteAModifier: actualite,
-        ),
+    // TODO: Implémenter la modification d'actualité
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Fonctionnalité de modification en développement'),
+        backgroundColor: Colors.orange,
       ),
     );
-    
-    if (resultat == true) {
-      _chargerDonnees(); // Recharger les données après modification
-    }
   }
 
   void _confirmerSuppressionActualite(Actualite actualite) {
@@ -773,18 +762,13 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
   }
 
   Future<void> _modifierEvenement(Evenement evenement) async {
-    final resultat = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => AdminAjouterEvenementEcran(
-          evenementAModifier: evenement,
-        ),
+    // TODO: Implémenter la modification d'événement
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Fonctionnalité de modification en développement'),
+        backgroundColor: Colors.orange,
       ),
     );
-    
-    if (resultat == true) {
-      _chargerDonnees(); // Recharger les données après modification
-    }
   }
 
   void _confirmerSuppressionEvenement(Evenement evenement) {

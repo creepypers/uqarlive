@@ -11,6 +11,7 @@ import '../widgets/navbar_widget.dart';
 import '../widgets/widget_barre_app_personnalisee.dart';
 import '../widgets/widget_section_statistiques.dart';
 import 'gestion_demandes_association_ecran.dart';
+import 'gestion_association_ecran.dart';
 
 // UI Design: Page de détails complète d'une association UQAR
 class DetailsAssociationEcran extends StatefulWidget {
@@ -25,7 +26,7 @@ class DetailsAssociationEcran extends StatefulWidget {
 class _DetailsAssociationEcranState extends State<DetailsAssociationEcran> {
   late final AdhesionsService _adhesionsService;
   late final AuthentificationService _authentificationService;
-  bool _estChef = false;
+  bool _estChefAssociation = false;
 
   @override
   void initState() {
@@ -33,19 +34,35 @@ class _DetailsAssociationEcranState extends State<DetailsAssociationEcran> {
     _adhesionsService = ServiceLocator.obtenirService<AdhesionsService>();
     _authentificationService = ServiceLocator.obtenirService<AuthentificationService>();
     _adhesionsService.initialiser();
+    print('DEBUG: initState appelé');
     _verifierStatutChef();
   }
 
   Future<void> _verifierStatutChef() async {
     final utilisateur = _authentificationService.utilisateurActuel;
+    print('DEBUG: _verifierStatutChef - utilisateur: $utilisateur');
+    
     if (utilisateur != null) {
-      final estChef = await _adhesionsService.estChefAssociation(utilisateur.id, widget.association.id);
-      setState(() => _estChef = estChef);
+      print('DEBUG: Utilisateur ID: ${utilisateur.id}');
+      print('DEBUG: Association chefId: ${widget.association.chefId}');
+      print('DEBUG: Comparaison: ${widget.association.chefId} == ${utilisateur.id}');
+      
+      final estChefAssociation = widget.association.chefId == utilisateur.id;
+      print('DEBUG: estChefAssociation: $estChefAssociation');
+      
+      setState(() {
+        _estChefAssociation = estChefAssociation;
+      });
+      print('DEBUG: Après setState - _estChefAssociation: $_estChefAssociation');
+    } else {
+      print('DEBUG: Aucun utilisateur connecté');
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    print('DEBUG BUILD: _estChefAssociation = $_estChefAssociation');
+    
     // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
     final mediaQuery = MediaQuery.of(context);
     final screenHeight = mediaQuery.size.height;
@@ -60,23 +77,20 @@ class _DetailsAssociationEcranState extends State<DetailsAssociationEcran> {
         titre: widget.association.nom,
         sousTitre: AssociationsUtils.obtenirNomType(widget.association.typeAssociation),
         afficherProfil: false,
+        afficherBoutonRetour: true,
         widgetFin: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (_estChef) ...[
+            if (_estChefAssociation) ...[
               IconButton(
                 icon: Icon(Icons.admin_panel_settings, color: CouleursApp.blanc, size: screenWidth * 0.06), // UI Design: Taille adaptative
                 onPressed: () => _ouvrirGestionDemandes(),
-                tooltip: 'Gérer les demandes',
+                tooltip: 'Gérer l\'association',
               ),
             ],
             IconButton(
               icon: Icon(Icons.person_add, color: CouleursApp.blanc, size: screenWidth * 0.06), // UI Design: Taille adaptative
               onPressed: () => _rejoindreAssociation(context),
-            ),
-            IconButton(
-              icon: Icon(Icons.share, color: CouleursApp.blanc, size: screenWidth * 0.06), // UI Design: Taille adaptative
-              onPressed: () => _partagerAssociation(context),
             ),
           ],
         ),
@@ -259,6 +273,25 @@ class _DetailsAssociationEcranState extends State<DetailsAssociationEcran> {
                     ],
                   ],
                 ),
+                SizedBox(height: screenHeight * 0.01), // UI Design: Espacement adaptatif
+                Row(
+                  children: [
+                    Icon(
+                      Icons.person,
+                      color: CouleursApp.blanc.withValues(alpha: 0.8),
+                      size: screenWidth * 0.04,
+                    ),
+                    SizedBox(width: screenWidth * 0.02),
+                    Text(
+                      'Chef: ${_obtenirNomChefAssociation()}',
+                      style: TextStyle(
+                        color: CouleursApp.blanc.withValues(alpha: 0.9),
+                        fontSize: screenWidth * 0.035,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -267,37 +300,197 @@ class _DetailsAssociationEcranState extends State<DetailsAssociationEcran> {
     );
   }
 
-  // UI Design: Section statistiques de l'association
+  // UI Design: Section statistiques de l'association modernisée
   Widget _construireSectionStatistiques() {
-    final anneesExistence = DateTime.now().year - widget.association.dateCreation.year;
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
     
-    return WidgetSectionStatistiques.marketplace(
-      statistiques: [
-        ElementStatistique(
-          valeur: widget.association.nombreMembresFormatte,
-          label: 'Membres\nactifs',
-          icone: Icons.groups,
-          couleurIcone: AssociationsUtils.obtenirCouleurType(
-            widget.association.typeAssociation,
+    final anneesExistence = DateTime.now().year - widget.association.dateCreation.year;
+    final tauxActivite = widget.association.activites.length > 0 ? 
+        (widget.association.activites.length / 10 * 100).clamp(0, 100).round() : 0; // Simulation taux d'activité
+    final couleurAssociation = AssociationsUtils.obtenirCouleurType(widget.association.typeAssociation);
+
+    return Container(
+      margin: EdgeInsets.all(screenWidth * 0.04),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // En-tête avec titre et icône
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(screenWidth * 0.025),
+                decoration: BoxDecoration(
+                  color: couleurAssociation.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.analytics,
+                  color: couleurAssociation,
+                  size: screenWidth * 0.06,
+                ),
+              ),
+              SizedBox(width: screenWidth * 0.03),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Statistiques de l\'association',
+                      style: StylesTexteApp.titre.copyWith(
+                        fontSize: screenWidth * 0.055,
+                        fontWeight: FontWeight.w700,
+                        color: CouleursApp.texteFonce,
+                      ),
+                    ),
+                    Text(
+                      'Données clés de ${widget.association.nom}',
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.035,
+                        color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ),
-        ElementStatistique(
-          valeur: '$anneesExistence',
-          label: 'Années\nd\'existence',
-          icone: Icons.cake,
-          couleurIcone: AssociationsUtils.obtenirCouleurType(
-            widget.association.typeAssociation,
+          SizedBox(height: screenHeight * 0.025),
+          
+          // Grille de statistiques modernes
+          Row(
+            children: [
+              Expanded(
+                child: _construireCarteStatistiqueAssociation(
+                  'Membres',
+                  widget.association.nombreMembresFormatte,
+                  Icons.groups,
+                  couleurAssociation,
+                  'Membres actifs',
+                ),
+              ),
+              SizedBox(width: screenWidth * 0.03),
+              Expanded(
+                child: _construireCarteStatistiqueAssociation(
+                  'Existence',
+                  '$anneesExistence ans',
+                  Icons.cake,
+                  couleurAssociation,
+                  'Années d\'existence',
+                ),
+              ),
+            ],
           ),
-        ),
-        ElementStatistique(
-          valeur: '${widget.association.activites.length}',
-          label: 'Activités\norganisées',
-          icone: Icons.event,
-          couleurIcone: AssociationsUtils.obtenirCouleurType(
-            widget.association.typeAssociation,
+          SizedBox(height: screenHeight * 0.02),
+          Row(
+            children: [
+              Expanded(
+                child: _construireCarteStatistiqueAssociation(
+                  'Activités',
+                  '${widget.association.activites.length}',
+                  Icons.event,
+                  couleurAssociation,
+                  'Activités organisées',
+                ),
+              ),
+              SizedBox(width: screenWidth * 0.03),
+              Expanded(
+                child: _construireCarteStatistiqueAssociation(
+                  'Taux',
+                  '$tauxActivite%',
+                  Icons.trending_up,
+                  couleurAssociation,
+                  'Taux d\'activité',
+                ),
+              ),
+            ],
           ),
+        ],
+      ),
+    );
+  }
+
+  // UI Design: Carte statistique moderne pour association
+  Widget _construireCarteStatistiqueAssociation(String titre, String valeur, IconData icone, Color couleur, String description) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    
+    return Container(
+      padding: EdgeInsets.all(screenWidth * 0.04),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            couleur.withValues(alpha: 0.15),
+            couleur.withValues(alpha: 0.05),
+          ],
         ),
-      ],
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: couleur.withValues(alpha: 0.3),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: couleur.withValues(alpha: 0.15),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(screenWidth * 0.025),
+                decoration: BoxDecoration(
+                  color: couleur.withValues(alpha: 0.25),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  icone,
+                  color: couleur,
+                  size: screenWidth * 0.055,
+                ),
+              ),
+              SizedBox(width: screenWidth * 0.025),
+              Expanded(
+                child: Text(
+                  titre,
+                  style: TextStyle(
+                    fontSize: screenWidth * 0.038,
+                    color: CouleursApp.texteFonce.withValues(alpha: 0.8),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: screenWidth * 0.025),
+          Text(
+            valeur,
+            style: TextStyle(
+              fontSize: screenWidth * 0.065,
+              fontWeight: FontWeight.bold,
+              color: couleur,
+            ),
+          ),
+          SizedBox(height: screenWidth * 0.015),
+          Text(
+            description,
+            style: TextStyle(
+              fontSize: screenWidth * 0.032,
+              color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
     );
   }
 
@@ -346,8 +539,35 @@ class _DetailsAssociationEcranState extends State<DetailsAssociationEcran> {
           ),
           SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
           
-
-          ],
+          // Informations de contact
+          _construireInfoContact(
+            Icons.email,
+            'Email',
+            _obtenirEmailAssociation(),
+            cliquable: true,
+          ),
+          SizedBox(height: screenHeight * 0.015),
+          _construireInfoContact(
+            Icons.phone,
+            'Téléphone',
+            _obtenirTelephoneAssociation(),
+            cliquable: true,
+          ),
+          SizedBox(height: screenHeight * 0.015),
+          _construireInfoContact(
+            Icons.location_on,
+            'Local',
+            _obtenirLocalAssociation(),
+            cliquable: false,
+          ),
+          SizedBox(height: screenHeight * 0.015),
+          _construireInfoContact(
+            Icons.schedule,
+            'Horaires',
+            _obtenirHorairesAssociation(),
+            cliquable: false,
+          ),
+        ],
       ),
     );
   }
@@ -973,38 +1193,34 @@ class _DetailsAssociationEcranState extends State<DetailsAssociationEcran> {
           ),
           SizedBox(height: screenHeight * 0.015), // UI Design: Espacement adaptatif
 
-          // Bouton s'abonner aux actualités
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              onPressed: () => _sabonnerActualites(context),
-              icon: Icon(Icons.notifications_active, size: screenWidth * 0.05), // UI Design: Taille adaptative
-              label: Text(
-                'S\'abonner aux actualités',
-                style: TextStyle(
-                  fontSize: screenWidth * 0.04, // UI Design: Taille adaptative
-                  fontWeight: FontWeight.w600,
-                ),
-                overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
-                maxLines: 1,
-              ),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AssociationsUtils.obtenirCouleurType(
-                  widget.association.typeAssociation,
-                ),
-                side: BorderSide(
-                  color: AssociationsUtils.obtenirCouleurType(
-                    widget.association.typeAssociation,
+          // Bouton de gestion pour le chef de l'association
+          if (_estChefAssociation) ...[
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () => _ouvrirGestionDemandes(),
+                icon: Icon(Icons.admin_panel_settings, size: screenWidth * 0.05), // UI Design: Taille adaptative
+                label: Text(
+                  'Gérer les demandes d\'adhésion',
+                  style: TextStyle(
+                    fontSize: screenWidth * 0.04, // UI Design: Taille adaptative
+                    fontWeight: FontWeight.bold,
                   ),
-                  width: 2,
+                  overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                  maxLines: 1,
                 ),
-                padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02), // UI Design: Padding adaptatif
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02), // UI Design: Padding adaptatif
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
             ),
-          ),
+            SizedBox(height: screenHeight * 0.015), // UI Design: Espacement adaptatif
+          ],
         ],
       ),
     );
@@ -1349,7 +1565,7 @@ class _DetailsAssociationEcranState extends State<DetailsAssociationEcran> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => GestionDemandesAssociationEcran(
+        builder: (context) => GestionAssociationEcran(
           association: widget.association,
         ),
       ),
@@ -1373,6 +1589,99 @@ class _DetailsAssociationEcranState extends State<DetailsAssociationEcran> {
         content: Text(message),
         backgroundColor: Colors.green,
         behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  // Méthodes pour obtenir les informations de contact et du chef
+  String _obtenirNomChefAssociation() {
+    // Utiliser le chefId de l'association pour obtenir le nom du chef
+    switch (widget.association.chefId) {
+      case 'etud_001': // Alexandre Martin
+        return 'Alexandre Martin';
+      case 'etud_006': // Sophie Gagnon
+        return 'Sophie Gagnon';
+      case 'etud_007': // Maxime Leblanc
+        return 'Maxime Leblanc';
+      case 'etud_008': // Juliette Beaulieu
+        return 'Juliette Beaulieu';
+      case 'etud_009': // Laurence Giguère
+        return 'Laurence Giguère';
+      case 'etud_010': // Maria Santos
+        return 'Maria Santos';
+      case 'etud_011': // Isabelle Dufour
+        return 'Isabelle Dufour';
+      default:
+        return widget.association.president ?? 'À déterminer';
+    }
+  }
+
+  String _obtenirEmailAssociation() {
+    switch (widget.association.id) {
+      case 'asso_001': // AEI
+        return 'aei@uqar.ca';
+      case 'asso_002': // Club Photo UQAR
+        return 'photo@uqar.ca';
+      case 'asso_003': // Sport UQAR
+        return 'sport@uqar.ca';
+      case 'asso_004': // AGE
+        return 'age@uqar.ca';
+      default:
+        return 'contact@uqar.ca';
+    }
+  }
+
+  String _obtenirTelephoneAssociation() {
+    switch (widget.association.id) {
+      case 'asso_001': // AEI
+        return '(418) 723-1986';
+      case 'asso_002': // Club Photo UQAR
+        return '(418) 723-1987';
+      case 'asso_003': // Sport UQAR
+        return '(418) 723-1988';
+      case 'asso_004': // AGE
+        return '(418) 723-1989';
+      default:
+        return '(418) 723-1986';
+    }
+  }
+
+  String _obtenirLocalAssociation() {
+    switch (widget.association.id) {
+      case 'asso_001': // AEI
+        return 'Local A-101';
+      case 'asso_002': // Club Photo UQAR
+        return 'Local C-302';
+      case 'asso_003': // Sport UQAR
+        return 'Centre sportif';
+      case 'asso_004': // AGE
+        return 'Local B-201';
+      default:
+        return 'Local à déterminer';
+    }
+  }
+
+  String _obtenirHorairesAssociation() {
+    switch (widget.association.id) {
+      case 'asso_001': // AEI
+        return 'Lun-Ven: 9h-17h';
+      case 'asso_002': // Club Photo UQAR
+        return 'Mar-Jeu: 14h-18h';
+      case 'asso_003': // Sport UQAR
+        return 'Lun-Dim: 7h-22h';
+      case 'asso_004': // AGE
+        return 'Lun-Ven: 10h-16h';
+      default:
+        return 'Horaires variables';
+    }
+  }
+
+    // Méthode pour ajouter une actualité (réservée au chef de l'association)
+  void _ajouterActualite(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Fonctionnalité d\'ajout d\'actualités en développement'),
+        backgroundColor: Colors.orange,
       ),
     );
   }

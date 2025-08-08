@@ -82,6 +82,7 @@ class DemandeAdhesionModel extends DemandeAdhesion {
   }
 
   // UI Design: Méthode copyWith
+  @override
   DemandeAdhesionModel copyWith({
     String? id,
     String? utilisateurId,

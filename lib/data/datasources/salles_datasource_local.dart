@@ -5,8 +5,8 @@ class SallesDatasourceLocal {
   // Liste des 7 salles de révision
   static final List<SalleModel> _salles = [
     const SalleModel(
-      id: '1',
-      nom: 'Salle de Révision A',
+      id: 'salle_001',
+      nom: 'Salle A-101',
       description: 'Salle calme avec vue sur le fleuve, idéale pour les études individuelles',
       capaciteMax: 4,
       equipements: ['WiFi', 'Tableau blanc', 'Prise électrique', 'Éclairage LED'],
@@ -16,8 +16,8 @@ class SallesDatasourceLocal {
       tarifParHeure: 5.0,
     ),
     const SalleModel(
-      id: '2',
-      nom: 'Salle de Révision B',
+      id: 'salle_002',
+      nom: 'Salle A-102',
       description: 'Espace spacieux pour les groupes d\'étude et projets collaboratifs',
       capaciteMax: 8,
       equipements: ['WiFi', 'Écran de projection', 'Tableaux blancs', 'Climatisation'],
@@ -27,8 +27,8 @@ class SallesDatasourceLocal {
       tarifParHeure: 8.0,
     ),
     const SalleModel(
-      id: '3',
-      nom: 'Salle de Révision C',
+      id: 'salle_003',
+      nom: 'Salle C-302',
       description: 'Salle insonorisée parfaite pour les présentations orales',
       capaciteMax: 6,
       equipements: ['WiFi', 'Système audio', 'Caméra web', 'Tableau interactif'],
@@ -38,8 +38,8 @@ class SallesDatasourceLocal {
       tarifParHeure: 7.0,
     ),
     const SalleModel(
-      id: '4',
-      nom: 'Salle de Révision D',
+      id: 'salle_004',
+      nom: 'Salle B-201',
       description: 'Petite salle cosy pour études concentrées en solo ou en duo',
       capaciteMax: 2,
       equipements: ['WiFi', 'Lampe de bureau', 'Prise USB', 'Silence garanti'],
@@ -49,8 +49,8 @@ class SallesDatasourceLocal {
       tarifParHeure: 3.0,
     ),
     const SalleModel(
-      id: '5',
-      nom: 'Salle de Révision E',
+      id: 'salle_005',
+      nom: 'Laboratoire B-205',
       description: 'Salle moderne avec équipements high-tech pour projets numériques',
       capaciteMax: 6,
       equipements: ['WiFi ultra-rapide', 'Écrans multiples', 'Station de charge', 'Ordinateurs'],
@@ -60,8 +60,8 @@ class SallesDatasourceLocal {
       tarifParHeure: 10.0,
     ),
     const SalleModel(
-      id: '6',
-      nom: 'Salle de Révision F',
+      id: 'salle_006',
+      nom: 'Amphithéâtre',
       description: 'Grande salle modulable pour événements étudiants et conférences',
       capaciteMax: 12,
       equipements: ['WiFi', 'Projecteur HD', 'Système de son', 'Tables modulables'],
@@ -71,8 +71,8 @@ class SallesDatasourceLocal {
       tarifParHeure: 15.0,
     ),
     const SalleModel(
-      id: '7',
-      nom: 'Salle de Révision G',
+      id: 'salle_007',
+      nom: 'Salle de conférence',
       description: 'Salle zen avec ambiance relaxante pour études de longue durée',
       capaciteMax: 4,
       equipements: ['WiFi', 'Éclairage tamisé', 'Plantes vertes', 'Fauteuils confortables'],

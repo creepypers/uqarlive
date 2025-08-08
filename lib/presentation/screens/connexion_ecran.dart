@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
+
+import '../../core/di/service_locator.dart';
 import '../../core/theme/app_theme.dart';
-import 'inscription_ecran.dart';
+import '../services/authentification_service.dart';
 import 'accueil_ecran.dart';
 import 'admin_dashboard_ecran.dart';
-import '../../core/di/service_locator.dart';
-import '../services/authentification_service.dart';
-
-
+import 'inscription_ecran.dart';
 
 // UI Design: Écran de connexion avec design UQAR et fond dégradé violet/bleu
 class ConnexionEcran extends StatefulWidget {
@@ -21,7 +20,7 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
       TextEditingController();
   final TextEditingController _controleurMotDePasse = TextEditingController();
   final GlobalKey<FormState> _cleFormulaire = GlobalKey<FormState>();
-  
+
   // UI Design: Service d'authentification
   late AuthentificationService _authentificationService;
   bool _connexionEnCours = false;
@@ -29,7 +28,8 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
   @override
   void initState() {
     super.initState();
-    _authentificationService = ServiceLocator.obtenirService<AuthentificationService>();
+    _authentificationService =
+        ServiceLocator.obtenirService<AuthentificationService>();
   }
 
   @override
@@ -42,39 +42,44 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
   void _gererConnexion() async {
     if (_cleFormulaire.currentState!.validate()) {
       setState(() => _connexionEnCours = true);
-      
+
       try {
         final utilisateur = await _authentificationService.authentifier(
           _controleurNomUtilisateur.text,
           _controleurMotDePasse.text,
         );
-        
+
         if (utilisateur != null) {
           // Debug temporaire
-          print('Utilisateur connecté: ${utilisateur.prenom} ${utilisateur.nom}');
+          print(
+              'Utilisateur connecté: ${utilisateur.prenom} ${utilisateur.nom}');
           print('Type utilisateur: ${utilisateur.typeUtilisateur}');
           print('Est admin (getter): ${utilisateur.estAdmin}');
-          print('Est admin (service): ${_authentificationService.estAdministrateur}');
-          
+          print(
+              'Est admin (service): ${_authentificationService.estAdministrateur}');
+
           // UI Design: Redirection selon le type d'utilisateur
           if (_authentificationService.estAdministrateur) {
             Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (context) => const AdminDashboardEcran()),
+              MaterialPageRoute(
+                  builder: (context) => const AdminDashboardEcran()),
               (route) => false,
             );
-            
+
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Row(
                   children: [
-                    const Icon(Icons.admin_panel_settings, color: Colors.white, size: 20),
+                    const Icon(Icons.admin_panel_settings,
+                        color: Colors.white, size: 20),
                     const SizedBox(width: 8),
                     Text('Bienvenue Administrateur ${utilisateur.prenom} !'),
                   ],
                 ),
                 backgroundColor: Colors.green,
                 behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
               ),
             );
           } else {
@@ -82,19 +87,21 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
               MaterialPageRoute(builder: (context) => const AccueilEcran()),
               (route) => false,
             );
-            
+
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Row(
                   children: [
-                    const Icon(Icons.check_circle, color: Colors.white, size: 20),
+                    const Icon(Icons.check_circle,
+                        color: Colors.white, size: 20),
                     const SizedBox(width: 8),
                     Text('Bienvenue ${utilisateur.prenom} !'),
                   ],
                 ),
                 backgroundColor: Colors.green,
                 behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
               ),
             );
           }
@@ -110,7 +117,7 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
       }
     }
   }
-  
+
   void _afficherErreurConnexion() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -123,39 +130,42 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
         ),
         backgroundColor: Colors.red,
         behavior: SnackBarBehavior.floating,
-                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-       ),
-     );
-   }
-   
-   // UI Design: Connexion rapide admin pour les tests
-   void _connexionAdminRapide() async {
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
+  // UI Design: Connexion rapide admin pour les tests
+  void _connexionAdminRapide() async {
     setState(() => _connexionEnCours = true);
-    
+
     try {
       final utilisateur = await _authentificationService.authentifier(
         'admin@uqar.ca',
         'admin123',
       );
-      
+
       if (utilisateur != null && _authentificationService.estAdministrateur) {
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const AdminDashboardEcran()),
           (route) => false,
         );
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
               children: [
-                const Icon(Icons.admin_panel_settings, color: Colors.white, size: 20),
+                const Icon(Icons.admin_panel_settings,
+                    color: Colors.white, size: 20),
                 const SizedBox(width: 8),
-                Text('Connexion Admin - ${utilisateur.prenom} ${utilisateur.nom}'),
+                Text(
+                    'Connexion Admin - ${utilisateur.prenom} ${utilisateur.nom}'),
               ],
             ),
             backgroundColor: Colors.green,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           ),
         );
       }
@@ -167,35 +177,37 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
       }
     }
   }
-  
+
   // UI Design: Connexion rapide étudiant pour les tests
   void _connexionEtudiantDemo() async {
     setState(() => _connexionEnCours = true);
-    
+
     try {
       final utilisateur = await _authentificationService.authentifier(
         'alexandre.martin@uqar.ca',
         'alex123',
       );
-      
+
       if (utilisateur != null) {
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const AccueilEcran()),
           (route) => false,
         );
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
               children: [
                 const Icon(Icons.check_circle, color: Colors.white, size: 20),
                 const SizedBox(width: 8),
-                Text('Connexion Démo - ${utilisateur.prenom} ${utilisateur.nom}'),
+                Text(
+                    'Connexion Démo - ${utilisateur.prenom} ${utilisateur.nom}'),
               ],
             ),
             backgroundColor: Colors.green,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           ),
         );
       }
@@ -213,7 +225,8 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Mot de passe oublié'),
-        content: const Text('Un email de réinitialisation sera envoyé à votre adresse.'),
+        content: const Text(
+            'Un email de réinitialisation sera envoyé à votre adresse.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -230,8 +243,10 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
                 ),
               );
             },
-            style: ElevatedButton.styleFrom(backgroundColor: CouleursApp.accent),
-            child: const Text('Envoyer', style: TextStyle(color: CouleursApp.blanc)),
+            style:
+                ElevatedButton.styleFrom(backgroundColor: CouleursApp.accent),
+            child: const Text('Envoyer',
+                style: TextStyle(color: CouleursApp.blanc)),
           ),
         ],
       ),
@@ -266,7 +281,8 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
               );
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Se déconnecter', style: TextStyle(color: CouleursApp.blanc)),
+            child: const Text('Se déconnecter',
+                style: TextStyle(color: CouleursApp.blanc)),
           ),
         ],
       ),
@@ -287,10 +303,11 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
     final screenWidth = mediaQuery.size.width;
     final padding = mediaQuery.padding;
     final viewInsets = mediaQuery.viewInsets;
-    
+
     return Scaffold(
       backgroundColor: CouleursApp.blanc,
-      resizeToAvoidBottomInset: true, // UI Design: Éviter les débordements avec le clavier
+      resizeToAvoidBottomInset:
+          true, // UI Design: Éviter les débordements avec le clavier
       body: SafeArea(
         child: Stack(
           children: [
@@ -307,7 +324,8 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          CouleursApp.accent.withValues(alpha: 0.7), // Bleu ciel UQAR transparent
+                          CouleursApp.accent.withValues(
+                              alpha: 0.7), // Bleu ciel UQAR transparent
                           CouleursApp.accent, // Bleu ciel UQAR
                           CouleursApp.principal, // Bleu foncé UQAR
                         ],
@@ -325,11 +343,13 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
                 ),
               ],
             ),
-            
+
             // Contenu par-dessus le background
             SingleChildScrollView(
               padding: EdgeInsets.only(
-                bottom: viewInsets.bottom + padding.bottom, // UI Design: Padding adaptatif pour éviter les débordements
+                bottom: viewInsets.bottom +
+                    padding
+                        .bottom, // UI Design: Padding adaptatif pour éviter les débordements
               ),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
@@ -354,11 +374,13 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
                                 Text(
                                   'UqarLive',
                                   style: StylesTexteApp.titre.copyWith(
-                                    fontSize: screenWidth * 0.1, // UI Design: Taille adaptative
+                                    fontSize: screenWidth *
+                                        0.1, // UI Design: Taille adaptative
                                     color: CouleursApp.blanc,
                                     fontWeight: FontWeight.bold,
                                   ),
-                                  overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                                  overflow: TextOverflow
+                                      .ellipsis, // UI Design: Éviter le débordement de texte
                                   maxLines: 1,
                                 ),
                               ],
@@ -367,23 +389,31 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
                           // Illustration de feuilles stylisées
                           Positioned(
                             top: 80,
-                            left: screenWidth * 0.05, // UI Design: Position adaptative
-                            child: _construireIllustrationFeuille(screenWidth * 0.15, screenWidth * 0.1),
+                            left: screenWidth *
+                                0.05, // UI Design: Position adaptative
+                            child: _construireIllustrationFeuille(
+                                screenWidth * 0.15, screenWidth * 0.1),
                           ),
                           Positioned(
                             top: 120,
-                            right: screenWidth * 0.08, // UI Design: Position adaptative
-                            child: _construireIllustrationFeuille(screenWidth * 0.2, screenWidth * 0.15),
+                            right: screenWidth *
+                                0.08, // UI Design: Position adaptative
+                            child: _construireIllustrationFeuille(
+                                screenWidth * 0.2, screenWidth * 0.15),
                           ),
                           Positioned(
                             bottom: 20,
-                            left: screenWidth * 0.1, // UI Design: Position adaptative
-                            child: _construireIllustrationFeuille(screenWidth * 0.25, screenWidth * 0.2),
+                            left: screenWidth *
+                                0.1, // UI Design: Position adaptative
+                            child: _construireIllustrationFeuille(
+                                screenWidth * 0.25, screenWidth * 0.2),
                           ),
                           Positioned(
                             bottom: 60,
-                            right: screenWidth * 0.05, // UI Design: Position adaptative
-                            child: _construireIllustrationFeuille(screenWidth * 0.3, screenWidth * 0.25),
+                            right: screenWidth *
+                                0.05, // UI Design: Position adaptative
+                            child: _construireIllustrationFeuille(
+                                screenWidth * 0.3, screenWidth * 0.25),
                           ),
                         ],
                       ),
@@ -392,7 +422,9 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
                     // Section inférieure avec formulaire
                     Container(
                       width: double.infinity,
-                      margin: EdgeInsets.only(top: screenHeight * 0.05), // UI Design: Marge adaptative
+                      margin: EdgeInsets.only(
+                          top: screenHeight *
+                              0.05), // UI Design: Marge adaptative
                       padding: EdgeInsets.fromLTRB(
                         screenWidth * 0.08, // UI Design: Padding adaptatif
                         screenHeight * 0.04,
@@ -402,7 +434,8 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
                       decoration: BoxDecoration(
                         color: CouleursApp.blanc,
                         borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(screenWidth * 0.12), // UI Design: Rayon adaptatif
+                          topLeft: Radius.circular(
+                              screenWidth * 0.12), // UI Design: Rayon adaptatif
                           topRight: Radius.circular(screenWidth * 0.12),
                         ),
                         boxShadow: [
@@ -423,13 +456,17 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
                             Text(
                               'Connexion',
                               style: StylesTexteApp.titre.copyWith(
-                                fontSize: screenWidth * 0.06, // UI Design: Taille adaptative
+                                fontSize: screenWidth *
+                                    0.06, // UI Design: Taille adaptative
                               ),
                               textAlign: TextAlign.left,
-                              overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                              overflow: TextOverflow
+                                  .ellipsis, // UI Design: Éviter le débordement de texte
                               maxLines: 1,
                             ),
-                            SizedBox(height: screenHeight * 0.05), // UI Design: Espacement adaptatif
+                            SizedBox(
+                                height: screenHeight *
+                                    0.05), // UI Design: Espacement adaptatif
 
                             // Champ nom d'utilisateur
                             _construireChampTexte(
@@ -437,7 +474,9 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
                               placeholderTexte: 'Nom d\'utilisateur',
                               icone: Icons.person_outline,
                             ),
-                            SizedBox(height: screenHeight * 0.025), // UI Design: Espacement adaptatif
+                            SizedBox(
+                                height: screenHeight *
+                                    0.025), // UI Design: Espacement adaptatif
 
                             // Champ mot de passe
                             _construireChampTexte(
@@ -446,7 +485,9 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
                               icone: Icons.lock_outline,
                               estMotDePasse: true,
                             ),
-                            SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
+                            SizedBox(
+                                height: screenHeight *
+                                    0.02), // UI Design: Espacement adaptatif
 
                             // Lien "Mot de passe oublié"
                             Align(
@@ -457,22 +498,30 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
                                   'Mot de passe oublié?',
                                   style: TextStyle(
                                     color: CouleursApp.accent,
-                                    fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
+                                    fontSize: screenWidth *
+                                        0.035, // UI Design: Taille adaptative
                                   ),
-                                  overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                                  overflow: TextOverflow
+                                      .ellipsis, // UI Design: Éviter le débordement de texte
                                   maxLines: 1,
                                 ),
                               ),
                             ),
-                            SizedBox(height: screenHeight * 0.04), // UI Design: Espacement adaptatif
+                            SizedBox(
+                                height: screenHeight *
+                                    0.04), // UI Design: Espacement adaptatif
 
                             // Bouton Connexion
                             _construireBoutonConnexion(),
-                            SizedBox(height: screenHeight * 0.04), // UI Design: Espacement adaptatif
+                            SizedBox(
+                                height: screenHeight *
+                                    0.04), // UI Design: Espacement adaptatif
 
                             // Lien vers inscription
                             _construireLienInscription(),
-                            SizedBox(height: screenHeight * 0.025), // UI Design: Espacement adaptatif
+                            SizedBox(
+                                height: screenHeight *
+                                    0.025), // UI Design: Espacement adaptatif
                           ],
                         ),
                       ),
@@ -495,7 +544,7 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
   }) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
-    
+
     return Container(
       decoration: DecorationsApp.champTexte,
       child: TextFormField(
@@ -555,13 +604,14 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
   Widget _construireLogoUqarLive() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
-    
+
     return Container(
       width: screenWidth * 0.2, // UI Design: Taille adaptative
       height: screenWidth * 0.2,
       decoration: BoxDecoration(
         color: CouleursApp.blanc,
-        borderRadius: BorderRadius.circular(screenWidth * 0.05), // UI Design: Rayon adaptatif
+        borderRadius: BorderRadius.circular(
+            screenWidth * 0.05), // UI Design: Rayon adaptatif
         boxShadow: [
           BoxShadow(
             color: CouleursApp.principal.withOpacity(0.3),
@@ -575,12 +625,11 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Icône stylisée représentant UQAR
-            Icon(
-              Icons.school, 
-              size: screenWidth * 0.08, // UI Design: Taille adaptative
-              color: CouleursApp.principal
-            ),
-            SizedBox(height: screenWidth * 0.01), // UI Design: Espacement adaptatif
+            Icon(Icons.school,
+                size: screenWidth * 0.08, // UI Design: Taille adaptative
+                color: CouleursApp.principal),
+            SizedBox(
+                height: screenWidth * 0.01), // UI Design: Espacement adaptatif
             // Petit texte "UQAR"
             Text(
               'UQAR',
@@ -589,7 +638,8 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
                 fontWeight: FontWeight.bold,
                 color: CouleursApp.principal,
               ),
-              overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+              overflow: TextOverflow
+                  .ellipsis, // UI Design: Éviter le débordement de texte
               maxLines: 1,
             ),
           ],
@@ -601,11 +651,11 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
   Widget _construireBoutonConnexion() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
-    
+
     return ElevatedButton(
       onPressed: _gererConnexion,
       style: DecorationsApp.boutonPrincipal.copyWith(
-        padding: MaterialStateProperty.all(
+        padding: WidgetStateProperty.all(
           EdgeInsets.symmetric(
             vertical: screenWidth * 0.04, // UI Design: Padding adaptatif
             horizontal: screenWidth * 0.08,
@@ -617,7 +667,8 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
         style: StylesTexteApp.bouton.copyWith(
           fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
         ),
-        overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+        overflow:
+            TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
         maxLines: 1,
       ),
     );
@@ -626,7 +677,7 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
   Widget _construireLienInscription() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
-    
+
     return Center(
       child: RichText(
         text: TextSpan(
@@ -643,11 +694,13 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
                   'S\'inscrire',
                   style: TextStyle(
                     color: CouleursApp.accent,
-                    fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
+                    fontSize:
+                        screenWidth * 0.035, // UI Design: Taille adaptative
                     fontWeight: FontWeight.w600,
                     decoration: TextDecoration.underline,
                   ),
-                  overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                  overflow: TextOverflow
+                      .ellipsis, // UI Design: Éviter le débordement de texte
                   maxLines: 1,
                 ),
               ),

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
+
 import '../screens/accueil_ecran.dart';
-import '../screens/marketplace_ecran.dart';
-import '../screens/cantine_ecran.dart';
 import '../screens/associations_ecran.dart';
+import '../screens/cantine_ecran.dart';
+import '../screens/marketplace_ecran.dart';
 import '../screens/profil_ecran.dart';
 import '../screens/salles_ecran.dart';
 
 // UI Design: Service de navigation centralisé pour éviter la duplication
 class NavigationService {
-  
   /// Gérer la navigation de la NavBar
   static void gererNavigationNavBar(BuildContext context, int index) {
     switch (index) {
@@ -35,7 +35,7 @@ class NavigationService {
     // Vérifier si on est déjà sur la page cible
     final currentRoute = ModalRoute.of(context)?.settings.name;
     final targetRoute = destination.runtimeType.toString();
-    
+
     if (currentRoute != targetRoute) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => destination),
@@ -50,7 +50,7 @@ class NavigationService {
     if (currentWidget.runtimeType.toString() == 'AccueilEcran') {
       return;
     }
-    
+
     // Sinon, naviguer vers l'accueil
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (context) => const AccueilEcran()),
@@ -72,7 +72,7 @@ class NavigationService {
   static int obtenirIndexCourant(BuildContext context) {
     final currentWidget = context.widget;
     final widgetType = currentWidget.runtimeType.toString();
-    
+
     switch (widgetType) {
       case 'CantineEcran':
         return 0;
@@ -88,4 +88,4 @@ class NavigationService {
         return 2; // Par défaut, accueil
     }
   }
-} 
+}

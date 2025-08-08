@@ -156,11 +156,11 @@ class _ProfilEcranState extends State<ProfilEcran> {
     
     // UI Design: Affichage d'un indicateur de chargement si les données ne sont pas encore disponibles
     if (_chargementEnCours || _utilisateurActuel == null) {
-      return Scaffold(
+      return const Scaffold(
         backgroundColor: CouleursApp.fond,
         resizeToAvoidBottomInset: true, // UI Design: Éviter les débordements avec le clavier
         body: SafeArea(
-          child: const Center(child: CircularProgressIndicator()),
+          child: Center(child: CircularProgressIndicator()),
         ),
       );
     }
@@ -262,7 +262,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
               _construireSectionLivres(context),
               SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
               
-              // Section mes réservations - NOUVELLE
+              // Section mes réservations - MISE À JOUR
               _construireSectionReservations(context),
               SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
               
@@ -582,10 +582,22 @@ class _ProfilEcranState extends State<ProfilEcran> {
     );
   }
 
-  // UI Design: Section mes réservations - NOUVELLE
+  // UI Design: Section mes réservations - MISE À JOUR
   Widget _construireSectionReservations(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
+    
+    // Filtrer les réservations actives (non annulées, non terminées, futures)
+    final reservationsActives = _mesReservations.where((reservation) {
+      return reservation.statut != 'annulee' && 
+             reservation.statut != 'terminee' &&
+             reservation.heureDebut.isAfter(DateTime.now());
+    }).toList();
+    
+    // Ne garder que la réservation la plus récente (une seule réservation active)
+    final reservationActive = reservationsActives.isNotEmpty 
+        ? [reservationsActives.reduce((a, b) => a.dateCreation.isAfter(b.dateCreation) ? a : b)]
+        : <ReservationSalle>[];
     
     return Container(
       margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.02), // UI Design: Marges adaptatives
@@ -620,28 +632,44 @@ class _ProfilEcranState extends State<ProfilEcran> {
           ),
           const SizedBox(height: 16),
           
-          // Liste des vraies réservations
-          if (_mesReservations.isEmpty)
+          // Liste des réservations actives
+          if (reservationActive.isEmpty)
             const Center(
               child: Padding(
                 padding: EdgeInsets.all(16.0),
-                child: Text(
-                  'Aucune réservation en cours',
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontStyle: FontStyle.italic,
-                  ),
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.event_seat_outlined,
+                      color: Colors.grey,
+                      size: 48,
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Aucune réservation active',
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontStyle: FontStyle.italic,
+                        fontSize: 16,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      'Réservez une salle pour commencer',
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             )
           else
-            ..._mesReservations.map((reservation) => Padding(
+            ...reservationActive.map((reservation) => Padding(
               padding: const EdgeInsets.only(bottom: 12.0),
-              child: _construireReservation(
-                _obtenirNomSalle(reservation.salleId),
-                '${_formaterDate(reservation.dateReservation)} ${_formaterHeure(reservation.heureDebut)}-${_formaterHeure(reservation.heureFin)}',
-                reservation.statut,
-                _obtenirCouleurStatutReservation(reservation.statut),
+              child: _construireReservationModerne(
+                reservation,
               ),
             )).toList(),
           
@@ -672,56 +700,112 @@ class _ProfilEcranState extends State<ProfilEcran> {
     );
   }
 
-  // UI Design: Helper pour une réservation
-  Widget _construireReservation(String salle, String creneau, String statut, Color couleurStatut) {
-    return Row(
-      children: [
-        const Icon(Icons.meeting_room, color: CouleursApp.accent, size: 20),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+  // UI Design: Helper moderne pour une réservation
+  Widget _construireReservationModerne(ReservationSalle reservation) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    
+    return Container(
+      padding: EdgeInsets.all(screenWidth * 0.04),
+      decoration: BoxDecoration(
+        color: CouleursApp.fond,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: _obtenirCouleurStatutReservation(reservation.statut).withValues(alpha: 0.3),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              Text(
-                salle,
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: CouleursApp.texteFonce),
-                overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
-                maxLines: 1,
+              Container(
+                padding: EdgeInsets.all(screenWidth * 0.02),
+                decoration: BoxDecoration(
+                  color: _obtenirCouleurStatutReservation(reservation.statut).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.meeting_room,
+                  color: _obtenirCouleurStatutReservation(reservation.statut),
+                  size: screenWidth * 0.05,
+                ),
               ),
-              Text(
-                creneau,
-                style: TextStyle(fontSize: 12, color: CouleursApp.texteFonce.withValues(alpha: 0.6)),
-                overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
-                maxLines: 1,
+              SizedBox(width: screenWidth * 0.03),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _obtenirNomSalle(reservation.salleId),
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.045,
+                        fontWeight: FontWeight.w600,
+                        color: CouleursApp.texteFonce,
+                      ),
+                    ),
+                    SizedBox(height: screenWidth * 0.01),
+                    Text(
+                      '${_formaterDate(reservation.dateReservation)} • ${_formaterHeure(reservation.heureDebut)} - ${_formaterHeure(reservation.heureFin)}',
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.035,
+                        color: CouleursApp.texteFonce.withValues(alpha: 0.7),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenWidth * 0.025,
+                  vertical: screenWidth * 0.015,
+                ),
+                decoration: BoxDecoration(
+                  color: _obtenirCouleurStatutReservation(reservation.statut).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  _obtenirLibelleStatut(reservation.statut),
+                  style: TextStyle(
+                    fontSize: screenWidth * 0.03,
+                    color: _obtenirCouleurStatutReservation(reservation.statut),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
             ],
           ),
-        ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: couleurStatut.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Text(
-            statut,
-            style: TextStyle(
-              fontSize: 11,
-              color: couleurStatut,
-              fontWeight: FontWeight.w600,
+          if (reservation.description != null) ...[
+            SizedBox(height: screenWidth * 0.02),
+            Text(
+              reservation.description!,
+              style: TextStyle(
+                fontSize: screenWidth * 0.035,
+                color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                fontStyle: FontStyle.italic,
+              ),
             ),
-            overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
-            maxLines: 1,
-          ),
-        ),
-        Builder(
-          builder: (context) => IconButton(
-            icon: Icon(Icons.more_vert, color: CouleursApp.texteFonce.withValues(alpha: 0.5), size: 18),
-            onPressed: () => _gererReservation(salle),
-          ),
-        ),
-      ],
+          ],
+        ],
+      ),
     );
+  }
+
+  // UI Design: Helper pour obtenir le libellé du statut
+  String _obtenirLibelleStatut(String statut) {
+    switch (statut) {
+      case 'en_attente':
+        return 'En attente';
+      case 'confirmee':
+        return 'Confirmée';
+      case 'annulee':
+        return 'Annulée';
+      case 'terminee':
+        return 'Terminée';
+      default:
+        return statut;
+    }
   }
 
   // UI Design: Helper pour un livre en vente

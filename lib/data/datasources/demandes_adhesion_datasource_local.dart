@@ -2,7 +2,7 @@ import '../models/demande_adhesion_model.dart';
 
 class DemandesAdhesionDatasourceLocal {
   // Simulation de données locales pour les demandes d'adhésion
-  static List<DemandeAdhesionModel> _demandes = [
+  static final List<DemandeAdhesionModel> _demandes = [
     // Demandes d'adhésion exemple
     DemandeAdhesionModel(
       id: 'demande_001',

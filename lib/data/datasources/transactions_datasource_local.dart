@@ -2,7 +2,7 @@ import '../models/transaction_model.dart';
 
 class TransactionsDatasourceLocal {
   // Simulation de données locales pour les transactions
-  static List<TransactionModel> _transactions = [
+  static final List<TransactionModel> _transactions = [
     // Transactions d'exemple pour différents utilisateurs
     TransactionModel(
       id: 'trans_001',
