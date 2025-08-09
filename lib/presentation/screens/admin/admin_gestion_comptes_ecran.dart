@@ -1,13 +1,14 @@
 // UI Design: Écran de gestion des comptes utilisateurs avec design moderne et épuré
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
-import '../../core/di/service_locator.dart';
-import '../../domain/entities/utilisateur.dart';
-import '../../domain/repositories/utilisateurs_repository.dart';
-import '../widgets/widget_barre_app_navigation_admin.dart';
-import '../widgets/widget_section_statistiques.dart';
-import '../services/statistiques_service.dart';
-import 'modifier_profil_ecran.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../core/di/service_locator.dart';
+import '../../../domain/entities/utilisateur.dart';
+import '../../../domain/repositories/utilisateurs_repository.dart';
+    import '../../../presentation/widgets/widget_barre_app_navigation_admin.dart';
+import '../../../presentation/widgets/widget_section_statistiques.dart';
+import '../../../presentation/services/statistiques_service.dart';
+import '../../../presentation/screens/utilisateur/profil_ecran.dart';
+import '../../../presentation/screens/utilisateur/modifier_profil_ecran.dart';
 
 class AdminGestionComptesEcran extends StatefulWidget {
   const AdminGestionComptesEcran({super.key});
@@ -21,6 +22,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
   late TabController _tabController;
   late UtilisateursRepository _utilisateursRepository;
   late StatistiquesService _statistiquesService;
+  bool _statistiquesVisibles = false;
   
   List<Utilisateur> _utilisateurs = [];
   List<Utilisateur> _utilisateursFiltres = [];
@@ -113,22 +115,29 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
       ),
       body: _chargementEnCours
           ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                _construireStatistiquesModernes(),
-                _construireBarreRechercheModerne(),
-                _construireOngletsModernes(),
-                Expanded(
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: [
-                      _construireListeUtilisateurs('tous'),
-                      _construireListeUtilisateurs('etudiants'),
-                      _construireListeUtilisateurs('admins'),
-                    ],
-                  ),
+          : SafeArea(
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Column(
+                  children: [
+                    _construireStatistiquesModernes(),
+                    _construireBarreRechercheModerne(),
+                    _construireOngletsModernes(),
+                    // Contenu scrollable des onglets
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.65,
+                      child: TabBarView(
+                        controller: _tabController,
+                        children: [
+                          _construireListeUtilisateurs('tous'),
+                          _construireListeUtilisateurs('etudiants'),
+                          _construireListeUtilisateurs('admins'),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _afficherModalNouvelUtilisateur,
@@ -168,66 +177,82 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(
-                Icons.analytics,
-                color: CouleursApp.principal,
-                size: screenWidth * 0.06,
+              Row(
+                children: [
+                  Icon(
+                    Icons.analytics,
+                    color: CouleursApp.principal,
+                    size: screenWidth * 0.06,
+                  ),
+                  SizedBox(width: screenWidth * 0.03),
+                  Text(
+                    'Vue d\'ensemble',
+                    style: StylesTexteApp.titrePage.copyWith(
+                      fontSize: screenWidth * 0.055,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(width: screenWidth * 0.03),
-              Text(
-                'Vue d\'ensemble',
-                style: StylesTexteApp.titrePage.copyWith(
-                  fontSize: screenWidth * 0.055,
-                  fontWeight: FontWeight.w600,
+              IconButton(
+                tooltip: _statistiquesVisibles ? 'Masquer les statistiques' : 'Afficher les statistiques',
+                onPressed: () => setState(() => _statistiquesVisibles = !_statistiquesVisibles),
+                icon: Icon(
+                  _statistiquesVisibles ? Icons.visibility_off : Icons.visibility,
+                  color: CouleursApp.principal,
+                  size: screenWidth * 0.06,
                 ),
               ),
             ],
           ),
-          SizedBox(height: screenHeight * 0.025),
-          Row(
-            children: [
-              Expanded(
-                child: _construireCarteStatistique(
-                  'Total',
-                  _statistiques!.totalUtilisateurs.toString(),
-                  Icons.people,
-                  CouleursApp.principal,
+          if (_statistiquesVisibles) ...[
+            SizedBox(height: screenHeight * 0.025),
+            Row(
+              children: [
+                Expanded(
+                  child: _construireCarteStatistique(
+                    'Total',
+                    _statistiques!.totalUtilisateurs.toString(),
+                    Icons.people,
+                    CouleursApp.principal,
+                  ),
                 ),
-              ),
-              SizedBox(width: screenWidth * 0.03),
-              Expanded(
-                child: _construireCarteStatistique(
-                  'Actifs',
-                  _statistiques!.utilisateursActifs.toString(),
-                  Icons.check_circle,
-                  Colors.green,
+                SizedBox(width: screenWidth * 0.03),
+                Expanded(
+                  child: _construireCarteStatistique(
+                    'Actifs',
+                    _statistiques!.utilisateursActifs.toString(),
+                    Icons.check_circle,
+                    Colors.green,
+                  ),
                 ),
-              ),
-            ],
-          ),
-          SizedBox(height: screenHeight * 0.02),
-          Row(
-            children: [
-              Expanded(
-                child: _construireCarteStatistique(
-                  'Étudiants',
-                  _statistiques!.etudiants.toString(),
-                  Icons.school,
-                  Colors.orange,
+              ],
+            ),
+            SizedBox(height: screenHeight * 0.02),
+            Row(
+              children: [
+                Expanded(
+                  child: _construireCarteStatistique(
+                    'Étudiants',
+                    _statistiques!.etudiants.toString(),
+                    Icons.school,
+                    Colors.orange,
+                  ),
                 ),
-              ),
-              SizedBox(width: screenWidth * 0.03),
-              Expanded(
-                child: _construireCarteStatistique(
-                  'Admins',
-                  _statistiques!.administrateurs.toString(),
-                  Icons.admin_panel_settings,
-                  CouleursApp.accent,
+                SizedBox(width: screenWidth * 0.03),
+                Expanded(
+                  child: _construireCarteStatistique(
+                    'Admins',
+                    _statistiques!.administrateurs.toString(),
+                    Icons.admin_panel_settings,
+                    CouleursApp.accent,
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
+          ],
         ],
       ),
     );
@@ -837,7 +862,12 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
   void _confirmerSuppressionUtilisateur(Utilisateur utilisateur) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => LayoutBuilder(builder: (context, constraints) {
+        final screenWidth = MediaQuery.of(context).size.width;
+        final dialogWidth = screenWidth * 0.9;
+        return ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: dialogWidth),
+          child: AlertDialog(
         title: Row(
           children: [
             Icon(Icons.warning, color: Colors.red, size: 24),
@@ -862,7 +892,9 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
             child: Text('Supprimer'),
           ),
         ],
-      ),
+          ),
+        );
+      }),
     );
   }
 
@@ -884,7 +916,12 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
   void _confirmerPromotionAdmin(Utilisateur utilisateur) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => LayoutBuilder(builder: (context, constraints) {
+        final screenWidth = MediaQuery.of(context).size.width;
+        final dialogWidth = screenWidth * 0.9;
+        return ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: dialogWidth),
+          child: AlertDialog(
         title: Row(
           children: [
             Icon(Icons.admin_panel_settings, color: Colors.orange),
@@ -934,7 +971,9 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
             child: Text('Promouvoir'),
           ),
         ],
-      ),
+          ),
+        );
+      }),
     );
   }
 

@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
-import '../widgets/navbar_widget.dart';
-import '../widgets/widget_barre_app_personnalisee.dart';
-import '../services/navigation_service.dart';
-import '../services/authentification_service.dart';
-import '../../core/di/service_locator.dart';
-import '../../domain/entities/utilisateur.dart';
-import '../../domain/entities/livre.dart';
-import '../../domain/entities/association.dart';
-import '../../domain/repositories/livres_repository.dart';
-import '../../domain/repositories/associations_repository.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../presentation/widgets/navbar_widget.dart';
+import '../../../presentation/widgets/widget_barre_app_personnalisee.dart';
+import '../../../presentation/services/navigation_service.dart';
+import '../../../presentation/services/authentification_service.dart';
+import '../../../core/di/service_locator.dart';
+import '../../../domain/entities/utilisateur.dart';
+import '../../../domain/entities/livre.dart';
+import '../../../domain/entities/association.dart';
+import '../../../domain/repositories/livres_repository.dart';
+import '../../../domain/repositories/associations_repository.dart';
 
-import '../../domain/repositories/membres_association_repository.dart';
-import '../../domain/entities/reservation_salle.dart';
-import '../../domain/repositories/reservations_salle_repository.dart';
+import '../../../domain/repositories/membres_association_repository.dart';
+import '../../../domain/entities/reservation_salle.dart';
+import '../../../domain/repositories/reservations_salle_repository.dart';
 
 import 'modifier_profil_ecran.dart';
-import 'gerer_livres_ecran.dart';
-import 'salles_ecran.dart';
+import '../livres/gerer_livres_ecran.dart';
+import '../salles_ecran.dart';
 import 'connexion_ecran.dart';
 
 

@@ -1,9 +1,9 @@
 // UI Design: Écran d'ajout d'actualités pour les chefs d'association
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
-import '../../domain/entities/actualite.dart';
-import '../../domain/entities/association.dart';
-import '../services/actualites_service.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../domain/entities/actualite.dart';
+import '../../../domain/entities/association.dart';
+import '../../../presentation/services/actualites_service.dart';
 
 class AjouterActualiteEcran extends StatefulWidget {
   final Association association;

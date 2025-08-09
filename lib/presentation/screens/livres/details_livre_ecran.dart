@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../../core/di/service_locator.dart';
-import '../../core/theme/app_theme.dart';
-import '../../domain/entities/livre.dart';
-import '../../domain/entities/utilisateur.dart';
-import '../services/authentification_service.dart';
-import '../services/transactions_service.dart';
+import '../../../core/di/service_locator.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../domain/entities/livre.dart';
+import '../../../domain/entities/utilisateur.dart';
+import '../../../presentation/services/authentification_service.dart';
+import '../../../presentation/services/transactions_service.dart';
 
 // UI Design: Page de détails d'un livre avec design UQAR et informations complètes
 class DetailsLivreEcran extends StatefulWidget {

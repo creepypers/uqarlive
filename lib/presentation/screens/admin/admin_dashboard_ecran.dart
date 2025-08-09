@@ -1,19 +1,18 @@
 // UI Design: Écran principal du dashboard administrateur avec statistiques dynamiques
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
-import '../../core/di/service_locator.dart';
-import '../../domain/entities/utilisateur.dart';
-import '../widgets/widget_barre_app_navigation_admin.dart';
-import '../widgets/widget_carte.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../core/di/service_locator.dart';
+import '../../../domain/entities/utilisateur.dart';
+import '../../widgets/widget_barre_app_navigation_admin.dart';
+import '../../widgets/widget_carte.dart';
 
-import '../services/statistiques_service.dart';
-import '../services/authentification_service.dart';
+import '../../services/statistiques_service.dart';
+import '../../services/authentification_service.dart';
 import 'admin_gestion_comptes_ecran.dart';
 import 'admin_gestion_cantine_ecran.dart';
-import 'admin_gestion_associations_ecran.dart';
-import 'gestion_privileges_admin_ecran.dart';
-import 'tableau_bord_chef_association_ecran.dart';
-import 'connexion_ecran.dart';
+import '../../../presentation/screens/admin/admin_gestion_associations_ecran.dart';
+import '../../../presentation/screens/admin/gestion_privileges_admin_ecran.dart';
+import '../../../presentation/screens/utilisateur/connexion_ecran.dart';
 
 class AdminDashboardEcran extends StatefulWidget {
   const AdminDashboardEcran({super.key});
@@ -80,54 +79,6 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
             ? 'Connecté en tant que ${_utilisateurActuel!.prenom} ${_utilisateurActuel!.nom}'
             : 'Vue d\'ensemble du système',
         sectionActive: 'dashboard',
-        // UI Design: Actions admin supplémentaires
-        actions: [
-          PopupMenuButton<String>(
-            onSelected: (action) => _gererActionAdmin(action),
-            icon: Icon(Icons.more_vert, color: CouleursApp.blanc, size: screenWidth * 0.06), // UI Design: Taille adaptative
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 'profil',
-                child: Row(
-                  children: [
-                    Icon(Icons.person, size: screenWidth * 0.05), // UI Design: Taille adaptative
-                    SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
-                    Text(
-                      'Mon Profil',
-                      style: TextStyle(fontSize: screenWidth * 0.035), // UI Design: Taille adaptative
-                    ),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 'privileges',
-                child: Row(
-                  children: [
-                    Icon(Icons.admin_panel_settings, color: Colors.orange, size: screenWidth * 0.05), // UI Design: Taille adaptative
-                    SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
-                    Text(
-                      'Gérer mes privilèges',
-                      style: TextStyle(fontSize: screenWidth * 0.035), // UI Design: Taille adaptative
-                    ),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 'deconnexion',
-                child: Row(
-                  children: [
-                    Icon(Icons.logout, color: Colors.red, size: screenWidth * 0.05), // UI Design: Taille adaptative
-                    SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
-                    Text(
-                      'Se déconnecter',
-                      style: TextStyle(color: Colors.red, fontSize: screenWidth * 0.035), // UI Design: Taille adaptative
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
       ),
       body: SafeArea(
         child: _chargementEnCours
@@ -684,12 +635,7 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
     );
   }
 
-  void _naviguerVersTableauBordChef() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const TableauBordChefAssociationEcran()),
-    );
-  }
+
 
   void _afficherMessageDeveloppement() {
     ScaffoldMessenger.of(context).showSnackBar(

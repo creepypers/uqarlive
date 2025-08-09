@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
-import '../../data/datasources/horaires_datasource_local.dart';
-import '../widgets/widget_barre_app_navigation_admin.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../../data/datasources/horaires_datasource_local.dart';
+import '../../../presentation/widgets/widget_barre_app_navigation_admin.dart';
 
 class AdminModifierHorairesEcran extends StatefulWidget {
   const AdminModifierHorairesEcran({super.key});

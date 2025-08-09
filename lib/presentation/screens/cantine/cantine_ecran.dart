@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
-import '../../core/di/service_locator.dart';
-import '../../domain/entities/menu.dart';
-import '../../domain/repositories/menus_repository.dart';
-import '../../data/repositories/menus_repository_impl.dart';
-import '../../data/datasources/menus_datasource_local.dart';
-import '../widgets/navbar_widget.dart';
-import '../widgets/widget_barre_app_personnalisee.dart';
-import '../widgets/widget_carte.dart';
-import '../widgets/widget_collection.dart';
-import '../widgets/widget_section_statistiques.dart';
-import '../services/statistiques_service.dart';
-import '../services/navigation_service.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../core/di/service_locator.dart';
+import '../../../domain/entities/menu.dart';
+import '../../../domain/repositories/menus_repository.dart';
+import '../../../presentation/widgets/navbar_widget.dart';
+import '../../../presentation/widgets/widget_barre_app_personnalisee.dart';
+import '../../../presentation/widgets/widget_carte.dart';
+import '../../../presentation/widgets/widget_collection.dart';
+import '../../../presentation/widgets/widget_section_statistiques.dart';
+import '../../../presentation/services/statistiques_service.dart';
+import '../../../presentation/services/navigation_service.dart';
 import 'details_menu_ecran.dart';
 
 // UI Design: Page cantine UQAR avec menus, horaires et design moderne
@@ -57,8 +55,7 @@ class _CantineEcranState extends State<CantineEcran> {
   }
 
   void _initialiserRepositories() {
-    final datasourceLocal = MenusDatasourceLocal();
-    _menusRepository = MenusRepositoryImpl(datasourceLocal);
+    _menusRepository = ServiceLocator.obtenirService<MenusRepository>();
     _statistiquesService = ServiceLocator.obtenirService<StatistiquesService>();
   }
 

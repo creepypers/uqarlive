@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
-import '../widgets/navbar_widget.dart';
-import '../widgets/widget_barre_app_personnalisee.dart';
-import '../widgets/widget_carte.dart';
-import '../widgets/widget_collection.dart';
-import '../services/navigation_service.dart';
-import '../../core/di/service_locator.dart';
-import '../../domain/repositories/livres_repository.dart';
-import '../../domain/entities/livre.dart';
-import '../../domain/entities/utilisateur.dart';
-import '../services/authentification_service.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../presentation/widgets/navbar_widget.dart';
+import '../../../presentation/widgets/widget_barre_app_personnalisee.dart';
+import '../../../presentation/widgets/widget_carte.dart';
+import '../../../presentation/widgets/widget_collection.dart';
+import '../../../presentation/services/navigation_service.dart';
+import '../../../core/di/service_locator.dart';
+import '../../../domain/entities/livre.dart';
+import '../../../domain/entities/utilisateur.dart';
+import '../../../domain/repositories/livres_repository.dart';
+import '../../../presentation/services/authentification_service.dart';
 
 // UI Design: Écran de gestion des livres personnels de l'utilisateur
 class GererLivresEcran extends StatefulWidget {

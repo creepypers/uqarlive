@@ -1,10 +1,10 @@
 // UI Design: Écran de gestion d'association pour les chefs
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
-import '../../domain/entities/association.dart';
-import '../../domain/entities/demande_adhesion.dart';
-import '../../presentation/services/adhesions_service.dart';
-import '../../core/di/service_locator.dart';
+// UI Design: Utilisation minimale des imports (aucun style direct requis ici)
+import '../../../domain/entities/association.dart';
+import '../../../domain/entities/demande_adhesion.dart';
+import '../../../presentation/services/adhesions_service.dart';
+import '../../../core/di/service_locator.dart';
 import 'ajouter_actualite_ecran.dart';
 import 'ajouter_evenement_ecran.dart';
 
@@ -127,8 +127,7 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
-    final screenWidth = mediaQuery.size.width;
-    final screenHeight = mediaQuery.size.height;
+    final screenWidth = mediaQuery.size.width; // utilisé dans styles responsives
 
     return Scaffold(
       appBar: AppBar(

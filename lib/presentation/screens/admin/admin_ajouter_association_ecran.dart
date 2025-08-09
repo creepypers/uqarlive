@@ -1,10 +1,10 @@
 // UI Design: Écran d'ajout d'association avec formulaire complet et validation
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
-import '../../core/di/service_locator.dart';
-import '../../domain/entities/association.dart';
-import '../../domain/repositories/associations_repository.dart';
-import '../widgets/widget_barre_app_navigation_admin.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../core/di/service_locator.dart';
+import '../../../domain/entities/association.dart';
+import '../../../domain/repositories/associations_repository.dart';
+import '../../../presentation/widgets/widget_barre_app_navigation_admin.dart';
 
 class AdminAjouterAssociationEcran extends StatefulWidget {
   final Association? associationAModifier;

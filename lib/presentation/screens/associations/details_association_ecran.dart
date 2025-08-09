@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
-import '../../core/theme/app_theme.dart';
-import '../../domain/entities/association.dart';
-import '../services/navigation_service.dart';
-import '../services/adhesions_service.dart';
-import '../services/authentification_service.dart';
-import '../../core/di/service_locator.dart';
-import '../utils/associations_utils.dart';
-import '../widgets/navbar_widget.dart';
-import '../widgets/widget_barre_app_personnalisee.dart';
-import '../widgets/widget_section_statistiques.dart';
-import 'gestion_demandes_association_ecran.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../domain/entities/association.dart';
+import '../../services/navigation_service.dart';
+import '../../services/adhesions_service.dart';
+import '../../services/authentification_service.dart';
+import '../../../core/di/service_locator.dart';
+import '../../utils/associations_utils.dart';
+import '../../widgets/navbar_widget.dart';
+import '../../widgets/widget_barre_app_personnalisee.dart';
+// import supprimé: widget_section_statistiques.dart non utilisé
+// import supprimé: gestion_demandes_association_ecran non utilisé ici
 import 'gestion_association_ecran.dart';
 
 // UI Design: Page de détails complète d'une association UQAR

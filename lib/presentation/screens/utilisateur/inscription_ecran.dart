@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
-import 'accueil_ecran.dart';
+import '../../../core/theme/app_theme.dart';
+import '../accueil_ecran.dart';
 
 // UI Design: Écran d'inscription avec design UQAR et fond dégradé bleu UQAR
 class InscriptionEcran extends StatefulWidget {

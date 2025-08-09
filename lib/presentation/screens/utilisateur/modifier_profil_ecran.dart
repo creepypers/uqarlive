@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
-import '../../domain/entities/utilisateur.dart';
-import '../widgets/navbar_widget.dart';
-import '../widgets/widget_barre_app_personnalisee.dart';
-import '../services/navigation_service.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../domain/entities/utilisateur.dart';
+import '../../../presentation/widgets/navbar_widget.dart';
+import '../../../presentation/widgets/widget_barre_app_personnalisee.dart';
+import '../../../presentation/services/navigation_service.dart';
 
 // UI Design: Page de modification du profil utilisateur avec formulaires complets
 class ModifierProfilEcran extends StatefulWidget {

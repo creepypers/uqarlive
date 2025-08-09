@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
-import '../screens/admin_dashboard_ecran.dart';
-import '../screens/admin_gestion_comptes_ecran.dart';
-import '../screens/admin_gestion_cantine_ecran.dart';
-import '../screens/admin_gestion_associations_ecran.dart';
-import '../screens/admin_ajouter_menu_ecran.dart';
-import '../screens/admin_modifier_horaires_ecran.dart';
+import '../screens/admin/admin_dashboard_ecran.dart';
+import '../screens/admin/admin_gestion_comptes_ecran.dart';
+import '../screens/admin/admin_gestion_cantine_ecran.dart';
+import '../screens/admin/admin_gestion_associations_ecran.dart';
+import '../screens/admin/admin_ajouter_menu_ecran.dart';
+import '../screens/admin/admin_modifier_horaires_ecran.dart';
 
 // UI Design: AppBar de navigation entre les différentes sections de gestion admin
 class WidgetBarreAppNavigationAdmin extends StatelessWidget implements PreferredSizeWidget {

@@ -1,19 +1,18 @@
 // UI Design: Écran de gestion des associations avec sous-sections pour actualités, événements et membres
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
-import '../../core/di/service_locator.dart';
-import '../../domain/entities/association.dart';
-import '../../domain/entities/actualite.dart';
-import '../../domain/entities/evenement.dart';
-import '../../domain/repositories/associations_repository.dart';
-import '../../domain/repositories/actualites_repository.dart';
-import '../../domain/repositories/evenements_repository.dart';
-import '../widgets/widget_barre_app_navigation_admin.dart';
-import '../widgets/widget_carte.dart';
-import '../widgets/widget_collection.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../core/di/service_locator.dart';
+import '../../../domain/entities/association.dart';
+import '../../../domain/entities/actualite.dart';
+import '../../../domain/entities/evenement.dart';
+import '../../../domain/repositories/associations_repository.dart';
+import '../../../domain/repositories/actualites_repository.dart';
+import '../../../domain/repositories/evenements_repository.dart';
+import '../../widgets/widget_barre_app_navigation_admin.dart';
+import '../../widgets/widget_carte.dart';
+import '../../widgets/widget_collection.dart';
 import 'admin_ajouter_association_ecran.dart';
-import 'ajouter_actualite_ecran.dart';
-import 'ajouter_evenement_ecran.dart';
+// imports supprimés: écrans d'ajout utilisés côté chef association uniquement
 
 class AdminGestionAssociationsEcran extends StatefulWidget {
   const AdminGestionAssociationsEcran({super.key});
@@ -80,11 +79,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
   @override
   Widget build(BuildContext context) {
     // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
-    final mediaQuery = MediaQuery.of(context);
-    final screenHeight = mediaQuery.size.height;
-    final screenWidth = mediaQuery.size.width;
-    final padding = mediaQuery.padding;
-    final viewInsets = mediaQuery.viewInsets;
+    final screenWidth = MediaQuery.of(context).size.width;
     
     return Scaffold(
       backgroundColor: CouleursApp.fond,
@@ -611,7 +606,11 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
   void _confirmerSuppressionAssociation(Association association) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => LayoutBuilder(builder: (context, constraints) {
+        final w = MediaQuery.of(context).size.width * 0.9;
+        return ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: w),
+          child: AlertDialog(
         title: const Text('Confirmer la suppression', style: StylesTexteApp.moyenTitre),
         content: Text(
           'Êtes-vous sûr de vouloir supprimer l\'association "${association.nom}" ?',
@@ -633,7 +632,9 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
             ),
           ),
         ],
-      ),
+          ),
+        );
+      }),
     );
   }
 
@@ -674,7 +675,11 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
   void _confirmerSuppressionActualite(Actualite actualite) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => LayoutBuilder(builder: (context, constraints) {
+        final w = MediaQuery.of(context).size.width * 0.9;
+        return ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: w),
+          child: AlertDialog(
         title: const Text('Confirmer la suppression', style: StylesTexteApp.moyenTitre),
         content: Text(
           'Êtes-vous sûr de vouloir supprimer l\'actualité "${actualite.titre}" ?',
@@ -696,7 +701,9 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
             ),
           ),
         ],
-      ),
+          ),
+        );
+      }),
     );
   }
 
@@ -774,7 +781,11 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
   void _confirmerSuppressionEvenement(Evenement evenement) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => LayoutBuilder(builder: (context, constraints) {
+        final w = MediaQuery.of(context).size.width * 0.9;
+        return ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: w),
+          child: AlertDialog(
         title: const Text('Confirmer la suppression', style: StylesTexteApp.moyenTitre),
         content: Text(
           'Êtes-vous sûr de vouloir supprimer l\'événement "${evenement.titre}" ?',
@@ -796,7 +807,9 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
             ),
           ),
         ],
-      ),
+          ),
+        );
+      }),
     );
   }
 

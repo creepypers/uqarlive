@@ -1,16 +1,16 @@
 // UI Design: Écran de gestion de la cantine pour les administrateurs
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
-import '../../core/di/service_locator.dart';
-import '../../domain/entities/menu.dart';
-import '../../domain/repositories/menus_repository.dart';
-import '../../data/datasources/horaires_datasource_local.dart';
-import '../widgets/widget_barre_app_navigation_admin.dart';
-import '../widgets/widget_carte.dart';
-import '../widgets/widget_collection.dart';
-import '../widgets/widget_section_statistiques.dart';
-import '../screens/admin_ajouter_menu_ecran.dart';
-import '../screens/admin_modifier_horaires_ecran.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../core/di/service_locator.dart';
+import '../../../domain/entities/menu.dart';
+import '../../../domain/repositories/menus_repository.dart';
+import '../../../data/datasources/horaires_datasource_local.dart';
+import '../../../presentation/widgets/widget_barre_app_navigation_admin.dart';
+import '../../../presentation/widgets/widget_carte.dart';
+import '../../../presentation/widgets/widget_collection.dart';
+import '../../../presentation/widgets/widget_section_statistiques.dart';
+import '../../../presentation/screens/admin/admin_ajouter_menu_ecran.dart';
+import '../../../presentation/screens/admin/admin_modifier_horaires_ecran.dart';
 
 class AdminGestionCantineEcran extends StatefulWidget {
   const AdminGestionCantineEcran({super.key});
@@ -498,7 +498,11 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
   void _changerStatutCantine(bool nouvelEtat) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => LayoutBuilder(builder: (context, constraints) {
+        final w = MediaQuery.of(context).size.width * 0.9;
+        return ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: w),
+          child: AlertDialog(
         title: Text('${nouvelEtat ? "Ouvrir" : "Fermer"} la Cantine'),
         content: Text('Voulez-vous vraiment ${nouvelEtat ? "ouvrir" : "fermer"} la cantine maintenant ?'),
         actions: [
@@ -519,7 +523,9 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
             child: Text(nouvelEtat ? 'Ouvrir' : 'Fermer'),
           ),
         ],
-      ),
+          ),
+        );
+      }),
     );
   }
 
@@ -562,7 +568,11 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
   void _supprimerMenu(Menu menu) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => LayoutBuilder(builder: (context, constraints) {
+        final w = MediaQuery.of(context).size.width * 0.9;
+        return ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: w),
+          child: AlertDialog(
         title: const Text('Supprimer le menu'),
         content: Text('Voulez-vous supprimer le menu "${menu.nom}" ?'),
         actions: [
@@ -587,7 +597,9 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
             child: const Text('Supprimer'),
           ),
         ],
-      ),
+          ),
+        );
+      }),
     );
   }
 
@@ -603,7 +615,11 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
   void _fermetureUrgente() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => LayoutBuilder(builder: (context, constraints) {
+        final w = MediaQuery.of(context).size.width * 0.9;
+        return ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: w),
+          child: AlertDialog(
         title: const Text('Fermeture d\'Urgence'),
         content: const Text('Cette action fermera immédiatement la cantine et enverra une notification à tous les utilisateurs.'),
         actions: [
@@ -625,7 +641,9 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
             child: const Text('Confirmer'),
           ),
         ],
-      ),
+          ),
+        );
+      }),
     );
   }
 

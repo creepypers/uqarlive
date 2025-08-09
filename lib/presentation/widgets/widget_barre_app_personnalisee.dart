@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/di/service_locator.dart';
 import '../../domain/entities/utilisateur.dart';
-import '../screens/profil_ecran.dart';
+import '../screens/utilisateur/profil_ecran.dart';
 import '../services/authentification_service.dart';
 
 // UI Design: Barre d'application personnalisée réutilisable avec design UQAR

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
-import '../../domain/entities/demande_adhesion.dart';
-import '../../domain/entities/association.dart';
-import '../services/adhesions_service.dart';
-import '../services/authentification_service.dart';
-import '../../core/di/service_locator.dart';
-import '../widgets/widget_barre_app_personnalisee.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../domain/entities/demande_adhesion.dart';
+import '../../../domain/entities/association.dart';
+import '../../services/adhesions_service.dart';
+import '../../services/authentification_service.dart';
+import '../../../core/di/service_locator.dart';
+import '../../widgets/widget_barre_app_personnalisee.dart';
 
 // UI Design: Écran de gestion des demandes d'adhésion pour les chefs d'associations
 class GestionDemandesAssociationEcran extends StatefulWidget {

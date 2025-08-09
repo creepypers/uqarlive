@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
-import 'connexion_ecran.dart';
+import 'utilisateur/connexion_ecran.dart';
 
 // UI Design: Écran de chargement avec fond noir et logo UqarLive
 class EcranChargement extends StatefulWidget {

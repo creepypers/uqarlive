@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../screens/accueil_ecran.dart';
-import '../screens/associations_ecran.dart';
-import '../screens/cantine_ecran.dart';
-import '../screens/marketplace_ecran.dart';
-import '../screens/profil_ecran.dart';
+import '../screens/associations/associations_ecran.dart';
+import '../screens/cantine/cantine_ecran.dart';
+import '../screens/livres/marketplace_ecran.dart';
+import '../screens/utilisateur/profil_ecran.dart';
 import '../screens/salles_ecran.dart';
 
 // UI Design: Service de navigation centralisé pour éviter la duplication

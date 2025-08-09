@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
-import '../../domain/entities/utilisateur.dart';
-import '../services/authentification_service.dart';
-import '../../domain/repositories/utilisateurs_repository.dart';
-import '../../core/di/service_locator.dart';
-import '../widgets/widget_barre_app_personnalisee.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../domain/entities/utilisateur.dart';
+import '../../../presentation/services/authentification_service.dart';
+import '../../../domain/repositories/utilisateurs_repository.dart';
+import '../../../core/di/service_locator.dart';
+import '../../../presentation/widgets/widget_barre_app_personnalisee.dart';
 
 // UI Design: Écran de gestion des privilèges administrateur
 class GestionPrivilegesAdminEcran extends StatefulWidget {

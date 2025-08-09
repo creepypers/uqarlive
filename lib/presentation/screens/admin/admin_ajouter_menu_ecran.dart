@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
-import '../widgets/widget_barre_app_navigation_admin.dart';
-import '../../domain/entities/menu.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../domain/entities/menu.dart';
+import '../../../presentation/widgets/widget_barre_app_navigation_admin.dart';
 
 // UI Design: Écran d'ajout/modification de menu pour la cantine
 class AdminAjouterMenuEcran extends StatefulWidget {

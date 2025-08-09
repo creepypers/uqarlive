@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
-import '../../core/di/service_locator.dart';
-import '../../domain/entities/livre.dart';
-import '../../domain/repositories/livres_repository.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../core/di/service_locator.dart';
+import '../../../domain/entities/livre.dart';
+import '../../../domain/repositories/livres_repository.dart';
 import 'details_livre_ecran.dart';
-import '../widgets/navbar_widget.dart';
-import '../services/navigation_service.dart';
-import '../widgets/widget_barre_app_personnalisee.dart';
-import '../widgets/widget_collection.dart';
-import '../widgets/widget_carte.dart';
-import '../widgets/widget_section_statistiques.dart';
-import '../services/statistiques_service.dart';
+import '../../../presentation/widgets/navbar_widget.dart';
+import '../../../presentation/services/navigation_service.dart';
+import '../../../presentation/widgets/widget_barre_app_personnalisee.dart';
+import '../../../presentation/widgets/widget_collection.dart';
+import '../../../presentation/widgets/widget_carte.dart';
+import '../../../presentation/widgets/widget_section_statistiques.dart';
+import '../../../presentation/services/statistiques_service.dart';
 
 // UI Design: Écran marketplace avec widgets ultra-minimalistes
 class MarketplaceEcran extends StatefulWidget {

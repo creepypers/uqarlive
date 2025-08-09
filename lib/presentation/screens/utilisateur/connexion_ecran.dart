@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../../core/di/service_locator.dart';
-import '../../core/theme/app_theme.dart';
-import '../services/authentification_service.dart';
-import 'accueil_ecran.dart';
-import 'admin_dashboard_ecran.dart';
+import '../../../core/di/service_locator.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../presentation/services/authentification_service.dart';
+import '../accueil_ecran.dart';
+import '../admin/admin_dashboard_ecran.dart';
 import 'inscription_ecran.dart';
 
 // UI Design: Écran de connexion avec design UQAR et fond dégradé violet/bleu

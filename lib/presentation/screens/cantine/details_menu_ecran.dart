@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
-import '../../domain/entities/menu.dart';
-import '../widgets/navbar_widget.dart';
-import '../widgets/widget_barre_app_personnalisee.dart';
-import '../widgets/widget_section_statistiques.dart';
-import '../services/navigation_service.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../domain/entities/menu.dart';
+import '../../../presentation/widgets/navbar_widget.dart';
+import '../../../presentation/widgets/widget_barre_app_personnalisee.dart';
+import '../../../presentation/widgets/widget_section_statistiques.dart';
+import '../../../presentation/services/navigation_service.dart';
 
 // UI Design: Page de détails complète d'un menu de la cantine UQAR
 class DetailsMenuEcran extends StatelessWidget {

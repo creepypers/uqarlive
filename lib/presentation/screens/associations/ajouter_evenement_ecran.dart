@@ -1,9 +1,9 @@
 // UI Design: Écran d'ajout d'événements pour les chefs d'association
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
-import '../../domain/entities/evenement.dart';
-import '../../domain/entities/association.dart';
-import '../services/evenements_service.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../domain/entities/evenement.dart';
+import '../../../domain/entities/association.dart';
+import '../../../presentation/services/evenements_service.dart';
 
 class AjouterEvenementEcran extends StatefulWidget {
   final Association association;

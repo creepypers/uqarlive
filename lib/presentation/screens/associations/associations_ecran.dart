@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
-import '../../domain/entities/association.dart';
-import '../../domain/repositories/associations_repository.dart';
-import '../../data/repositories/associations_repository_impl.dart';
-import '../../data/datasources/associations_datasource_local.dart';
-import '../widgets/navbar_widget.dart';
-import '../widgets/widget_barre_app_personnalisee.dart';
-import '../widgets/widget_carte.dart';
-import '../widgets/widget_collection.dart';
-import '../widgets/widget_section_statistiques.dart';
-import '../services/navigation_service.dart';
-import '../utils/associations_utils.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../domain/entities/association.dart';
+import '../../../domain/repositories/associations_repository.dart';
+import '../../../data/repositories/associations_repository_impl.dart';
+import '../../../data/datasources/associations_datasource_local.dart';
+import '../../widgets/navbar_widget.dart';
+import '../../widgets/widget_barre_app_personnalisee.dart';
+import '../../widgets/widget_carte.dart';
+import '../../widgets/widget_collection.dart';
+import '../../widgets/widget_section_statistiques.dart';
+import '../../services/navigation_service.dart';
+import '../../utils/associations_utils.dart';
 import 'details_association_ecran.dart';
 
 // UI Design: Page associations étudiantes UQAR avec filtres et design moderne
