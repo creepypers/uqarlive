@@ -4,8 +4,10 @@ import '../../../core/di/service_locator.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../domain/entities/livre.dart';
 import '../../../domain/entities/utilisateur.dart';
+import '../../../domain/repositories/livres_repository.dart';
 import '../../../presentation/services/authentification_service.dart';
 import '../../../presentation/services/transactions_service.dart';
+import 'selectionner_livre_echange_ecran.dart';
 
 // UI Design: Page de détails d'un livre avec design UQAR et informations complètes
 class DetailsLivreEcran extends StatefulWidget {
@@ -24,6 +26,7 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
   bool _isFavoris = false;
   late final AuthentificationService _authentificationService;
   late final TransactionsService _transactionsService;
+  late final LivresRepository _livresRepository;
   Utilisateur? _utilisateurActuel;
 
   @override
@@ -32,6 +35,7 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
     _authentificationService =
         ServiceLocator.obtenirService<AuthentificationService>();
     _transactionsService = ServiceLocator.obtenirService<TransactionsService>();
+    _livresRepository = ServiceLocator.obtenirService<LivresRepository>();
     _transactionsService.initialiser();
     _chargerUtilisateur();
   }
@@ -47,8 +51,6 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
     final mediaQuery = MediaQuery.of(context);
     final screenHeight = mediaQuery.size.height;
     final screenWidth = mediaQuery.size.width;
-    final padding = mediaQuery.padding;
-    final viewInsets = mediaQuery.viewInsets;
 
     return Scaffold(
       backgroundColor: CouleursApp.fond,
@@ -637,7 +639,7 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
       child: ElevatedButton(
         onPressed: () => _proposerEchange(),
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.green,
+          backgroundColor: CouleursApp.principal,
           foregroundColor: Colors.white,
           padding: EdgeInsets.symmetric(
               vertical: screenHeight * 0.02), // UI Design: Padding adaptatif
@@ -774,24 +776,13 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
       return;
     }
 
-    // TODO: Implémenter la sélection du livre à échanger
-    // Pour l'instant, on affiche juste un message
-    _afficherInfo(
-        'Échange proposé ! Cette fonctionnalité sera bientôt disponible.');
+    // UI Design: Implémenter la sélection du livre à échanger
+    await _ouvrirSelectionLivreEchange();
   }
 
   void _contacterProprietaire() {
-    // TODO: Implémenter la messagerie
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Message envoyé à ${widget.livre.proprietaire}'),
-        backgroundColor: CouleursApp.accent,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-    );
+    // UI Design: Implémenter la messagerie
+    _ouvrirMessagerieContact();
   }
 
   Widget _construireBoutonAcheter() {
@@ -858,11 +849,15 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
     );
 
     if (success) {
-      _afficherSucces(
-          'Demande d\'achat envoyée ! Le vendeur va recevoir votre demande.');
-      Navigator.of(context).pop(); // Retourner à l'écran précédent
+      if (mounted) {
+        _afficherSucces(
+            'Demande d\'achat envoyée ! Le vendeur va recevoir votre demande.');
+        Navigator.of(context).pop(); // Retourner à l'écran précédent
+      }
     } else {
-      _afficherErreur('Erreur lors de la création de la demande d\'achat');
+      if (mounted) {
+        _afficherErreur('Erreur lors de la création de la demande d\'achat');
+      }
     }
   }
 
@@ -912,7 +907,8 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Confirmer l\'achat'),
-        content: Column(
+        content: SingleChildScrollView(
+          child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -929,6 +925,7 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
               style: TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ],
+          ),
         ),
         actions: [
           TextButton(
@@ -946,5 +943,170 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
         ],
       ),
     );
+  }
+
+  // UI Design: Ouvrir la sélection du livre à échanger
+  Future<void> _ouvrirSelectionLivreEchange() async {
+    if (_utilisateurActuel == null) {
+      _afficherErreur('Vous devez être connecté pour effectuer un échange');
+      return;
+    }
+
+    try {
+      // Récupérer les livres de l'utilisateur
+      final mesLivres = await _livresRepository.obtenirLivresParProprietaire(_utilisateurActuel!.id);
+      final livresDisponibles = mesLivres.where((livre) => livre.estDisponible && livre.id != widget.livre.id).toList();
+
+      if (livresDisponibles.isEmpty) {
+        if (mounted) {
+          _afficherInfo('Vous n\'avez pas de livres disponibles pour l\'échange. Ajoutez-en dans votre collection !');
+        }
+        return;
+      }
+
+      if (mounted) {
+        final livreSelectionne = await Navigator.of(context).push<Livre>(
+          MaterialPageRoute(
+            builder: (context) => SelectionnerLivreEchangeEcran(
+              livres: livresDisponibles,
+              livreACible: widget.livre,
+            ),
+          ),
+        );
+
+        if (livreSelectionne != null) {
+          // Proposer l'échange
+          await _proposerEchangeAvecLivre(livreSelectionne);
+        }
+      }
+    } catch (e) {
+      _afficherErreur('Erreur lors du chargement de vos livres: ${e.toString()}');
+    }
+  }
+
+
+
+  // UI Design: Proposer l'échange avec un livre spécifique
+  Future<void> _proposerEchangeAvecLivre(Livre monLivre) async {
+    try {
+      final resultat = await _transactionsService.proposerEchange(
+        _utilisateurActuel!.id,
+        monLivre.id,
+        widget.livre.id,
+        'Échange proposé via UqarLive',
+      );
+
+      if (resultat) {
+        _afficherInfo('Échange proposé avec succès ! Le propriétaire sera notifié.');
+      } else {
+        _afficherErreur('Erreur lors de la proposition d\'échange.');
+      }
+    } catch (e) {
+      _afficherErreur('Erreur technique: ${e.toString()}');
+    }
+  }
+
+  // UI Design: Ouvrir la messagerie de contact
+  void _ouvrirMessagerieContact() {
+    if (_utilisateurActuel == null) {
+      _afficherErreur('Vous devez être connecté pour contacter le propriétaire');
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => _construireDialogueMessage(),
+    );
+  }
+
+  // UI Design: Construire le dialogue de message
+  Widget _construireDialogueMessage() {
+    final TextEditingController controleurMessage = TextEditingController();
+    
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      title: Text('Contacter ${widget.livre.proprietaire}'),
+      content: SingleChildScrollView(
+        child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Concernant: "${widget.livre.titre}"',
+            style: StylesTexteApp.champ.copyWith(
+              fontWeight: FontWeight.w500,
+              color: CouleursApp.principal,
+            ),
+          ),
+          const SizedBox(height: 16),
+            SizedBox(
+              height: 120, // Hauteur fixe pour éviter le débordement
+              child: TextField(
+            controller: controleurMessage,
+                maxLines: null, // Permet l'expansion
+                expands: true, // Utilise tout l'espace disponible
+            autofocus: true,
+            style: StylesTexteApp.champ,
+            decoration: InputDecoration(
+              hintText: 'Votre message...',
+              hintStyle: StylesTexteApp.champ.copyWith(
+                color: CouleursApp.texteFonce.withValues(alpha: 0.5),
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: CouleursApp.principal.withValues(alpha: 0.3)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: CouleursApp.principal, width: 2),
+              ),
+              contentPadding: const EdgeInsets.all(16),
+                ),
+            ),
+          ),
+        ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Annuler'),
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            if (controleurMessage.text.trim().isEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Veuillez saisir un message'),
+                  backgroundColor: Colors.orange,
+                ),
+              );
+              return;
+            }
+
+            Navigator.of(context).pop();
+            await _envoyerMessage(controleurMessage.text.trim());
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: CouleursApp.principal,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+          child: const Text('Envoyer', style: TextStyle(color: CouleursApp.blanc)),
+        ),
+      ],
+    );
+  }
+
+  // UI Design: Envoyer un message
+  Future<void> _envoyerMessage(String contenu) async {
+    try {
+      // Pour l'instant, on simule l'envoi de message
+      // Dans une vraie implémentation, on aurait un service de messagerie
+      await Future.delayed(const Duration(milliseconds: 500));
+      
+      _afficherInfo('Message envoyé à ${widget.livre.proprietaire} !');
+    } catch (e) {
+      _afficherErreur('Erreur lors de l\'envoi du message: ${e.toString()}');
+    }
   }
 }

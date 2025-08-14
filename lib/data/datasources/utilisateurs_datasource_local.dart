@@ -138,9 +138,9 @@ class UtilisateursDatasourceLocal {
     if (_utilisateurActuel == null) {
       try {
         _utilisateurActuel = _utilisateurs.firstWhere((u) => u.id == 'etud_001');
-        print('DEBUG: Utilisateur automatiquement chargé: ${_utilisateurActuel?.prenom} ${_utilisateurActuel?.nom} (${_utilisateurActuel?.id})');
-      } catch (e) {
-        print('DEBUG: Erreur lors du chargement automatique: $e');
+              // Utilisateur automatiquement chargé
+    } catch (e) {
+      // Erreur lors du chargement automatique
       }
     }
     return _utilisateurActuel;

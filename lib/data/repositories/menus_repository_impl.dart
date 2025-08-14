@@ -98,4 +98,53 @@ class MenusRepositoryImpl implements MenusRepository {
       throw Exception('Erreur lors du chargement de tous les menus: $e');
     }
   }
+
+  @override
+  Future<Menu> ajouterMenu(Menu menu) async {
+    try {
+      final menuModel = MenuModel.fromEntity(menu);
+      final menuAjoute = await _datasourceLocal.ajouterMenu(menuModel.toMap());
+      return MenuModel.fromMap(menuAjoute);
+    } catch (e) {
+      throw Exception('Erreur lors de l\'ajout du menu: $e');
+    }
+  }
+
+  @override
+  Future<Menu> mettreAJourMenu(Menu menu) async {
+    try {
+      final menuModel = MenuModel.fromEntity(menu);
+      final menuMisAJour = await _datasourceLocal.mettreAJourMenu(menu.id, menuModel.toMap());
+      return MenuModel.fromMap(menuMisAJour);
+    } catch (e) {
+      throw Exception('Erreur lors de la mise à jour du menu: $e');
+    }
+  }
+
+  @override
+  Future<bool> supprimerMenu(String menuId) async {
+    try {
+      return await _datasourceLocal.supprimerMenu(menuId);
+    } catch (e) {
+      throw Exception('Erreur lors de la suppression du menu: $e');
+    }
+  }
+
+  @override
+  Future<void> definirMenuDuJour(String menuId) async {
+    try {
+      await _datasourceLocal.definirMenuDuJour(menuId);
+    } catch (e) {
+      throw Exception('Erreur lors de la définition du menu du jour: $e');
+    }
+  }
+
+  @override
+  Future<String?> obtenirMenuDuJourActuel() async {
+    try {
+      return await _datasourceLocal.obtenirMenuDuJourActuel();
+    } catch (e) {
+      throw Exception('Erreur lors de la récupération du menu du jour actuel: $e');
+    }
+  }
 } 

@@ -67,7 +67,7 @@ class StatistiquesService {
         // Actualités
         totalActualites: actualites.length,
         actualitesEpinglees: actualites.where((a) => a.estEpinglee).length,
-        actualitesUrgentes: actualites.where((a) => a.priorite == 'urgent').length,
+        actualitesUrgentes: actualites.where((a) => a.priorite == 'urgente').length,
         vuesMoyennes: actualites.isEmpty ? 0 : actualites.fold<int>(0, (sum, a) => sum + ((a as dynamic).nombreVues as num).toInt()) / actualites.length,
 
         // Événements

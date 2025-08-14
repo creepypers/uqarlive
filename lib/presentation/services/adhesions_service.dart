@@ -3,6 +3,7 @@ import '../../core/di/service_locator.dart';
 import '../../domain/entities/demande_adhesion.dart';
 import '../../domain/entities/utilisateur.dart';
 import '../../domain/entities/association.dart';
+import '../../domain/entities/membre_association.dart';
 import '../../domain/repositories/demandes_adhesion_repository.dart';
 import '../../domain/repositories/membres_association_repository.dart';
 
@@ -111,11 +112,24 @@ class AdhesionsService {
     final success = await demandesRepo.accepterDemande(demandeId, chefId, messageReponse);
     
     if (success) {
-      // Créer automatiquement le membership
+      // UI Design: Créer automatiquement le membership quand la demande est acceptée
       final demande = await demandesRepo.obtenirDemandeParId(demandeId);
       if (demande != null) {
-        // TODO: Créer le MembreAssociation dans le repository
-        // Pour l'instant, on laisse juste la demande acceptée
+        final nouveauMembre = MembreAssociation(
+          id: 'membre_${DateTime.now().millisecondsSinceEpoch}',
+          utilisateurId: demande.utilisateurId,
+          associationId: demande.associationId,
+          role: demande.roledemande,
+          dateAdhesion: DateTime.now(),
+          estActif: true,
+          responsabilites: const [],
+        );
+        
+        // Ajouter le nouveau membre au repository
+        final ajoutReussi = await membresRepo.ajouterMembre(nouveauMembre);
+        if (!ajoutReussi) {
+          // Log l'erreur mais ne pas faire échouer l'acceptation de la demande
+        }
       }
     }
     

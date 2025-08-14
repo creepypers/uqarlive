@@ -5,10 +5,9 @@ import '../../../core/di/service_locator.dart';
 import '../../../domain/entities/utilisateur.dart';
 import '../../../domain/repositories/utilisateurs_repository.dart';
     import '../../../presentation/widgets/widget_barre_app_navigation_admin.dart';
-import '../../../presentation/widgets/widget_section_statistiques.dart';
 import '../../../presentation/services/statistiques_service.dart';
-import '../../../presentation/screens/utilisateur/profil_ecran.dart';
 import '../../../presentation/screens/utilisateur/modifier_profil_ecran.dart';
+
 
 class AdminGestionComptesEcran extends StatefulWidget {
   const AdminGestionComptesEcran({super.key});
@@ -102,7 +101,6 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
   Widget build(BuildContext context) {
     // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
     final mediaQuery = MediaQuery.of(context);
-    final screenHeight = mediaQuery.size.height;
     final screenWidth = mediaQuery.size.width;
     
     return Scaffold(
@@ -460,7 +458,6 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
   Widget _construireListeUtilisateurs(String typeFiltre) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
-    final screenHeight = mediaQuery.size.height;
     
     final utilisateursFiltres = _utilisateurs.where((u) {
       final rechercheOk = _filtreRecherche.isEmpty ||
@@ -807,7 +804,10 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ModifierProfilEcran(utilisateur: utilisateur),
+        builder: (context) => ModifierProfilEcran(
+          utilisateur: utilisateur, 
+          modeAdmin: true, // UI Design: Mode admin permet de modifier le code permanent
+        ),
       ),
     ).then((resultat) {
       if (resultat == true) {
@@ -868,7 +868,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
         return ConstrainedBox(
           constraints: BoxConstraints(maxWidth: dialogWidth),
           child: AlertDialog(
-        title: Row(
+        title: const Row(
           children: [
             Icon(Icons.warning, color: Colors.red, size: 24),
             SizedBox(width: 8),
@@ -881,7 +881,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Annuler'),
+            child: const Text('Annuler'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -889,7 +889,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
               _supprimerUtilisateur(utilisateur);
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: Text('Supprimer'),
+            child: const Text('Supprimer'),
           ),
         ],
           ),
@@ -922,7 +922,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
         return ConstrainedBox(
           constraints: BoxConstraints(maxWidth: dialogWidth),
           child: AlertDialog(
-        title: Row(
+        title: const Row(
           children: [
             Icon(Icons.admin_panel_settings, color: Colors.orange),
             SizedBox(width: 8),
@@ -936,12 +936,12 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
             Text(
               'Êtes-vous sûr de vouloir promouvoir "${utilisateur.prenom} ${utilisateur.nom}" en administrateur ?',
             ),
-            SizedBox(height: 16),
-            Text(
+            const SizedBox(height: 16),
+            const Text(
               'Cette action lui donnera accès à :',
               style: TextStyle(fontWeight: FontWeight.w600),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             ...[
               '• Gestion des comptes utilisateurs',
               '• Administration de la cantine',
@@ -957,7 +957,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Annuler'),
+            child: const Text('Annuler'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -968,7 +968,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
               backgroundColor: Colors.orange,
               foregroundColor: Colors.white,
             ),
-            child: Text('Promouvoir'),
+            child: const Text('Promouvoir'),
           ),
         ],
           ),
@@ -1002,8 +1002,8 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
             SnackBar(
               content: Row(
                 children: [
-                  Icon(Icons.admin_panel_settings, color: Colors.white),
-                  SizedBox(width: 8),
+                  const Icon(Icons.admin_panel_settings, color: Colors.white),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       '${utilisateur.prenom} ${utilisateur.nom} a été promu administrateur avec succès !',
@@ -1020,7 +1020,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
+            const SnackBar(
               content: Text('Erreur lors de la promotion de l\'utilisateur'),
               backgroundColor: Colors.red,
               behavior: SnackBarBehavior.floating,
@@ -1042,78 +1042,25 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
   }
 
   void _afficherGestionPrivileges(Utilisateur utilisateur) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Row(
-          children: [
-            Icon(Icons.security, color: Colors.blue),
-            SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                'Privilèges de ${utilisateur.prenom} ${utilisateur.nom}',
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Privilèges actuels:',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-              SizedBox(height: 12),
-              ...[
-                {'code': PrivilegesUtilisateur.gestionComptes, 'nom': 'Gestion des comptes'},
-                {'code': PrivilegesUtilisateur.gestionCantine, 'nom': 'Gestion de la cantine'},
-                {'code': PrivilegesUtilisateur.gestionActualites, 'nom': 'Gestion des actualités'},
-                {'code': PrivilegesUtilisateur.gestionAssociations, 'nom': 'Gestion des associations'},
-                {'code': PrivilegesUtilisateur.gestionSalles, 'nom': 'Gestion des salles'},
-                {'code': PrivilegesUtilisateur.gestionLivres, 'nom': 'Gestion des livres'},
-                {'code': PrivilegesUtilisateur.moderationContenu, 'nom': 'Modération du contenu'},
-                {'code': PrivilegesUtilisateur.statistiques, 'nom': 'Accès aux statistiques'},
-              ].map((privilege) => CheckboxListTile(
-                title: Text(privilege['nom']!),
-                value: utilisateur.privileges.contains(privilege['code']),
-                onChanged: null,
-                dense: true,
-                activeColor: CouleursApp.principal,
-              )),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Fermer'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Modification des privilèges - Fonctionnalité à venir'),
-                  backgroundColor: CouleursApp.accent,
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-            },
-            child: Text('Modifier'),
-          ),
-        ],
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ModifierProfilEcran(utilisateur: utilisateur, modeAdmin: true),
       ),
-    );
+    ).then((resultat) {
+      if (resultat == true) {
+        _chargerDonnees();
+      }
+    });
   }
 
   void _afficherModalNouvelUtilisateur() {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const ModifierProfilEcran(),
+        builder: (context) => const ModifierProfilEcran(
+          modeAdmin: true, // UI Design: Mode admin pour créer un utilisateur complet
+        ),
       ),
     ).then((resultat) {
       if (resultat == true) {

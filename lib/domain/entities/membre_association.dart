@@ -31,14 +31,32 @@ class MembreAssociation {
   int get dureeAdhesionEnMois => (dureeAdhesion.inDays / 30).round();
 
   String get roleFormate {
-    switch (role) {
-      case 'president': return 'Président';
-      case 'vice_president': return 'Vice-Président';
-      case 'tresorier': return 'Trésorier';
-      case 'secretaire': return 'Secrétaire';
-      case 'membre_bureau': return 'Membre du Bureau';
-      case 'membre': return 'Membre';
-      default: return 'Membre';
+    final roleLower = role.toLowerCase();
+    switch (roleLower) {
+      case 'president':
+      case 'président':
+        return 'Président';
+      case 'vice_president':
+      case 'vice-président':
+      case 'vice président':
+        return 'Vice-Président';
+      case 'tresorier':
+      case 'trésorier':
+        return 'Trésorier';
+      case 'secretaire':
+      case 'secrétaire':
+        return 'Secrétaire';
+      case 'membre_bureau':
+      case 'membre du bureau':
+        return 'Membre du Bureau';
+      case 'chef':
+        return 'Chef';
+      case 'membre':
+      case 'membre actif':
+        return 'Membre';
+      default: 
+        // Si le rôle n'est pas reconnu, retourner tel quel avec première lettre majuscule
+        return role.isEmpty ? 'Membre' : '${role[0].toUpperCase()}${role.substring(1)}';
     }
   }
 

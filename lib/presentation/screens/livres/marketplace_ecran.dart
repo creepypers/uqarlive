@@ -9,7 +9,7 @@ import '../../../presentation/services/navigation_service.dart';
 import '../../../presentation/widgets/widget_barre_app_personnalisee.dart';
 import '../../../presentation/widgets/widget_collection.dart';
 import '../../../presentation/widgets/widget_carte.dart';
-import '../../../presentation/widgets/widget_section_statistiques.dart';
+
 import '../../../presentation/services/statistiques_service.dart';
 
 // UI Design: Écran marketplace avec widgets ultra-minimalistes
@@ -33,6 +33,10 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
   String _matiereSelectionnee = 'Matières';
   String _filtreEtat = 'États';
   String _filtreAnnee = 'Années';
+  
+  // Variables pour la recherche
+  final TextEditingController _controleurRecherche = TextEditingController();
+  String _termeRecherche = '';
 
   final List<String> _matieres = [
     'Matières', 'Mathématiques', 'Physique', 'Chimie', 'Biologie', 
@@ -47,6 +51,12 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
     super.initState();
     _initialiserRepositories();
     _chargerDonnees();
+  }
+
+  @override
+  void dispose() {
+    _controleurRecherche.dispose();
+    super.dispose();
   }
 
   void _initialiserRepositories() {
@@ -83,8 +93,124 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
     }
   }
 
-  Future<void> _chargerLivres() async {
-    await _chargerDonnees();
+  // UI Design: Implémenter la recherche de livres par titre, auteur ou matière
+  void _rechercherLivres(String terme) {
+    setState(() {
+      _termeRecherche = terme.toLowerCase().trim();
+      _appliquerFiltres();
+    });
+  }
+
+  // UI Design: Appliquer tous les filtres (recherche + filtres spécifiques)
+  void _appliquerFiltres() {
+    List<Livre> livresFiltres = _livresDisponibles;
+
+    // Filtre par terme de recherche
+    if (_termeRecherche.isNotEmpty) {
+      livresFiltres = livresFiltres.where((livre) {
+        return livre.titre.toLowerCase().contains(_termeRecherche) ||
+               livre.auteur.toLowerCase().contains(_termeRecherche) ||
+               livre.matiere.toLowerCase().contains(_termeRecherche);
+      }).toList();
+    }
+
+    // Filtre par matière
+    if (_matiereSelectionnee != 'Matières') {
+      livresFiltres = livresFiltres.where((livre) => 
+          livre.matiere == _matiereSelectionnee).toList();
+    }
+
+    // Filtre par état
+    if (_filtreEtat != 'États') {
+      livresFiltres = livresFiltres.where((livre) => 
+          livre.etatLivre == _filtreEtat).toList();
+    }
+
+    // Filtre par année
+    if (_filtreAnnee != 'Années') {
+      livresFiltres = livresFiltres.where((livre) => 
+          livre.anneeEtude == _filtreAnnee).toList();
+    }
+
+    setState(() {
+      _livresFiltres = livresFiltres;
+    });
+  }
+
+  // UI Design: Ouvrir l'interface de recherche
+  void _ouvrirRecherche() {
+    showDialog(
+      context: context,
+      builder: (context) => _construireDialogueRecherche(),
+    );
+  }
+
+  // UI Design: Construire le dialogue de recherche
+  Widget _construireDialogueRecherche() {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      title: const Text('Rechercher un livre'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            controller: _controleurRecherche,
+            autofocus: true,
+            style: StylesTexteApp.champ,
+            decoration: InputDecoration(
+              hintText: 'Titre, auteur, matière...',
+              hintStyle: StylesTexteApp.champ.copyWith(
+                color: CouleursApp.texteFonce.withValues(alpha: 0.5),
+              ),
+              prefixIcon: Icon(
+                Icons.search,
+                color: CouleursApp.principal.withValues(alpha: 0.7),
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: CouleursApp.principal.withValues(alpha: 0.3)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: CouleursApp.principal, width: 2),
+              ),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            ),
+            onChanged: _rechercherLivres,
+          ),
+          const SizedBox(height: 16),
+          if (_termeRecherche.isNotEmpty) 
+            Text(
+              '${_livresFiltres.length} livre(s) trouvé(s)',
+              style: StylesTexteApp.champ.copyWith(
+                color: CouleursApp.principal,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            _controleurRecherche.clear();
+            _rechercherLivres('');
+            Navigator.pop(context);
+          },
+          child: Text(
+            'Effacer',
+            style: TextStyle(color: CouleursApp.texteFonce.withValues(alpha: 0.6)),
+          ),
+        ),
+        ElevatedButton(
+          onPressed: () => Navigator.pop(context),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: CouleursApp.principal,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+          child: const Text('Fermer', style: TextStyle(color: CouleursApp.blanc)),
+        ),
+      ],
+    );
   }
 
   @override
@@ -138,9 +264,7 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
     return WidgetBarreAppPersonnalisee(
       titre: 'Échange de Livres',
       sousTitre: 'Livres Universitaires',
-      onTapFin: () {
-        // TODO: Implémenter la recherche
-      },
+      onTapFin: _ouvrirRecherche, // UI Design: Recherche implementée
     );
   }
 
@@ -201,7 +325,7 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
                     setState(() {
                       _matiereSelectionnee = matiere;
                     });
-                    _chargerLivres();
+                    _appliquerFiltres(); // UI Design: Utiliser la fonction de filtrage locale
                   },
                 ),
               );
@@ -244,7 +368,7 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
                     ),
                     onChanged: (String? newValue) {
                       setState(() => _filtreEtat = newValue!);
-                      _chargerLivres();
+                      _appliquerFiltres(); // UI Design: Utiliser la fonction de filtrage locale
                     },
                     items: _etatsLivre.map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
@@ -295,7 +419,7 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
                     ),
                     onChanged: (String? newValue) {
                       setState(() => _filtreAnnee = newValue!);
-                      _chargerLivres();
+                      _appliquerFiltres(); // UI Design: Utiliser la fonction de filtrage locale
                     },
                     items: _anneesEtude.map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
@@ -321,32 +445,155 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
     );
   }
 
-  // UI Design: Statistiques dynamiques pour l'échange de livres
+  // UI Design: Statistiques modernes et attrayantes pour l'échange de livres
   Widget _construireStatistiquesEchangeLivres() {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
     if (_statistiques == null) {
       return const SizedBox.shrink();
     }
 
-    return WidgetSectionStatistiques.marketplace(
-      statistiques: [
-        {
-          'valeur': _statistiques!.livresDisponibles.toString(),
-          'label': 'Livres\ndisponibles',
-          'icone': Icons.menu_book,
-          'couleur': CouleursApp.principal,
-        },
-        {
-          'valeur': _statistiques!.livresRecents.toString(),
-          'label': 'Livres\nrécents',
-          'icone': Icons.swap_horiz,
-          'couleur': CouleursApp.principal,
-        },
-        {
-          'valeur': _statistiques!.utilisateursActifs.toString(),
-          'label': 'Étudiants\nactifs',
-          'icone': Icons.school,
-          'couleur': CouleursApp.principal,
-        },
+         return Container(
+       padding: EdgeInsets.all(screenWidth * 0.05),
+      child: Column(
+        children: [
+          
+          
+          // Grille de statistiques moderne
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.8),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: CouleursApp.principal.withValues(alpha: 0.1),
+              ),
+            ),
+            child: Column(
+              children: [
+                // Première ligne de stats
+                Row(
+                  children: [
+                    Expanded(
+                      child: _construireStatistiqueModerne(
+                        valeur: '${_statistiques!.livresDisponibles}',
+                        label: 'Livres\nDisponibles',
+                        icone: Icons.menu_book,
+                        couleur: CouleursApp.principal,
+                        screenWidth: screenWidth,
+                      ),
+                    ),
+                    Container(
+                      width: 1,
+                      height: 60,
+                      color: CouleursApp.gris.withValues(alpha: 0.3),
+                      margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+                    ),
+                    Expanded(
+                      child: _construireStatistiqueModerne(
+                        valeur: '${_statistiques!.livresRecents}',
+                        label: 'Livres\nRécents',
+                        icone: Icons.fiber_new,
+                        couleur: CouleursApp.accent,
+                        screenWidth: screenWidth,
+                      ),
+                    ),
+                  ],
+                ),
+                Container(
+                  height: 1,
+                  color: CouleursApp.gris.withValues(alpha: 0.2),
+                  margin: EdgeInsets.symmetric(vertical: screenHeight * 0.02),
+                ),
+                // Deuxième ligne de stats
+                Row(
+                  children: [
+                    Expanded(
+                      child: _construireStatistiqueModerne(
+                        valeur: '${_statistiques!.utilisateursActifs}',
+                        label: 'Étudiants\nActifs',
+                        icone: Icons.school,
+                        couleur: Colors.green,
+                        screenWidth: screenWidth,
+                      ),
+                    ),
+                    Container(
+                      width: 1,
+                      height: 60,
+                      color: CouleursApp.gris.withValues(alpha: 0.3),
+                      margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+                    ),
+                    Expanded(
+                      child: _construireStatistiqueModerne(
+                        valeur: '${_livresDisponibles.length}',
+                        label: 'Échanges\nPossibles',
+                        icone: Icons.sync_alt,
+                        couleur: Colors.orange,
+                        screenWidth: screenWidth,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          
+
+        ],
+      ),
+    );
+  }
+
+  // UI Design: Widget de statistique moderne et animé
+  Widget _construireStatistiqueModerne({
+    required String valeur,
+    required String label,
+    required IconData icone,
+    required Color couleur,
+    required double screenWidth,
+  }) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: couleur.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: couleur.withValues(alpha: 0.2),
+            ),
+          ),
+          child: Icon(
+            icone,
+            color: couleur,
+            size: 24,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          valeur,
+          style: TextStyle(
+            fontSize: screenWidth * 0.065,
+            fontWeight: FontWeight.bold,
+            color: couleur,
+            height: 1.0,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: screenWidth * 0.03,
+            color: CouleursApp.texteFonce.withValues(alpha: 0.7),
+            height: 1.2,
+            fontWeight: FontWeight.w500,
+          ),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
       ],
     );
   }

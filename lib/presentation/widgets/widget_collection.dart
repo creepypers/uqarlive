@@ -142,16 +142,9 @@ class WidgetCollection<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
-    final mediaQuery = MediaQuery.of(context);
-    final screenWidth = mediaQuery.size.width;
-    final screenHeight = mediaQuery.size.height;
+
     
-    // UI Design: Calculer les espacements adaptatifs
-    final espacementHorizontalAdaptatif = espacementHorizontal * (screenWidth / 375); // Basé sur iPhone SE
-    final espacementColonnesAdaptatif = espacementColonnes * (screenWidth / 375);
-    final espacementLignesAdaptatif = espacementLignes * (screenHeight / 812);
-    final espacementVerticalAdaptatif = espacementVertical * (screenHeight / 812);
+
     
     if (enChargement) {
       return const Center(child: CircularProgressIndicator());

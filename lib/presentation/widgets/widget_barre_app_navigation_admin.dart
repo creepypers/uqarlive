@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/di/service_locator.dart';
+import '../services/authentification_service.dart';
 import '../screens/admin/admin_dashboard_ecran.dart';
 import '../screens/admin/admin_gestion_comptes_ecran.dart';
 import '../screens/admin/admin_gestion_cantine_ecran.dart';
 import '../screens/admin/admin_gestion_associations_ecran.dart';
 import '../screens/admin/admin_ajouter_menu_ecran.dart';
+import '../screens/admin/admin_ajouter_association_ecran.dart';
 import '../screens/admin/admin_modifier_horaires_ecran.dart';
+import '../screens/utilisateur/connexion_ecran.dart';
 
 // UI Design: AppBar de navigation entre les différentes sections de gestion admin
 class WidgetBarreAppNavigationAdmin extends StatelessWidget implements PreferredSizeWidget {
@@ -454,107 +458,19 @@ class WidgetBarreAppNavigationAdmin extends StatelessWidget implements Preferred
   }
 
   void _afficherModalNouvelleAssociation(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.group_add, color: Colors.purple),
-            SizedBox(width: 8),
-            Text('Nouvelle Association', style: StylesTexteApp.moyenTitre),
-          ],
-        ),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                'Fonctionnalité en développement',
-                style: StylesTexteApp.corpsNormal,
-              ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.purple.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Row(
-                  children: [
-                    Icon(Icons.info, color: Colors.purple),
-                    SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'Interface de création d\'association avec description et contact',
-                        style: StylesTexteApp.corpsGris,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Fermer'),
-          ),
-        ],
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AdminAjouterAssociationEcran(),
       ),
     );
   }
 
   void _afficherModalModifierAssociation(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.edit, color: Colors.indigo),
-            SizedBox(width: 8),
-            Text('Modifier Association', style: StylesTexteApp.moyenTitre),
-          ],
-        ),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                'Fonctionnalité en développement',
-                style: StylesTexteApp.corpsNormal,
-              ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.indigo.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Row(
-                  children: [
-                    Icon(Icons.info, color: Colors.indigo),
-                    SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'Interface de modification des informations d\'association',
-                        style: StylesTexteApp.corpsGris,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Fermer'),
-          ),
-        ],
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AdminGestionAssociationsEcran(),
       ),
     );
   }
@@ -571,29 +487,58 @@ class WidgetBarreAppNavigationAdmin extends StatelessWidget implements Preferred
             child: const Text('Annuler'),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                '/connexion',
-                (route) => false,
-              );
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.white, size: 20),
-                      SizedBox(width: 8),
-                      Text('Déconnexion réussie'),
-                    ],
-                  ),
-                  backgroundColor: Colors.green,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              );
+              
+              try {
+                // UI Design: Déconnexion via le service d'authentification
+                final authentificationService = ServiceLocator.obtenirService<AuthentificationService>();
+                await authentificationService.deconnecter();
+                
+                // UI Design: Navigation vers l'écran de connexion avec nettoyage complet des routes
+                if (context.mounted) {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => const ConnexionEcran()),
+                    (route) => false,
+                  );
+                  
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Row(
+                        children: [
+                          Icon(Icons.check_circle, color: Colors.white, size: 20),
+                          SizedBox(width: 8),
+                          Text('Déconnexion réussie'),
+                        ],
+                      ),
+                      backgroundColor: Colors.green,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Row(
+                        children: [
+                          const Icon(Icons.error, color: Colors.white, size: 20),
+                          const SizedBox(width: 8),
+                          Text('Erreur lors de la déconnexion: $e'),
+                        ],
+                      ),
+                      backgroundColor: Colors.red,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  );
+                }
+              }
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             child: const Text('Se déconnecter', style: TextStyle(color: Colors.white)),

@@ -19,6 +19,7 @@ import '../../presentation/services/statistiques_service.dart';
 import '../../presentation/services/authentification_service.dart';
 import '../../presentation/services/transactions_service.dart';
 import '../../presentation/services/adhesions_service.dart';
+
 import '../../data/repositories/livres_repository_impl.dart';
 import '../../data/repositories/menus_repository_impl.dart';
 import '../../data/repositories/salles_repository_impl.dart';
@@ -136,6 +137,7 @@ class ServiceLocator {
     getIt.registerLazySingleton<AdhesionsService>(
       () => AdhesionsService.instance,
     );
+
   }
 
   // Méthode pour obtenir un service

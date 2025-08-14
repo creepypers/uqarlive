@@ -4,7 +4,7 @@ class Actualite {
   final String titre;
   final String description;
   final String contenu;
-  final String nomAssociation;
+  final String associationId; // ID de l'association qui publie l'actualité
   final String auteur;
   final DateTime datePublication;
   final DateTime? dateEvenement;
@@ -20,7 +20,7 @@ class Actualite {
     required this.titre,
     required this.description,
     required this.contenu,
-    required this.nomAssociation,
+    required this.associationId,
     required this.auteur,
     required this.datePublication,
     this.dateEvenement,
@@ -47,7 +47,7 @@ class Actualite {
     String? titre,
     String? description,
     String? contenu,
-    String? nomAssociation,
+    String? associationId,
     String? auteur,
     DateTime? datePublication,
     DateTime? dateEvenement,
@@ -63,7 +63,7 @@ class Actualite {
       titre: titre ?? this.titre,
       description: description ?? this.description,
       contenu: contenu ?? this.contenu,
-      nomAssociation: nomAssociation ?? this.nomAssociation,
+      associationId: associationId ?? this.associationId,
       auteur: auteur ?? this.auteur,
       datePublication: datePublication ?? this.datePublication,
       dateEvenement: dateEvenement ?? this.dateEvenement,

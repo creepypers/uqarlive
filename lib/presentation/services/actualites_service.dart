@@ -45,8 +45,8 @@ class ActualitesService {
         throw Exception('La description de l\'actualité ne peut pas être vide');
       }
 
-      if (actualite.nomAssociation.trim().isEmpty) {
-        throw Exception('Le nom de l\'association est requis');
+      if (actualite.associationId.trim().isEmpty) {
+        throw Exception('L\'ID de l\'association est requis');
       }
 
       return await _actualitesRepository.ajouterActualite(actualite);
@@ -56,7 +56,7 @@ class ActualitesService {
   }
 
   /// Met à jour une actualité existante
-  Future<Actualite> mettreAJourActualite(Actualite actualite) async {
+  Future<bool> mettreAJourActualite(Actualite actualite) async {
     try {
       // Validation métier
       if (actualite.description.trim().isEmpty) {
@@ -100,7 +100,7 @@ class ActualitesService {
   Future<Actualite> creerActualite({
     required String titre,
     required String description,
-    required String nomAssociation,
+    required String associationId,
     required String auteur,
     String priorite = 'normale',
     bool estEpinglee = false,
@@ -110,7 +110,7 @@ class ActualitesService {
       titre: titre,
       description: description,
       contenu: description, // Utilise la description comme contenu
-      nomAssociation: nomAssociation,
+      associationId: associationId,
       auteur: auteur,
       datePublication: DateTime.now(),
       priorite: priorite,

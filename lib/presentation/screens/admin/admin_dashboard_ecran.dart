@@ -11,8 +11,8 @@ import '../../services/authentification_service.dart';
 import 'admin_gestion_comptes_ecran.dart';
 import 'admin_gestion_cantine_ecran.dart';
 import '../../../presentation/screens/admin/admin_gestion_associations_ecran.dart';
-import '../../../presentation/screens/admin/gestion_privileges_admin_ecran.dart';
-import '../../../presentation/screens/utilisateur/connexion_ecran.dart';
+
+
 
 class AdminDashboardEcran extends StatefulWidget {
   const AdminDashboardEcran({super.key});
@@ -409,8 +409,9 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
                 description: 'Gérer admins & privilèges',
                 icone: Icons.admin_panel_settings,
                 couleurIcone: Colors.red,
-                onTap: () => _afficherGestionPrivileges(),
+                onTap: () => _afficherGestionComptes(),
               ),
+             
             ],
           ),
         ),
@@ -418,38 +419,7 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
     );
   }
 
-  // UI Design: Carte de gestion individuelle
-  Widget _construireCarteGestion(String titre, String description, IconData icone, Color couleur, VoidCallback onTap) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(icone, color: couleur, size: 28),
-              const SizedBox(height: 8),
-              Text(
-                titre,
-                style: StylesTexteApp.moyenTitre.copyWith(color: couleur),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                description,
-                style: StylesTexteApp.petitGris,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+
 
   // UI Design: Section d'activité récente
   Widget _construireActiviteRecente() {
@@ -637,248 +607,20 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
 
 
 
-  void _afficherMessageDeveloppement() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Fonctionnalité en cours de développement'),
-        backgroundColor: Colors.orange,
-      ),
-    );
-  }
 
-  // UI Design: Gestionnaire d'actions admin
-  void _gererActionAdmin(String action) {
-    switch (action) {
-      case 'profil':
-        _afficherProfilAdmin();
-        break;
-      case 'privileges':
-        _afficherGestionPrivileges();
-        break;
-      case 'deconnexion':
-        _confirmerDeconnexion();
-        break;
-    }
-  }
 
-  // UI Design: Afficher le profil de l'admin connecté
-  void _afficherProfilAdmin() {
-    if (_utilisateurActuel == null) return;
-    
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Row(
-          children: [
-            CircleAvatar(
-              backgroundColor: CouleursApp.principal,
-              child: Text(
-                '${_utilisateurActuel!.prenom[0]}${_utilisateurActuel!.nom[0]}',
-                style: const TextStyle(color: CouleursApp.blanc, fontWeight: FontWeight.bold),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('${_utilisateurActuel!.prenom} ${_utilisateurActuel!.nom}'),
-                  Text(
-                    'Administrateur',
-                    style: StylesTexteApp.petitGris.copyWith(color: Colors.orange),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _construireInfoProfil('Email', _utilisateurActuel!.email),
-            _construireInfoProfil('Code Étudiant', _utilisateurActuel!.codeEtudiant),
-            _construireInfoProfil('Programme', _utilisateurActuel!.programme),
-            _construireInfoProfil('Privilèges', '${_utilisateurActuel!.privileges.length} privilège(s)'),
-            _construireInfoProfil('Dernière connexion', 
-              _utilisateurActuel!.derniereConnexion != null 
-                ? _formatDate(_utilisateurActuel!.derniereConnexion!)
-                : 'Jamais'),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Fermer'),
-          ),
-        ],
-      ),
-    );
-  }
 
-  Widget _construireInfoProfil(String label, String valeur) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 80,
-            child: Text(
-              '$label:',
-              style: StylesTexteApp.corpsNormal.copyWith(fontWeight: FontWeight.w600),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              valeur,
-              style: StylesTexteApp.corpsNormal,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  
 
-  String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year} à ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
-  }
 
-  // UI Design: Ouvrir la gestion des privilèges admin
-  void _afficherGestionPrivileges() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const GestionPrivilegesAdminEcran(),
-      ),
-    );
-  }
 
-  // UI Design: Ancienne méthode pour afficher les privilèges (dialogue)
-  void _afficherMesPrivileges() {
-    if (_utilisateurActuel == null) return;
-    
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.admin_panel_settings, color: Colors.orange),
-            SizedBox(width: 8),
-            Text('Mes Privilèges'),
-          ],
-        ),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Privilèges attribués à votre compte:',
-                style: StylesTexteApp.corpsNormal.copyWith(fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 16),
-              ...[
-                {'code': PrivilegesUtilisateur.gestionComptes, 'nom': 'Gestion des comptes'},
-                {'code': PrivilegesUtilisateur.gestionCantine, 'nom': 'Gestion de la cantine'},
-                {'code': PrivilegesUtilisateur.gestionActualites, 'nom': 'Gestion des actualités'},
-                {'code': PrivilegesUtilisateur.gestionAssociations, 'nom': 'Gestion des associations'},
-                {'code': PrivilegesUtilisateur.gestionSalles, 'nom': 'Gestion des salles'},
-                {'code': PrivilegesUtilisateur.gestionLivres, 'nom': 'Gestion des livres'},
-                {'code': PrivilegesUtilisateur.moderationContenu, 'nom': 'Modération du contenu'},
-                {'code': PrivilegesUtilisateur.statistiques, 'nom': 'Accès aux statistiques'},
-              ].map((privilege) => Container(
-                margin: const EdgeInsets.symmetric(vertical: 2),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: _utilisateurActuel!.privileges.contains(privilege['code'])
-                      ? Colors.green.withValues(alpha: 0.1)
-                      : Colors.grey.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: _utilisateurActuel!.privileges.contains(privilege['code'])
-                        ? Colors.green
-                        : Colors.grey,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      _utilisateurActuel!.privileges.contains(privilege['code']!)
-                          ? Icons.check_circle
-                          : Icons.cancel,
-                      color: _utilisateurActuel!.privileges.contains(privilege['code']!)
-                          ? Colors.green
-                          : Colors.grey,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        privilege['nom']!,
-                        style: StylesTexteApp.corpsNormal,
-                      ),
-                    ),
-                  ],
-                ),
-              )),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Fermer'),
-          ),
-        ],
-      ),
-    );
-  }
 
-  // UI Design: Confirmer la déconnexion
-  void _confirmerDeconnexion() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.logout, color: Colors.red),
-            SizedBox(width: 8),
-            Text('Déconnexion'),
-          ],
-        ),
-        content: const Text(
-          'Êtes-vous sûr de vouloir vous déconnecter de votre session administrateur ?',
-          style: StylesTexteApp.corpsNormal,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Annuler'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              await _authentificationService.deconnecter();
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const ConnexionEcran()),
-                (route) => false,
-              );
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Déconnexion réussie'),
-                  backgroundColor: Colors.green,
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Se déconnecter', style: TextStyle(color: CouleursApp.blanc)),
-          ),
-        ],
-      ),
-    );
-  }
+
+
+
+  
+
+  
 
   // UI Design: Méthode utilitaire pour les libellés des types d'utilisateur
   String _obtenirLibelleTypeUtilisateur(TypeUtilisateur type) {
@@ -886,6 +628,14 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
       case TypeUtilisateur.administrateur: return 'Administrateur';
       case TypeUtilisateur.etudiant: return 'Étudiant';
     }
+  }
+
+  // UI Design: Navigation vers la gestion des comptes
+  void _afficherGestionComptes() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const AdminGestionComptesEcran()),
+    );
   }
 }
 

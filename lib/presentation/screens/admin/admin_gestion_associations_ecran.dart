@@ -12,6 +12,7 @@ import '../../widgets/widget_barre_app_navigation_admin.dart';
 import '../../widgets/widget_carte.dart';
 import '../../widgets/widget_collection.dart';
 import 'admin_ajouter_association_ecran.dart';
+import '../associations/details_association_ecran.dart';
 // imports supprimés: écrans d'ajout utilisés côté chef association uniquement
 
 class AdminGestionAssociationsEcran extends StatefulWidget {
@@ -512,31 +513,110 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
   }
 
   Future<void> _ajouterActualite() async {
-    // TODO: Implémenter l'ajout d'actualité pour admin
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Fonctionnalité d\'ajout d\'actualité en développement'),
-        backgroundColor: Colors.orange,
-      ),
+    // UI Design: Implémenter l'ajout d'actualité pour admin
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (context) => _construireDialogueAjoutActualite(),
     );
+
+    if (result != null) {
+      try {
+        final nouvelleActualite = Actualite(
+          id: 'actu_admin_${DateTime.now().millisecondsSinceEpoch}',
+          titre: result['titre'],
+          description: result['titre'], // UI Design: Utiliser le titre comme description courte
+          contenu: result['contenu'],
+          associationId: result['associationId'] ?? 'admin_general',
+          auteur: 'Administrateur UQAR',
+          datePublication: DateTime.now(),
+          priorite: 'normale',
+          estEpinglee: result['estEpinglee'] ?? false,
+          nombreVues: 0,
+          nombreLikes: 0,
+          tags: result['tags'] ?? [],
+        );
+
+        final actualiteAjoutee = await _actualitesRepository.ajouterActualite(nouvelleActualite);
+        if (mounted) {
+          if (actualiteAjoutee.id.isNotEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Actualité ajoutée avec succès !'),
+                backgroundColor: Colors.green,
+              ),
+            );
+            _chargerDonnees();
+          }
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Erreur: ${e.toString()}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
   }
 
   Future<void> _ajouterEvenement() async {
-    // TODO: Implémenter l'ajout d'événement pour admin
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Fonctionnalité d\'ajout d\'événement en développement'),
-        backgroundColor: Colors.orange,
-      ),
+    // UI Design: Implémenter l'ajout d'événement pour admin
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (context) => _construireDialogueAjoutEvenement(),
     );
+
+    if (result != null) {
+      try {
+        final nouvelEvenement = Evenement(
+          id: 'event_admin_${DateTime.now().millisecondsSinceEpoch}',
+          titre: result['titre'],
+          description: result['description'],
+          typeEvenement: 'academique', // UI Design: Type par défaut pour les événements admin
+          lieu: result['lieu'],
+          organisateur: 'Administration UQAR',
+          associationId: result['associationId'] ?? 'admin_general',
+          dateDebut: result['dateDebut'],
+          dateFin: result['dateFin'],
+          estGratuit: result['estGratuit'] ?? true,
+          prix: result['estGratuit'] == false ? result['tarif']?.toDouble() : null,
+          inscriptionRequise: result['necessiteInscription'] ?? false,
+          capaciteMaximale: result['capaciteMaximale'],
+          dateCreation: DateTime.now(),
+        );
+
+        final succes = await _evenementsRepository.ajouterEvenement(nouvelEvenement);
+        if (mounted) {
+          if (succes) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Événement ajouté avec succès !'),
+                backgroundColor: Colors.green,
+              ),
+            );
+            _chargerDonnees();
+          }
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Erreur: ${e.toString()}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
   }
 
   void _ouvrirDetailsAssociation(Association association) {
-    // TODO: Implémenter l'ouverture des détails d'association
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Ouverture des détails de ${association.nom}'),
-        backgroundColor: CouleursApp.principal,
+    // UI Design: Navigation vers les détails de l'association
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => DetailsAssociationEcran(association: association),
       ),
     );
   }
@@ -638,17 +718,33 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
     );
   }
 
-  void _supprimerAssociation(Association association) {
-    // TODO: Implémenter la suppression d'association dans le repository
-    setState(() {
-      _associations.remove(association);
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Association "${association.nom}" supprimée'),
-        backgroundColor: Colors.green,
-      ),
-    );
+  void _supprimerAssociation(Association association) async {
+    // UI Design: Supprimer l'association du repository
+    final succes = await _associationsRepository.supprimerAssociation(association.id);
+    
+    if (mounted) {
+      if (succes) {
+        setState(() {
+          _associations.remove(association);
+        });
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Association "${association.nom}" supprimée'),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erreur lors de la suppression de "${association.nom}"'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
   }
 
   void _gererActualite(Actualite actualite, String action) {
@@ -663,13 +759,107 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
   }
 
   Future<void> _modifierActualite(Actualite actualite) async {
-    // TODO: Implémenter la modification d'actualité
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Fonctionnalité de modification en développement'),
-        backgroundColor: Colors.orange,
+    // UI Design: Dialogue de modification d'actualité
+    await _ouvrirDialogueModificationActualite(actualite);
+  }
+
+  Future<void> _ouvrirDialogueModificationActualite(Actualite actualite) async {
+    final formKey = GlobalKey<FormState>();
+    final controleurTitre = TextEditingController(text: actualite.titre);
+    final controleurDescription = TextEditingController(text: actualite.description);
+    String prioriteSelectionnee = actualite.priorite;
+    
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Modifier l\'actualité'),
+        content: SingleChildScrollView(
+          child: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: controleurTitre,
+                  decoration: const InputDecoration(labelText: 'Titre'),
+                  validator: (value) => value?.isEmpty == true ? 'Titre requis' : null,
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: controleurDescription,
+                  decoration: const InputDecoration(labelText: 'Description'),
+                  maxLines: 3,
+                  validator: (value) => value?.isEmpty == true ? 'Description requise' : null,
+                ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  value: prioriteSelectionnee,
+                  decoration: const InputDecoration(labelText: 'Priorité'),
+                  items: ['normale', 'moyenne', 'haute', 'urgente'].map((priorite) {
+                    return DropdownMenuItem(value: priorite, child: Text(priorite));
+                  }).toList(),
+                  onChanged: (value) => prioriteSelectionnee = value!,
+                ),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Annuler'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (formKey.currentState!.validate()) {
+                Navigator.of(context).pop(true);
+              }
+            },
+            child: const Text('Modifier'),
+          ),
+        ],
       ),
     );
+
+    if (result == true) {
+      final actualiteModifiee = Actualite(
+        id: actualite.id,
+        titre: controleurTitre.text,
+        description: controleurDescription.text,
+        contenu: actualite.contenu,
+        associationId: actualite.associationId,
+        auteur: actualite.auteur,
+        datePublication: actualite.datePublication,
+        priorite: prioriteSelectionnee,
+        estEpinglee: actualite.estEpinglee,
+        nombreVues: actualite.nombreVues,
+        nombreLikes: actualite.nombreLikes,
+      );
+
+      try {
+        await _actualitesRepository.mettreAJourActualite(actualiteModifiee);
+        await _chargerDonnees();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Actualité modifiée avec succès'),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Erreur lors de la modification'),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
+    }
   }
 
   void _confirmerSuppressionActualite(Actualite actualite) {
@@ -707,17 +897,33 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
     );
   }
 
-  void _supprimerActualite(Actualite actualite) {
-    // TODO: Implémenter la suppression d'actualité
-    setState(() {
-      _actualites.remove(actualite);
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Actualité "${actualite.titre}" supprimée'),
-        backgroundColor: Colors.green,
-      ),
-    );
+  void _supprimerActualite(Actualite actualite) async {
+    // UI Design: Supprimer l'actualité du repository
+    final succes = await _actualitesRepository.supprimerActualite(actualite.id);
+    
+    if (mounted) {
+      if (succes) {
+        setState(() {
+          _actualites.remove(actualite);
+        });
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Actualité "${actualite.titre}" supprimée'),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erreur lors de la suppression de "${actualite.titre}"'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
   }
 
   String _formaterDate(DateTime date) {
@@ -769,13 +975,183 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
   }
 
   Future<void> _modifierEvenement(Evenement evenement) async {
-    // TODO: Implémenter la modification d'événement
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Fonctionnalité de modification en développement'),
-        backgroundColor: Colors.orange,
+    // UI Design: Dialogue de modification d'événement
+    await _ouvrirDialogueModificationEvenement(evenement);
+  }
+
+  Future<void> _ouvrirDialogueModificationEvenement(Evenement evenement) async {
+    final formKey = GlobalKey<FormState>();
+    final controleurTitre = TextEditingController(text: evenement.titre);
+    final controleurDescription = TextEditingController(text: evenement.description);
+    final controleurLieu = TextEditingController(text: evenement.lieu);
+    final controleurPrix = TextEditingController(text: evenement.prix?.toString() ?? '0');
+    String typeEvenementSelectionne = evenement.typeEvenement;
+    DateTime dateSelectionnee = evenement.dateDebut;
+    TimeOfDay heureSelectionnee = TimeOfDay.fromDateTime(evenement.dateDebut);
+    bool inscriptionRequise = evenement.inscriptionRequise;
+    
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('Modifier l\'événement'),
+          content: SingleChildScrollView(
+            child: Form(
+              key: formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    controller: controleurTitre,
+                    decoration: const InputDecoration(labelText: 'Titre'),
+                    validator: (value) => value?.isEmpty == true ? 'Titre requis' : null,
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: controleurDescription,
+                    decoration: const InputDecoration(labelText: 'Description'),
+                    maxLines: 3,
+                    validator: (value) => value?.isEmpty == true ? 'Description requise' : null,
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: controleurLieu,
+                    decoration: const InputDecoration(labelText: 'Lieu'),
+                    validator: (value) => value?.isEmpty == true ? 'Lieu requis' : null,
+                  ),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    value: typeEvenementSelectionne,
+                    decoration: const InputDecoration(labelText: 'Type'),
+                    items: ['conference', 'atelier', 'social', 'sport', 'culture', 'academique'].map((type) {
+                      return DropdownMenuItem(value: type, child: Text(type));
+                    }).toList(),
+                    onChanged: (value) => setDialogState(() => typeEvenementSelectionne = value!),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextButton(
+                          onPressed: () async {
+                            if (!mounted) return;
+                            final date = await showDatePicker(
+                              context: context,
+                              initialDate: dateSelectionnee,
+                              firstDate: DateTime.now(),
+                              lastDate: DateTime.now().add(const Duration(days: 365)),
+                            );
+                            if (date != null && mounted) {
+                              setDialogState(() => dateSelectionnee = date);
+                            }
+                          },
+                          child: Text('Date: ${dateSelectionnee.day}/${dateSelectionnee.month}/${dateSelectionnee.year}'),
+                        ),
+                      ),
+                      Expanded(
+                        child: TextButton(
+                          onPressed: () async {
+                            if (!mounted) return;
+                            final heure = await showTimePicker(
+                              context: context,
+                              initialTime: heureSelectionnee,
+                            );
+                            if (heure != null && mounted) {
+                              setDialogState(() => heureSelectionnee = heure);
+                            }
+                          },
+                          child: Text('Heure: ${heureSelectionnee.format(context)}'),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: controleurPrix,
+                    decoration: const InputDecoration(labelText: 'Prix (CAD)'),
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value?.isEmpty == true) return 'Prix requis';
+                      if (double.tryParse(value!) == null) return 'Prix invalide';
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  CheckboxListTile(
+                    title: const Text('Inscription requise'),
+                    value: inscriptionRequise,
+                    onChanged: (value) => setDialogState(() => inscriptionRequise = value!),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Annuler'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (formKey.currentState!.validate()) {
+                  Navigator.of(context).pop(true);
+                }
+              },
+              child: const Text('Modifier'),
+            ),
+          ],
+        ),
       ),
     );
+
+    if (result == true) {
+      final dateEvenement = DateTime(
+        dateSelectionnee.year,
+        dateSelectionnee.month,
+        dateSelectionnee.day,
+        heureSelectionnee.hour,
+        heureSelectionnee.minute,
+      );
+
+      final evenementModifie = Evenement(
+        id: evenement.id,
+        titre: controleurTitre.text,
+        description: controleurDescription.text,
+        organisateur: evenement.organisateur,
+        associationId: evenement.associationId,
+        dateDebut: dateEvenement,
+        dateFin: dateEvenement.add(const Duration(hours: 2)),
+        lieu: controleurLieu.text,
+        typeEvenement: typeEvenementSelectionne,
+        dateCreation: evenement.dateCreation,
+        prix: double.parse(controleurPrix.text),
+        inscriptionRequise: inscriptionRequise,
+      );
+
+      try {
+        await _evenementsRepository.mettreAJourEvenement(evenementModifie);
+        await _chargerDonnees();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Événement modifié avec succès'),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Erreur lors de la modification'),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
+    }
   }
 
   void _confirmerSuppressionEvenement(Evenement evenement) {
@@ -813,15 +1189,358 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
     );
   }
 
-  void _supprimerEvenement(Evenement evenement) {
-    // TODO: Implémenter la suppression d'événement dans le repository
-    setState(() {
-      _evenements.remove(evenement);
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Événement "${evenement.titre}" supprimé'),
-        backgroundColor: Colors.green,
+  void _supprimerEvenement(Evenement evenement) async {
+    // UI Design: Supprimer l'événement du repository
+    final succes = await _evenementsRepository.supprimerEvenement(evenement.id);
+    
+    if (mounted) {
+      if (succes) {
+        setState(() {
+          _evenements.remove(evenement);
+        });
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Événement "${evenement.titre}" supprimé'),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erreur lors de la suppression de "${evenement.titre}"'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
+  }
+
+  // UI Design: Dialogue pour l'ajout d'actualité par admin
+  Widget _construireDialogueAjoutActualite() {
+    final TextEditingController titreController = TextEditingController();
+    final TextEditingController contenuController = TextEditingController();
+    String? associationSelectionnee;
+    bool estEpinglee = false;
+
+    return StatefulBuilder(
+      builder: (context, setState) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Nouvelle Actualité'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: titreController,
+                decoration: const InputDecoration(
+                  labelText: 'Titre',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 1,
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: contenuController,
+                decoration: const InputDecoration(
+                  labelText: 'Contenu',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 4,
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: associationSelectionnee,
+                decoration: const InputDecoration(
+                  labelText: 'Association (optionnel)',
+                  border: OutlineInputBorder(),
+                ),
+                items: [
+                  const DropdownMenuItem(
+                    value: null,
+                    child: Text('Actualité générale'),
+                  ),
+                  ..._associations.map((assoc) => DropdownMenuItem(
+                    value: assoc.id,
+                    child: Text(assoc.nom),
+                  )),
+                ],
+                onChanged: (value) {
+                  setState(() {
+                    associationSelectionnee = value;
+                  });
+                },
+              ),
+              const SizedBox(height: 16),
+              CheckboxListTile(
+                title: const Text('Épingler l\'actualité'),
+                value: estEpinglee,
+                onChanged: (value) {
+                  setState(() {
+                    estEpinglee = value ?? false;
+                  });
+                },
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Annuler'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (titreController.text.trim().isEmpty || contenuController.text.trim().isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Veuillez remplir tous les champs obligatoires'),
+                    backgroundColor: Colors.orange,
+                  ),
+                );
+                return;
+              }
+              
+              Navigator.of(context).pop({
+                'titre': titreController.text.trim(),
+                'contenu': contenuController.text.trim(),
+                'associationId': associationSelectionnee,
+                'estEpinglee': estEpinglee,
+              });
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: CouleursApp.principal),
+            child: const Text('Créer', style: TextStyle(color: CouleursApp.blanc)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // UI Design: Dialogue pour l'ajout d'événement par admin
+  Widget _construireDialogueAjoutEvenement() {
+    final TextEditingController titreController = TextEditingController();
+    final TextEditingController descriptionController = TextEditingController();
+    final TextEditingController lieuController = TextEditingController();
+    final TextEditingController capaciteController = TextEditingController();
+    final TextEditingController tarifController = TextEditingController();
+    DateTime? dateDebut;
+    DateTime? dateFin;
+    String? associationSelectionnee;
+    bool estGratuit = true;
+    bool necessiteInscription = false;
+
+    return StatefulBuilder(
+      builder: (context, setState) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Nouvel Événement'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: titreController,
+                decoration: const InputDecoration(
+                  labelText: 'Titre',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 1,
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: descriptionController,
+                decoration: const InputDecoration(
+                  labelText: 'Description',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 3,
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: lieuController,
+                decoration: const InputDecoration(
+                  labelText: 'Lieu',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 1,
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextButton.icon(
+                      onPressed: () async {
+                        if (!mounted) return;
+                        final currentContext = context;
+                        
+                        final date = await showDatePicker(
+                          context: currentContext,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime.now(),
+                          lastDate: DateTime.now().add(const Duration(days: 365)),
+                        );
+                        if (date != null && mounted) {
+                          final time = await showTimePicker(
+                            context: currentContext,
+                            initialTime: TimeOfDay.now(),
+                          );
+                          if (time != null && mounted) {
+                            setState(() {
+                              dateDebut = DateTime(date.year, date.month, date.day, time.hour, time.minute);
+                            });
+                          }
+                        }
+                      },
+                      icon: const Icon(Icons.calendar_today),
+                      label: Text(
+                        dateDebut != null 
+                          ? 'Début: ${dateDebut!.day}/${dateDebut!.month} ${dateDebut!.hour}:${dateDebut!.minute.toString().padLeft(2, '0')}'
+                          : 'Date début',
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextButton.icon(
+                      onPressed: () async {
+                        if (!mounted) return;
+                        final currentContext = context;
+                        
+                        final date = await showDatePicker(
+                          context: currentContext,
+                          initialDate: dateDebut ?? DateTime.now(),
+                          firstDate: dateDebut ?? DateTime.now(),
+                          lastDate: DateTime.now().add(const Duration(days: 365)),
+                        );
+                        if (date != null && mounted) {
+                          final time = await showTimePicker(
+                            context: currentContext,
+                            initialTime: TimeOfDay.now(),
+                          );
+                          if (time != null && mounted) {
+                            setState(() {
+                              dateFin = DateTime(date.year, date.month, date.day, time.hour, time.minute);
+                            });
+                          }
+                        }
+                      },
+                      icon: const Icon(Icons.calendar_today),
+                      label: Text(
+                        dateFin != null 
+                          ? 'Fin: ${dateFin!.day}/${dateFin!.month} ${dateFin!.hour}:${dateFin!.minute.toString().padLeft(2, '0')}'
+                          : 'Date fin',
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: associationSelectionnee,
+                decoration: const InputDecoration(
+                  labelText: 'Association (optionnel)',
+                  border: OutlineInputBorder(),
+                ),
+                items: [
+                  const DropdownMenuItem(
+                    value: null,
+                    child: Text('Événement général'),
+                  ),
+                  ..._associations.map((assoc) => DropdownMenuItem(
+                    value: assoc.id,
+                    child: Text(assoc.nom),
+                  )),
+                ],
+                onChanged: (value) {
+                  setState(() {
+                    associationSelectionnee = value;
+                  });
+                },
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: capaciteController,
+                decoration: const InputDecoration(
+                  labelText: 'Capacité maximale (optionnel)',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+              ),
+              const SizedBox(height: 16),
+              CheckboxListTile(
+                title: const Text('Événement gratuit'),
+                value: estGratuit,
+                onChanged: (value) {
+                  setState(() {
+                    estGratuit = value ?? true;
+                  });
+                },
+              ),
+              if (!estGratuit) ...[
+                const SizedBox(height: 8),
+                TextField(
+                  controller: tarifController,
+                  decoration: const InputDecoration(
+                    labelText: 'Tarif (CAD)',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+              ],
+              CheckboxListTile(
+                title: const Text('Inscription requise'),
+                value: necessiteInscription,
+                onChanged: (value) {
+                  setState(() {
+                    necessiteInscription = value ?? false;
+                  });
+                },
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Annuler'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (titreController.text.trim().isEmpty || 
+                  descriptionController.text.trim().isEmpty ||
+                  lieuController.text.trim().isEmpty ||
+                  dateDebut == null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Veuillez remplir tous les champs obligatoires'),
+                    backgroundColor: Colors.orange,
+                  ),
+                );
+                return;
+              }
+              
+              Navigator.of(context).pop({
+                'titre': titreController.text.trim(),
+                'description': descriptionController.text.trim(),
+                'lieu': lieuController.text.trim(),
+                'dateDebut': dateDebut,
+                'dateFin': dateFin ?? dateDebut!.add(const Duration(hours: 2)),
+                'associationId': associationSelectionnee,
+                'capaciteMaximale': capaciteController.text.isEmpty ? null : int.tryParse(capaciteController.text),
+                'tarif': estGratuit ? 0.0 : (tarifController.text.isEmpty ? 0.0 : double.tryParse(tarifController.text) ?? 0.0),
+                'estGratuit': estGratuit,
+                'necessiteInscription': necessiteInscription,
+              });
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: CouleursApp.principal),
+            child: const Text('Créer', style: TextStyle(color: CouleursApp.blanc)),
+          ),
+        ],
       ),
     );
   }

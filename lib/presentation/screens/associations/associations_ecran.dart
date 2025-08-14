@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../domain/entities/association.dart';
+import '../../../domain/entities/actualite.dart';
 import '../../../domain/repositories/associations_repository.dart';
-import '../../../data/repositories/associations_repository_impl.dart';
-import '../../../data/datasources/associations_datasource_local.dart';
+import '../../../domain/repositories/actualites_repository.dart';
+import '../../../core/di/service_locator.dart';
 import '../../widgets/navbar_widget.dart';
 import '../../widgets/widget_barre_app_personnalisee.dart';
 import '../../widgets/widget_carte.dart';
 import '../../widgets/widget_collection.dart';
-import '../../widgets/widget_section_statistiques.dart';
 import '../../services/navigation_service.dart';
 import '../../utils/associations_utils.dart';
 import 'details_association_ecran.dart';
+import '../actualites/actualites_ecran.dart';
 
 // UI Design: Page associations étudiantes UQAR avec filtres et design moderne
 class AssociationsEcran extends StatefulWidget {
@@ -24,11 +25,14 @@ class AssociationsEcran extends StatefulWidget {
 class _AssociationsEcranState extends State<AssociationsEcran> {
   // Repository pour accéder aux données des associations
   late final AssociationsRepository _associationsRepository;
+  late final ActualitesRepository _actualitesRepository;
   List<Association> _toutesLesAssociations = [];
   List<Association> _associationsPopulaires = [];
   List<String> _typesAssociations = [];
+  List<Actualite> _actualitesRecentes = [];
   String _typeSelectionne = 'toutes';
   bool _chargementAssociations = false;
+  bool _chargementActualites = false;
   String _recherche = '';
   bool _modeRecherche = false;
   final TextEditingController _controleurRecherche = TextEditingController();
@@ -46,6 +50,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
     super.initState();
     _initialiserRepository();
     _chargerAssociations();
+    _chargerActualitesRecentes();
   }
 
   @override
@@ -55,8 +60,8 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
   }
 
   void _initialiserRepository() {
-    final datasourceLocal = AssociationsDatasourceLocal();
-    _associationsRepository = AssociationsRepositoryImpl(datasourceLocal);
+    _associationsRepository = ServiceLocator.obtenirService<AssociationsRepository>();
+    _actualitesRepository = ServiceLocator.obtenirService<ActualitesRepository>();
   }
 
   Future<void> _chargerAssociations() async {
@@ -634,7 +639,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
     
-    final actualitesRecentes = _obtenirActualitesRecentes();
+    // UI Design: Utiliser les actualités dynamiques chargées
     
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -661,10 +666,11 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
               ),
               TextButton(
                 onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Toutes les actualités - À venir'),
-                      backgroundColor: CouleursApp.accent,
+                  // UI Design: Navigation vers l'écran actualités
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ActualitesEcran(),
                     ),
                   );
                 },
@@ -687,9 +693,9 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Padding adaptatif
-            itemCount: actualitesRecentes.length,
-            itemBuilder: (context, index) {
-              final actualite = actualitesRecentes[index];
+            itemCount: _chargementActualites ? 1 : _actualitesRecentes.length,
+                  itemBuilder: (context, index) {
+                    final actualite = _actualitesRecentes[index];
               return Container(
                 width: screenWidth * 0.75, // UI Design: Largeur adaptative
                 margin: EdgeInsets.only(right: screenWidth * 0.04), // UI Design: Marge adaptative
@@ -717,15 +723,15 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
                             vertical: screenWidth * 0.01,
                           ),
                           decoration: BoxDecoration(
-                            color: _obtenirCouleurAssociation(actualite['associationId']!).withValues(alpha: 0.1),
+                            color: (actualite.estEpinglee ? Colors.orange : CouleursApp.principal).withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
-                            actualite['association']!,
+                            _obtenirNomAssociation(actualite.associationId),
                             style: TextStyle(
                               fontSize: screenWidth * 0.028, // UI Design: Taille adaptative
                               fontWeight: FontWeight.w600,
-                              color: _obtenirCouleurAssociation(actualite['associationId']!),
+                              color: actualite.estEpinglee ? Colors.orange : CouleursApp.principal,
                             ),
                             overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
                             maxLines: 1,
@@ -733,7 +739,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
                         ),
                         const Spacer(),
                         Text(
-                          actualite['date']!,
+                          _formaterDate(actualite.datePublication),
                           style: TextStyle(
                             fontSize: screenWidth * 0.028, // UI Design: Taille adaptative
                             color: CouleursApp.texteFonce.withValues(alpha: 0.6),
@@ -747,7 +753,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
                     
                     // Titre
                     Text(
-                      actualite['titre']!,
+                      actualite.titre,
                       style: TextStyle(
                         fontSize: screenWidth * 0.038, // UI Design: Taille adaptative
                         fontWeight: FontWeight.bold,
@@ -760,8 +766,8 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
                     
                     // Description
                     Expanded(
-                      child: Text(
-                        actualite['description']!,
+                      child:                         Text(
+                          actualite.description,
                         style: TextStyle(
                           fontSize: screenWidth * 0.033, // UI Design: Taille adaptative
                           color: CouleursApp.texteFonce.withValues(alpha: 0.8),
@@ -777,21 +783,13 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () {
-                          // Navigation vers l'association concernée
-                          try {
-                            final association = _toutesLesAssociations.firstWhere(
-                              (a) => a.id == actualite['associationId'],
-                            );
-                            _ouvrirDetailsAssociation(association);
-                          } catch (e) {
-                            // Association non trouvée, afficher un message
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Association non trouvée'),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                          }
+                          // UI Design: Navigation vers l'écran actualités pour voir toutes les actualités
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ActualitesEcran(),
+                            ),
+                          );
                         },
                         style: TextButton.styleFrom(
                           padding: EdgeInsets.symmetric(
@@ -802,7 +800,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
                         child: Text(
                           'Voir plus',
                           style: TextStyle(
-                            color: _obtenirCouleurAssociation(actualite['associationId']!),
+                            color: actualite.estEpinglee ? Colors.orange : CouleursApp.principal,
                             fontSize: screenWidth * 0.03, // UI Design: Taille adaptative
                             fontWeight: FontWeight.w600,
                           ),
@@ -821,51 +819,63 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
     );
   }
 
-  // Obtenir les actualités récentes de toutes les associations
-  List<Map<String, String>> _obtenirActualitesRecentes() {
-    return [
-      {
-        'associationId': '1',
-        'association': 'AÉUQAR',
-        'date': '15 jan',
-        'titre': 'Nouvelle assurance dentaire étendue',
-        'description': 'Couverture dentaire améliorée pour tous les membres avec nouveaux avantages orthodontiques et remboursements élargis.'
-      },
-      {
-        'associationId': '2',
-        'association': 'Radio UQAR',
-        'date': '12 jan',
-        'titre': 'Nouveau studio d\'enregistrement',
-        'description': 'Équipement professionnel installé pour améliorer la qualité des émissions étudiantes et podcasts.'
-      },
-      {
-        'associationId': '3',
-        'association': 'Sport UQAR',
-        'date': '14 jan',
-        'titre': 'Tournoi inter-universitaire',
-        'description': 'Inscription ouverte pour le championnat provincial de volleyball en mars. Places limitées.'
-      },
-      {
-        'associationId': '4',
-        'association': 'Génie UQAR',
-        'date': '13 jan',
-        'titre': 'Génie Olympiques 2025',
-        'description': 'Compétition annuelle d\'ingénierie avec défis techniques et prix pour les meilleures équipes.'
-      },
-    ];
+  Future<void> _chargerActualitesRecentes() async {
+    setState(() {
+      _chargementActualites = true;
+    });
+
+    try {
+      // UI Design: Récupérer les actualités récentes de toutes les associations
+      final actualites = await _actualitesRepository.obtenirActualites();
+      
+      // Trier par date de publication et prendre les 4 plus récentes
+      actualites.sort((a, b) => b.datePublication.compareTo(a.datePublication));
+      
+      setState(() {
+        _actualitesRecentes = actualites.take(4).toList();
+        _chargementActualites = false;
+      });
+    } catch (e) {
+      setState(() {
+        _actualitesRecentes = [];
+        _chargementActualites = false;
+      });
+    }
   }
 
-  // Obtenir couleur selon ID association
-  Color _obtenirCouleurAssociation(String associationId) {
+  // UI Design: Obtenir le nom de l'association à partir de l'ID
+  String _obtenirNomAssociation(String? associationId) {
+    if (associationId == null || associationId.isEmpty) {
+      return 'UQAR - Administration';
+    }
+    
     try {
       final association = _toutesLesAssociations.firstWhere(
         (a) => a.id == associationId,
       );
-      return AssociationsUtils.obtenirCouleurType(association.typeAssociation);
+      return association.nom;
     } catch (e) {
-      return CouleursApp.principal;
+      return 'Association';
     }
   }
+  
+  // UI Design: Formater la date pour l'affichage
+  String _formaterDate(DateTime date) {
+    final maintenant = DateTime.now();
+    final difference = maintenant.difference(date);
+    
+    if (difference.inDays == 0) {
+      return 'Aujourd\'hui';
+    } else if (difference.inDays == 1) {
+      return 'Hier';
+    } else if (difference.inDays < 7) {
+      return 'Il y a ${difference.inDays} jours';
+    } else {
+      return '${date.day}/${date.month}';
+    }
+  }
+
+
 
   void _ouvrirDetailsAssociation(Association association) {
     Navigator.push(

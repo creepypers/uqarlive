@@ -49,7 +49,7 @@ class WidgetBarreAppPersonnalisee extends StatelessWidget implements PreferredSi
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.10),
+            color: Colors.black.withValues(alpha: 0.10),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -60,7 +60,7 @@ class WidgetBarreAppPersonnalisee extends StatelessWidget implements PreferredSi
         ),
         border: Border(
           bottom: BorderSide(
-            color: Colors.white.withOpacity(0.18),
+            color: Colors.white.withValues(alpha: 0.18),
             width: 1.2,
           ),
         ),
@@ -126,7 +126,7 @@ class WidgetBarreAppPersonnalisee extends StatelessWidget implements PreferredSi
                   Text(
                     titre,
                     style: TextStyle(
-                        color: CouleursApp.blanc.withOpacity(0.85),
+                        color: CouleursApp.blanc.withValues(alpha: 0.85),
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
                         letterSpacing: 0.2,
@@ -142,7 +142,7 @@ class WidgetBarreAppPersonnalisee extends StatelessWidget implements PreferredSi
                         letterSpacing: 0.1,
                         shadows: [
                           Shadow(
-                            color: Colors.black.withOpacity(0.08),
+                            color: Colors.black.withValues(alpha: 0.08),
                             blurRadius: 2,
                             offset: const Offset(0, 1),
                           ),
@@ -165,7 +165,7 @@ class WidgetBarreAppPersonnalisee extends StatelessWidget implements PreferredSi
                       width: 44,
                       height: 44,
                       decoration: BoxDecoration(
-                          color: CouleursApp.blanc.withOpacity(0.15),
+                          color: CouleursApp.blanc.withValues(alpha: 0.15),
                           shape: BoxShape.circle,
                       ),
                       child: Icon(

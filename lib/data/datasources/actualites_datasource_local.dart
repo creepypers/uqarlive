@@ -1,23 +1,27 @@
 import '../models/actualite_model.dart';
 import '../../domain/entities/actualite.dart';
 
-// UI Design: Source de données locale simulée pour les actualités d'associations
+// UI Design: Source de données locale dynamique pour les actualités d'associations
 class ActualitesDatasourceLocal {
   
-  // UI Design: Données simulées d'actualités d'associations étudiantes UQAR
-  static final List<Map<String, dynamic>> _actualitesSimulees = [
+  // UI Design: Données dynamiques d'actualités d'associations étudiantes UQAR (non-hardcodées)
+  static final List<Map<String, dynamic>> _actualitesStockees = [];
+  static bool _donneesSeedees = false;
+
+  // UI Design: Données de démarrage par défaut (utilisées seulement si aucune actualité n'existe)
+  static final List<Map<String, dynamic>> _actualitesParDefaut = [
     {
       'id': '1',
       'titre': 'Tournoi de Gaming Inter-Programmes',
       'description': 'Grande compétition de jeux vidéo entre tous les programmes de l\'UQAR',
       'contenu': 'L\'Association des Étudiants en Informatique organise un tournoi de gaming épique ! Inscriptions ouvertes pour League of Legends, Valorant, et FIFA. Prizes à gagner et pizza gratuite pour tous les participants.',
-      'nomAssociation': 'Association Étudiants Informatique',
+      'associationId': 'asso_001', // AEI
       'auteur': 'Alex Tremblay',
       'datePublication': '2025-01-15T10:30:00Z',
       'dateEvenement': '2025-01-25T18:00:00Z',
       'imageUrl': null,
       'tags': ['gaming', 'compétition', 'informatique'],
-      'priorite': 'haute',
+      'priorite': 'urgente',
       'estEpinglee': true,
       'nombreVues': 245,
       'nombreLikes': 89,
@@ -27,13 +31,13 @@ class ActualitesDatasourceLocal {
       'titre': 'Soirée Cinéma Horreur',
       'description': 'Marathon de films d\'horreur classiques avec popcorn illimité',
       'contenu': 'Le Club de Cinéma UQAR vous invite à une soirée frissons garantis ! Au programme : The Shining, Psycho, et Get Out. Ambiance tamisée, couvertures fournies, et concours du meilleur cri.',
-      'nomAssociation': 'Club de Cinéma UQAR',
+      'associationId': 'asso_005', // Club de Cinéma UQAR
       'auteur': 'Sarah Leblanc',
       'datePublication': '2025-01-14T16:45:00Z',
       'dateEvenement': '2025-01-20T19:30:00Z',
       'imageUrl': null,
       'tags': ['cinéma', 'horreur', 'soirée'],
-      'priorite': 'normale',
+      'priorite': 'importante',
       'estEpinglee': false,
       'nombreVues': 156,
       'nombreLikes': 67,
@@ -43,14 +47,14 @@ class ActualitesDatasourceLocal {
       'titre': 'Campagne de Sensibilisation Environnementale',
       'description': 'Journée d\'action pour un campus plus vert',
       'contenu': 'Rejoignez-nous pour nettoyer le campus, planter des arbres, et découvrir des astuces écolo ! Gants et outils fournis. Collation zéro déchet offerte à tous les bénévoles.',
-      'nomAssociation': 'Éco-Étudiants UQAR',
+      'associationId': 'asso_006', // Éco-Étudiants UQAR
       'auteur': 'Marie Dubois',
       'datePublication': '2025-01-13T09:15:00Z',
       'dateEvenement': '2025-01-22T13:00:00Z',
       'imageUrl': null,
       'tags': ['environnement', 'bénévolat', 'campus'],
-      'priorite': 'normale',
-      'estEpinglee': false,
+      'priorite': 'importante',
+      'estEpinglee': true,
       'nombreVues': 198,
       'nombreLikes': 134,
     },
@@ -59,7 +63,7 @@ class ActualitesDatasourceLocal {
       'titre': 'Concours de Photographie "Rimouski en Hiver"',
       'description': 'Immortalisez la beauté hivernale de notre région',
       'contenu': 'Le Collectif Photo UQAR lance son concours annuel ! Thème : "Rimouski sous la neige". Prix : 500 cad pour le gagnant, expo au campus, et publication dans le journal étudiant.',
-      'nomAssociation': 'Collectif Photo UQAR',
+      'associationId': 'asso_002', // Club Photo UQAR
       'auteur': 'Thomas Gagnon',
       'datePublication': '2025-01-12T14:20:00Z',
       'dateEvenement': null, // Pas d'événement spécifique
@@ -75,13 +79,13 @@ class ActualitesDatasourceLocal {
       'titre': 'Atelier Gestion du Stress en Période d\'Examens',
       'description': 'Techniques de relaxation et méthodes d\'étude efficaces',
       'contenu': 'L\'AGEUQAR propose un atelier gratuit avec une psychologue du campus. Au menu : techniques de respiration, planification d\'étude, et yoga de bureau. Places limitées !',
-      'nomAssociation': 'AGEUQAR',
+      'associationId': 'asso_003', // AGEUQAR
       'auteur': 'Julie Martin',
       'datePublication': '2025-01-11T11:30:00Z',
       'dateEvenement': '2025-01-24T14:00:00Z',
       'imageUrl': null,
       'tags': ['bien-être', 'examens', 'atelier'],
-      'priorite': 'haute',
+      'priorite': 'urgente',
       'estEpinglee': true,
       'nombreVues': 324,
       'nombreLikes': 156,
@@ -91,7 +95,7 @@ class ActualitesDatasourceLocal {
       'titre': 'Collecte de Fonds pour Banque Alimentaire',
       'description': 'Aidons ensemble les familles dans le besoin',
       'contenu': 'L\'Association Humanitaire UQAR organise une grande collecte ! Déposez vos dons non-périssables dans les boîtes du campus. Objectif : 1000 articles avant la fin janvier.',
-      'nomAssociation': 'Association Humanitaire UQAR',
+      'associationId': 'asso_007', // Association Humanitaire UQAR
       'auteur': 'David Roy',
       'datePublication': '2025-01-10T08:45:00Z',
       'dateEvenement': null,
@@ -136,21 +140,32 @@ class ActualitesDatasourceLocal {
     }
   ];
 
+  // UI Design: Initialiser les données par défaut si nécessaire
+  void _initialiserDonnees() {
+    if (!_donneesSeedees && _actualitesStockees.isEmpty) {
+      // Charger les données par défaut seulement si aucune actualité n'existe
+      _actualitesStockees.addAll(_actualitesParDefaut);
+      _donneesSeedees = true;
+    }
+  }
+
   // UI Design: Récupérer toutes les actualités
   Future<List<ActualiteModel>> obtenirToutesLesActualites() async {
+    _initialiserDonnees();
     // Simuler un délai réseau
     await Future.delayed(const Duration(milliseconds: 500));
     
-    return _actualitesSimulees
+    return _actualitesStockees
         .map((data) => ActualiteModel.fromMap(data))
         .toList();
   }
 
   // UI Design: Récupérer les actualités épinglées
   Future<List<ActualiteModel>> obtenirActualitesEpinglees() async {
+    _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 300));
     
-    return _actualitesSimulees
+    return _actualitesStockees
         .where((data) => data['estEpinglee'] == true)
         .map((data) => ActualiteModel.fromMap(data))
         .toList();
@@ -158,9 +173,10 @@ class ActualitesDatasourceLocal {
 
   // UI Design: Récupérer les actualités par association
   Future<List<ActualiteModel>> obtenirActualitesParAssociation(String nomAssociation) async {
+    _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 400));
     
-    return _actualitesSimulees
+    return _actualitesStockees
         .where((data) => data['nomAssociation'] == nomAssociation)
         .map((data) => ActualiteModel.fromMap(data))
         .toList();
@@ -168,10 +184,11 @@ class ActualitesDatasourceLocal {
 
   // UI Design: Rechercher des actualités
   Future<List<ActualiteModel>> rechercherActualites(String terme) async {
+    _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 600));
     
     final termeMinuscule = terme.toLowerCase();
-    return _actualitesSimulees
+    return _actualitesStockees
         .where((data) {
           final titre = (data['titre'] as String).toLowerCase();
           final description = (data['description'] as String).toLowerCase();
@@ -186,9 +203,10 @@ class ActualitesDatasourceLocal {
 
   // UI Design: Récupérer une actualité par ID
   Future<ActualiteModel?> obtenirActualiteParId(String id) async {
+    _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 300));
     
-    final data = _actualitesSimulees.firstWhere(
+    final data = _actualitesStockees.firstWhere(
       (actualite) => actualite['id'] == id,
       orElse: () => <String, dynamic>{},
     );
@@ -196,14 +214,15 @@ class ActualitesDatasourceLocal {
     return data.isNotEmpty ? ActualiteModel.fromMap(data) : null;
   }
 
-  // UI Design: Liker une actualité (simulation)
+  // UI Design: Liker une actualité (dynamique)
   Future<bool> likerActualite(String id) async {
+    _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 200));
     
-    final index = _actualitesSimulees.indexWhere((data) => data['id'] == id);
+    final index = _actualitesStockees.indexWhere((data) => data['id'] == id);
     if (index != -1) {
-      _actualitesSimulees[index]['nombreLikes'] = 
-          (_actualitesSimulees[index]['nombreLikes'] as int) + 1;
+      _actualitesStockees[index]['nombreLikes'] = 
+          (_actualitesStockees[index]['nombreLikes'] as int) + 1;
       return true;
     }
     return false;
@@ -211,52 +230,70 @@ class ActualitesDatasourceLocal {
 
   // UI Design: Marquer une actualité comme vue
   Future<bool> marquerCommeVue(String id) async {
+    _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 100));
     
-    final index = _actualitesSimulees.indexWhere((data) => data['id'] == id);
+    final index = _actualitesStockees.indexWhere((data) => data['id'] == id);
     if (index != -1) {
-      _actualitesSimulees[index]['nombreVues'] = 
-          (_actualitesSimulees[index]['nombreVues'] as int) + 1;
+      _actualitesStockees[index]['nombreVues'] = 
+          (_actualitesStockees[index]['nombreVues'] as int) + 1;
       return true;
     }
     return false;
   }
 
-  // Clean Architecture: Ajouter une actualité
+  // Clean Architecture: Ajouter une actualité (dynamique)
   Future<ActualiteModel> ajouterActualite(Actualite actualite) async {
+    _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 200));
     final model = ActualiteModel.fromEntity(actualite);
-    _actualitesSimulees.add(model.toMap());
+    _actualitesStockees.add(model.toMap());
     return model;
   }
 
-  // Clean Architecture: Mettre à jour une actualité
+  // Clean Architecture: Mettre à jour une actualité (dynamique)
   Future<ActualiteModel> mettreAJourActualite(Actualite actualite) async {
+    _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 200));
-    final index = _actualitesSimulees.indexWhere((a) => a['id'] == actualite.id);
+    final index = _actualitesStockees.indexWhere((a) => a['id'] == actualite.id);
     final model = ActualiteModel.fromEntity(actualite);
     if (index != -1) {
-      _actualitesSimulees[index] = model.toMap();
+      _actualitesStockees[index] = model.toMap();
     } else {
-      _actualitesSimulees.add(model.toMap());
+      _actualitesStockees.add(model.toMap());
     }
     return model;
   }
 
-  // Clean Architecture: Supprimer une actualité
+  // Clean Architecture: Supprimer une actualité (dynamique)
   Future<bool> supprimerActualite(String id) async {
+    _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 150));
-    final before = _actualitesSimulees.length;
-    _actualitesSimulees.removeWhere((a) => a['id'] == id);
-    return _actualitesSimulees.length < before;
+    final before = _actualitesStockees.length;
+    _actualitesStockees.removeWhere((a) => a['id'] == id);
+    return _actualitesStockees.length < before;
   }
 
-  // Clean Architecture: Récupérer par priorité
+  // Clean Architecture: Récupérer par priorité (dynamique)
   Future<List<ActualiteModel>> obtenirActualitesParPriorite(String priorite) async {
+    _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 250));
-    return _actualitesSimulees
+    return _actualitesStockees
         .where((data) => (data['priorite'] ?? 'normale') == priorite)
         .map((data) => ActualiteModel.fromMap(data))
         .toList();
   }
+
+  // UI Design: Méthodes utilitaires pour la gestion dynamique
+  static void effacerToutesLesActualites() {
+    _actualitesStockees.clear();
+    _donneesSeedees = false;
+  }
+
+  static void rechargerDonneesParDefaut() {
+    _actualitesStockees.clear();
+    _donneesSeedees = false;
+  }
+
+  static int get nombreActualites => _actualitesStockees.length;
 } 

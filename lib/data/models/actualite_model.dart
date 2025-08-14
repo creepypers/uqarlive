@@ -6,7 +6,7 @@ class ActualiteModel {
   final String titre;
   final String description;
   final String contenu;
-  final String nomAssociation;
+  final String associationId; // ID de l'association qui publie l'actualité
   final String auteur;
   final String datePublication; // Format ISO String
   final String? dateEvenement; // Format ISO String
@@ -22,7 +22,7 @@ class ActualiteModel {
     required this.titre,
     required this.description,
     required this.contenu,
-    required this.nomAssociation,
+    required this.associationId,
     required this.auteur,
     required this.datePublication,
     this.dateEvenement,
@@ -41,7 +41,7 @@ class ActualiteModel {
       titre: map['titre'] ?? '',
       description: map['description'] ?? '',
       contenu: map['contenu'] ?? '',
-      nomAssociation: map['nomAssociation'] ?? '',
+      associationId: map['associationId'] ?? map['nomAssociation'] ?? '', // Support des deux formats
       auteur: map['auteur'] ?? '',
       datePublication: map['datePublication'] ?? '',
       dateEvenement: map['dateEvenement'],
@@ -61,7 +61,7 @@ class ActualiteModel {
       'titre': titre,
       'description': description,
       'contenu': contenu,
-      'nomAssociation': nomAssociation,
+      'associationId': associationId,
       'auteur': auteur,
       'datePublication': datePublication,
       'dateEvenement': dateEvenement,
@@ -81,7 +81,7 @@ class ActualiteModel {
       titre: titre,
       description: description,
       contenu: contenu,
-      nomAssociation: nomAssociation,
+      associationId: associationId,
       auteur: auteur,
       datePublication: DateTime.parse(datePublication),
       dateEvenement: dateEvenement != null ? DateTime.parse(dateEvenement!) : null,
@@ -101,7 +101,7 @@ class ActualiteModel {
       titre: actualite.titre,
       description: actualite.description,
       contenu: actualite.contenu,
-      nomAssociation: actualite.nomAssociation,
+      associationId: actualite.associationId,
       auteur: actualite.auteur,
       datePublication: actualite.datePublication.toIso8601String(),
       dateEvenement: actualite.dateEvenement?.toIso8601String(),
@@ -120,7 +120,7 @@ class ActualiteModel {
     String? titre,
     String? description,
     String? contenu,
-    String? nomAssociation,
+    String? associationId,
     String? auteur,
     String? datePublication,
     String? dateEvenement,
@@ -136,7 +136,7 @@ class ActualiteModel {
       titre: titre ?? this.titre,
       description: description ?? this.description,
       contenu: contenu ?? this.contenu,
-      nomAssociation: nomAssociation ?? this.nomAssociation,
+      associationId: associationId ?? this.associationId,
       auteur: auteur ?? this.auteur,
       datePublication: datePublication ?? this.datePublication,
       dateEvenement: dateEvenement ?? this.dateEvenement,

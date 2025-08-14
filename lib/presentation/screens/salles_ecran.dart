@@ -11,7 +11,6 @@ import '../../domain/repositories/salles_repository.dart';
 import '../../domain/repositories/reservations_salle_repository.dart';
 import '../../domain/entities/salle.dart';
 import '../../domain/entities/reservation_salle.dart';
-import '../../data/models/salle_model.dart';
 
 // UI Design: Page de gestion et réservation des salles de révision
 class SallesEcran extends StatefulWidget {
@@ -136,8 +135,6 @@ class _SallesEcranState extends State<SallesEcran> {
     final mediaQuery = MediaQuery.of(context);
     final screenHeight = mediaQuery.size.height;
     final screenWidth = mediaQuery.size.width;
-    final padding = mediaQuery.padding;
-    final viewInsets = mediaQuery.viewInsets;
     
     return Scaffold(
       backgroundColor: CouleursApp.fond,
@@ -199,7 +196,6 @@ class _SallesEcranState extends State<SallesEcran> {
   Widget _construireBarreRecherche() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
-    final screenHeight = mediaQuery.size.height;
     
     return Container(
       margin: EdgeInsets.all(screenWidth * 0.04), // UI Design: Marge adaptative
@@ -805,14 +801,16 @@ class _SallesEcranState extends State<SallesEcran> {
 
       if (success) {
         final heuresTexte = heuresSelectionnees.map((h) => '${h}h').join(', ');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('${salle.nom} modifiée pour $heuresTexte'),
-            backgroundColor: CouleursApp.accent,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          ),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('${salle.nom} modifiée pour $heuresTexte'),
+              backgroundColor: CouleursApp.accent,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+          );
+        }
         _chargerSalles(); // Recharger les salles
       } else {
         _afficherErreur('Erreur lors de la modification');
@@ -838,16 +836,16 @@ class _SallesEcranState extends State<SallesEcran> {
   String _obtenirNomSalle(String salleId) {
     final salle = _salles.firstWhere(
       (s) => s.id == salleId,
-      orElse: () => SalleModel(
+      orElse: () => const Salle(
         id: '', 
         nom: 'Salle inconnue', 
-        capaciteMax: 0, 
-        tarifParHeure: 0,
         description: '',
-        batiment: '',
-        etage: '',
+        capaciteMax: 0,
         equipements: [],
-        estDisponible: true,
+        etage: '',
+        batiment: '',
+        estDisponible: false,
+        tarifParHeure: 0,
       ),
     );
     return salle.nom;
@@ -937,14 +935,16 @@ class _SallesEcranState extends State<SallesEcran> {
 
       if (success) {
         final heuresTexte = heuresSelectionnees.map((h) => '${h}h').join(', ');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('${salle.nom} réservée pour $heuresTexte'),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          ),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('${salle.nom} réservée pour $heuresTexte'),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+          );
+        }
         _chargerSalles(); // Recharger les salles
       } else {
         _afficherErreur('Erreur lors de la réservation');
@@ -1004,14 +1004,16 @@ class _SallesEcranState extends State<SallesEcran> {
       final success = await _reservationsSalleRepository.creerReservation(reservation);
 
       if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Salle "${salle.nom}" réservée avec succès !'),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          ),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Salle "${salle.nom}" réservée avec succès !'),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+          );
+        }
         _chargerSalles(); // Recharger les salles
       } else {
         _afficherErreur('Erreur lors de la réservation');
@@ -1078,9 +1080,9 @@ class _SallesEcranState extends State<SallesEcran> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: CouleursApp.principal.withOpacity(0.1),
+                color: CouleursApp.principal.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: CouleursApp.principal.withOpacity(0.3)),
+                border: Border.all(color: CouleursApp.principal.withValues(alpha: 0.3)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1192,24 +1194,7 @@ class _SallesEcranState extends State<SallesEcran> {
     );
   }
 
-  // UI Design: Annuler la réservation
-  Future<void> _annulerReservation(Salle salle) async {
-    final success = await _sallesRepository.annulerReservation(salle.id);
-    
-    if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Réservation de "${salle.nom}" annulée'),
-          backgroundColor: Colors.orange,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        ),
-      );
-      _chargerSalles(); // Recharger les salles
-    } else {
-      _afficherErreur('Erreur lors de l\'annulation');
-    }
-  }
+
 
   // UI Design: Annuler la réservation active de l'utilisateur
   Future<void> _annulerReservationActive() async {
@@ -1222,14 +1207,16 @@ class _SallesEcranState extends State<SallesEcran> {
     try {
       final success = await _reservationsSalleRepository.annulerReservation(reservationActive.id);
       if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Réservation annulée avec succès'),
-            backgroundColor: Colors.orange,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          ),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Réservation annulée avec succès'),
+              backgroundColor: Colors.orange,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+          );
+        }
         _chargerSalles(); // Recharger les salles
       } else {
         _afficherErreur('Erreur lors de l\'annulation');
@@ -1239,77 +1226,5 @@ class _SallesEcranState extends State<SallesEcran> {
     }
   }
 
-  // UI Design: Modifier la réservation active
-  Future<void> _modifierReservationActive(Salle nouvelleSalle, List<int> heuresSelectionnees) async {
-    final reservationActive = _obtenirReservationActive();
-    if (reservationActive == null) {
-      _afficherErreur('Aucune réservation active à modifier');
-      return;
-    }
 
-    final utilisateur = _authentificationService.utilisateurActuel;
-    if (utilisateur == null) {
-      _afficherErreur('Vous devez être connecté pour modifier');
-      return;
-    }
-
-    // Pour simplifier, on utilise la première et dernière heure comme début et fin
-    heuresSelectionnees.sort();
-    final heureDebut = heuresSelectionnees.first;
-    final heureFin = heuresSelectionnees.last + 1; // +1 pour inclure l'heure complète
-    
-    final maintenant = DateTime.now();
-    final dateReservation = DateTime(maintenant.year, maintenant.month, maintenant.day, heureDebut);
-    final dateFin = DateTime(maintenant.year, maintenant.month, maintenant.day, heureFin);
-    
-    // Vérifier si la nouvelle salle est disponible pour ce créneau
-    if (!_estSalleDisponiblePourCreneau(nouvelleSalle.id, dateReservation, dateFin)) {
-      _afficherErreur('Cette salle n\'est pas disponible pour le créneau sélectionné');
-      return;
-    }
-    
-    try {
-      // D'abord annuler l'ancienne réservation
-      final annulationSuccess = await _reservationsSalleRepository.annulerReservation(reservationActive.id);
-      if (!annulationSuccess) {
-        _afficherErreur('Erreur lors de la modification');
-        return;
-      }
-      
-      // Créer la nouvelle réservation
-      final nouvelleReservation = ReservationSalle(
-        id: 'res_${DateTime.now().millisecondsSinceEpoch}',
-        utilisateurId: utilisateur.id,
-        salleId: nouvelleSalle.id,
-        dateReservation: dateReservation,
-        heureDebut: dateReservation,
-        heureFin: dateFin,
-        motif: reservationActive.motif,
-        description: reservationActive.description ?? 'Réservation modifiée',
-        statut: 'en_attente',
-        nombrePersonnes: reservationActive.nombrePersonnes,
-        coutTotal: nouvelleSalle.tarifParHeure * (heureFin - heureDebut),
-        dateCreation: DateTime.now(),
-      );
-
-      final success = await _reservationsSalleRepository.creerReservation(nouvelleReservation);
-
-      if (success) {
-        final heuresTexte = heuresSelectionnees.map((h) => '${h}h').join(', ');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Réservation modifiée pour ${nouvelleSalle.nom} à $heuresTexte'),
-            backgroundColor: CouleursApp.accent,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          ),
-        );
-        _chargerSalles(); // Recharger les salles
-      } else {
-        _afficherErreur('Erreur lors de la modification');
-      }
-    } catch (e) {
-      _afficherErreur('Erreur lors de la modification: $e');
-    }
-  }
 } 

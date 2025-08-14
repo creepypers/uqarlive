@@ -4,7 +4,7 @@ import '../screens/accueil_ecran.dart';
 import '../screens/associations/associations_ecran.dart';
 import '../screens/cantine/cantine_ecran.dart';
 import '../screens/livres/marketplace_ecran.dart';
-import '../screens/utilisateur/profil_ecran.dart';
+
 import '../screens/salles_ecran.dart';
 
 // UI Design: Service de navigation centralisé pour éviter la duplication
@@ -58,15 +58,9 @@ class NavigationService {
     );
   }
 
-  /// Navigation vers les associations
-  static void _naviguerVersAssociations(BuildContext context) {
-    _naviguerVers(context, const AssociationsEcran());
-  }
 
-  /// Navigation vers le profil
-  static void _naviguerVersProfil(BuildContext context) {
-    _naviguerVers(context, const ProfilEcran());
-  }
+
+
 
   /// Obtenir l'index de la NavBar selon la page courante
   static int obtenirIndexCourant(BuildContext context) {

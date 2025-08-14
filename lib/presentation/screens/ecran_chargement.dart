@@ -72,7 +72,7 @@ class _EcranChargementState extends State<EcranChargement>
               Text(
                 'Université du Québec à Rimouski',
                 style: StylesTexteApp.champ.copyWith(
-                  color: CouleursApp.blanc.withOpacity(0.8),
+                  color: CouleursApp.blanc.withValues(alpha: 0.8),
                   fontSize: 16,
                 ),
               ),
@@ -98,7 +98,7 @@ class _EcranChargementState extends State<EcranChargement>
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: CouleursApp.accent.withOpacity(0.5),
+            color: CouleursApp.accent.withValues(alpha: 0.5),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),

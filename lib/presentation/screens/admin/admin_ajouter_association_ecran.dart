@@ -34,12 +34,14 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
   bool _estActive = true;
   bool _enChargement = false;
   bool _modeModification = false;
+  final List<String> _activites = ['Activités à définir']; // UI Design: Liste des activités modifiable
   
   // Catégories d'associations
   final List<Map<String, String>> _categories = const [
     {'valeur': 'academique', 'libelle': 'Académique'},
     {'valeur': 'culturelle', 'libelle': 'Culturelle'},
     {'valeur': 'sportive', 'libelle': 'Sportive'},
+    {'valeur': 'etudiante', 'libelle': 'Étudiante'},
     {'valeur': 'sociale', 'libelle': 'Sociale'},
     {'valeur': 'technologie', 'libelle': 'Technologie'},
     {'valeur': 'environnement', 'libelle': 'Environnement'},
@@ -371,7 +373,94 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
                 return null;
               },
             ),
+            const SizedBox(height: 24),
+            
+            // Section Activités
+            const Text(
+              'Activités de l\'association',
+              style: StylesTexteApp.grandTitre,
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Listez les principales activités que votre association organise',
+              style: StylesTexteApp.corpsGris,
+            ),
             const SizedBox(height: 16),
+            
+            // Liste des activités
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: CouleursApp.principal.withValues(alpha: 0.3)),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: CouleursApp.principal.withValues(alpha: 0.1),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(8),
+                        topRight: Radius.circular(8),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.list, color: CouleursApp.principal),
+                        const SizedBox(width: 8),
+                        const Expanded(
+                          child: Text(
+                            'Activités',
+                            style: StylesTexteApp.moyenTitre,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: _ajouterActivite,
+                          icon: const Icon(Icons.add, color: CouleursApp.principal),
+                          tooltip: 'Ajouter une activité',
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (_activites.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Text(
+                        'Aucune activité ajoutée',
+                        style: StylesTexteApp.corpsGris,
+                        textAlign: TextAlign.center,
+                      ),
+                    )
+                  else
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: _activites.length,
+                      separatorBuilder: (context, index) => Divider(
+                        color: CouleursApp.principal.withValues(alpha: 0.2),
+                        height: 1,
+                      ),
+                      itemBuilder: (context, index) {
+                        final activite = _activites[index];
+                        return ListTile(
+                          leading: const Icon(Icons.play_arrow, color: CouleursApp.accent),
+                          title: Text(
+                            activite,
+                            style: StylesTexteApp.corpsNormal,
+                          ),
+                          trailing: IconButton(
+                            onPressed: () => _supprimerActivite(index),
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            tooltip: 'Supprimer cette activité',
+                          ),
+                        );
+                      },
+                    ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
             
             // Statut actif
             SwitchListTile(
@@ -459,17 +548,22 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
         telephone: _controleurTelephone.text.trim().isEmpty ? null : _controleurTelephone.text.trim(),
         siteWeb: _controleurSiteWeb.text.trim().isEmpty ? null : _controleurSiteWeb.text.trim(),
         cotisationAnnuelle: _controleurBudget.text.trim().isEmpty ? null : double.parse(_controleurBudget.text.trim()),
-        activites: const ['Activités à définir'], // TODO: Permettre la saisie d'activités
+        activites: _activites, // UI Design: Activités saisies par l'utilisateur
         estActive: _estActive,
         dateCreation: _modeModification ? widget.associationAModifier!.dateCreation : DateTime.now(),
         nombreMembres: _modeModification ? widget.associationAModifier!.nombreMembres : 0,
       );
 
-      // TODO: Implémenter les méthodes d'ajout et modification dans le repository
+      // UI Design: Appeler les méthodes du repository selon le mode
+      bool succes = false;
       if (_modeModification) {
-        // await _associationsRepository.mettreAJourAssociation(association);
+        succes = await _associationsRepository.mettreAJourAssociation(association);
       } else {
-        // await _associationsRepository.ajouterAssociation(association);
+        succes = await _associationsRepository.ajouterAssociation(association);
+      }
+
+      if (!succes) {
+        throw Exception('Échec de l\'opération');
       }
 
       if (mounted) {
@@ -498,6 +592,99 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
       if (mounted) {
         setState(() => _enChargement = false);
       }
+    }
+  }
+
+  // UI Design: Ajouter une nouvelle activité
+  void _ajouterActivite() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        final TextEditingController controleurActivite = TextEditingController();
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Nouvelle Activité'),
+          content: TextField(
+            controller: controleurActivite,
+            autofocus: true,
+            decoration: const InputDecoration(
+              labelText: 'Nom de l\'activité',
+              hintText: 'Ex: Conférences tech, Ateliers de programmation...',
+              border: OutlineInputBorder(),
+            ),
+            maxLines: 1,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Annuler'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final activite = controleurActivite.text.trim();
+                if (activite.isNotEmpty && !_activites.contains(activite)) {
+                  setState(() {
+                    _activites.add(activite);
+                  });
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Activité "$activite" ajoutée'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                } else if (_activites.contains(activite)) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Cette activité existe déjà'),
+                      backgroundColor: Colors.orange,
+                    ),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: CouleursApp.principal),
+              child: const Text('Ajouter', style: TextStyle(color: CouleursApp.blanc)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // UI Design: Supprimer une activité
+  void _supprimerActivite(int index) {
+    if (index >= 0 && index < _activites.length) {
+      final activite = _activites[index];
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Supprimer l\'activité'),
+          content: Text('Voulez-vous vraiment supprimer "$activite" ?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Annuler'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _activites.removeAt(index);
+                });
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Activité "$activite" supprimée'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              child: const Text('Supprimer', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        ),
+      );
     }
   }
 } 

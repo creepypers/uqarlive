@@ -22,4 +22,13 @@ abstract class AssociationsRepository {
 
   /// Obtenir les types d'associations disponibles
   Future<List<String>> obtenirTypesAssociations();
+
+  /// Ajouter une nouvelle association
+  Future<bool> ajouterAssociation(Association association);
+
+  /// Modifier une association existante
+  Future<bool> mettreAJourAssociation(Association association);
+
+  /// Supprimer une association
+  Future<bool> supprimerAssociation(String id);
 } 

@@ -90,4 +90,33 @@ class AssociationsRepositoryImpl implements AssociationsRepository {
       return ['toutes'];
     }
   }
+
+  @override
+  Future<bool> ajouterAssociation(Association association) async {
+    try {
+      final associationModel = AssociationModel.fromEntity(association);
+      return _datasourceLocal.ajouterAssociation(associationModel.toMap());
+    } catch (e) {
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> mettreAJourAssociation(Association association) async {
+    try {
+      final associationModel = AssociationModel.fromEntity(association);
+      return _datasourceLocal.mettreAJourAssociation(associationModel.toMap());
+    } catch (e) {
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> supprimerAssociation(String id) async {
+    try {
+      return _datasourceLocal.supprimerAssociation(id);
+    } catch (e) {
+      return false;
+    }
+  }
 } 

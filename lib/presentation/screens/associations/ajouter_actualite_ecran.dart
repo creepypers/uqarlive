@@ -1,16 +1,20 @@
-// UI Design: Écran d'ajout d'actualités pour les chefs d'association
+// UI Design: Écran d'ajout/modification d'actualités pour les chefs d'association
 import 'package:flutter/material.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../domain/entities/actualite.dart';
+
+import '../../../core/di/service_locator.dart';
 import '../../../domain/entities/association.dart';
-import '../../../presentation/services/actualites_service.dart';
+import '../../../domain/entities/actualite.dart';
+import '../../../domain/repositories/actualites_repository.dart';
+import '../../../presentation/services/authentification_service.dart';
 
 class AjouterActualiteEcran extends StatefulWidget {
   final Association association;
+  final Actualite? actualiteAModifier; // UI Design: Support de la modification
 
   const AjouterActualiteEcran({
     Key? key,
     required this.association,
+    this.actualiteAModifier,
   }) : super(key: key);
 
   @override
@@ -21,23 +25,41 @@ class _AjouterActualiteEcranState extends State<AjouterActualiteEcran> {
   final _formKey = GlobalKey<FormState>();
   final _titreController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _contenuController = TextEditingController();
   String _priorite = 'normale';
   bool _estEpinglee = false;
   bool _chargement = false;
-  late final ActualitesService _actualitesService;
+  bool _modeModification = false;
+  late final ActualitesRepository _actualitesRepository;
 
   final List<String> _priorites = ['normale', 'importante', 'urgente'];
+  late final AuthentificationService _authentificationService;
 
   @override
   void initState() {
     super.initState();
-    _actualitesService = ActualitesService();
+    _actualitesRepository = ServiceLocator.obtenirService<ActualitesRepository>();
+    _authentificationService = ServiceLocator.obtenirService<AuthentificationService>();
+    _modeModification = widget.actualiteAModifier != null;
+    
+    if (_modeModification) {
+      _remplirFormulaire(widget.actualiteAModifier!);
+    }
+  }
+
+  void _remplirFormulaire(Actualite actualite) {
+    _titreController.text = actualite.titre;
+    _descriptionController.text = actualite.description;
+    _contenuController.text = actualite.contenu;
+    _priorite = actualite.priorite;
+    _estEpinglee = actualite.estEpinglee;
   }
 
   @override
   void dispose() {
     _titreController.dispose();
     _descriptionController.dispose();
+    _contenuController.dispose();
     super.dispose();
   }
 
@@ -49,21 +71,54 @@ class _AjouterActualiteEcranState extends State<AjouterActualiteEcran> {
     });
 
     try {
-      // Utilisation du service pour créer l'actualité
-      await _actualitesService.creerActualite(
+      final actualite = Actualite(
+        id: _modeModification ? widget.actualiteAModifier!.id : 'actu_${DateTime.now().millisecondsSinceEpoch}',
         titre: _titreController.text.trim(),
         description: _descriptionController.text.trim(),
-        nomAssociation: widget.association.nom,
-        auteur: 'Chef de l\'association', // TODO: Récupérer l'utilisateur connecté
+        contenu: _contenuController.text.trim(),
+        associationId: widget.association.id,
+        auteur: _authentificationService.utilisateurActuel != null 
+            ? '${_authentificationService.utilisateurActuel!.prenom} ${_authentificationService.utilisateurActuel!.nom}'
+            : 'Chef de l\'association',
+        datePublication: _modeModification ? widget.actualiteAModifier!.datePublication : DateTime.now(),
         priorite: _priorite,
         estEpinglee: _estEpinglee,
+        nombreVues: _modeModification ? widget.actualiteAModifier!.nombreVues : 0,
+        nombreLikes: _modeModification ? widget.actualiteAModifier!.nombreLikes : 0,
+        tags: _modeModification ? widget.actualiteAModifier!.tags : [],
       );
+
+      bool succes = false;
+      if (_modeModification) {
+        succes = await _actualitesRepository.mettreAJourActualite(actualite);
+      } else {
+        final actualiteAjoutee = await _actualitesRepository.ajouterActualite(actualite);
+        succes = actualiteAjoutee.id.isNotEmpty;
+      }
+
+      if (!succes) {
+        throw Exception('Échec de l\'opération');
+      }
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Actualité ajoutée avec succès !'),
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle, color: Colors.white, size: 20),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    _modeModification 
+                      ? 'Actualité modifiée avec succès !' 
+                      : 'Actualité ajoutée avec succès !',
+                  ),
+                ),
+              ],
+            ),
             backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           ),
         );
         Navigator.pop(context, true);
@@ -72,8 +127,16 @@ class _AjouterActualiteEcranState extends State<AjouterActualiteEcran> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erreur: $e'),
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.white, size: 20),
+                const SizedBox(width: 8),
+                Expanded(child: Text('Erreur: $e')),
+              ],
+            ),
             backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           ),
         );
       }
@@ -88,8 +151,6 @@ class _AjouterActualiteEcranState extends State<AjouterActualiteEcran> {
 
   @override
   Widget build(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
-    final screenWidth = mediaQuery.size.width;
 
     return Scaffold(
       appBar: AppBar(
@@ -115,7 +176,7 @@ class _AjouterActualiteEcranState extends State<AjouterActualiteEcran> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.08),
+                        color: Colors.black.withValues(alpha: 0.08),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),
@@ -129,7 +190,7 @@ class _AjouterActualiteEcranState extends State<AjouterActualiteEcran> {
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF005499).withOpacity(0.1),
+                              color: const Color(0xFF005499).withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: const Icon(
@@ -177,7 +238,7 @@ class _AjouterActualiteEcranState extends State<AjouterActualiteEcran> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.08),
+                        color: Colors.black.withValues(alpha: 0.08),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),

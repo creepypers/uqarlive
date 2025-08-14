@@ -6,6 +6,7 @@ class Evenement {
   final String typeEvenement; // 'conference', 'atelier', 'social', 'sportif', 'culturel', 'academique', 'autre'
   final String lieu;
   final String organisateur;
+  final String associationId; // ID de l'association organisatrice
   final DateTime dateDebut;
   final DateTime dateFin;
   final bool estGratuit;
@@ -23,6 +24,7 @@ class Evenement {
     required this.typeEvenement,
     required this.lieu,
     required this.organisateur,
+    required this.associationId,
     required this.dateDebut,
     required this.dateFin,
     this.estGratuit = true,
@@ -60,6 +62,7 @@ class Evenement {
     String? typeEvenement,
     String? lieu,
     String? organisateur,
+    String? associationId,
     DateTime? dateDebut,
     DateTime? dateFin,
     bool? estGratuit,
@@ -77,6 +80,7 @@ class Evenement {
       typeEvenement: typeEvenement ?? this.typeEvenement,
       lieu: lieu ?? this.lieu,
       organisateur: organisateur ?? this.organisateur,
+      associationId: associationId ?? this.associationId,
       dateDebut: dateDebut ?? this.dateDebut,
       dateFin: dateFin ?? this.dateFin,
       estGratuit: estGratuit ?? this.estGratuit,

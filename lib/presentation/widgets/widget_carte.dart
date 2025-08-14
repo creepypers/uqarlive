@@ -229,12 +229,12 @@ class WidgetCarte extends StatelessWidget {
             ),
           ],
         ),
-        child: _construireContenu(),
+        child: _construireContenu(tailleIconeAdaptative),
       ),
     );
   }
 
-  Widget _construireContenu() {
+  Widget _construireContenu(double tailleIconeAdaptative) {
     // Pour les cartes d'associations en mode HORIZONTAL (rectangulaires)
     if (modeListe && modeHorizontal) {
       return Padding(
@@ -248,7 +248,7 @@ class WidgetCarte extends StatelessWidget {
                 color: couleurFond,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(icone, color: couleurIcone, size: tailleIcone),
+              child: Icon(icone, color: couleurIcone, size: tailleIconeAdaptative),
             ),
             const SizedBox(width: 12),
             // Informations à droite
@@ -264,8 +264,9 @@ class WidgetCarte extends StatelessWidget {
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: CouleursApp.texteFonce,
+                      height: 1.2, // UI Design: Hauteur de ligne pour meilleure lisibilité
                     ),
-                    maxLines: 1,
+                    maxLines: 2, // UI Design: Permettre 2 lignes pour les titres longs
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
@@ -300,7 +301,7 @@ class WidgetCarte extends StatelessWidget {
                 color: couleurFond,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(icone, color: couleurIcone, size: tailleIcone),
+              child: Icon(icone, color: couleurIcone, size: tailleIconeAdaptative),
             ),
             const SizedBox(height: 8),
             Flexible(
@@ -354,7 +355,7 @@ class WidgetCarte extends StatelessWidget {
                 Center(
                   child: Icon(
                     icone,
-                    size: tailleIcone ?? 40,
+                    size: tailleIconeAdaptative,
                     color: couleurIcone,
                   ),
                 ),
@@ -387,7 +388,7 @@ class WidgetCarte extends StatelessWidget {
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
                       color: CouleursApp.texteFonce,
-                      height: 1.1,
+                      height: 1.2, // UI Design: Hauteur de ligne augmentée pour meilleure lisibilité
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -438,7 +439,7 @@ class WidgetCarte extends StatelessWidget {
                   Center(
                     child: Icon(
                       icone,
-                      size: tailleIcone ?? 45,
+                      size: tailleIconeAdaptative,
                       color: couleurIcone,
                     ),
                   ),
@@ -467,14 +468,15 @@ class WidgetCarte extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Flexible(
+                  Expanded(
+                    flex: 2,
                     child: Text(
                       titre,
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: CouleursApp.texteFonce,
-                        height: 1.1,
+                        height: 1.2, // UI Design: Hauteur de ligne augmentée pour meilleure lisibilité
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,

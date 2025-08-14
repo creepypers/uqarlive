@@ -45,7 +45,9 @@ class Menu {
     List<String> result = [];
     if (estVegan) {
       result.add('VEGAN');
-    } else if (estVegetarien) result.add('VÉGÉ');
+    } else if (estVegetarien) {
+      result.add('VÉGÉ');
+    }
     if (!estDisponible) result.add('ÉPUISÉ');
     if (note != null && note! >= 4.5) result.add('POPULAIRE');
     return result;

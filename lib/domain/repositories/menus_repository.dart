@@ -28,4 +28,19 @@ abstract class MenusRepository {
 
   /// Obtenir tous les menus (pour administration)
   Future<List<Menu>> obtenirTousLesMenus();
+
+  /// Ajouter un nouveau menu (administration)
+  Future<Menu> ajouterMenu(Menu menu);
+
+  /// Modifier un menu existant (administration)
+  Future<Menu> mettreAJourMenu(Menu menu);
+
+  /// Supprimer un menu (administration)
+  Future<bool> supprimerMenu(String menuId);
+
+  /// Définir un menu comme menu du jour (administration)
+  Future<void> definirMenuDuJour(String menuId);
+
+  /// Obtenir l'ID du menu du jour actuel
+  Future<String?> obtenirMenuDuJourActuel();
 } 

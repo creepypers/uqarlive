@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../../data/datasources/horaires_datasource_local.dart';
+import '../../../core/di/service_locator.dart';
+import '../../../domain/repositories/horaires_repository.dart';
 import '../../../presentation/widgets/widget_barre_app_navigation_admin.dart';
 
 class AdminModifierHorairesEcran extends StatefulWidget {
-  const AdminModifierHorairesEcran({super.key});
+  final String? jourInitial; // UI Design: Jour à modifier directement
+  
+  const AdminModifierHorairesEcran({super.key, this.jourInitial});
 
   @override
   State<AdminModifierHorairesEcran> createState() => _AdminModifierHorairesEcranState();
 }
 
-class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran> {
-  final _horairesDatasource = HorairesDatasourceLocal();
+class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran> with SingleTickerProviderStateMixin {
+  late final HorairesRepository _horairesRepository;
+  late TabController _tabController;
+  
   String _jourSelectionne = 'Lundi';
   bool _isLoading = false;
   late Map<String, TimeOfDay> _horairesJourSelectionne;
@@ -19,14 +24,43 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
   @override
   void initState() {
     super.initState();
-    _horairesJourSelectionne = _horairesDatasource.obtenirHorairesCantine(_jourSelectionne);
+    _tabController = TabController(length: 2, vsync: this);
+    _horairesRepository = ServiceLocator.obtenirService<HorairesRepository>();
+    _jourSelectionne = widget.jourInitial ?? 'Lundi';
+    _chargerDonnees();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _chargerDonnees() async {
+    setState(() => _isLoading = true);
+    try {
+      _horairesJourSelectionne = await _horairesRepository.obtenirHorairesCantine(_jourSelectionne);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erreur lors du chargement: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   Future<void> _sauvegarderHoraires() async {
     setState(() => _isLoading = true);
 
     try {
-      await _horairesDatasource.mettreAJourHorairesCantine(
+      await _horairesRepository.mettreAJourHorairesCantine(
         _jourSelectionne,
         _horairesJourSelectionne['ouverture']!,
         _horairesJourSelectionne['fermeture']!,
@@ -39,7 +73,7 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
               children: [
                 const Icon(Icons.check_circle, color: CouleursApp.blanc),
                 const SizedBox(width: 8),
-                Text('Horaires mis à jour pour $_jourSelectionne'),
+                Expanded(child: Text('Horaires mis à jour pour $_jourSelectionne')),
               ],
             ),
             backgroundColor: Colors.green,
@@ -47,16 +81,17 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           ),
         );
+        Navigator.pop(context, true); // UI Design: Retourner avec succès
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Row(
+            content: Row(
               children: [
-                Icon(Icons.error, color: CouleursApp.blanc),
-                SizedBox(width: 8),
-                Text('Erreur lors de la mise à jour des horaires'),
+                const Icon(Icons.error, color: CouleursApp.blanc),
+                const SizedBox(width: 8),
+                Expanded(child: Text('Erreur: $e')),
               ],
             ),
             backgroundColor: Colors.red,
@@ -154,10 +189,10 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: CouleursApp.principal.withOpacity(0.1),
+        color: CouleursApp.principal.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: CouleursApp.principal.withOpacity(0.3),
+          color: CouleursApp.principal.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -166,7 +201,7 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: CouleursApp.principal.withOpacity(0.2),
+              color: CouleursApp.principal.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(16),
             ),
             child: const Icon(
@@ -207,7 +242,7 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: CouleursApp.principal.withOpacity(0.08),
+            color: CouleursApp.principal.withValues(alpha: 0.08),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -229,11 +264,11 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
               prefixIcon: const Icon(Icons.calendar_today, color: CouleursApp.principal),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: CouleursApp.principal.withOpacity(0.3)),
+                borderSide: BorderSide(color: CouleursApp.principal.withValues(alpha: 0.3)),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: CouleursApp.principal.withOpacity(0.3)),
+                borderSide: BorderSide(color: CouleursApp.principal.withValues(alpha: 0.3)),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
@@ -249,12 +284,23 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
               DropdownMenuItem(value: 'Samedi', child: Text('Samedi')),
               DropdownMenuItem(value: 'Dimanche', child: Text('Dimanche')),
             ],
-            onChanged: (jour) {
+            onChanged: (jour) async {
               if (jour != null) {
                 setState(() {
                   _jourSelectionne = jour;
-                  _horairesJourSelectionne = _horairesDatasource.obtenirHorairesCantine(jour);
                 });
+                try {
+                  final horaires = await _horairesRepository.obtenirHorairesCantine(jour);
+                  setState(() {
+                    _horairesJourSelectionne = horaires;
+                  });
+                } catch (e) {
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Erreur: $e'), backgroundColor: Colors.red),
+                    );
+                  }
+                }
               }
             },
           ),
@@ -278,7 +324,7 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
             trailing: const Icon(Icons.edit, color: CouleursApp.principal),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
-              side: BorderSide(color: CouleursApp.principal.withOpacity(0.3)),
+              side: BorderSide(color: CouleursApp.principal.withValues(alpha: 0.3)),
             ),
             onTap: () => _selectionnerHeure('ouverture'),
           ),
@@ -295,7 +341,7 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
             trailing: const Icon(Icons.edit, color: CouleursApp.principal),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
-              side: BorderSide(color: CouleursApp.principal.withOpacity(0.3)),
+              side: BorderSide(color: CouleursApp.principal.withValues(alpha: 0.3)),
             ),
             onTap: () => _selectionnerHeure('fermeture'),
           ),
@@ -312,7 +358,7 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
           child: ElevatedButton(
             onPressed: _isLoading ? null : _sauvegarderHoraires,
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
+              backgroundColor: CouleursApp.principal,
               foregroundColor: CouleursApp.blanc,
               padding: const EdgeInsets.symmetric(vertical: 18),
               shape: RoundedRectangleBorder(

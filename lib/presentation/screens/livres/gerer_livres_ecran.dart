@@ -367,24 +367,26 @@ class _GererLivresEcranState extends State<GererLivresEcran> {
           : await _livresRepository.marquerLivreDisponible(livre.id);
       
       if (succes) {
-        setState(() {
-          final index = _mesLivres.indexWhere((l) => l.id == livre.id);
-          if (index != -1) {
-            _mesLivres[index] = livre.copyWith(estDisponible: !livre.estDisponible);
-          }
-        });
-        
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          livre.estDisponible 
-              ? 'Livre suspendu des échanges'
-              : 'Livre remis en échange'
-        ),
-        backgroundColor: livre.estDisponible ? Colors.orange : Colors.green,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+        if (mounted) {
+          setState(() {
+            final index = _mesLivres.indexWhere((l) => l.id == livre.id);
+            if (index != -1) {
+              _mesLivres[index] = livre.copyWith(estDisponible: !livre.estDisponible);
+            }
+          });
+          
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                livre.estDisponible 
+                    ? 'Livre suspendu des échanges'
+                    : 'Livre remis en échange'
+              ),
+              backgroundColor: livre.estDisponible ? Colors.orange : Colors.green,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
       } else {
         _afficherErreur('Erreur lors de la modification');
       }
@@ -412,19 +414,23 @@ class _GererLivresEcranState extends State<GererLivresEcran> {
                 final succes = await _livresRepository.supprimerLivre(livre.id);
                 
                 if (succes) {
-                  setState(() {
-                    _mesLivres.removeWhere((l) => l.id == livre.id);
-                  });
-                  
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                      content: Text('"${livre.titre}" supprimé avec succès'),
-                      backgroundColor: Colors.green,
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
+                  if (mounted) {
+                    setState(() {
+                      _mesLivres.removeWhere((l) => l.id == livre.id);
+                    });
+                    
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('"${livre.titre}" supprimé avec succès'),
+                        backgroundColor: Colors.green,
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  }
                 } else {
-                  _afficherErreur('Erreur lors de la suppression');
+                  if (mounted) {
+                    _afficherErreur('Erreur lors de la suppression');
+                  }
                 }
               } catch (e) {
                 _afficherErreur('Erreur inattendue: $e');
@@ -832,11 +838,15 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
       final succes = await _livresRepository.ajouterLivre(nouveauLivre);
       
       if (succes) {
-      widget.onLivreAjoute(nouveauLivre);
-      Navigator.pop(context);
+        if (mounted) {
+          widget.onLivreAjoute(nouveauLivre);
+          Navigator.pop(context);
+        }
       } else {
-        setState(() => _sauvegardeEnCours = false);
-        _afficherErreur('Erreur lors de l\'ajout du livre');
+        if (mounted) {
+          setState(() => _sauvegardeEnCours = false);
+          _afficherErreur('Erreur lors de l\'ajout du livre');
+        }
       }
     } catch (e) {
       setState(() => _sauvegardeEnCours = false);
@@ -1252,11 +1262,15 @@ class _ModalModificationLivreState extends State<_ModalModificationLivre> {
         final succes = await _livresRepository.modifierLivre(livreModifie);
         
         if (succes) {
-          widget.onLivreModifie(livreModifie);
-          Navigator.pop(context);
+          if (mounted) {
+            widget.onLivreModifie(livreModifie);
+            Navigator.pop(context);
+          }
         } else {
-          setState(() => _sauvegardeEnCours = false);
-          _afficherErreur('Erreur lors de la modification du livre');
+          if (mounted) {
+            setState(() => _sauvegardeEnCours = false);
+            _afficherErreur('Erreur lors de la modification du livre');
+          }
         }
       } catch (e) {
         setState(() => _sauvegardeEnCours = false);

@@ -3,6 +3,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/di/service_locator.dart';
 import '../../../domain/entities/menu.dart';
 import '../../../domain/repositories/menus_repository.dart';
+import '../../../domain/repositories/horaires_repository.dart';
 import '../../../presentation/widgets/navbar_widget.dart';
 import '../../../presentation/widgets/widget_barre_app_personnalisee.dart';
 import '../../../presentation/widgets/widget_carte.dart';
@@ -24,12 +25,20 @@ class _CantineEcranState extends State<CantineEcran> {
   // Repository pour accéder aux données des menus
   late final MenusRepository _menusRepository;
   late final StatistiquesService _statistiquesService;
+  late final HorairesRepository _horairesRepository; // UI Design: Horaires dynamiques
   List<Menu> _menusDuJour = [];
+  Menu? _menuDuJourSpecial; // UI Design: Menu du jour spécial défini par l'admin
   List<Menu> _tousLesMenus = [];
+  List<Menu> _menusFiltres = [];
+  Map<String, Map<String, TimeOfDay>> _horaires = {}; // UI Design: Horaires de la cantine
   StatistiquesGlobales? _statistiques;
   String _categorieSelectionnee = 'menu_jour';
   bool _chargementMenus = false;
   bool _afficheVegetarienUniquement = false;
+  
+  // Variables pour la recherche
+  final TextEditingController _controleurRecherche = TextEditingController();
+  String _termeRecherche = '';
 
   final List<String> _categories = [
     'menu_jour',
@@ -54,9 +63,16 @@ class _CantineEcranState extends State<CantineEcran> {
     _chargerDonnees();
   }
 
+  @override
+  void dispose() {
+    _controleurRecherche.dispose();
+    super.dispose();
+  }
+
   void _initialiserRepositories() {
     _menusRepository = ServiceLocator.obtenirService<MenusRepository>();
     _statistiquesService = ServiceLocator.obtenirService<StatistiquesService>();
+    _horairesRepository = ServiceLocator.obtenirService<HorairesRepository>(); // UI Design: Horaires dynamiques
   }
 
   Future<void> _chargerDonnees() async {
@@ -67,14 +83,34 @@ class _CantineEcranState extends State<CantineEcran> {
     try {
       final results = await Future.wait([
         _menusRepository.obtenirMenusDuJour(),
-        _menusRepository.obtenirMenusParCategorie(_categorieSelectionnee),
+        _menusRepository.obtenirTousLesMenus(), // UI Design: Charger tous les menus pour le filtrage local
         _statistiquesService.obtenirStatistiquesGlobales(),
+        _menusRepository.obtenirMenuDuJourActuel(), // UI Design: Menu du jour spécial
+        _horairesRepository.obtenirTousLesHorairesCantine(), // UI Design: Horaires dynamiques
       ]);
 
       setState(() {
         _menusDuJour = results[0] as List<Menu>;
         _tousLesMenus = results[1] as List<Menu>;
+        _menusFiltres = results[1] as List<Menu>; // UI Design: Initialiser les menus filtrés
         _statistiques = results[2] as StatistiquesGlobales;
+        _horaires = results[4] as Map<String, Map<String, TimeOfDay>>; // UI Design: Horaires dynamiques
+        
+        // UI Design: Récupérer le menu du jour spécial défini par l'admin
+        final menuDuJourId = results[3] as String?;
+        if (menuDuJourId != null && menuDuJourId.isNotEmpty) {
+          try {
+            _menuDuJourSpecial = _tousLesMenus.firstWhere(
+              (menu) => menu.id == menuDuJourId,
+            );
+          } catch (e) {
+            // Menu du jour non trouvé dans la liste
+            _menuDuJourSpecial = null;
+          }
+        } else {
+          _menuDuJourSpecial = null;
+        }
+        
         _chargementMenus = false;
       });
     } catch (e) {
@@ -84,43 +120,138 @@ class _CantineEcranState extends State<CantineEcran> {
     }
   }
 
-  Future<void> _chargerMenus() async {
-    await _chargerDonnees();
+
+
+  // UI Design: Implémenter la recherche de menus par nom, description ou catégorie
+  void _rechercherMenus(String terme) {
+    setState(() {
+      _termeRecherche = terme.toLowerCase().trim();
+      _appliquerFiltres();
+    });
+  }
+
+  // UI Design: Appliquer tous les filtres (recherche + catégorie + végétarien)
+  void _appliquerFiltres() {
+    List<Menu> menusFiltres = _tousLesMenus;
+
+    // Filtre par terme de recherche
+    if (_termeRecherche.isNotEmpty) {
+      menusFiltres = menusFiltres.where((menu) {
+        return menu.nom.toLowerCase().contains(_termeRecherche) ||
+               menu.description.toLowerCase().contains(_termeRecherche) ||
+               menu.categorie.toLowerCase().contains(_termeRecherche) ||
+               menu.ingredients.any((ingredient) => ingredient.toLowerCase().contains(_termeRecherche));
+      }).toList();
+    }
+
+    // Filtre par catégorie
+    if (_categorieSelectionnee != 'menu_jour') {
+      menusFiltres = menusFiltres.where((menu) => 
+          menu.categorie == _categorieSelectionnee).toList();
+    }
+
+    // Filtre végétarien
+    if (_afficheVegetarienUniquement) {
+      menusFiltres = menusFiltres.where((menu) => 
+          menu.estVegetarien).toList();
+    }
+
+    setState(() {
+      _menusFiltres = menusFiltres;
+    });
+  }
+
+  // UI Design: Ouvrir l'interface de recherche
+  void _ouvrirRecherche() {
+    showDialog(
+      context: context,
+      builder: (context) => _construireDialogueRecherche(),
+    );
+  }
+
+  // UI Design: Construire le dialogue de recherche
+  Widget _construireDialogueRecherche() {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      title: const Text('Rechercher un menu'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            controller: _controleurRecherche,
+            autofocus: true,
+            style: StylesTexteApp.champ,
+            decoration: InputDecoration(
+              hintText: 'Nom, description, ingrédient...',
+              hintStyle: StylesTexteApp.champ.copyWith(
+                color: CouleursApp.texteFonce.withValues(alpha: 0.5),
+              ),
+              prefixIcon: Icon(
+                Icons.search,
+                color: CouleursApp.principal.withValues(alpha: 0.7),
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: CouleursApp.principal.withValues(alpha: 0.3)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: CouleursApp.principal, width: 2),
+              ),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            ),
+            onChanged: _rechercherMenus,
+          ),
+          const SizedBox(height: 16),
+          if (_termeRecherche.isNotEmpty) 
+            Text(
+              '${_menusFiltres.length} menu(s) trouvé(s)',
+              style: StylesTexteApp.champ.copyWith(
+                color: CouleursApp.principal,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            _controleurRecherche.clear();
+            _rechercherMenus('');
+            Navigator.pop(context);
+          },
+          child: Text(
+            'Effacer',
+            style: TextStyle(color: CouleursApp.texteFonce.withValues(alpha: 0.6)),
+          ),
+        ),
+        ElevatedButton(
+          onPressed: () => Navigator.pop(context),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: CouleursApp.principal,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+          child: const Text('Fermer', style: TextStyle(color: CouleursApp.blanc)),
+        ),
+      ],
+    );
   }
 
   Future<void> _changerCategorie(String nouvelleCategorie) async {
     setState(() {
       _categorieSelectionnee = nouvelleCategorie;
-      _chargementMenus = true;
     });
-
-    try {
-      List<Menu> menusCategorie;
-      if (_afficheVegetarienUniquement) {
-        menusCategorie = await _menusRepository.obtenirMenusVegetariens();
-        if (nouvelleCategorie != 'menu_jour') {
-          menusCategorie = menusCategorie.where((m) => m.categorie == nouvelleCategorie).toList();
-        }
-      } else {
-        menusCategorie = await _menusRepository.obtenirMenusParCategorie(nouvelleCategorie);
-      }
-
-      setState(() {
-        _tousLesMenus = menusCategorie;
-        _chargementMenus = false;
-      });
-    } catch (e) {
-      setState(() {
-        _chargementMenus = false;
-      });
-    }
+    
+    // UI Design: Utiliser le filtrage local au lieu de recharger depuis le repository
+    _appliquerFiltres();
   }
 
   Future<void> _toggleVegetarien() async {
     setState(() {
       _afficheVegetarienUniquement = !_afficheVegetarienUniquement;
     });
-    await _changerCategorie(_categorieSelectionnee);
+    // UI Design: Utiliser le filtrage local
+    _appliquerFiltres();
   }
 
 
@@ -162,9 +293,7 @@ class _CantineEcranState extends State<CantineEcran> {
             ),
             SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
             GestureDetector(
-              onTap: () {
-                // TODO: Implémenter la recherche
-              },
+              onTap: _ouvrirRecherche, // UI Design: Recherche implementée
               child: Container(
                 padding: EdgeInsets.all(screenWidth * 0.025), // UI Design: Padding adaptatif
                 decoration: BoxDecoration(
@@ -193,11 +322,12 @@ class _CantineEcranState extends State<CantineEcran> {
               _construireSectionInfos(),
               SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
               
-              // Section menus du jour
-              if (_menusDuJour.isNotEmpty) ...[
-                _construireSectionMenusDuJour(),
+              // Section menu du jour spécial (défini par l'admin)
+              if (_menuDuJourSpecial != null) ...[
+                _construireSectionMenuDuJourSpecial(),
                 SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
               ],
+              
               
               // Filtres et catégories
               _construireFiltres(),
@@ -223,15 +353,37 @@ class _CantineEcranState extends State<CantineEcran> {
       return const SizedBox.shrink();
     }
 
+    // UI Design: Obtenir les horaires du jour actuel
+    final maintenant = DateTime.now();
+    final jourActuel = _obtenirJourSemaine(maintenant.weekday);
+    final horairesDuJour = _horaires[jourActuel];
+    
+    String horairesText = 'Fermé';
+    Color horairesColor = Colors.red;
+    
+    if (horairesDuJour != null) {
+      final ouverture = horairesDuJour['ouverture'];
+      final fermeture = horairesDuJour['fermeture'];
+      
+      if (ouverture != null && fermeture != null) {
+        horairesText = '${_formatterHeure(ouverture)} - ${_formatterHeure(fermeture)}';
+        
+        // UI Design: Vérifier si c'est ouvert maintenant
+        final heureActuelle = TimeOfDay.now();
+        final estOuvert = _estDansCreneauHoraire(heureActuelle, ouverture, fermeture);
+        horairesColor = estOuvert ? Colors.green : CouleursApp.accent;
+      }
+    }
+
     return WidgetSectionStatistiques.cantine(
       titre: 'Horaires & Infos',
       iconeTitre: Icons.restaurant,
       statistiques: [
-        const {
-          'valeur': '11h30 - 14h00',
-          'label': 'Ouverture',
+        {
+          'valeur': horairesText,
+          'label': 'Aujourd\'hui ($jourActuel)',
           'icone': Icons.access_time,
-          'couleur': CouleursApp.accent,
+          'couleur': horairesColor,
         },
         {
           'valeur': '${_statistiques!.capaciteTotal} places',
@@ -255,58 +407,233 @@ class _CantineEcranState extends State<CantineEcran> {
     );
   }
 
-  // UI Design: Section menus du jour avec WidgetCollection optimisé
-  Widget _construireSectionMenusDuJour() {
+  // UI Design: Section menu du jour spécial défini par l'admin
+  Widget _construireSectionMenuDuJourSpecial() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
     
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Padding adaptatif
-          child: Row(
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // En-tête avec badge spécial
+          Row(
             children: [
-              Icon(
-                Icons.today,
-                color: CouleursApp.principal,
-                size: screenWidth * 0.06, // UI Design: Taille adaptative
-              ),
-              SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
-              Text(
-                'Menus du Jour',
-                style: StylesTexteApp.titre.copyWith(
-                  fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
+              Container(
+                padding: EdgeInsets.all(screenWidth * 0.025),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Colors.orange, Colors.deepOrange],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
-                maxLines: 1,
+                child: Icon(
+                  Icons.star,
+                  color: Colors.white,
+                  size: screenWidth * 0.06,
+                ),
+              ),
+              SizedBox(width: screenWidth * 0.03),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Menu du Jour Spécial',
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.05,
+                        fontWeight: FontWeight.bold,
+                        color: CouleursApp.texteFonce,
+                      ),
+                    ),
+                    Text(
+                      'Recommandé par notre chef',
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.032,
+                        color: Colors.orange.shade700,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenWidth * 0.025,
+                  vertical: screenWidth * 0.015,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+                ),
+                child: Text(
+                  'NOUVEAU',
+                  style: TextStyle(
+                    color: Colors.orange.shade700,
+                    fontWeight: FontWeight.bold,
+                    fontSize: screenWidth * 0.025,
+                  ),
+                ),
               ),
             ],
           ),
-        ),
-        SizedBox(height: screenHeight * 0.015), // UI Design: Espacement adaptatif
-        WidgetCollection<Menu>.listeHorizontale(
-          elements: _menusDuJour,
-          hauteur: screenHeight * 0.24, // UI Design: Hauteur adaptative
-          constructeurElement: (context, menu, index) {
-            return WidgetCarte.menu(
-              menu: menu,
-              modeListe: true,
-              largeur: screenWidth * 0.5, // UI Design: Largeur adaptative
-              hauteur: screenHeight * 0.23, // UI Design: Hauteur adaptative
-              onTap: () => _ouvrirDetailsMenu(menu), // Ajout navigation
-            );
-          },
-          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Padding adaptatif
-          messageEtatVide: 'Aucun menu du jour disponible',
-          iconeEtatVide: Icons.restaurant_menu_outlined,
-        ),
-      ],
+          SizedBox(height: screenHeight * 0.02),
+          
+          // Carte menu spécial premium
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.orange.withValues(alpha: 0.1),
+                  Colors.deepOrange.withValues(alpha: 0.05),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: Colors.orange.withValues(alpha: 0.3),
+                width: 2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.orange.withValues(alpha: 0.15),
+                  blurRadius: 15,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => _ouvrirDetailsMenu(_menuDuJourSpecial!),
+                borderRadius: BorderRadius.circular(20),
+                child: Padding(
+                  padding: EdgeInsets.all(screenWidth * 0.05),
+                  child: Row(
+                    children: [
+                      // Image ou icône du menu
+                      Container(
+                        width: screenWidth * 0.2,
+                        height: screenWidth * 0.2,
+                        decoration: BoxDecoration(
+                          color: Colors.orange.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Icon(
+                          Icons.restaurant_menu,
+                          color: Colors.orange.shade700,
+                          size: screenWidth * 0.08,
+                        ),
+                      ),
+                      SizedBox(width: screenWidth * 0.04),
+                      
+                      // Informations du menu
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _menuDuJourSpecial!.nom,
+                              style: TextStyle(
+                                fontSize: screenWidth * 0.045,
+                                fontWeight: FontWeight.bold,
+                                color: CouleursApp.texteFonce,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            SizedBox(height: screenHeight * 0.005),
+                            Text(
+                              _menuDuJourSpecial!.description,
+                              style: TextStyle(
+                                fontSize: screenWidth * 0.035,
+                                color: CouleursApp.texteFonce.withValues(alpha: 0.7),
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            SizedBox(height: screenHeight * 0.01),
+                            
+                            // Prix et badges
+                            Row(
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: screenWidth * 0.025,
+                                    vertical: screenWidth * 0.01,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.orange,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    '${_menuDuJourSpecial!.prix.toStringAsFixed(2)}€',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: screenWidth * 0.035,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: screenWidth * 0.02),
+                                if (_menuDuJourSpecial!.estVegetarien)
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: screenWidth * 0.02,
+                                      vertical: screenWidth * 0.008,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.green.withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.eco,
+                                          size: screenWidth * 0.03,
+                                          color: Colors.green,
+                                        ),
+                                        SizedBox(width: screenWidth * 0.01),
+                                        Text(
+                                          _menuDuJourSpecial!.estVegan ? 'VEGAN' : 'VÉGÉ',
+                                          style: TextStyle(
+                                            fontSize: screenWidth * 0.025,
+                                            color: Colors.green,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      
+                      // Flèche
+                      Icon(
+                        Icons.arrow_forward_ios,
+                        color: Colors.orange.shade700,
+                        size: screenWidth * 0.05,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  // UI Design: Filtres et catégories
+  // UI Design: Section menus du jour avec WidgetCollection optimisé/ UI Design: Filtres et catégories
   Widget _construireFiltres() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
@@ -385,7 +712,7 @@ class _CantineEcranState extends State<CantineEcran> {
     final screenHeight = mediaQuery.size.height;
     
     return WidgetCollection<Menu>.grille(
-      elements: _tousLesMenus,
+      elements: _menusFiltres, // UI Design: Utiliser les menus filtrés pour l'affichage
       enChargement: _chargementMenus,
       nombreColonnes: 2,
       espacementColonnes: screenWidth * 0.04, // UI Design: Espacement adaptatif
@@ -413,5 +740,24 @@ class _CantineEcranState extends State<CantineEcran> {
         builder: (context) => DetailsMenuEcran(menu: menu),
       ),
     );
+  }
+
+  // UI Design: Méthodes utilitaires pour les horaires
+  String _obtenirJourSemaine(int weekday) {
+    const jours = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+    return jours[weekday - 1];
+  }
+
+  String _formatterHeure(TimeOfDay heure) {
+    final minute = heure.minute.toString().padLeft(2, '0');
+    return '${heure.hour}h$minute';
+  }
+
+  bool _estDansCreneauHoraire(TimeOfDay maintenant, TimeOfDay ouverture, TimeOfDay fermeture) {
+    final maintenantMinutes = maintenant.hour * 60 + maintenant.minute;
+    final ouvertureMinutes = ouverture.hour * 60 + ouverture.minute;
+    final fermetureMinutes = fermeture.hour * 60 + fermeture.minute;
+    
+    return maintenantMinutes >= ouvertureMinutes && maintenantMinutes <= fermetureMinutes;
   }
 } 

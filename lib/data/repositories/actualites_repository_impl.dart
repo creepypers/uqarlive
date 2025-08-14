@@ -84,12 +84,12 @@ class ActualitesRepositoryImpl implements ActualitesRepository {
   }
 
   @override
-  Future<Actualite> mettreAJourActualite(Actualite actualite) async {
+  Future<bool> mettreAJourActualite(Actualite actualite) async {
     try {
-      final model = await _datasourceLocal.mettreAJourActualite(actualite);
-      return model.toEntity();
+      await _datasourceLocal.mettreAJourActualite(actualite);
+      return true;
     } catch (e) {
-      throw Exception('Erreur lors de la mise à jour de l\'actualité: $e');
+      return false;
     }
   }
 

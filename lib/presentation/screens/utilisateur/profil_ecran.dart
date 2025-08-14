@@ -18,6 +18,7 @@ import '../../../domain/repositories/reservations_salle_repository.dart';
 import 'modifier_profil_ecran.dart';
 import '../livres/gerer_livres_ecran.dart';
 import '../salles_ecran.dart';
+import '../associations/details_association_ecran.dart';
 import 'connexion_ecran.dart';
 
 
@@ -41,6 +42,8 @@ class _ProfilEcranState extends State<ProfilEcran> {
 
   List<Association> _mesAssociations = [];
   List<ReservationSalle> _mesReservations = [];
+  // Stocker les informations de membership pour les badges
+  final Map<String, String> _rolesAssociations = {};
   int _nombreLivresEnVente = 0;
   int _nombreLivresEchanges = 0;
   int _nombreAssociations = 0;
@@ -103,6 +106,8 @@ class _ProfilEcranState extends State<ProfilEcran> {
       
       // Récupérer les détails des associations pour chaque membership
       final List<Association> associations = [];
+      _rolesAssociations.clear(); // Réinitialiser les rôles
+      
       for (final membership in memberships) {
         try {
           final toutesAssociations = await _associationsRepository.obtenirAssociationsPopulaires(limite: 50);
@@ -111,6 +116,9 @@ class _ProfilEcranState extends State<ProfilEcran> {
             orElse: () => throw Exception('Association non trouvée'),
           );
           associations.add(association);
+          
+          // Stocker le rôle formaté de l'utilisateur dans cette association
+          _rolesAssociations[association.id] = membership.roleFormate;
         } catch (e) {
           // Ignorer si l'association n'est pas trouvée
         }
@@ -121,6 +129,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
     } catch (e) {
       _mesAssociations = [];
       _nombreAssociations = 0;
+      _rolesAssociations.clear();
     }
   }
 
@@ -337,7 +346,18 @@ class _ProfilEcranState extends State<ProfilEcran> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const ModifierProfilEcran(),
+        builder: (context) => ModifierProfilEcran(utilisateur: _utilisateurActuel),
+      ),
+    );
+  }
+
+  // Ouvrir une association spécifique
+  void _ouvrirAssociation(Association association) {
+    // Navigation vers l'écran de détails de l'association spécifique
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DetailsAssociationEcran(association: association),
       ),
     );
   }
@@ -361,17 +381,19 @@ class _ProfilEcranState extends State<ProfilEcran> {
               await _authentificationService.deconnecter();
               
               // Retour à l'écran de connexion
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const ConnexionEcran()),
-                (route) => false,
-              );
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Déconnexion réussie'),
-                  backgroundColor: Colors.green,
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Déconnexion réussie'),
+                    backgroundColor: Colors.green,
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const ConnexionEcran()),
+                  (route) => false,
+                );
+              }
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             child: const Text('Se déconnecter', style: TextStyle(color: CouleursApp.blanc)),
@@ -474,9 +496,9 @@ class _ProfilEcranState extends State<ProfilEcran> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: CouleursApp.principal.withOpacity(0.05),
+              color: CouleursApp.principal.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: CouleursApp.principal.withOpacity(0.2)),
+              border: Border.all(color: CouleursApp.principal.withValues(alpha: 0.2)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -836,10 +858,10 @@ class _ProfilEcranState extends State<ProfilEcran> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: statut == 'En vente' ? Colors.green.withOpacity(0.1) :
-                statut == 'Vendu' ? Colors.orange.withOpacity(0.1) :
-                statut == 'Disponible' ? Colors.blue.withOpacity(0.1) :
-                Colors.grey.withOpacity(0.1),
+            color: statut == 'En vente' ? Colors.green.withValues(alpha: 0.1) :
+                statut == 'Vendu' ? Colors.orange.withValues(alpha: 0.1) :
+                statut == 'Disponible' ? Colors.blue.withValues(alpha: 0.1) :
+                Colors.grey.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(
@@ -865,74 +887,9 @@ class _ProfilEcranState extends State<ProfilEcran> {
   }
 
 
-  void _gererReservation(String salle) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Réservation - $salle', style: StylesTexteApp.titre.copyWith(fontSize: 18)),
-            const SizedBox(height: 20),
-            ListTile(
-              leading: const Icon(Icons.edit, color: CouleursApp.accent),
-              title: const Text('Modifier la réservation'),
-              onTap: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Modification de la réservation $salle'),
-                    backgroundColor: CouleursApp.accent,
-                    behavior: SnackBarBehavior.floating,
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.cancel, color: Colors.red),
-              title: const Text('Annuler la réservation'),
-                             onTap: () {
-                 Navigator.pop(context);
-                 _confirmerAnnulationReservation(salle);
-               },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
-  void _confirmerAnnulationReservation(String salle) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Annuler la réservation'),
-        content: Text('Êtes-vous sûr de vouloir annuler votre réservation pour $salle ?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Non'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Réservation $salle annulée'),
-                  backgroundColor: Colors.red,
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Oui, annuler', style: TextStyle(color: CouleursApp.blanc)),
-          ),
-        ],
-      ),
-    );
-  }
+
+
 
 
 
@@ -1103,14 +1060,21 @@ class _ProfilEcranState extends State<ProfilEcran> {
               final couleur = couleurs[index % couleurs.length];
               final icones = [Icons.school, Icons.camera_alt, Icons.groups_2, Icons.sports, Icons.science];
               final icone = icones[index % icones.length];
+               
+               // Obtenir le rôle de l'utilisateur dans cette association
+               final role = _rolesAssociations[association.id] ?? 'Membre';
               
               return Padding(
                 padding: EdgeInsets.only(bottom: index < _mesAssociations.length - 1 ? 12.0 : 0),
+                 child: InkWell(
+                   onTap: () => _ouvrirAssociation(association),
+                   borderRadius: BorderRadius.circular(8),
                 child: _construireAssociation(
                   association.nom,
-                  'Membre', // Rôle par défaut (pourrait être récupéré du membership)
+                     role, // Rôle dynamique depuis le membership
                   icone,
                   couleur,
+                   ),
                 ),
               );
             }),
@@ -1125,7 +1089,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               child: const Text(
-                'Explorer les associations',
+                 'Voir mes associations',
                 style: TextStyle(color: CouleursApp.accent, fontWeight: FontWeight.w600),
               ),
             ),

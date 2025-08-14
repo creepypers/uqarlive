@@ -1,6 +1,9 @@
 // UI Design: Source de données locale pour les menus de la cantine UQAR
 class MenusDatasourceLocal {
   
+  // UI Design: Variable statique pour stocker l'ID du menu du jour actuel
+  static String? _menuDuJourActuel;
+  
   /// Obtenir tous les menus de la cantine
   List<Map<String, dynamic>> obtenirTousLesMenus() {
     return [
@@ -282,5 +285,73 @@ class MenusDatasourceLocal {
   // Méthode pour obtenir les catégories
   List<String> obtenirCategories() {
     return ['menu_jour', 'plat', 'snack', 'dessert', 'boisson'];
+  }
+
+  /// Ajouter un nouveau menu
+  Future<Map<String, dynamic>> ajouterMenu(Map<String, dynamic> menuData) async {
+
+    
+    // Créer une copie de la liste existante
+    final menus = obtenirTousLesMenus();
+    
+    // Ajouter le nouveau menu
+    menus.add(menuData);
+    
+    // Note: Dans une vraie implémentation, on utiliserait une base de données
+    // Ici on simule juste le succès de l'opération
+    return menuData;
+  }
+
+  /// Mettre à jour un menu existant
+  Future<Map<String, dynamic>> mettreAJourMenu(String menuId, Map<String, dynamic> menuData) async {
+    // Simulation de mise à jour - dans une vraie app, cela irait en base de données
+    // Pour cette démo, nous simulons la modification en mettant à jour la liste en mémoire
+    
+    // Créer une copie de la liste existante
+    final menus = obtenirTousLesMenus();
+    
+    // Trouver l'index du menu à modifier
+    final index = menus.indexWhere((m) => m['id'] == menuId);
+    
+    if (index != -1) {
+      // Mettre à jour le menu existant
+      menus[index] = menuData;
+      return menuData;
+    }
+    
+    return menuData;
+  }
+
+  /// Supprimer un menu
+  Future<bool> supprimerMenu(String menuId) async {
+    // Simulation de suppression - dans une vraie app, cela irait en base de données
+    // Si on supprime le menu du jour actuel, le retirer
+    if (_menuDuJourActuel == menuId) {
+      _menuDuJourActuel = null;
+    }
+    return true;
+  }
+
+  /// Définir un menu comme menu du jour
+  Future<void> definirMenuDuJour(String menuId) async {
+    // Si ID vide, retirer le menu du jour
+    if (menuId.isEmpty) {
+      _menuDuJourActuel = null;
+      return;
+    }
+    
+    // Vérifier que le menu existe
+    final menu = obtenirMenuParId(menuId);
+    if (menu == null) {
+      throw Exception('Menu avec l\'ID $menuId non trouvé');
+    }
+    
+    // Définir le menu du jour
+    _menuDuJourActuel = menuId;
+  }
+
+  /// Obtenir l'ID du menu du jour actuel
+  Future<String?> obtenirMenuDuJourActuel() async {
+    return _menuDuJourActuel;
   }
 } 

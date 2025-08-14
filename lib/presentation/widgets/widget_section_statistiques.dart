@@ -359,8 +359,8 @@ class WidgetSectionStatistiques extends StatelessWidget {
         SizedBox(
           width: double.infinity, // UI Design: Prendre toute la largeur disponible
           child: Row(
-            children: row,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween, // UI Design: Espacer les éléments
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: row, // UI Design: Espacer les éléments
           ),
         ),
       );

@@ -38,7 +38,7 @@ class EvenementsService {
   }
 
   /// Ajoute un nouvel événement
-  Future<Evenement> ajouterEvenement(Evenement evenement) async {
+  Future<bool> ajouterEvenement(Evenement evenement) async {
     try {
       // Validation métier
       if (evenement.dateDebut.isAfter(evenement.dateFin)) {
@@ -56,7 +56,7 @@ class EvenementsService {
   }
 
   /// Met à jour un événement existant
-  Future<Evenement> mettreAJourEvenement(Evenement evenement) async {
+  Future<bool> mettreAJourEvenement(Evenement evenement) async {
     try {
       // Validation métier
       if (evenement.dateDebut.isAfter(evenement.dateFin)) {
@@ -138,6 +138,7 @@ class EvenementsService {
     required String description,
     required String lieu,
     required String organisateur,
+    required String associationId,
     required DateTime dateDebut,
     required DateTime dateFin,
     required String typeEvenement,
@@ -149,6 +150,7 @@ class EvenementsService {
       description: description,
       lieu: lieu,
       organisateur: organisateur,
+      associationId: associationId,
       dateDebut: dateDebut,
       dateFin: dateFin,
       typeEvenement: typeEvenement,
@@ -157,6 +159,11 @@ class EvenementsService {
       dateCreation: DateTime.now(),
     );
 
-    return await ajouterEvenement(evenement);
+    final succes = await ajouterEvenement(evenement);
+    if (succes) {
+      return evenement;
+    } else {
+      throw Exception('Impossible de créer l\'événement');
+    }
   }
 }

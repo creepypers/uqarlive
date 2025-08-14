@@ -162,6 +162,26 @@ class TransactionsService {
     return await transactionsRepository.annulerTransaction(transactionId);
   }
 
+  // UI Design: Proposer un échange (alias pour creerTransactionEchange)
+  Future<bool> proposerEchange(
+    String acheteurId,
+    String livreEchangeId,
+    String livreId,
+    String messageAcheteur,
+  ) async {
+    // Obtenir les infos du livre pour récupérer le vendeurId
+    final livre = await livresRepository.obtenirLivreParId(livreId);
+    if (livre == null) return false;
+    
+    return await creerTransactionEchange(
+      livreId: livreId,
+      vendeurId: livre.proprietaireId,
+      acheteurId: acheteurId,
+      livreEchangeId: livreEchangeId,
+      messageAcheteur: messageAcheteur,
+    );
+  }
+
   // UI Design: Obtenir les statistiques de transactions
   Future<Map<String, int>> obtenirStatistiques(String utilisateurId) async {
     return await transactionsRepository.obtenirStatistiquesTransactions(utilisateurId);

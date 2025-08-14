@@ -12,10 +12,10 @@ abstract class EvenementsRepository {
   Future<Evenement?> obtenirEvenementParId(String id);
   
   /// Ajoute un nouvel événement
-  Future<Evenement> ajouterEvenement(Evenement evenement);
+  Future<bool> ajouterEvenement(Evenement evenement);
   
   /// Met à jour un événement existant
-  Future<Evenement> mettreAJourEvenement(Evenement evenement);
+  Future<bool> mettreAJourEvenement(Evenement evenement);
   
   /// Supprime un événement
   Future<bool> supprimerEvenement(String id);

@@ -23,7 +23,6 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
 
   // UI Design: Service d'authentification
   late AuthentificationService _authentificationService;
-  bool _connexionEnCours = false;
 
   @override
   void initState() {
@@ -41,7 +40,6 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
 
   void _gererConnexion() async {
     if (_cleFormulaire.currentState!.validate()) {
-      setState(() => _connexionEnCours = true);
 
       try {
         final utilisateur = await _authentificationService.authentifier(
@@ -51,59 +49,55 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
 
         if (utilisateur != null) {
           // Debug temporaire
-          print(
-              'Utilisateur connecté: ${utilisateur.prenom} ${utilisateur.nom}');
-          print('Type utilisateur: ${utilisateur.typeUtilisateur}');
-          print('Est admin (getter): ${utilisateur.estAdmin}');
-          print(
-              'Est admin (service): ${_authentificationService.estAdministrateur}');
 
           // UI Design: Redirection selon le type d'utilisateur
-          if (_authentificationService.estAdministrateur) {
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(
-                  builder: (context) => const AdminDashboardEcran()),
-              (route) => false,
-            );
+          if (mounted) {
+            if (_authentificationService.estAdministrateur) {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                    builder: (context) => const AdminDashboardEcran()),
+                (route) => false,
+              );
 
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Row(
-                  children: [
-                    const Icon(Icons.admin_panel_settings,
-                        color: Colors.white, size: 20),
-                    const SizedBox(width: 8),
-                    Text('Bienvenue Administrateur ${utilisateur.prenom} !'),
-                  ],
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Row(
+                    children: [
+                      const Icon(Icons.admin_panel_settings,
+                          color: Colors.white, size: 20),
+                      const SizedBox(width: 8),
+                      Text('Bienvenue Administrateur ${utilisateur.prenom} !'),
+                    ],
+                  ),
+                  backgroundColor: Colors.green,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
                 ),
-                backgroundColor: Colors.green,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-              ),
-            );
-          } else {
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (context) => const AccueilEcran()),
-              (route) => false,
-            );
+              );
+            } else {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const AccueilEcran()),
+                (route) => false,
+              );
 
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Row(
-                  children: [
-                    const Icon(Icons.check_circle,
-                        color: Colors.white, size: 20),
-                    const SizedBox(width: 8),
-                    Text('Bienvenue ${utilisateur.prenom} !'),
-                  ],
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Row(
+                    children: [
+                      const Icon(Icons.check_circle,
+                          color: Colors.white, size: 20),
+                      const SizedBox(width: 8),
+                      Text('Bienvenue ${utilisateur.prenom} !'),
+                    ],
+                  ),
+                  backgroundColor: Colors.green,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
                 ),
-                backgroundColor: Colors.green,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-              ),
-            );
+              );
+            }
           }
         } else {
           _afficherErreurConnexion();
@@ -111,9 +105,7 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
       } catch (e) {
         _afficherErreurConnexion();
       } finally {
-        if (mounted) {
-          setState(() => _connexionEnCours = false);
-        }
+        // Connexion terminée
       }
     }
   }
@@ -135,90 +127,7 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
     );
   }
 
-  // UI Design: Connexion rapide admin pour les tests
-  void _connexionAdminRapide() async {
-    setState(() => _connexionEnCours = true);
 
-    try {
-      final utilisateur = await _authentificationService.authentifier(
-        'admin@uqar.ca',
-        'admin123',
-      );
-
-      if (utilisateur != null && _authentificationService.estAdministrateur) {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const AdminDashboardEcran()),
-          (route) => false,
-        );
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.admin_panel_settings,
-                    color: Colors.white, size: 20),
-                const SizedBox(width: 8),
-                Text(
-                    'Connexion Admin - ${utilisateur.prenom} ${utilisateur.nom}'),
-              ],
-            ),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          ),
-        );
-      }
-    } catch (e) {
-      _afficherErreurConnexion();
-    } finally {
-      if (mounted) {
-        setState(() => _connexionEnCours = false);
-      }
-    }
-  }
-
-  // UI Design: Connexion rapide étudiant pour les tests
-  void _connexionEtudiantDemo() async {
-    setState(() => _connexionEnCours = true);
-
-    try {
-      final utilisateur = await _authentificationService.authentifier(
-        'alexandre.martin@uqar.ca',
-        'alex123',
-      );
-
-      if (utilisateur != null) {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const AccueilEcran()),
-          (route) => false,
-        );
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.check_circle, color: Colors.white, size: 20),
-                const SizedBox(width: 8),
-                Text(
-                    'Connexion Démo - ${utilisateur.prenom} ${utilisateur.nom}'),
-              ],
-            ),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          ),
-        );
-      }
-    } catch (e) {
-      _afficherErreurConnexion();
-    } finally {
-      if (mounted) {
-        setState(() => _connexionEnCours = false);
-      }
-    }
-  }
 
   void _gererMotDePasseOublie() {
     showDialog(
@@ -253,41 +162,7 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
     );
   }
 
-  void _gererDeconnexion() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Déconnexion'),
-        content: const Text('Êtes-vous sûr de vouloir vous déconnecter ?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Annuler'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              // Retour à l'écran de connexion
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const ConnexionEcran()),
-                (route) => false,
-              );
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Déconnexion réussie'),
-                  backgroundColor: Colors.green,
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Se déconnecter',
-                style: TextStyle(color: CouleursApp.blanc)),
-          ),
-        ],
-      ),
-    );
-  }
+
 
   void _gererCreerCompte() {
     Navigator.of(
@@ -585,7 +460,7 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
       width: largeur,
       height: hauteur,
       decoration: BoxDecoration(
-        color: CouleursApp.principal.withOpacity(0.3),
+        color: CouleursApp.principal.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(hauteur / 2),
       ),
       child: Center(
@@ -593,7 +468,7 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
           width: largeur * 0.7,
           height: hauteur * 0.7,
           decoration: BoxDecoration(
-            color: CouleursApp.principal.withOpacity(0.5),
+            color: CouleursApp.principal.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(hauteur / 3),
           ),
         ),
@@ -614,7 +489,7 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
             screenWidth * 0.05), // UI Design: Rayon adaptatif
         boxShadow: [
           BoxShadow(
-            color: CouleursApp.principal.withOpacity(0.3),
+            color: CouleursApp.principal.withValues(alpha: 0.3),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),

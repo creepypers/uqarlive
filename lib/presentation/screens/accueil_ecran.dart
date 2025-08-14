@@ -4,12 +4,19 @@ import '../../core/di/service_locator.dart';
 import '../../domain/entities/livre.dart';
 import '../../domain/entities/association.dart';
 import '../../domain/entities/utilisateur.dart';
+import '../../domain/entities/actualite.dart';
+import '../../domain/entities/evenement.dart';
 import '../../domain/repositories/livres_repository.dart';
 import '../../domain/repositories/associations_repository.dart';
+import '../../domain/repositories/actualites_repository.dart';
+import '../../domain/repositories/evenements_repository.dart';
+import '../../domain/repositories/membres_association_repository.dart';
 import '../services/authentification_service.dart';
 import 'livres/details_livre_ecran.dart';
-import 'associations/associations_ecran.dart';
+
 import 'associations/details_association_ecran.dart';
+import 'actualites/actualites_ecran.dart';
+import 'evenements/evenements_ecran.dart';
 import '../widgets/navbar_widget.dart';
 import '../widgets/widget_barre_app_personnalisee.dart';
 import '../widgets/widget_carte.dart';
@@ -28,17 +35,24 @@ class _AccueilEcranState extends State<AccueilEcran> {
   // Services et Repositories
   late final LivresRepository _livresRepository;
   late final AssociationsRepository _associationsRepository;
+  late final ActualitesRepository _actualitesRepository;
+  late final EvenementsRepository _evenementsRepository;
   late final AuthentificationService _authentificationService;
+  late final MembresAssociationRepository _membresAssociationRepository;
   
   // États des données
   Utilisateur? _utilisateurActuel;
   List<Livre> _mesLivres = [];
-  List<Livre> _livresEnVente = [];
   List<Association> _mesAssociations = [];
+  List<Actualite> _actualites = []; // UI Design: Actualités dynamiques
+  List<Evenement> _evenements = []; // UI Design: Événements dynamiques
+  final Map<String, String> _rolesAssociations = {}; // Stocker les rôles des associations
   bool _chargementLivres = false;
-  bool _chargementLivresVente = false;
   bool _chargementAssociations = false;
+  bool _chargementActualites = false; // UI Design: État de chargement des actualités
+  bool _chargementEvenements = false; // UI Design: État de chargement des événements
   bool _chargementUtilisateur = true;
+  bool _donneesChargees = false; // Éviter le rechargement inutile
 
   @override
   void initState() {
@@ -48,6 +62,11 @@ class _AccueilEcranState extends State<AccueilEcran> {
   }
 
   Future<void> _chargerDonneesUtilisateur() async {
+    // Éviter le rechargement si les données sont déjà chargées
+    if (_donneesChargees && _utilisateurActuel != null) {
+      return;
+    }
+    
     setState(() => _chargementUtilisateur = true);
     
     try {
@@ -57,9 +76,14 @@ class _AccueilEcranState extends State<AccueilEcran> {
       if (_utilisateurActuel != null) {
         await Future.wait([
           _chargerMesLivres(),
-          _chargerLivresEnVente(),
           _chargerMesAssociations(),
+          _chargerActualites(), // UI Design: Charger les actualités dynamiques
+          _chargerEvenements(), // UI Design: Charger les événements dynamiques
         ]);
+        _donneesChargees = true;
+      } else {
+        // UI Design: Charger les actualités même si l'utilisateur n'est pas connecté
+        await _chargerActualites();
       }
     } catch (e) {
       // Gérer l'erreur
@@ -72,7 +96,10 @@ class _AccueilEcranState extends State<AccueilEcran> {
     // UI Design: Injection de dépendances via ServiceLocator - Clean Architecture
     _livresRepository = ServiceLocator.obtenirService<LivresRepository>();
     _associationsRepository = ServiceLocator.obtenirService<AssociationsRepository>();
+    _actualitesRepository = ServiceLocator.obtenirService<ActualitesRepository>();
+    _evenementsRepository = ServiceLocator.obtenirService<EvenementsRepository>();
     _authentificationService = ServiceLocator.obtenirService<AuthentificationService>();
+    _membresAssociationRepository = ServiceLocator.obtenirService<MembresAssociationRepository>();
   }
 
   Future<void> _chargerMesLivres() async {
@@ -95,23 +122,7 @@ class _AccueilEcranState extends State<AccueilEcran> {
     }
   }
 
-  Future<void> _chargerLivresEnVente() async {
-    setState(() => _chargementLivresVente = true);
 
-    try {
-      final tousLesLivres = await _livresRepository.obtenirTousLesLivres();
-      setState(() {
-        // UI Design: Filtrer pour obtenir seulement les livres en vente
-        _livresEnVente = tousLesLivres
-            .where((livre) => livre.prix != null && livre.prix! > 0 && livre.estDisponible)
-            .take(6)
-            .toList();
-        _chargementLivresVente = false;
-      });
-    } catch (e) {
-      setState(() => _chargementLivresVente = false);
-    }
-  }
 
   Future<void> _chargerMesAssociations() async {
     if (_utilisateurActuel == null) return;
@@ -119,15 +130,73 @@ class _AccueilEcranState extends State<AccueilEcran> {
     setState(() => _chargementAssociations = true);
 
     try {
-      // UI Design: Pour l'instant, simulation des associations de l'utilisateur
-      final toutesLesAssociations = await _associationsRepository.obtenirAssociationsPopulaires(limite: 10);
+      // Récupérer les memberships de l'utilisateur
+      final memberships = await _membresAssociationRepository.obtenirMembresParUtilisateur(_utilisateurActuel!.id);
+      
+      // Récupérer les détails des associations pour chaque membership
+      final List<Association> associations = [];
+      _rolesAssociations.clear(); // Réinitialiser les rôles
+      
+      for (final membership in memberships) {
+        try {
+          final toutesAssociations = await _associationsRepository.obtenirAssociationsPopulaires(limite: 50);
+          final association = toutesAssociations.firstWhere(
+            (assoc) => assoc.id == membership.associationId,
+            orElse: () => throw Exception('Association non trouvée'),
+          );
+          associations.add(association);
+          
+          // Stocker le rôle formaté de l'utilisateur dans cette association
+          _rolesAssociations[association.id] = membership.roleFormate;
+        } catch (e) {
+          // Ignorer si l'association n'est pas trouvée
+        }
+      }
+      
       setState(() {
-        // Simuler que l'utilisateur fait partie de quelques associations
-        _mesAssociations = toutesLesAssociations.take(3).toList();
+        _mesAssociations = associations.take(3).toList(); // Limiter à 3 pour l'accueil
         _chargementAssociations = false;
       });
     } catch (e) {
-      setState(() => _chargementAssociations = false);
+      setState(() {
+        _mesAssociations = [];
+        _chargementAssociations = false;
+        _rolesAssociations.clear();
+      });
+    }
+  }
+
+  // UI Design: Charger les actualités dynamiques depuis le repository
+  Future<void> _chargerActualites() async {
+    setState(() => _chargementActualites = true);
+
+    try {
+      // Charger toutes les actualités pour avoir un mélange de priorités
+        final toutesActualites = await _actualitesRepository.obtenirActualites();
+      
+      // Prioriser les actualités épinglées et urgentes
+      final actualitesTriees = List<Actualite>.from(toutesActualites);
+      actualitesTriees.sort((a, b) {
+        // D'abord les épinglées
+        if (a.estEpinglee && !b.estEpinglee) return -1;
+        if (!a.estEpinglee && b.estEpinglee) return 1;
+        
+        // Puis par priorité (urgente > importante > normale)
+        final prioriteA = a.priorite == 'urgente' ? 3 : (a.priorite == 'importante' ? 2 : 1);
+        final prioriteB = b.priorite == 'urgente' ? 3 : (b.priorite == 'importante' ? 2 : 1);
+        if (prioriteA != prioriteB) return prioriteB.compareTo(prioriteA);
+        
+        // Enfin par date (plus récent en premier)
+        return b.datePublication.compareTo(a.datePublication);
+      });
+      
+        setState(() {
+        // UI Design: Prendre les 3 premières actualités triées pour l'accueil
+        _actualites = actualitesTriees.take(3).toList();
+          _chargementActualites = false;
+        });
+    } catch (e) {
+        setState(() => _chargementActualites = false);
     }
   }
 
@@ -227,6 +296,10 @@ class _AccueilEcranState extends State<AccueilEcran> {
               
               // Section mes associations
               _construireSectionMesAssociations(),
+              SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
+              
+              // Section événements à venir
+              _construireSectionEvenements(),
               SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
               
               // Section cantine
@@ -336,102 +409,7 @@ class _AccueilEcranState extends State<AccueilEcran> {
     );
   }
 
-  // UI Design: Section livres en vente avec WidgetCollection
-  Widget _construireSectionLivresEnVente() {
-    final mediaQuery = MediaQuery.of(context);
-    final screenWidth = mediaQuery.size.width;
-    final screenHeight = mediaQuery.size.height;
-    
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded( // UI Design: Widget flexible pour éviter les débordements
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Livres en Vente',
-                    style: StylesTexteApp.titre.copyWith(
-                      fontSize: screenWidth * 0.055, // UI Design: Taille adaptative
-                    ),
-                    overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
-                    maxLines: 1,
-                  ),
-                  Text(
-                    'Livres disponibles à l\'achat',
-                    style: TextStyle(
-                      fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
-                      color: CouleursApp.texteFonce.withValues(alpha: 0.6),
-                    ),
-                    overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
-                    maxLines: 1,
-                  ),
-                ],
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                NavigationService.gererNavigationNavBar(context, 1); // Index 1 = Marketplace
-              },
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: screenWidth * 0.03, // UI Design: Padding adaptatif
-                  vertical: screenWidth * 0.015,
-                ),
-                decoration: BoxDecoration(
-                  color: CouleursApp.accent.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Voir tout',
-                      style: TextStyle(
-                        color: CouleursApp.accent,
-                        fontSize: screenWidth * 0.03, // UI Design: Taille adaptative
-                        fontWeight: FontWeight.w600,
-                      ),
-                      overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
-                      maxLines: 1,
-                    ),
-                    SizedBox(width: screenWidth * 0.01), // UI Design: Espacement adaptatif
-                    Icon(
-                      Icons.arrow_forward_ios,
-                      color: CouleursApp.accent,
-                      size: screenWidth * 0.03, // UI Design: Taille adaptative
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
-        
-        WidgetCollection<Livre>.listeHorizontale(
-          elements: _livresEnVente,
-          enChargement: _chargementLivresVente,
-          hauteur: screenHeight * 0.25, // UI Design: Hauteur adaptative
-          constructeurElement: (context, livre, index) => SizedBox(
-            width: screenWidth * 0.35, // UI Design: Largeur adaptative
-            child: WidgetCarte.livre(
-              livre: livre,
-              modeListe: true,
-              hauteur: screenHeight * 0.23, // UI Design: Hauteur adaptative
-              largeur: screenWidth * 0.35, // UI Design: Largeur adaptative
-              onTap: () => _naviguerVersDetailsLivre(livre),
-            ),
-          ),
-          messageEtatVide: 'Aucun livre en vente pour le moment',
-          iconeEtatVide: Icons.sell_outlined,
-        ),
-      ],
-    );
-  }
+
 
   // UI Design: Section mes associations avec design moderne
   Widget _construireSectionMesAssociations() {
@@ -474,7 +452,7 @@ class _AccueilEcranState extends State<AccueilEcran> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const AssociationsEcran(),
+                    builder: (context) => const ActualitesEcran(),
                   ),
                 );
               },
@@ -489,7 +467,7 @@ class _AccueilEcranState extends State<AccueilEcran> {
                   border: Border.all(color: CouleursApp.principal.withValues(alpha: 0.3)),
                 ),
                 child: Text(
-                  'Explorer',
+                  'Voir plus',
                   style: TextStyle(
                     color: CouleursApp.principal,
                     fontWeight: FontWeight.w500,
@@ -597,13 +575,13 @@ class _AccueilEcranState extends State<AccueilEcran> {
                                           vertical: screenWidth * 0.01,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: Colors.green.withValues(alpha: 0.1),
+                                          color: _obtenirCouleurRole(_rolesAssociations[association.id] ?? 'Membre').withValues(alpha: 0.1),
                                           borderRadius: BorderRadius.circular(6),
                                         ),
                                         child: Text(
-                                          'Membre',
+                                          _rolesAssociations[association.id] ?? 'Membre',
                                           style: TextStyle(
-                                            color: Colors.green,
+                                            color: _obtenirCouleurRole(_rolesAssociations[association.id] ?? 'Membre'),
                                             fontSize: screenWidth * 0.025, // UI Design: Taille adaptative
                                             fontWeight: FontWeight.w600,
                                           ),
@@ -688,7 +666,7 @@ class _AccueilEcranState extends State<AccueilEcran> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const AssociationsEcran(),
+                    builder: (context) => const ActualitesEcran(),
                   ),
                 );
               },
@@ -717,44 +695,53 @@ class _AccueilEcranState extends State<AccueilEcran> {
           ],
         ),
         SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
-        // UI Design: Liste horizontale d'actualités simulées
+        // UI Design: Liste horizontale d'actualités dynamiques
         SizedBox(
           height: screenHeight * 0.19, // UI Design: Hauteur adaptative
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Padding adaptatif
-            itemCount: 3, // Afficher 3 actualités sur l'accueil
-            itemBuilder: (context, index) {
-              final actualites = [
-                {
-                  'titre': 'Tournoi Gaming Inter-Programmes',
-                  'association': 'Étudiants Informatique',
-                  'date': '25 Jan',
-                  'priorite': 'haute',
-                },
-                {
-                  'titre': 'Atelier Gestion du Stress',
-                  'association': 'AGEUQAR',
-                  'date': '24 Jan',
-                  'priorite': 'haute',
-                },
-                {
-                  'titre': 'Collecte Banque Alimentaire',
-                  'association': 'Association Humanitaire',
-                  'date': 'En cours',
-                  'priorite': 'normale',
-                },
-              ];
-              
-              final actualite = actualites[index];
+          child: _chargementActualites
+            ? const Center(
+                child: CircularProgressIndicator(
+                  color: CouleursApp.principal,
+                  strokeWidth: 2,
+                ),
+              )
+            : _actualites.isEmpty 
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.newspaper_outlined,
+                        size: screenWidth * 0.1,
+                        color: CouleursApp.texteFonce.withValues(alpha: 0.3),
+                      ),
+                      SizedBox(height: screenHeight * 0.01),
+                      Text(
+                        'Aucune actualité disponible',
+                        style: TextStyle(
+                          color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                          fontSize: screenWidth * 0.035,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Padding adaptatif
+                  itemCount: _actualites.length,
+                  itemBuilder: (context, index) {
+                    final actualite = _actualites[index];
               return Container(
                 width: screenWidth * 0.45, // UI Design: Largeur adaptative
                 margin: EdgeInsets.only(right: screenWidth * 0.03), // UI Design: Marge adaptative
                 decoration: BoxDecoration(
                   color: CouleursApp.blanc,
                   borderRadius: BorderRadius.circular(12),
-                  border: actualite['priorite'] == 'haute' 
-                    ? Border.all(color: CouleursApp.principal, width: 2)
+                  border: actualite.priorite == 'urgente' 
+                    ? Border.all(color: Colors.red, width: 2)
+                    : actualite.priorite == 'importante'
+                      ? Border.all(color: Colors.orange, width: 1.5)
                     : null,
                   boxShadow: [
                     BoxShadow(
@@ -769,8 +756,11 @@ class _AccueilEcranState extends State<AccueilEcran> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Badge priorité si haute
-                      if (actualite['priorite'] == 'haute') ...[
+                      // Badges priorité et épinglé
+                      Row(
+                        children: [
+                          // Badge priorité
+                          if (actualite.priorite == 'urgente') ...[
                         Container(
                           padding: EdgeInsets.symmetric(
                             horizontal: screenWidth * 0.02, // UI Design: Padding adaptatif
@@ -791,11 +781,52 @@ class _AccueilEcranState extends State<AccueilEcran> {
                             maxLines: 1,
                           ),
                         ),
+                            SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
+                          ] else if (actualite.priorite == 'importante') ...[
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: screenWidth * 0.02, // UI Design: Padding adaptatif
+                                vertical: screenWidth * 0.01,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.orange,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                'IMPORTANT',
+                                style: TextStyle(
+                                  color: CouleursApp.blanc,
+                                  fontSize: screenWidth * 0.025, // UI Design: Taille adaptative
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                                maxLines: 1,
+                              ),
+                            ),
+                            SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
+                          ],
+                          // Badge épinglé
+                          if (actualite.estEpinglee) ...[
+                            Container(
+                              padding: EdgeInsets.all(screenWidth * 0.01),
+                              decoration: BoxDecoration(
+                                color: CouleursApp.principal.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Icon(
+                                Icons.push_pin,
+                                color: CouleursApp.principal,
+                                size: screenWidth * 0.03,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                      if (actualite.priorite == 'urgente' || actualite.priorite == 'importante' || actualite.estEpinglee)
                         SizedBox(height: screenHeight * 0.01), // UI Design: Espacement adaptatif
-                      ],
                       // Titre
                       Text(
-                        actualite['titre']!,
+                        actualite.titre,
                         style: TextStyle(
                           fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
                           fontWeight: FontWeight.w600,
@@ -807,7 +838,7 @@ class _AccueilEcranState extends State<AccueilEcran> {
                       const Spacer(),
                       // Association et date
                       Text(
-                        actualite['association']!,
+                        _obtenirNomAssociation(actualite.associationId),
                         style: TextStyle(
                           fontSize: screenWidth * 0.03, // UI Design: Taille adaptative
                           color: CouleursApp.principal,
@@ -818,7 +849,7 @@ class _AccueilEcranState extends State<AccueilEcran> {
                       ),
                       SizedBox(height: screenHeight * 0.005), // UI Design: Espacement adaptatif
                       Text(
-                        actualite['date']!,
+                        _formaterDateActualite(actualite.datePublication),
                         style: TextStyle(
                           fontSize: screenWidth * 0.028, // UI Design: Taille adaptative
                           color: CouleursApp.texteFonce.withValues(alpha: 0.6),
@@ -830,8 +861,8 @@ class _AccueilEcranState extends State<AccueilEcran> {
                   ),
                 ),
               );
-            },
-          ),
+                  },
+                ),
         ),
       ],
     );
@@ -984,12 +1015,362 @@ class _AccueilEcranState extends State<AccueilEcran> {
     );
   }
 
-  // UI Design: Navigation vers les détails d'un livre
-  void _naviguerVersDetailsLivre(Livre livre) {
-    Navigator.pushNamed(
-      context,
-      '/details_livre',
-      arguments: livre,
+  // UI Design: Formater la date d'une actualité pour l'affichage
+  String _formaterDateActualite(DateTime datePublication) {
+    final maintenant = DateTime.now();
+    final difference = maintenant.difference(datePublication);
+
+    if (difference.inDays == 0) {
+      return 'Aujourd\'hui';
+    } else if (difference.inDays == 1) {
+      return 'Hier';
+    } else if (difference.inDays < 7) {
+      return 'Il y a ${difference.inDays} jours';
+    } else if (difference.inDays < 30) {
+      final semaines = (difference.inDays / 7).floor();
+      return semaines == 1 ? 'Il y a 1 semaine' : 'Il y a $semaines semaines';
+    } else {
+      // Format court: jour/mois
+      return '${datePublication.day}/${datePublication.month}';
+    }
+  }
+
+  // UI Design: Obtenir la couleur selon le rôle de l'utilisateur
+  Color _obtenirCouleurRole(String role) {
+    switch (role.toLowerCase()) {
+      case 'président':
+      case 'chef':
+        return Colors.purple;
+      case 'vice-président':
+        return Colors.blue;
+      case 'trésorier':
+        return Colors.orange;
+      case 'secrétaire':
+        return Colors.teal;
+      case 'membre du bureau':
+        return Colors.indigo;
+      default:
+        return Colors.green;
+    }
+  }
+
+
+
+  // UI Design: Obtenir le nom de l'association à partir de son ID
+  String _obtenirNomAssociation(String associationId) {
+    if (associationId == 'admin_general') return 'UQAR - Administration';
+    
+    try {
+      final association = _mesAssociations.firstWhere(
+        (assoc) => assoc.id == associationId,
+        orElse: () => throw Exception('Association non trouvée'),
+      );
+      return association.nom;
+    } catch (e) {
+      return 'Association';
+    }
+  }
+
+  // UI Design: Charger les événements dynamiques depuis le repository
+  Future<void> _chargerEvenements() async {
+    setState(() => _chargementEvenements = true);
+
+    try {
+      // Charger tous les événements à venir
+      final tousEvenements = await _evenementsRepository.obtenirEvenements();
+      
+      // Filtrer pour obtenir seulement les événements à venir
+      final evenementsAVenir = tousEvenements
+          .where((e) => e.estAVenir)
+          .take(3) // Limiter à 3 événements pour l'accueil
+          .toList();
+      
+      setState(() {
+        _evenements = evenementsAVenir;
+        _chargementEvenements = false;
+      });
+    } catch (e) {
+      setState(() => _chargementEvenements = false);
+    }
+  }
+
+  // UI Design: Section événements à venir avec design moderne
+  Widget _construireSectionEvenements() {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded( // UI Design: Widget flexible pour éviter les débordements
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Événements à Venir',
+                    style: StylesTexteApp.titre.copyWith(
+                      fontSize: screenWidth * 0.055, // UI Design: Taille adaptative
+                    ),
+                    overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                    maxLines: 1,
+                  ),
+                  Text(
+                    'Prochains événements de vos associations',
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
+                      color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                    ),
+                    overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                    maxLines: 1,
+                  ),
+                ],
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const EvenementsEcran(),
+                  ),
+                );
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenWidth * 0.04, // UI Design: Padding adaptatif
+                  vertical: screenWidth * 0.02,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+                ),
+                child: Text(
+                  'Voir tout',
+                  style: TextStyle(
+                    color: Colors.orange,
+                    fontWeight: FontWeight.w500,
+                    fontSize: screenWidth * 0.03, // UI Design: Taille adaptative
+                  ),
+                  overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                  maxLines: 1,
+                ),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
+        // UI Design: Liste horizontale d'événements dynamiques
+        SizedBox(
+          height: screenHeight * 0.19, // UI Design: Hauteur adaptative
+          child: _chargementEvenements
+            ? const Center(
+                child: CircularProgressIndicator(
+                  color: Colors.orange,
+                  strokeWidth: 2,
+                ),
+              )
+            : _evenements.isEmpty 
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.event_outlined,
+                        size: screenWidth * 0.1,
+                        color: CouleursApp.texteFonce.withValues(alpha: 0.3),
+                      ),
+                      SizedBox(height: screenHeight * 0.01),
+                      Text(
+                        'Aucun événement à venir',
+                        style: TextStyle(
+                          color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                          fontSize: screenWidth * 0.035,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Padding adaptatif
+                  itemCount: _evenements.length,
+                  itemBuilder: (context, index) {
+                    final evenement = _evenements[index];
+                    return Container(
+                      width: screenWidth * 0.45, // UI Design: Largeur adaptative
+                      margin: EdgeInsets.only(right: screenWidth * 0.03), // UI Design: Marge adaptative
+                      decoration: BoxDecoration(
+                        color: CouleursApp.blanc,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.orange.withValues(alpha: 0.08),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.all(screenWidth * 0.03), // UI Design: Padding adaptatif
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Type d'événement avec icône
+                            Row(
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.all(screenWidth * 0.02),
+                                  decoration: BoxDecoration(
+                                    color: Colors.orange.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Icon(
+                                    _obtenirIconeTypeEvenement(evenement.typeEvenement),
+                                    color: Colors.orange,
+                                    size: screenWidth * 0.04,
+                                  ),
+                                ),
+                                SizedBox(width: screenWidth * 0.02),
+                                Expanded(
+                                  child: Text(
+                                    evenement.typeEvenement.toUpperCase(),
+                                    style: TextStyle(
+                                      fontSize: screenWidth * 0.025,
+                                      color: Colors.orange,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: screenHeight * 0.01),
+                            // Titre
+                            Text(
+                              evenement.titre,
+                              style: TextStyle(
+                                fontSize: screenWidth * 0.035,
+                                fontWeight: FontWeight.w600,
+                                color: CouleursApp.texteFonce,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const Spacer(),
+                            // Date et lieu
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.access_time,
+                                  color: Colors.grey[600],
+                                  size: screenWidth * 0.035,
+                                ),
+                                SizedBox(width: screenWidth * 0.02),
+                                Text(
+                                  '${evenement.dateDebut.day}/${evenement.dateDebut.month}',
+                                  style: TextStyle(
+                                    fontSize: screenWidth * 0.03,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                                if (evenement.lieu.isNotEmpty) ...[
+                                  SizedBox(width: screenWidth * 0.03),
+                                  Icon(
+                                    Icons.location_on,
+                                    color: Colors.grey[600],
+                                    size: screenWidth * 0.035,
+                                  ),
+                                  SizedBox(width: screenWidth * 0.02),
+                                  Expanded(
+                                    child: Text(
+                                      evenement.lieu,
+                                      style: TextStyle(
+                                        fontSize: screenWidth * 0.03,
+                                        color: Colors.grey[600],
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                            // Informations d'inscription
+                            if (evenement.inscriptionRequise) ...[
+                              SizedBox(height: screenHeight * 0.01),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.people,
+                                    color: Colors.grey[600],
+                                    size: screenWidth * 0.035,
+                                  ),
+                                  SizedBox(width: screenWidth * 0.02),
+                                  Text(
+                                    '${evenement.nombreInscrits}/${evenement.capaciteMaximale ?? '∞'} inscrits',
+                                    style: TextStyle(
+                                      fontSize: screenWidth * 0.03,
+                                      color: Colors.grey[600],
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  if (evenement.estComplet)
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: screenWidth * 0.02,
+                                        vertical: screenWidth * 0.01,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.red.withValues(alpha: 0.1),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Text(
+                                        'COMPLET',
+                                        style: TextStyle(
+                                          color: Colors.red,
+                                          fontSize: screenWidth * 0.025,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+        ),
+      ],
     );
+  }
+
+  // UI Design: Obtenir l'icône selon le type d'événement
+  IconData _obtenirIconeTypeEvenement(String type) {
+    switch (type.toLowerCase()) {
+      case 'conference':
+        return Icons.mic;
+      case 'atelier':
+        return Icons.build;
+      case 'soiree':
+        return Icons.celebration;
+      case 'sportif':
+        return Icons.sports;
+      case 'culturel':
+        return Icons.theater_comedy;
+      case 'academique':
+        return Icons.school;
+      default:
+        return Icons.event;
+    }
   }
 } 

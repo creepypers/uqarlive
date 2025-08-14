@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+
 import '../../core/theme/app_theme.dart';
 
 // UI Design: Utilitaires centralisés pour les associations UQAR
 class AssociationsUtils {
-  
   /// Obtenir l'icône selon le type d'association
   static IconData obtenirIconeType(String type) {
     switch (type) {
@@ -51,4 +51,4 @@ class AssociationsUtils {
         return 'Autre';
     }
   }
-} 
+}

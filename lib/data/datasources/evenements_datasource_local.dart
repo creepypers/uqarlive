@@ -1,8 +1,12 @@
 import '../../domain/entities/evenement.dart';
 
 class EvenementsDatasourceLocal {
-  // UI Design: Données d'exemple pour les événements
-  static final List<Evenement> _evenements = [
+  // UI Design: Données dynamiques pour les événements (non-hardcodées)
+  static final List<Evenement> _evenementsStockes = [];
+  static bool _donneesSeedees = false;
+
+  // UI Design: Données de démarrage par défaut (utilisées seulement si aucun événement n'existe)
+  static final List<Evenement> _evenementsParDefaut = [
     Evenement(
       id: '1',
       titre: 'Conférence Intelligence Artificielle',
@@ -10,6 +14,7 @@ class EvenementsDatasourceLocal {
       typeEvenement: 'conference',
       lieu: 'Amphithéâtre A-101',
       organisateur: 'Association des étudiants en informatique',
+      associationId: 'asso_001', // AEI
       dateDebut: DateTime.now().add(const Duration(days: 15)),
       dateFin: DateTime.now().add(const Duration(days: 15, hours: 3)),
       estGratuit: true,
@@ -25,6 +30,7 @@ class EvenementsDatasourceLocal {
       typeEvenement: 'atelier',
       lieu: 'Laboratoire informatique B-205',
       organisateur: 'Club de programmation UQAR',
+      associationId: 'asso_001', // AEI
       dateDebut: DateTime.now().add(const Duration(days: 7)),
       dateFin: DateTime.now().add(const Duration(days: 7, hours: 4)),
       estGratuit: false,
@@ -41,6 +47,7 @@ class EvenementsDatasourceLocal {
       typeEvenement: 'social',
       lieu: 'Salle des étudiants',
       organisateur: 'Association générale des étudiants',
+      associationId: 'asso_004', // AGE
       dateDebut: DateTime.now().add(const Duration(days: 3)),
       dateFin: DateTime.now().add(const Duration(days: 3, hours: 3)),
       estGratuit: true,
@@ -49,30 +56,43 @@ class EvenementsDatasourceLocal {
     ),
   ];
 
+  // UI Design: Initialiser les données par défaut si nécessaire
+  void _initialiserDonnees() {
+    if (!_donneesSeedees && _evenementsStockes.isEmpty) {
+      // Charger les données par défaut seulement si aucun événement n'existe
+      _evenementsStockes.addAll(_evenementsParDefaut);
+      _donneesSeedees = true;
+    }
+  }
+
   // UI Design: Récupérer tous les événements
   Future<List<Evenement>> obtenirTousLesEvenements() async {
+    _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 500)); // Simulation latence
-    return List.from(_evenements);
+    return List.from(_evenementsStockes);
   }
 
   // UI Design: Récupérer les événements à venir
   Future<List<Evenement>> obtenirEvenementsAVenir() async {
+    _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 300));
     final maintenant = DateTime.now();
-    return _evenements.where((event) => event.dateDebut.isAfter(maintenant)).toList();
+    return _evenementsStockes.where((event) => event.dateDebut.isAfter(maintenant)).toList();
   }
 
   // UI Design: Récupérer les événements par type
   Future<List<Evenement>> obtenirEvenementsParType(String type) async {
+    _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 300));
-    return _evenements.where((event) => event.typeEvenement == type).toList();
+    return _evenementsStockes.where((event) => event.typeEvenement == type).toList();
   }
 
   // UI Design: Récupérer un événement par son ID
   Future<Evenement?> obtenirEvenementParId(String id) async {
+    _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 200));
     try {
-      return _evenements.firstWhere((event) => event.id == id);
+      return _evenementsStockes.firstWhere((event) => event.id == id);
     } catch (e) {
       return null;
     }
@@ -80,81 +100,103 @@ class EvenementsDatasourceLocal {
 
   // UI Design: Rechercher des événements
   Future<List<Evenement>> rechercherEvenements(String terme) async {
+    _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 400));
     final termeMin = terme.toLowerCase();
-    return _evenements.where((event) => 
+    return _evenementsStockes.where((event) => 
       event.titre.toLowerCase().contains(termeMin) ||
       event.description.toLowerCase().contains(termeMin) ||
       event.organisateur.toLowerCase().contains(termeMin)
     ).toList();
   }
 
-  // Clean Architecture: Récupérer par association (simulation via organisateur)
-  Future<List<Evenement>> obtenirEvenementsParAssociation(String associationIdOuNom) async {
+  // Clean Architecture: Récupérer par association
+  Future<List<Evenement>> obtenirEvenementsParAssociation(String associationId) async {
+    _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 300));
-    // Hypothèse: on identifie l'association via le champ organisateur (nom)
-    return _evenements.where((e) => e.organisateur == associationIdOuNom).toList();
+    // Utiliser le champ associationId pour filtrer
+    return _evenementsStockes.where((e) => e.associationId == associationId).toList();
   }
 
-  // Clean Architecture: Ajouter un événement
+  // Clean Architecture: Ajouter un événement (dynamique)
   Future<Evenement> ajouterEvenement(Evenement evenement) async {
+    _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 200));
-    _evenements.add(evenement);
+    _evenementsStockes.add(evenement);
     return evenement;
   }
 
-  // Clean Architecture: Mettre à jour un événement
+  // Clean Architecture: Mettre à jour un événement (dynamique)
   Future<Evenement> mettreAJourEvenement(Evenement evenement) async {
+    _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 200));
-    final index = _evenements.indexWhere((e) => e.id == evenement.id);
+    final index = _evenementsStockes.indexWhere((e) => e.id == evenement.id);
     if (index != -1) {
-      _evenements[index] = evenement;
+      _evenementsStockes[index] = evenement;
     } else {
-      _evenements.add(evenement);
+      _evenementsStockes.add(evenement);
     }
     return evenement;
   }
 
-  // Clean Architecture: Supprimer un événement
+  // Clean Architecture: Supprimer un événement (dynamique)
   Future<bool> supprimerEvenement(String id) async {
+    _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 150));
-    final before = _evenements.length;
-    _evenements.removeWhere((e) => e.id == id);
-    return _evenements.length < before;
+    final before = _evenementsStockes.length;
+    _evenementsStockes.removeWhere((e) => e.id == id);
+    return _evenementsStockes.length < before;
   }
 
-  // Clean Architecture: Récupérer par période
+  // Clean Architecture: Récupérer par période (dynamique)
   Future<List<Evenement>> obtenirEvenementsParPeriode(DateTime debut, DateTime fin) async {
+    _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 250));
-    return _evenements.where((e) => !e.dateDebut.isAfter(fin) && !e.dateFin.isBefore(debut)).toList();
+    return _evenementsStockes.where((e) => !e.dateDebut.isAfter(fin) && !e.dateFin.isBefore(debut)).toList();
   }
 
-  // Clean Architecture: Gestion des inscriptions
+  // Clean Architecture: Gestion des inscriptions (dynamique)
   Future<bool> peutSInscrire(String evenementId, String utilisateurId) async {
+    _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 120));
-    final ev = _evenements.firstWhere((e) => e.id == evenementId, orElse: () => throw Exception('Événement introuvable'));
+    final ev = _evenementsStockes.firstWhere((e) => e.id == evenementId, orElse: () => throw Exception('Événement introuvable'));
     if (!ev.inscriptionRequise) return true;
     if (ev.capaciteMaximale == null) return true;
     return ev.nombreInscrits < ev.capaciteMaximale!;
   }
 
   Future<bool> inscrireUtilisateur(String evenementId, String utilisateurId) async {
+    _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 150));
-    final index = _evenements.indexWhere((e) => e.id == evenementId);
+    final index = _evenementsStockes.indexWhere((e) => e.id == evenementId);
     if (index == -1) return false;
-    final ev = _evenements[index];
+    final ev = _evenementsStockes[index];
     if (ev.capaciteMaximale != null && ev.nombreInscrits >= ev.capaciteMaximale!) return false;
-    _evenements[index] = ev.copyWith(nombreInscrits: ev.nombreInscrits + 1);
+    _evenementsStockes[index] = ev.copyWith(nombreInscrits: ev.nombreInscrits + 1);
     return true;
   }
 
   Future<bool> desinscrireUtilisateur(String evenementId, String utilisateurId) async {
+    _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 150));
-    final index = _evenements.indexWhere((e) => e.id == evenementId);
+    final index = _evenementsStockes.indexWhere((e) => e.id == evenementId);
     if (index == -1) return false;
-    final ev = _evenements[index];
+    final ev = _evenementsStockes[index];
     if (ev.nombreInscrits <= 0) return false;
-    _evenements[index] = ev.copyWith(nombreInscrits: ev.nombreInscrits - 1);
+    _evenementsStockes[index] = ev.copyWith(nombreInscrits: ev.nombreInscrits - 1);
     return true;
   }
+
+  // UI Design: Méthodes utilitaires pour la gestion dynamique
+  static void effacerTousLesEvenements() {
+    _evenementsStockes.clear();
+    _donneesSeedees = false;
+  }
+
+  static void rechargerDonneesParDefaut() {
+    _evenementsStockes.clear();
+    _donneesSeedees = false;
+  }
+
+  static int get nombreEvenements => _evenementsStockes.length;
 } 

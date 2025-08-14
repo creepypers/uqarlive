@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../domain/entities/menu.dart';
+import '../../../domain/repositories/menus_repository.dart';
+import '../../../core/di/service_locator.dart';
 import '../../../presentation/widgets/widget_barre_app_navigation_admin.dart';
 
 // UI Design: Écran d'ajout/modification de menu pour la cantine
@@ -18,6 +20,7 @@ class AdminAjouterMenuEcran extends StatefulWidget {
 
 class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
   final _formKey = GlobalKey<FormState>();
+  late final MenusRepository _menusRepository;
   
   // Contrôleurs pour les champs de texte
   final _nomMenuController = TextEditingController();
@@ -28,7 +31,7 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
   final _nutritionInfoController = TextEditingController();
   
   String _categorieSelectionnee = 'plat_principal';
-  List<String> _ingredients = [];
+
   bool _estDisponible = true;
   bool _estVegetarien = false;
   bool _estVegan = false;
@@ -48,6 +51,7 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
   @override
   void initState() {
     super.initState();
+    _menusRepository = ServiceLocator.obtenirService<MenusRepository>();
     if (widget.menuAModifier != null) {
       // Vérifier si la catégorie existe dans la liste des catégories disponibles
       final categorieExiste = _categories.any((cat) => cat['value'] == widget.menuAModifier!.categorie);
@@ -60,7 +64,7 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
       _allergenesController.text = widget.menuAModifier!.allergenes ?? '';
       _nutritionInfoController.text = widget.menuAModifier!.nutritionInfo ?? '';
       _categorieSelectionnee = categorieExiste ? widget.menuAModifier!.categorie : 'plat_principal';
-      _ingredients = List.from(widget.menuAModifier!.ingredients);
+
       _estDisponible = widget.menuAModifier!.estDisponible;
       _estVegetarien = widget.menuAModifier!.estVegetarien;
       _estVegan = widget.menuAModifier!.estVegan;
@@ -419,7 +423,7 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
           child: ElevatedButton(
             onPressed: _isLoading ? null : _ajouterMenu,
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
+              backgroundColor: CouleursApp.principal,
               foregroundColor: CouleursApp.blanc,
               padding: const EdgeInsets.symmetric(vertical: 18),
               shape: RoundedRectangleBorder(
@@ -453,6 +457,34 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
           ),
         ),
         const SizedBox(height: 12),
+        
+        // Bouton ajouter au menu du jour (seulement si on modifie un menu existant)
+        if (widget.menuAModifier != null) ...[
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: _isLoading ? null : _ajouterAuMenuDuJour,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange,
+                foregroundColor: CouleursApp.blanc,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                elevation: 4,
+              ),
+              icon: const Icon(Icons.star, size: 20),
+              label: const Text(
+                'Ajouter au Menu du Jour',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
         
         // Bouton annuler
         SizedBox(
@@ -533,31 +565,184 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
         _isLoading = true;
       });
 
-      // Simuler l'ajout
-      await Future.delayed(const Duration(seconds: 2));
+      try {
+        if (widget.menuAModifier != null) {
+          // Modification d'un menu existant
+          final menuModifie = Menu(
+            id: widget.menuAModifier!.id,
+            nom: _nomMenuController.text,
+            description: _descriptionController.text,
+            prix: double.parse(_prixController.text),
+            estDisponible: _estDisponible,
+            ingredients: [], 
+            allergenes: _allergenesController.text.isEmpty ? null : _allergenesController.text,
+            categorie: _categorieSelectionnee,
+            calories: _caloriesController.text.isEmpty ? null : int.parse(_caloriesController.text),
+            estVegetarien: _estVegetarien,
+            estVegan: _estVegan,
+            imageUrl: widget.menuAModifier!.imageUrl,
+            dateAjout: widget.menuAModifier!.dateAjout,
+            nutritionInfo: _nutritionInfoController.text.isEmpty ? null : _nutritionInfoController.text,
+            note: widget.menuAModifier!.note,
+          );
+
+          await _menusRepository.mettreAJourMenu(menuModifie);
+
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: [
+                    const Icon(Icons.check_circle, color: Colors.white, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text('Menu "${_nomMenuController.text}" modifié avec succès !'),
+                    ),
+                  ],
+                ),
+                backgroundColor: Colors.green,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              ),
+            );
+          }
+        } else {
+          // Ajout d'un nouveau menu
+          final nouveauMenu = Menu(
+            id: 'menu_${DateTime.now().millisecondsSinceEpoch}',
+            nom: _nomMenuController.text,
+            description: _descriptionController.text,
+            prix: double.parse(_prixController.text),
+            estDisponible: _estDisponible,
+            ingredients: [],  
+            allergenes: _allergenesController.text.isEmpty ? null : _allergenesController.text,
+            categorie: _categorieSelectionnee,
+            calories: _caloriesController.text.isEmpty ? null : int.parse(_caloriesController.text),
+            estVegetarien: _estVegetarien,
+            estVegan: _estVegan,
+            imageUrl: null,
+            dateAjout: DateTime.now(),
+            nutritionInfo: _nutritionInfoController.text.isEmpty ? null : _nutritionInfoController.text,
+            note: 0.0,
+          );
+
+          await _menusRepository.ajouterMenu(nouveauMenu);
+
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: [
+                    const Icon(Icons.check_circle, color: Colors.white, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text('Menu "${_nomMenuController.text}" ajouté avec succès !'),
+                    ),
+                  ],
+                ),
+                backgroundColor: Colors.green,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              ),
+            );
+          }
+        }
+
+        // Retourner à l'écran précédent avec un indicateur de succès
+        if (mounted) {
+          Navigator.pop(context, true);
+        }
+      } catch (e) {
+        setState(() {
+          _isLoading = false;
+        });
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.error_outline, color: Colors.white, size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text('Erreur: $e'),
+                  ),
+                ],
+              ),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  // UI Design: Ajouter le menu au menu du jour
+  void _ajouterAuMenuDuJour() async {
+    if (widget.menuAModifier == null) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // UI Design: Définir ce menu comme menu du jour en utilisant le repository
+      await _menusRepository.definirMenuDuJour(widget.menuAModifier!.id);
 
       setState(() {
         _isLoading = false;
       });
 
       // Afficher confirmation
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.check_circle, color: Colors.white, size: 20),
-              const SizedBox(width: 8),
-              Text('Menu "${_nomMenuController.text}" ajouté avec succès !'),
-            ],
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.star, color: Colors.white, size: 20),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text('Menu "${widget.menuAModifier!.nom}" ajouté au menu du jour !'),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.orange,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           ),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        ),
-      );
+        );
+      }
 
-      // Retourner à l'écran précédent
-      Navigator.pop(context);
+      // Retourner à l'écran précédent avec un indicateur de succès
+      if (mounted) {
+        Navigator.pop(context, 'menu_du_jour_ajoute');
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+
+      // Afficher erreur
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.white, size: 20),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text('Erreur lors de l\'ajout au menu du jour: $e'),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          ),
+        );
+      }
     }
   }
 } 

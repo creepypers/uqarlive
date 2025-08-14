@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/di/service_locator.dart';
+import '../services/authentification_service.dart';
+import '../screens/admin/admin_dashboard_ecran.dart';
+import '../screens/admin/admin_gestion_comptes_ecran.dart';
+import '../screens/admin/admin_gestion_cantine_ecran.dart';
+import '../screens/admin/admin_gestion_associations_ecran.dart';
+import '../screens/utilisateur/connexion_ecran.dart';
 
 // UI Design: AppBar spécialisée pour la navigation admin
 class WidgetBarreAppAdmin extends StatelessWidget implements PreferredSizeWidget {
@@ -142,20 +149,28 @@ class WidgetBarreAppAdmin extends StatelessWidget implements PreferredSizeWidget
   void _gererNavigationRapide(BuildContext context, String valeur) {
     switch (valeur) {
       case 'dashboard':
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          '/admin-dashboard',
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const AdminDashboardEcran()),
           (route) => false,
         );
         break;
       case 'comptes':
-        Navigator.pushNamed(context, '/admin-comptes');
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const AdminGestionComptesEcran()),
+        );
         break;
       case 'cantine':
-        Navigator.pushNamed(context, '/admin-cantine');
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const AdminGestionCantineEcran()),
+        );
         break;
       case 'actualites':
-        Navigator.pushNamed(context, '/admin-actualites');
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const AdminGestionAssociationsEcran()),
+        );
         break;
       case 'deconnexion':
         _afficherDialogueDeconnexion(context);
@@ -175,29 +190,58 @@ class WidgetBarreAppAdmin extends StatelessWidget implements PreferredSizeWidget
             child: const Text('Annuler'),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                '/connexion',
-                (route) => false,
-              );
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.white, size: 20),
-                      SizedBox(width: 8),
-                      Text('Déconnexion réussie'),
-                    ],
-                  ),
-                  backgroundColor: Colors.green,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              );
+              
+              try {
+                // UI Design: Déconnexion via le service d'authentification
+                final authentificationService = ServiceLocator.obtenirService<AuthentificationService>();
+                await authentificationService.deconnecter();
+                
+                // UI Design: Navigation vers l'écran de connexion avec nettoyage complet des routes
+                if (context.mounted) {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => const ConnexionEcran()),
+                    (route) => false,
+                  );
+                  
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Row(
+                        children: [
+                          Icon(Icons.check_circle, color: Colors.white, size: 20),
+                          SizedBox(width: 8),
+                          Text('Déconnexion réussie'),
+                        ],
+                      ),
+                      backgroundColor: Colors.green,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Row(
+                        children: [
+                          const Icon(Icons.error, color: Colors.white, size: 20),
+                          const SizedBox(width: 8),
+                          Text('Erreur lors de la déconnexion: $e'),
+                        ],
+                      ),
+                      backgroundColor: Colors.red,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  );
+                }
+              }
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             child: const Text('Se déconnecter', style: TextStyle(color: Colors.white)),

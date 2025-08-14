@@ -91,7 +91,7 @@ class AuthentificationService {
       // Vérifier qu'on ne retire pas les privilèges admin du dernier admin
       if (utilisateur.aPrivilege('admin') && !nouveauxPrivileges.contains('admin')) {
         final tousUtilisateurs = await _utilisateursRepository.obtenirTousLesUtilisateurs();
-        final admins = tousUtilisateurs.where((u) => u.aPrivilege('admin') || u.typeUtilisateur == 'admin').toList();
+        final admins = tousUtilisateurs.where((u) => u.aPrivilege('admin') || u.typeUtilisateur == TypeUtilisateur.administrateur).toList();
         if (admins.length <= 1) {
           return false; // Ne pas retirer le dernier admin
         }

@@ -25,6 +25,7 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
   List<Menu> _menus = [];
   Map<String, Map<String, String>> _horaires = {};
   bool _chargementEnCours = true;
+  String? _menuDuJourId; // UI Design: Menu du jour sélectionné
 
   @override
   void initState() {
@@ -38,15 +39,17 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
     try {
       setState(() => _chargementEnCours = true);
       
-      // Charger menus et horaires en parallèle
+      // Charger menus, horaires et menu du jour en parallèle
       final futures = await Future.wait<dynamic>([
         _menusRepository.obtenirTousLesMenus(),
         Future.value(_horairesDatasource.obtenirTousLesHorairesCantine()),
+        _menusRepository.obtenirMenuDuJourActuel(),
       ]);
       
       setState(() {
         _menus = futures[0] as List<Menu>;
         _horaires = _convertirHorairesEnString(futures[1] as Map<String, Map<String, TimeOfDay>>);
+        _menuDuJourId = futures[2] as String?;
         _chargementEnCours = false;
       });
     } catch (e) {
@@ -93,6 +96,8 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _construireStatutCantine(),
+                    SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
+                    _construireGestionMenuDuJour(),
                     SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
                     _construireGestionHoraires(),
                     SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
@@ -151,19 +156,357 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
     );
   }
 
-  Widget _construireInfoStatut(String titre, String valeur) {
-    return Column(
-      children: [
-        Text(
-          titre,
-          style: StylesTexteApp.petitBlanc,
+  // UI Design: Gestion moderne du menu du jour avec design premium
+  Widget _construireGestionMenuDuJour() {
+    Menu? menuDuJour;
+    
+    // UI Design: Rechercher le menu du jour sélectionné
+    if (_menuDuJourId != null && _menuDuJourId!.isNotEmpty) {
+      try {
+        menuDuJour = _menus.firstWhere((menu) => menu.id == _menuDuJourId);
+      } catch (e) {
+        // Menu du jour non trouvé
+        menuDuJour = null;
+      }
+    }
+
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.orange.withValues(alpha: 0.05),
+            Colors.deepOrange.withValues(alpha: 0.02),
+          ],
         ),
-        const SizedBox(height: 4),
-        Text(
-          valeur,
-          style: StylesTexteApp.moyenBlanc.copyWith(fontWeight: FontWeight.bold),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: menuDuJour != null ? Colors.orange.withValues(alpha: 0.3) : CouleursApp.gris.withValues(alpha: 0.2),
+          width: 2,
         ),
-      ],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.orange.withValues(alpha: 0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(screenWidth * 0.05),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // En-tête premium avec badges
+            Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(screenWidth * 0.03),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Colors.orange, Colors.deepOrange],
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.orange.withValues(alpha: 0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Icon(
+                    Icons.star,
+                    color: Colors.white,
+                    size: screenWidth * 0.06,
+                  ),
+                ),
+                SizedBox(width: screenWidth * 0.04),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              'Menu du Jour Spécial',
+                              style: TextStyle(
+                                fontSize: screenWidth * 0.05,
+                                fontWeight: FontWeight.bold,
+                                color: CouleursApp.texteFonce,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          SizedBox(width: screenWidth * 0.02),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: screenWidth * 0.02,
+                              vertical: screenWidth * 0.008,
+                            ),
+                            decoration: BoxDecoration(
+                              color: menuDuJour != null ? Colors.green.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: menuDuJour != null ? Colors.green.withValues(alpha: 0.3) : Colors.grey.withValues(alpha: 0.3),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  menuDuJour != null ? Icons.check_circle : Icons.radio_button_unchecked,
+                                  size: screenWidth * 0.03,
+                                  color: menuDuJour != null ? Colors.green : Colors.grey,
+                                ),
+                                SizedBox(width: screenWidth * 0.008),
+                                Text(
+                                  menuDuJour != null ? 'ACTIF' : 'INACTIF',
+                                  style: TextStyle(
+                                    fontSize: screenWidth * 0.025,
+                                    fontWeight: FontWeight.bold,
+                                    color: menuDuJour != null ? Colors.green : Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: screenHeight * 0.005),
+                      Text(
+                        menuDuJour != null 
+                          ? 'Menu recommandé par notre chef'
+                          : 'Aucun menu spécial défini',
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.032,
+                          color: menuDuJour != null ? Colors.orange.shade700 : CouleursApp.gris,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: screenHeight * 0.025),
+
+            if (menuDuJour != null) ...[
+              // Carte du menu actuel - Design premium
+              Container(
+                padding: EdgeInsets.all(screenWidth * 0.04),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: Colors.orange.withValues(alpha: 0.2),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.orange.withValues(alpha: 0.05),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: screenWidth * 0.15,
+                      height: screenWidth * 0.15,
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.restaurant_menu,
+                        color: Colors.orange.shade700,
+                        size: screenWidth * 0.07,
+                      ),
+                    ),
+                    SizedBox(width: screenWidth * 0.03),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            menuDuJour.nom,
+                            style: TextStyle(
+                              fontSize: screenWidth * 0.042,
+                              fontWeight: FontWeight.bold,
+                              color: CouleursApp.texteFonce,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          SizedBox(height: screenHeight * 0.005),
+                          Text(
+                            menuDuJour.description,
+                            style: TextStyle(
+                              fontSize: screenWidth * 0.032,
+                              color: CouleursApp.texteFonce.withValues(alpha: 0.7),
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          SizedBox(height: screenHeight * 0.008),
+                          Row(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: screenWidth * 0.02,
+                                  vertical: screenWidth * 0.008,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.orange,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  '${menuDuJour.prix.toStringAsFixed(2)}€',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: screenWidth * 0.03,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: screenWidth * 0.02),
+                              if (menuDuJour.estVegetarien) ...[
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: screenWidth * 0.015,
+                                    vertical: screenWidth * 0.006,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.green.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    menuDuJour.estVegan ? 'VEGAN' : 'VÉGÉ',
+                                    style: TextStyle(
+                                      fontSize: screenWidth * 0.025,
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: screenHeight * 0.02),
+            ] else ...[
+              // État vide avec design moderne
+              Container(
+                padding: EdgeInsets.all(screenWidth * 0.06),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: CouleursApp.gris.withValues(alpha: 0.2),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(screenWidth * 0.04),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: Icon(
+                        Icons.restaurant_menu_outlined,
+                        color: Colors.grey.withValues(alpha: 0.6),
+                        size: screenWidth * 0.08,
+                      ),
+                    ),
+                    SizedBox(height: screenHeight * 0.015),
+                    Text(
+                      'Aucun menu du jour défini',
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.04,
+                        fontWeight: FontWeight.w600,
+                        color: CouleursApp.texteFonce.withValues(alpha: 0.7),
+                      ),
+                    ),
+                    SizedBox(height: screenHeight * 0.008),
+                    Text(
+                      'Modifiez un menu et utilisez\n"Ajouter au Menu du Jour"',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.032,
+                        color: CouleursApp.texteFonce.withValues(alpha: 0.5),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: screenHeight * 0.02),
+            ],
+
+            // Actions
+            if (menuDuJour != null) ...[
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: _retirerMenuDuJour,
+                  icon: const Icon(Icons.clear, size: 18),
+                  label: const Text('Retirer le Menu du Jour'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(vertical: screenHeight * 0.018),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    elevation: 4,
+                  ),
+                ),
+              ),
+            ] else ...[
+              // Bouton d'aide pour définir un menu
+              Container(
+                padding: EdgeInsets.all(screenWidth * 0.04),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.blue.withValues(alpha: 0.2)),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.lightbulb_outline,
+                      color: Colors.blue.shade600,
+                      size: screenWidth * 0.05,
+                    ),
+                    SizedBox(width: screenWidth * 0.03),
+                    Expanded(
+                      child: Text(
+                        'Astuce : Modifiez un menu existant puis cliquez sur "Ajouter au Menu du Jour" pour le définir comme menu spécial.',
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.032,
+                          color: Colors.blue.shade700,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
     );
   }
 
@@ -175,8 +518,8 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Expanded( // UI Design: Utiliser Expanded pour le titre
-              child: const Text(
+            const Expanded( // UI Design: Utiliser Expanded pour le titre
+              child: Text(
                 'Horaires d\'Ouverture',
                 style: StylesTexteApp.grandTitre,
               ),
@@ -288,13 +631,28 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'Menus Disponibles',
-              style: StylesTexteApp.grandTitre,
+            const Expanded(
+              child: Text(
+                'Menus Disponibles',
+                style: StylesTexteApp.grandTitre,
+              ),
             ),
-            Text(
-              '${_menus.length} menu(s)',
-              style: StylesTexteApp.corpsGris,
+            Row(
+              children: [
+                Text(
+                  '${_menus.length} menu(s)',
+                  style: StylesTexteApp.corpsGris,
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  onPressed: _actualiserMenus,
+                  icon: const Icon(
+                    Icons.refresh,
+                    color: CouleursApp.accent,
+                  ),
+                  tooltip: 'Actualiser la liste',
+                ),
+              ],
             ),
           ],
         ),
@@ -325,14 +683,22 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
               hauteur: 200,
               actionsPersonnalisees: [
                 IconButton(
+                  onPressed: () => _dupliquerMenu(menu),
+                  icon: const Icon(Icons.copy, color: Colors.orange, size: 20),
+                  constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                  tooltip: 'Dupliquer',
+                ),
+                IconButton(
                   onPressed: () => _modifierMenu(menu),
                   icon: const Icon(Icons.edit, color: CouleursApp.accent, size: 20),
                   constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                  tooltip: 'Modifier',
                 ),
                 IconButton(
                   onPressed: () => _supprimerMenu(menu),
                   icon: const Icon(Icons.delete, color: Colors.red, size: 20),
                   constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                  tooltip: 'Supprimer',
                 ),
               ],
             ),
@@ -349,86 +715,9 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
 
 
 
-  // UI Design: Actions rapides
-  Widget _construireActionsRapides() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Actions Rapides',
-          style: StylesTexteApp.grandTitre,
-        ),
-        const SizedBox(height: 16),
-        GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-          childAspectRatio: 2.5,
-          children: [
-            _construireBoutonActionRapide(
-              'Menu du Jour',
-              Icons.today,
-              CouleursApp.principal,
-              _definirMenuDuJour,
-            ),
-            _construireBoutonActionRapide(
-              'Fermeture Urgente',
-              Icons.warning,
-              Colors.red,
-              _fermetureUrgente,
-            ),
-            _construireBoutonActionRapide(
-              'Mise à Jour Prix',
-              Icons.euro,
-              CouleursApp.accent,
-              _mettreAJourPrix,
-            ),
-            _construireBoutonActionRapide(
-              'Rapport Activité',
-              Icons.analytics,
-              Colors.green,
-              _genererRapport,
-            ),
-          ],
-        ),
-      ],
-    );
-  }
 
-  Widget _construireBoutonActionRapide(
-    String titre,
-    IconData icone,
-    Color couleur,
-    VoidCallback onPressed,
-  ) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: couleur,
-        foregroundColor: CouleursApp.blanc,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 4,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icone, size: 20),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              titre,
-              style: StylesTexteApp.petitBlanc.copyWith(fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-              maxLines: 2, // UI Design: Limiter à 2 lignes
-              overflow: TextOverflow.ellipsis, // UI Design: Gérer le débordement
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+
+
 
   // UI Design: Méthodes utilitaires
   String _obtenirJourSemaine(int weekday) {
@@ -495,172 +784,448 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
   }
 
   // UI Design: Actions de gestion
-  void _changerStatutCantine(bool nouvelEtat) {
-    showDialog(
-      context: context,
-      builder: (context) => LayoutBuilder(builder: (context, constraints) {
-        final w = MediaQuery.of(context).size.width * 0.9;
-        return ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: w),
-          child: AlertDialog(
-        title: Text('${nouvelEtat ? "Ouvrir" : "Fermer"} la Cantine'),
-        content: Text('Voulez-vous vraiment ${nouvelEtat ? "ouvrir" : "fermer"} la cantine maintenant ?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Annuler'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Cantine ${nouvelEtat ? "ouverte" : "fermée"} avec succès !'),
-                  backgroundColor: Colors.green,
-                ),
-              );
-            },
-            child: Text(nouvelEtat ? 'Ouvrir' : 'Fermer'),
-          ),
-        ],
-          ),
-        );
-      }),
+
+  void _modifierHoraireJour(String jour) async {
+    final resultat = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AdminModifierHorairesEcran(jourInitial: jour),
+      ),
     );
+    
+    // UI Design: Recharger les données si modification réussie
+    if (resultat == true) {
+      await _chargerDonnees();
+    }
   }
 
-  void _modifierHoraireJour(String jour) {
-    Navigator.push(
+  void _modifierTousLesHoraires() async {
+    final resultat = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => const AdminModifierHorairesEcran(),
       ),
     );
+    
+    // UI Design: Recharger les données si modification réussie
+    if (resultat == true) {
+      await _chargerDonnees();
+    }
   }
 
-  void _modifierTousLesHoraires() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const AdminModifierHorairesEcran(),
-      ),
-    );
-  }
-
-  void _ajouterNouveauMenu() {
-    Navigator.push(
+  void _ajouterNouveauMenu() async {
+    final resultat = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => const AdminAjouterMenuEcran(),
       ),
     );
+    
+    // Si un menu a été ajouté, recharger les données
+    if (resultat == true) {
+      await _chargerDonnees();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Menu ajouté avec succès !'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    }
   }
 
-  void _modifierMenu(Menu menu) {
-    Navigator.push(
+  void _modifierMenu(Menu menu) async {
+    final resultat = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => AdminAjouterMenuEcran(menuAModifier: menu),
       ),
     );
+    
+    // Si un menu a été modifié ou ajouté au menu du jour, recharger les données
+    if (resultat == true || resultat == 'menu_du_jour_ajoute') {
+      await _chargerDonnees();
+      if (mounted) {
+        if (resultat == 'menu_du_jour_ajoute') {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Menu défini comme menu du jour !'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Menu modifié avec succès !'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      }
+    }
   }
 
   void _supprimerMenu(Menu menu) {
     showDialog(
       context: context,
-      builder: (context) => LayoutBuilder(builder: (context, constraints) {
-        final w = MediaQuery.of(context).size.width * 0.9;
-        return ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: w),
-          child: AlertDialog(
-        title: const Text('Supprimer le menu'),
-        content: Text('Voulez-vous supprimer le menu "${menu.nom}" ?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Annuler'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              setState(() {
-                _menus.removeWhere((m) => m.id == menu.id);
-              });
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Menu supprimé avec succès !'),
-                  backgroundColor: Colors.green,
+      builder: (context) => LayoutBuilder(
+        builder: (context, constraints) {
+          final screenWidth = MediaQuery.of(context).size.width;
+          final screenHeight = MediaQuery.of(context).size.height;
+          
+          return AlertDialog(
+            backgroundColor: CouleursApp.blanc,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            titlePadding: EdgeInsets.fromLTRB(
+              screenWidth * 0.05,
+              screenHeight * 0.025,
+              screenWidth * 0.05,
+              screenHeight * 0.01,
+            ),
+            contentPadding: EdgeInsets.fromLTRB(
+              screenWidth * 0.05,
+              0,
+              screenWidth * 0.05,
+              screenHeight * 0.02,
+            ),
+            actionsPadding: EdgeInsets.fromLTRB(
+              screenWidth * 0.05,
+              0,
+              screenWidth * 0.05,
+              screenHeight * 0.02,
+            ),
+            title: Row(
+              children: [
+                Icon(
+                  Icons.delete_forever,
+                  color: Colors.red,
+                  size: screenWidth * 0.06,
                 ),
-              );
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Supprimer'),
-          ),
-        ],
-          ),
-        );
-      }),
-    );
-  }
-
-  void _definirMenuDuJour() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Définition menu du jour - Fonctionnalité en développement'),
-        backgroundColor: Colors.blue,
+                SizedBox(width: screenWidth * 0.03),
+                Expanded(
+                  child: Text(
+                    'Supprimer le menu',
+                    style: StylesTexteApp.moyenTitre.copyWith(
+                      color: Colors.red,
+                      fontSize: screenWidth * 0.045,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            content: SizedBox(
+              width: screenWidth * 0.8,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Voulez-vous supprimer le menu :',
+                    style: StylesTexteApp.corpsNormal.copyWith(
+                      fontSize: screenWidth * 0.04,
+                    ),
+                  ),
+                  SizedBox(height: screenHeight * 0.01),
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(screenWidth * 0.03),
+                    decoration: BoxDecoration(
+                      color: CouleursApp.principal.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: CouleursApp.principal.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    child: Text(
+                      '"${menu.nom}"',
+                      style: StylesTexteApp.corpsNormal.copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: screenWidth * 0.04,
+                        color: CouleursApp.principal,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  SizedBox(height: screenHeight * 0.015),
+                  Container(
+                    padding: EdgeInsets.all(screenWidth * 0.03),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.warning,
+                          color: Colors.red,
+                          size: screenWidth * 0.05,
+                        ),
+                        SizedBox(width: screenWidth * 0.02),
+                        Expanded(
+                          child: Text(
+                            'Cette action est irréversible',
+                            style: StylesTexteApp.petitGris.copyWith(
+                              color: Colors.red[700],
+                              fontSize: screenWidth * 0.035,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              SizedBox(
+                width: double.infinity,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: screenHeight * 0.015),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            side: BorderSide(
+                              color: CouleursApp.gris.withValues(alpha: 0.5),
+                            ),
+                          ),
+                        ),
+                        child: Text(
+                          'Annuler',
+                          style: TextStyle(
+                            color: CouleursApp.gris,
+                            fontSize: screenWidth * 0.04,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: screenWidth * 0.03),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          Navigator.pop(context);
+                          
+                          try {
+                            // Utiliser le repository pour supprimer le menu
+                            final succes = await _menusRepository.supprimerMenu(menu.id);
+                            
+                            if (succes) {
+                              await _chargerDonnees(); // Recharger les données
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Menu supprimé avec succès !'),
+                                    backgroundColor: Colors.green,
+                                  ),
+                                );
+                              }
+                            } else {
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Erreur lors de la suppression du menu'),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              }
+                            }
+                          } catch (e) {
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Erreur: $e'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(vertical: screenHeight * 0.015),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: Text(
+                          'Supprimer',
+                          style: TextStyle(
+                            fontSize: screenWidth * 0.04,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
 
-  void _fermetureUrgente() {
+
+
+  // UI Design: Actualiser la liste des menus
+  Future<void> _actualiserMenus() async {
+    await _chargerDonnees();
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Liste des menus actualisée'),
+          backgroundColor: Colors.blue,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  // UI Design: Dupliquer un menu existant
+  void _dupliquerMenu(Menu menu) async {
+    try {
+      // Créer une copie du menu avec un nouvel ID et un nom modifié
+      final menuDuplique = Menu(
+        id: 'menu_${DateTime.now().millisecondsSinceEpoch}',
+        nom: '${menu.nom} (Copie)',
+        description: menu.description,
+        prix: menu.prix,
+        estDisponible: menu.estDisponible,
+        ingredients: menu.ingredients,
+        allergenes: menu.allergenes,
+        categorie: menu.categorie,
+        calories: menu.calories,
+        estVegetarien: menu.estVegetarien,
+        estVegan: menu.estVegan,
+        imageUrl: menu.imageUrl,
+        dateAjout: DateTime.now(), // Nouvelle date pour la copie
+        nutritionInfo: menu.nutritionInfo,
+        note: menu.note,
+      );
+
+      // Ajouter le menu dupliqué via le repository
+      await _menusRepository.ajouterMenu(menuDuplique);
+      
+      // Recharger les données
+      await _chargerDonnees();
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Menu "${menu.nom}" dupliqué avec succès !'),
+            backgroundColor: Colors.green,
+            action: SnackBarAction(
+              label: 'Modifier',
+              onPressed: () => _modifierMenu(menuDuplique),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erreur lors de la duplication: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+
+
+  // UI Design: Retirer le menu du jour via le repository
+  void _retirerMenuDuJour() async {
     showDialog(
       context: context,
-      builder: (context) => LayoutBuilder(builder: (context, constraints) {
-        final w = MediaQuery.of(context).size.width * 0.9;
-        return ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: w),
-          child: AlertDialog(
-        title: const Text('Fermeture d\'Urgence'),
-        content: const Text('Cette action fermera immédiatement la cantine et enverra une notification à tous les utilisateurs.'),
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.red.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(Icons.clear, color: Colors.red),
+            ),
+            const SizedBox(width: 12),
+            const Text(
+              'Retirer le Menu du Jour',
+              style: StylesTexteApp.moyenTitre,
+            ),
+          ],
+        ),
+        content: const Text(
+          'Êtes-vous sûr de vouloir retirer le menu du jour actuel ? '
+          'Les clients ne verront plus de menu spécial aujourd\'hui.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text('Annuler'),
           ),
           ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Fermeture d\'urgence activée ! Notifications envoyées.'),
-                  backgroundColor: Colors.red,
-                ),
-              );
+            onPressed: () async {
+              try {
+                // Retirer le menu du jour via le repository
+                await _menusRepository.definirMenuDuJour('');
+                
+                if (mounted) {
+                  Navigator.pop(context);
+                }
+                
+                // Recharger les données
+                await _chargerDonnees();
+                
+                if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Row(
+                          children: [
+                            Icon(Icons.check_circle, color: Colors.white, size: 20),
+                            SizedBox(width: 8),
+                            Text('Menu du jour retiré avec succès'),
+                          ],
+                        ),
+                        backgroundColor: Colors.green,
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    );
+                }
+              } catch (e) {
+                if (mounted) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Erreur lors du retrait: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Confirmer'),
+            child: const Text('Retirer', style: TextStyle(color: Colors.white)),
           ),
         ],
-          ),
-        );
-      }),
-    );
-  }
-
-  void _mettreAJourPrix() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Mise à jour des prix - Fonctionnalité en développement'),
-        backgroundColor: Colors.orange,
-      ),
-    );
-  }
-
-  void _genererRapport() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Génération rapport d\'activité - Fonctionnalité en développement'),
-        backgroundColor: Colors.green,
       ),
     );
   }

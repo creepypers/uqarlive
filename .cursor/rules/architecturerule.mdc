@@ -1,6 +1,4 @@
 ---
-description:
-globs:
 alwaysApply: false
 ---
 You are an expert Flutter architect following Clean Architecture principles. I want to structure this project using the following clean layers:

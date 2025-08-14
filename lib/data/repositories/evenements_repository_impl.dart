@@ -39,13 +39,23 @@ class EvenementsRepositoryImpl implements EvenementsRepository {
   }
 
   @override
-  Future<Evenement> ajouterEvenement(Evenement evenement) async {
-    return _datasource.ajouterEvenement(evenement);
+  Future<bool> ajouterEvenement(Evenement evenement) async {
+    try {
+      await _datasource.ajouterEvenement(evenement);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   @override
-  Future<Evenement> mettreAJourEvenement(Evenement evenement) async {
-    return _datasource.mettreAJourEvenement(evenement);
+  Future<bool> mettreAJourEvenement(Evenement evenement) async {
+    try {
+      await _datasource.mettreAJourEvenement(evenement);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   @override

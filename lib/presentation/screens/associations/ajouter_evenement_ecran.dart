@@ -1,16 +1,19 @@
-// UI Design: Écran d'ajout d'événements pour les chefs d'association
+// UI Design: Écran d'ajout/modification d'événements pour les chefs d'association
 import 'package:flutter/material.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../domain/entities/evenement.dart';
+
+import '../../../core/di/service_locator.dart';
 import '../../../domain/entities/association.dart';
-import '../../../presentation/services/evenements_service.dart';
+import '../../../domain/entities/evenement.dart';
+import '../../../domain/repositories/evenements_repository.dart';
 
 class AjouterEvenementEcran extends StatefulWidget {
   final Association association;
+  final Evenement? evenementAModifier; // UI Design: Support de la modification
 
   const AjouterEvenementEcran({
     Key? key,
     required this.association,
+    this.evenementAModifier,
   }) : super(key: key);
 
   @override
@@ -23,13 +26,17 @@ class _AjouterEvenementEcranState extends State<AjouterEvenementEcran> {
   final _descriptionController = TextEditingController();
   final _lieuController = TextEditingController();
   final _organisateurController = TextEditingController();
+  final _prixController = TextEditingController();
   
   DateTime _dateDebut = DateTime.now();
   DateTime _dateFin = DateTime.now().add(const Duration(hours: 2));
   String _typeEvenement = 'reunion';
   int _capaciteMaximale = 50;
+  double _prix = 0.0;
+  bool _inscriptionRequise = false;
   bool _chargement = false;
-  late final EvenementsService _evenementsService;
+  bool _modeModification = false;
+  late final EvenementsRepository _evenementsRepository;
 
   final List<String> _typesEvenements = [
     'reunion',
@@ -43,7 +50,25 @@ class _AjouterEvenementEcranState extends State<AjouterEvenementEcran> {
   @override
   void initState() {
     super.initState();
-    _evenementsService = EvenementsService();
+    _evenementsRepository = ServiceLocator.obtenirService<EvenementsRepository>();
+    _modeModification = widget.evenementAModifier != null;
+    
+    if (_modeModification) {
+      _remplirFormulaire(widget.evenementAModifier!);
+    }
+  }
+
+  void _remplirFormulaire(Evenement evenement) {
+    _titreController.text = evenement.titre;
+    _descriptionController.text = evenement.description;
+    _lieuController.text = evenement.lieu;
+    _organisateurController.text = evenement.organisateur;
+    _prixController.text = evenement.prix?.toString() ?? '0';
+    _dateDebut = evenement.dateDebut;
+    _dateFin = evenement.dateFin;
+    _typeEvenement = evenement.typeEvenement;
+    _prix = evenement.prix ?? 0.0;
+    _inscriptionRequise = evenement.inscriptionRequise;
   }
 
   @override
@@ -52,6 +77,7 @@ class _AjouterEvenementEcranState extends State<AjouterEvenementEcran> {
     _descriptionController.dispose();
     _lieuController.dispose();
     _organisateurController.dispose();
+    _prixController.dispose();
     super.dispose();
   }
 
@@ -134,23 +160,51 @@ class _AjouterEvenementEcranState extends State<AjouterEvenementEcran> {
     });
 
     try {
-      // Utilisation du service pour créer l'événement
-      await _evenementsService.creerEvenement(
+      final evenement = Evenement(
+        id: _modeModification ? widget.evenementAModifier!.id : 'evt_${DateTime.now().millisecondsSinceEpoch}',
         titre: _titreController.text.trim(),
         description: _descriptionController.text.trim(),
         lieu: _lieuController.text.trim(),
         organisateur: _organisateurController.text.trim(),
+        associationId: widget.association.id,
         dateDebut: _dateDebut,
         dateFin: _dateFin,
         typeEvenement: _typeEvenement,
-        capaciteMaximale: _capaciteMaximale,
+        dateCreation: _modeModification ? widget.evenementAModifier!.dateCreation : DateTime.now(),
+        prix: _prix,
+        inscriptionRequise: _inscriptionRequise,
       );
+
+      bool succes = false;
+      if (_modeModification) {
+        succes = await _evenementsRepository.mettreAJourEvenement(evenement);
+      } else {
+        succes = await _evenementsRepository.ajouterEvenement(evenement);
+      }
+
+      if (!succes) {
+        throw Exception('Échec de l\'opération');
+      }
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Événement créé avec succès !'),
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle, color: Colors.white, size: 20),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    _modeModification 
+                      ? 'Événement modifié avec succès !' 
+                      : 'Événement créé avec succès !',
+                  ),
+                ),
+              ],
+            ),
             backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           ),
         );
         Navigator.pop(context, true);
@@ -159,8 +213,16 @@ class _AjouterEvenementEcranState extends State<AjouterEvenementEcran> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erreur: $e'),
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.white, size: 20),
+                const SizedBox(width: 8),
+                Expanded(child: Text('Erreur: $e')),
+              ],
+            ),
             backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           ),
         );
       }
@@ -207,7 +269,7 @@ class _AjouterEvenementEcranState extends State<AjouterEvenementEcran> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.08),
+                        color: Colors.black.withValues(alpha: 0.08),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),
@@ -221,7 +283,7 @@ class _AjouterEvenementEcranState extends State<AjouterEvenementEcran> {
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF005499).withOpacity(0.1),
+                              color: const Color(0xFF005499).withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: const Icon(
@@ -269,7 +331,7 @@ class _AjouterEvenementEcranState extends State<AjouterEvenementEcran> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.08),
+                        color: Colors.black.withValues(alpha: 0.08),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),

@@ -1,9 +1,8 @@
 // UI Design: Datasource local pour les associations étudiantes UQAR
 class AssociationsDatasourceLocal {
   
-  // Données des associations étudiantes UQAR
-  List<Map<String, dynamic>> obtenirToutesLesAssociations() {
-    return [
+  // Liste mutable pour stocker les associations (simulation de base de données)
+  static final List<Map<String, dynamic>> _associations = [
       {
         'id': 'asso_001',
         'nom': 'AEI',
@@ -317,6 +316,10 @@ class AssociationsDatasourceLocal {
         ],
       },
     ];
+
+  // Méthode pour obtenir toutes les associations
+  List<Map<String, dynamic>> obtenirToutesLesAssociations() {
+    return _associations;
   }
 
   // Méthodes pour filtrer les associations
@@ -366,5 +369,58 @@ class AssociationsDatasourceLocal {
     associations.sort((a, b) => 
         (b['nombreMembres'] as int).compareTo(a['nombreMembres'] as int));
     return associations.take(limite).toList();
+  }
+
+  // UI Design: Ajouter une nouvelle association
+  bool ajouterAssociation(Map<String, dynamic> association) {
+    try {
+
+      final associations = obtenirToutesLesAssociations();
+      
+      // Ajouter la nouvelle association
+      associations.add(association);
+      
+      // Note: Dans une vraie implémentation, on utiliserait une base de données
+      // Ici on simule juste le succès de l'opération
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // UI Design: Modifier une association existante
+  bool mettreAJourAssociation(Map<String, dynamic> association) {
+    try {
+
+      final associations = obtenirToutesLesAssociations();
+      
+      // Trouver l'index de l'association à modifier
+      final index = associations.indexWhere((a) => a['id'] == association['id']);
+      
+      if (index != -1) {
+        // Mettre à jour l'association existante
+        associations[index] = association;
+        return true;
+      }
+      
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // UI Design: Supprimer une association
+  bool supprimerAssociation(String id) {
+    try {
+      final associations = obtenirToutesLesAssociations();
+      final index = associations.indexWhere((association) => association['id'] == id);
+      if (index != -1) {
+        associations.removeAt(index);
+        return true;
+      }
+      return false;
+    } catch (e) {
+      return false;
+    }
   }
 } 

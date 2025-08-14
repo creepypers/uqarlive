@@ -8,7 +8,7 @@ class MembresAssociationDatasourceLocal {
       id: 'membre_001',
       utilisateurId: 'etud_001', // Alexandre Martin
       associationId: 'asso_001', // AEI
-      role: 'Membre actif',
+      role: 'Chef',
       dateAdhesion: DateTime.now().subtract(const Duration(days: 365)),
       estActif: true,
     ),

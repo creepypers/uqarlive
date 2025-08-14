@@ -15,7 +15,7 @@ abstract class ActualitesRepository {
   Future<Actualite> ajouterActualite(Actualite actualite);
   
   /// Met à jour une actualité existante
-  Future<Actualite> mettreAJourActualite(Actualite actualite);
+  Future<bool> mettreAJourActualite(Actualite actualite);
   
   /// Supprime une actualité
   Future<bool> supprimerActualite(String id);

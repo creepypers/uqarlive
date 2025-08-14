@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/di/service_locator.dart';
+import '../../../domain/entities/utilisateur.dart';
+import '../../../domain/repositories/utilisateurs_repository.dart';
+import '../../services/authentification_service.dart';
 import '../accueil_ecran.dart';
 
 // UI Design: Écran d'inscription avec design UQAR et fond dégradé bleu UQAR
@@ -40,7 +44,7 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
     super.dispose();
   }
 
-  void _gererInscription() {
+  Future<void> _gererInscription() async {
     if (_cleFormulaire.currentState!.validate()) {
       if (_controleurMotDePasse.text != _controleurConfirmerMotDePasse.text) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -54,33 +58,101 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
         return;
       }
 
-      // UI Design: Connexion automatique après inscription réussie
-      // Navigation directe vers l'accueil avec message de bienvenue
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => const AccueilEcran()),
-        (route) => false, // Supprime toutes les routes précédentes
-      );
-      
-      // Message de bienvenue après connexion automatique
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.check_circle, color: Colors.white, size: 20),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text('Bienvenue ${_controleurPrenom.text} ${_controleurNom.text} ! Vous êtes maintenant connecté(e).'),
-              ),
-            ],
-          ),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 4),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      // UI Design: Afficher un indicateur de chargement
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(color: CouleursApp.principal),
         ),
       );
 
-      // TODO: Implémenter la logique d'inscription réelle
+      try {
+        // UI Design: Créer le nouvel utilisateur
+        final utilisateursRepo = ServiceLocator.obtenirService<UtilisateursRepository>();
+        final authentificationService = AuthentificationService.instance;
+        
+        final nouvelUtilisateur = Utilisateur(
+          id: 'user_${DateTime.now().millisecondsSinceEpoch}',
+          nom: _controleurNom.text.trim(),
+          prenom: _controleurPrenom.text.trim(),
+          email: _controleurEmail.text.trim().toLowerCase(),
+          codeEtudiant: _controleurCodePermanent.text.trim().toUpperCase(),
+          programme: 'Non spécifié', // Pourra être modifié plus tard dans le profil
+          niveauEtude: 'Non spécifié', // Pourra être modifié plus tard dans le profil
+          telephone: '', // Pourra être ajouté plus tard dans le profil
+          dateInscription: DateTime.now(),
+          estActif: true,
+          typeUtilisateur: TypeUtilisateur.etudiant,
+          privileges: const [],
+        );
+
+        // Vérifier si l'email ou le code étudiant existe déjà
+        final utilisateurExistant = await utilisateursRepo.obtenirUtilisateurParCodeEtudiant(nouvelUtilisateur.codeEtudiant);
+        if (utilisateurExistant != null) {
+          if (mounted) {
+            Navigator.of(context).pop(); // Fermer l'indicateur de chargement
+            _afficherErreur('Ce code permanent est déjà utilisé');
+          }
+          return;
+        }
+
+        // Créer l'utilisateur avec mot de passe
+        final inscriptionReussie = await utilisateursRepo.creerUtilisateur(
+          nouvelUtilisateur, 
+          _controleurMotDePasse.text,
+        );
+
+        if (inscriptionReussie) {
+          // Authentifier automatiquement l'utilisateur
+          final utilisateurAuth = await authentificationService.authentifier(
+            nouvelUtilisateur.email,
+            _controleurMotDePasse.text,
+          );
+
+          if (mounted) {
+            Navigator.of(context).pop(); // Fermer l'indicateur de chargement
+
+            if (utilisateurAuth != null) {
+              // UI Design: Navigation vers l'accueil avec message de bienvenue
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const AccueilEcran()),
+                (route) => false,
+              );
+              
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Row(
+                    children: [
+                      const Icon(Icons.check_circle, color: Colors.white, size: 20),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text('Bienvenue ${nouvelUtilisateur.prenom} ${nouvelUtilisateur.nom} ! Votre compte a été créé avec succès.'),
+                      ),
+                    ],
+                  ),
+                  backgroundColor: Colors.green,
+                  behavior: SnackBarBehavior.floating,
+                  duration: const Duration(seconds: 4),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+              );
+            } else {
+              _afficherErreur('Inscription réussie mais erreur de connexion automatique. Veuillez vous connecter manuellement.');
+            }
+          }
+        } else {
+          if (mounted) {
+            Navigator.of(context).pop(); // Fermer l'indicateur de chargement
+            _afficherErreur('Erreur lors de la création du compte. Veuillez réessayer.');
+          }
+        }
+      } catch (e) {
+        if (mounted) {
+          Navigator.of(context).pop(); // Fermer l'indicateur de chargement
+          _afficherErreur('Erreur technique: ${e.toString()}');
+        }
+      }
     }
   }
 
@@ -638,7 +710,7 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
       width: largeur,
       height: hauteur,
       decoration: BoxDecoration(
-        color: CouleursApp.principal.withOpacity(0.3),
+        color: CouleursApp.principal.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(hauteur / 2),
       ),
       child: Center(
@@ -646,7 +718,7 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
           width: largeur * 0.7,
           height: hauteur * 0.7,
           decoration: BoxDecoration(
-            color: CouleursApp.principal.withOpacity(0.5),
+            color: CouleursApp.principal.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(hauteur / 3),
           ),
         ),
@@ -667,7 +739,7 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
         borderRadius: BorderRadius.circular(screenWidth * 0.05), // UI Design: Rayon adaptatif
         boxShadow: [
           BoxShadow(
-            color: CouleursApp.principal.withOpacity(0.3),
+            color: CouleursApp.principal.withValues(alpha: 0.3),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
