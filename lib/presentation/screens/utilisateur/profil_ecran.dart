@@ -382,13 +382,13 @@ class _ProfilEcranState extends State<ProfilEcran> {
               
               // Retour à l'écran de connexion
               if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Déconnexion réussie'),
-                    backgroundColor: Colors.green,
-                    behavior: SnackBarBehavior.floating,
-                  ),
-                );
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Déconnexion réussie'),
+                  backgroundColor: Colors.green,
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
                 Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (context) => const ConnexionEcran()),
                   (route) => false,

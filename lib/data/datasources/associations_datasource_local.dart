@@ -49,7 +49,7 @@ class AssociationsDatasourceLocal {
         'typeAssociation': 'culturelle',
         'president': 'Sophie Gagnon',
         'vicePresident': 'Martin Côté',
-        'chefId': 'etud_006', // Sophie Gagnon
+        'chefId': 'etud_002', // Sophie Gagnon
         'nombreMembres': 85,
         'email': 'radio@uqar.ca',
         'telephone': '418-724-1446',
@@ -88,7 +88,7 @@ class AssociationsDatasourceLocal {
         'typeAssociation': 'sportive',
         'president': 'Maxime Leblanc',
         'vicePresident': 'Catherine Roy',
-        'chefId': 'etud_007', // Maxime Leblanc
+        'chefId': 'etud_003', // Maxime Leblanc
         'nombreMembres': 520,
         'email': 'sport@uqar.ca',
         'telephone': '418-723-1986',
@@ -166,7 +166,7 @@ class AssociationsDatasourceLocal {
         'typeAssociation': 'culturelle',
         'president': 'Juliette Beaulieu',
         'vicePresident': 'Thomas Côté',
-        'chefId': 'etud_008', // Juliette Beaulieu
+        'chefId': 'etud_001', // Juliette Beaulieu (utilise Alexandre Martin temporairement)
         'nombreMembres': 45,
         'email': 'theatre@uqar.ca',
         'telephone': null,
@@ -205,7 +205,7 @@ class AssociationsDatasourceLocal {
         'typeAssociation': 'etudiante',
         'president': 'Laurence Giguère',
         'vicePresident': 'Gabriel Morin',
-        'chefId': 'etud_009', // Laurence Giguère
+        'chefId': 'etud_002', // Laurence Giguère (utilise Sophie Gagnon temporairement)
         'nombreMembres': 120,
         'email': 'eco@uqar.ca',
         'telephone': null,
@@ -380,8 +380,7 @@ class AssociationsDatasourceLocal {
       // Ajouter la nouvelle association
       associations.add(association);
       
-      // Note: Dans une vraie implémentation, on utiliserait une base de données
-      // Ici on simule juste le succès de l'opération
+          
       return true;
     } catch (e) {
       return false;

@@ -511,6 +511,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
           onTap: () => _afficherDetailsUtilisateur(utilisateur),
+          onLongPress: () => _afficherMenuUtilisateur(utilisateur),
           child: Padding(
             padding: EdgeInsets.all(screenWidth * 0.04),
             child: Row(
@@ -623,29 +624,8 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
                     ],
                   ),
                 ),
-                // Menu actions moderne
-                PopupMenuButton<String>(
-                  onSelected: (action) => _gererActionUtilisateur(utilisateur, action),
-                  icon: Icon(
-                    Icons.more_vert,
-                    size: screenWidth * 0.06,
-                    color: CouleursApp.texteFonce.withValues(alpha: 0.7),
-                  ),
-                  itemBuilder: (context) => [
-                    _construireMenuItem('modifier', 'Modifier', Icons.edit, null),
-                    if (utilisateur.typeUtilisateur == TypeUtilisateur.etudiant)
-                      _construireMenuItem('attribuer_admin', 'Promouvoir Admin', Icons.admin_panel_settings, Colors.orange),
-                    if (utilisateur.typeUtilisateur == TypeUtilisateur.administrateur)
-                      _construireMenuItem('gerer_privileges', 'Gérer privilèges', Icons.security, Colors.blue),
-                    _construireMenuItem(
-                      utilisateur.estActif ? 'suspendre' : 'activer',
-                      utilisateur.estActif ? 'Suspendre' : 'Activer',
-                      utilisateur.estActif ? Icons.block : Icons.check_circle,
-                      utilisateur.estActif ? Colors.red : Colors.green,
-                    ),
-                    _construireMenuItem('supprimer', 'Supprimer', Icons.delete, Colors.red),
-                  ],
-                ),
+                // UI Design: Appui long pour les actions (invisible)
+                const SizedBox.shrink(),
               ],
             ),
           ),
@@ -654,32 +634,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
     );
   }
 
-  // UI Design: Menu item moderne
-  PopupMenuItem<String> _construireMenuItem(String value, String text, IconData icon, Color? color) {
-    final mediaQuery = MediaQuery.of(context);
-    final screenWidth = mediaQuery.size.width;
-    
-    return PopupMenuItem(
-      value: value,
-      child: Row(
-        children: [
-          Icon(
-            icon,
-            size: screenWidth * 0.05,
-            color: color ?? CouleursApp.texteFonce.withValues(alpha: 0.7),
-          ),
-          SizedBox(width: screenWidth * 0.03),
-          Text(
-            text,
-            style: TextStyle(
-              fontSize: screenWidth * 0.035,
-              color: color ?? CouleursApp.texteFonce,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+
 
   // UI Design: Badge de statut moderne
   Widget _construireBadgeStatutModerne(Utilisateur utilisateur) {
@@ -814,6 +769,85 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
         _chargerDonnees();
       }
     });
+  }
+
+  void _afficherMenuUtilisateur(Utilisateur utilisateur) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        padding: EdgeInsets.all(screenWidth * 0.05),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Actions pour ${utilisateur.prenom} ${utilisateur.nom}',
+              style: TextStyle(
+                fontSize: screenWidth * 0.045,
+                fontWeight: FontWeight.bold,
+                color: CouleursApp.texteFonce,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: screenWidth * 0.04),
+            ListTile(
+              leading: Icon(Icons.edit, color: CouleursApp.principal, size: screenWidth * 0.06),
+              title: Text('Modifier', style: TextStyle(fontSize: screenWidth * 0.04)),
+              onTap: () {
+                Navigator.pop(context);
+                _gererActionUtilisateur(utilisateur, 'modifier');
+              },
+            ),
+            if (utilisateur.typeUtilisateur == TypeUtilisateur.etudiant)
+              ListTile(
+                leading: Icon(Icons.admin_panel_settings, color: Colors.orange, size: screenWidth * 0.06),
+                title: Text('Promouvoir Admin', style: TextStyle(fontSize: screenWidth * 0.04)),
+                onTap: () {
+                  Navigator.pop(context);
+                  _gererActionUtilisateur(utilisateur, 'attribuer_admin');
+                },
+              ),
+            if (utilisateur.typeUtilisateur == TypeUtilisateur.administrateur)
+              ListTile(
+                leading: Icon(Icons.security, color: Colors.blue, size: screenWidth * 0.06),
+                title: Text('Gérer privilèges', style: TextStyle(fontSize: screenWidth * 0.04)),
+                onTap: () {
+                  Navigator.pop(context);
+                  _gererActionUtilisateur(utilisateur, 'gerer_privileges');
+                },
+              ),
+            ListTile(
+              leading: Icon(
+                utilisateur.estActif ? Icons.block : Icons.check_circle,
+                color: utilisateur.estActif ? Colors.red : Colors.green,
+                size: screenWidth * 0.06,
+              ),
+              title: Text(
+                utilisateur.estActif ? 'Suspendre' : 'Activer',
+                style: TextStyle(fontSize: screenWidth * 0.04),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                _gererActionUtilisateur(utilisateur, utilisateur.estActif ? 'suspendre' : 'activer');
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.delete, color: Colors.red, size: screenWidth * 0.06),
+              title: Text('Supprimer', style: TextStyle(fontSize: screenWidth * 0.04, color: Colors.red)),
+              onTap: () {
+                Navigator.pop(context);
+                _gererActionUtilisateur(utilisateur, 'supprimer');
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _gererActionUtilisateur(Utilisateur utilisateur, String action) {

@@ -199,11 +199,11 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
       child: Padding(
         padding: EdgeInsets.all(screenWidth * 0.05),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
             // En-tête premium avec badges
-            Row(
-              children: [
+        Row(
+          children: [
                 Container(
                   padding: EdgeInsets.all(screenWidth * 0.03),
                   decoration: BoxDecoration(
@@ -226,7 +226,7 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
                   ),
                 ),
                 SizedBox(width: screenWidth * 0.04),
-                Expanded(
+            Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -244,40 +244,40 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
                             ),
                           ),
                           SizedBox(width: screenWidth * 0.02),
-                          Container(
+            Container(
                             padding: EdgeInsets.symmetric(
                               horizontal: screenWidth * 0.02,
                               vertical: screenWidth * 0.008,
                             ),
-                            decoration: BoxDecoration(
+              decoration: BoxDecoration(
                               color: menuDuJour != null ? Colors.green.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
                                 color: menuDuJour != null ? Colors.green.withValues(alpha: 0.3) : Colors.grey.withValues(alpha: 0.3),
                               ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
                                 Icon(
                                   menuDuJour != null ? Icons.check_circle : Icons.radio_button_unchecked,
                                   size: screenWidth * 0.03,
                                   color: menuDuJour != null ? Colors.green : Colors.grey,
                                 ),
                                 SizedBox(width: screenWidth * 0.008),
-                                Text(
+                  Text(
                                   menuDuJour != null ? 'ACTIF' : 'INACTIF',
-                                  style: TextStyle(
+                    style: TextStyle(
                                     fontSize: screenWidth * 0.025,
-                                    fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.bold,
                                     color: menuDuJour != null ? Colors.green : Colors.grey,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
                       SizedBox(height: screenHeight * 0.005),
                       Text(
                         menuDuJour != null 
@@ -298,16 +298,16 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
 
             if (menuDuJour != null) ...[
               // Carte du menu actuel - Design premium
-              Container(
+        Container(
                 padding: EdgeInsets.all(screenWidth * 0.04),
-                decoration: BoxDecoration(
+          decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     color: Colors.orange.withValues(alpha: 0.2),
                   ),
-                  boxShadow: [
-                    BoxShadow(
+            boxShadow: [
+              BoxShadow(
                       color: Colors.orange.withValues(alpha: 0.05),
                       blurRadius: 8,
                       offset: const Offset(0, 4),
@@ -315,37 +315,37 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
                   ],
                 ),
                 child: Row(
-                  children: [
-                    Container(
+                children: [
+                  Container(
                       width: screenWidth * 0.15,
                       height: screenWidth * 0.15,
-                      decoration: BoxDecoration(
-                        color: Colors.orange.withValues(alpha: 0.1),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
+                    ),
+                    child: Icon(
                         Icons.restaurant_menu,
                         color: Colors.orange.shade700,
                         size: screenWidth * 0.07,
                       ),
                     ),
                     SizedBox(width: screenWidth * 0.03),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
                             menuDuJour.nom,
                             style: TextStyle(
                               fontSize: screenWidth * 0.042,
-                              fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.bold,
                               color: CouleursApp.texteFonce,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                           ),
+                            maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                           SizedBox(height: screenHeight * 0.005),
-                          Text(
+                        Text(
                             menuDuJour.description,
                             style: TextStyle(
                               fontSize: screenWidth * 0.032,
@@ -398,11 +398,11 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
                               ],
                             ],
                           ),
-                        ],
-                      ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
+              ),
               ),
               SizedBox(height: screenHeight * 0.02),
             ] else ...[
@@ -417,7 +417,7 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
                   ),
                 ),
                 child: Column(
-                  children: [
+                children: [
                     Container(
                       padding: EdgeInsets.all(screenWidth * 0.04),
                       decoration: BoxDecoration(
@@ -459,14 +459,14 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  onPressed: _retirerMenuDuJour,
-                  icon: const Icon(Icons.clear, size: 18),
+                      onPressed: _retirerMenuDuJour,
+                      icon: const Icon(Icons.clear, size: 18),
                   label: const Text('Retirer le Menu du Jour'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    foregroundColor: Colors.white,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
                     padding: EdgeInsets.symmetric(vertical: screenHeight * 0.018),
-                    shape: RoundedRectangleBorder(
+                        shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
                     elevation: 4,
@@ -479,7 +479,7 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
                 padding: EdgeInsets.all(screenWidth * 0.04),
                 decoration: BoxDecoration(
                   color: Colors.blue.withValues(alpha: 0.05),
-                  borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: Colors.blue.withValues(alpha: 0.2)),
                 ),
                 child: Row(
@@ -499,11 +499,11 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                    ),
-                  ],
-                ),
               ),
             ],
+          ),
+        ),
+      ],
           ],
         ),
       ),
@@ -855,12 +855,12 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
             ),
           );
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Menu modifié avec succès !'),
-              backgroundColor: Colors.green,
-            ),
-          );
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Menu modifié avec succès !'),
+            backgroundColor: Colors.green,
+          ),
+        );
         }
       }
     }
@@ -1186,29 +1186,29 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
                 await _menusRepository.definirMenuDuJour('');
                 
                 if (mounted) {
-                  Navigator.pop(context);
+              Navigator.pop(context);
                 }
                 
                 // Recharger les données
                 await _chargerDonnees();
                 
                 if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Row(
-                          children: [
-                            Icon(Icons.check_circle, color: Colors.white, size: 20),
-                            SizedBox(width: 8),
-                            Text('Menu du jour retiré avec succès'),
-                          ],
-                        ),
-                        backgroundColor: Colors.green,
-                        behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    );
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Row(
+                    children: [
+                      Icon(Icons.check_circle, color: Colors.white, size: 20),
+                      SizedBox(width: 8),
+                      Text('Menu du jour retiré avec succès'),
+                    ],
+                  ),
+                  backgroundColor: Colors.green,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              );
                 }
               } catch (e) {
                 if (mounted) {

@@ -26,7 +26,6 @@ class _CantineEcranState extends State<CantineEcran> {
   late final MenusRepository _menusRepository;
   late final StatistiquesService _statistiquesService;
   late final HorairesRepository _horairesRepository; // UI Design: Horaires dynamiques
-  List<Menu> _menusDuJour = [];
   Menu? _menuDuJourSpecial; // UI Design: Menu du jour spécial défini par l'admin
   List<Menu> _tousLesMenus = [];
   List<Menu> _menusFiltres = [];
@@ -90,7 +89,6 @@ class _CantineEcranState extends State<CantineEcran> {
       ]);
 
       setState(() {
-        _menusDuJour = results[0] as List<Menu>;
         _tousLesMenus = results[1] as List<Menu>;
         _menusFiltres = results[1] as List<Menu>; // UI Design: Initialiser les menus filtrés
         _statistiques = results[2] as StatistiquesGlobales;
@@ -438,8 +436,8 @@ class _CantineEcranState extends State<CantineEcran> {
               SizedBox(width: screenWidth * 0.03),
               Expanded(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
                     Text(
                       'Menu du Jour Spécial',
                       style: TextStyle(
@@ -513,7 +511,7 @@ class _CantineEcranState extends State<CantineEcran> {
                 borderRadius: BorderRadius.circular(20),
                 child: Padding(
                   padding: EdgeInsets.all(screenWidth * 0.05),
-                  child: Row(
+          child: Row(
                     children: [
                       // Image ou icône du menu
                       Container(
@@ -592,14 +590,14 @@ class _CantineEcranState extends State<CantineEcran> {
                                     ),
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(
+            children: [
+              Icon(
                                           Icons.eco,
                                           size: screenWidth * 0.03,
                                           color: Colors.green,
                                         ),
                                         SizedBox(width: screenWidth * 0.01),
-                                        Text(
+              Text(
                                           _menuDuJourSpecial!.estVegan ? 'VEGAN' : 'VÉGÉ',
                                           style: TextStyle(
                                             fontSize: screenWidth * 0.025,
@@ -621,10 +619,10 @@ class _CantineEcranState extends State<CantineEcran> {
                         Icons.arrow_forward_ios,
                         color: Colors.orange.shade700,
                         size: screenWidth * 0.05,
-                      ),
-                    ],
-                  ),
-                ),
+              ),
+            ],
+          ),
+        ),
               ),
             ),
           ),

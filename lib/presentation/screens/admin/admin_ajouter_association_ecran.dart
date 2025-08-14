@@ -29,12 +29,30 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
   final TextEditingController _controleurTelephone = TextEditingController();
   final TextEditingController _controleurSiteWeb = TextEditingController();
   final TextEditingController _controleurBudget = TextEditingController();
+
+  final TextEditingController _controleurLocalisation = TextEditingController();
+  final TextEditingController _controleurHoraires = TextEditingController();
   
   // Variables d'état
   bool _estActive = true;
   bool _enChargement = false;
   bool _modeModification = false;
   final List<String> _activites = ['Activités à définir']; // UI Design: Liste des activités modifiable
+  
+  // Liste des utilisateurs disponibles pour être chef d'association
+  final List<Map<String, String>> _utilisateursDisponibles = [
+    {'id': 'etud_001', 'nom': 'Alexandre Martin'},
+    {'id': 'etud_002', 'nom': 'Sophie Gagnon'},
+    {'id': 'etud_003', 'nom': 'Marc Lavoie'},
+    // Utilisateurs temporaires pour les associations existantes
+    {'id': 'etud_006', 'nom': 'Sophie Gagnon (Club Photo)'},
+    {'id': 'etud_007', 'nom': 'Maxime Leblanc (Sport)'},
+    {'id': 'etud_008', 'nom': 'Juliette Beaulieu (Théâtre)'},
+    {'id': 'etud_009', 'nom': 'Laurence Giguère (Éco)'},
+    {'id': 'etud_010', 'nom': 'Maria Santos (International)'},
+    {'id': 'etud_011', 'nom': 'Isabelle Dufour (AELIES)'},
+  ];
+  String _chefSelectionne = 'etud_001'; // Alexandre Martin par défaut
   
   // Catégories d'associations
   final List<Map<String, String>> _categories = const [
@@ -68,6 +86,9 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
     _controleurTelephone.dispose();
     _controleurSiteWeb.dispose();
     _controleurBudget.dispose();
+
+    _controleurLocalisation.dispose();
+    _controleurHoraires.dispose();
     super.dispose();
   }
 
@@ -78,6 +99,9 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
     _controleurTelephone.text = association.telephone ?? '';
     _controleurSiteWeb.text = association.siteWeb ?? '';
     _controleurBudget.text = association.cotisationAnnuelle?.toString() ?? '';
+    _chefSelectionne = association.chefId ?? 'etud_001';
+    _controleurLocalisation.text = association.localisation ?? '';
+    _controleurHoraires.text = association.horairesBureau ?? '';
     _estActive = association.estActive;
     
     // Vérifier si la catégorie existe
@@ -208,6 +232,39 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
             ),
             const SizedBox(height: 16),
             
+                        // Chef de l'association
+            DropdownButtonFormField<String>(
+              value: _chefSelectionne,
+              isExpanded: true, // UI Design: Utiliser toute la largeur disponible
+              decoration: InputDecoration(
+                labelText: 'Chef de l\'association *',
+                prefixIcon: const Icon(Icons.person, color: CouleursApp.principal),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: CouleursApp.principal, width: 2),
+                ),
+              ),
+              items: _utilisateursDisponibles.map((utilisateur) => DropdownMenuItem(
+                value: utilisateur['id'],
+                child: Text(utilisateur['nom']!),
+              )).toList(),
+              onChanged: (valeur) {
+                setState(() {
+                  _chefSelectionne = valeur!;
+                });
+              },
+              validator: (valeur) {
+                if (valeur == null || valeur.isEmpty) {
+                  return 'Veuillez sélectionner un chef d\'association';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            
             // Description
             TextFormField(
               controller: _controleurDescription,
@@ -305,6 +362,42 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
                 }
                 return null;
               },
+            ),
+            const SizedBox(height: 16),
+            
+            // Localisation
+            TextFormField(
+              controller: _controleurLocalisation,
+              decoration: InputDecoration(
+                labelText: 'Localisation',
+                hintText: 'Ex: Local J-215, Pavillon des Sciences',
+                prefixIcon: const Icon(Icons.location_on, color: CouleursApp.principal),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: CouleursApp.principal, width: 2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            
+            // Horaires de bureau
+            TextFormField(
+              controller: _controleurHoraires,
+              decoration: InputDecoration(
+                labelText: 'Horaires de bureau',
+                hintText: 'Ex: Lun-Ven: 9h-16h, Mar-Jeu: 14h-18h',
+                prefixIcon: const Icon(Icons.schedule, color: CouleursApp.principal),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: CouleursApp.principal, width: 2),
+                ),
+              ),
             ),
             const SizedBox(height: 16),
             
@@ -544,9 +637,12 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
         nom: _controleurNom.text.trim(),
         description: _controleurDescription.text.trim(),
         typeAssociation: _categorieSelectionnee,
+        chefId: _chefSelectionne, // UI Design: Chef obligatoire
         email: _controleurEmail.text.trim().isEmpty ? null : _controleurEmail.text.trim(),
         telephone: _controleurTelephone.text.trim().isEmpty ? null : _controleurTelephone.text.trim(),
         siteWeb: _controleurSiteWeb.text.trim().isEmpty ? null : _controleurSiteWeb.text.trim(),
+        localisation: _controleurLocalisation.text.trim().isEmpty ? null : _controleurLocalisation.text.trim(),
+        horairesBureau: _controleurHoraires.text.trim().isEmpty ? null : _controleurHoraires.text.trim(),
         cotisationAnnuelle: _controleurBudget.text.trim().isEmpty ? null : double.parse(_controleurBudget.text.trim()),
         activites: _activites, // UI Design: Activités saisies par l'utilisateur
         estActive: _estActive,

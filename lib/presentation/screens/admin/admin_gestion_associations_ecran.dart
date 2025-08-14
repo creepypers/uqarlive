@@ -13,7 +13,7 @@ import '../../widgets/widget_carte.dart';
 import '../../widgets/widget_collection.dart';
 import 'admin_ajouter_association_ecran.dart';
 import '../associations/details_association_ecran.dart';
-// imports supprimés: écrans d'ajout utilisés côté chef association uniquement
+
 
 class AdminGestionAssociationsEcran extends StatefulWidget {
   const AdminGestionAssociationsEcran({super.key});
@@ -277,31 +277,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
                           ),
                         ],
                       ),
-                      trailing: PopupMenuButton<String>(
-                        onSelected: (value) => _gererActualite(actualite, value),
-                        itemBuilder: (context) => [
-                          const PopupMenuItem(
-                            value: 'modifier',
-                            child: Row(
-                              children: [
-                                Icon(Icons.edit),
-                                SizedBox(width: 8),
-                                Text('Modifier'),
-                              ],
-                            ),
-                          ),
-                          const PopupMenuItem(
-                            value: 'supprimer',
-                            child: Row(
-                              children: [
-                                Icon(Icons.delete, color: Colors.red),
-                                SizedBox(width: 8),
-                                Text('Supprimer', style: TextStyle(color: Colors.red)),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                      onLongPress: () => _afficherMenuActualite(actualite),
                     ),
                   );
                 },
@@ -348,14 +324,16 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
                 itemCount: _evenements.length,
                 itemBuilder: (context, index) {
                   final evenement = _evenements[index];
-                  return Card(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
+                  return GestureDetector(
+                    onLongPress: () => _afficherMenuEvenement(evenement),
+                    child: Card(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           // Avatar de l'événement
@@ -426,36 +404,12 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
                               ],
                             ),
                           ),
-                          // Menu des actions
-                          PopupMenuButton<String>(
-                            onSelected: (value) => _gererEvenement(evenement, value),
-                            itemBuilder: (context) => [
-                              const PopupMenuItem(
-                                value: 'modifier',
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.edit),
-                                    SizedBox(width: 8),
-                                    Text('Modifier'),
-                                  ],
-                                ),
-                              ),
-                              const PopupMenuItem(
-                                value: 'supprimer',
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.delete, color: Colors.red),
-                                    SizedBox(width: 8),
-                                    Text('Supprimer', style: TextStyle(color: Colors.red)),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
+
                         ],
                       ),
                     ),
-                  );
+                  ),
+                );
                 },
               ),
         ],
@@ -513,7 +467,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
   }
 
   Future<void> _ajouterActualite() async {
-    // UI Design: Implémenter l'ajout d'actualité pour admin
+    // UI Design: Créer une actualité générale pour l'admin
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
       builder: (context) => _construireDialogueAjoutActualite(),
@@ -524,27 +478,21 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
         final nouvelleActualite = Actualite(
           id: 'actu_admin_${DateTime.now().millisecondsSinceEpoch}',
           titre: result['titre'],
-          description: result['titre'], // UI Design: Utiliser le titre comme description courte
+          description: result['titre'],
           contenu: result['contenu'],
           associationId: result['associationId'] ?? 'admin_general',
           auteur: 'Administrateur UQAR',
           datePublication: DateTime.now(),
-          priorite: 'normale',
+          priorite: result['priorite'] ?? 'normale',
           estEpinglee: result['estEpinglee'] ?? false,
           nombreVues: 0,
           nombreLikes: 0,
-          tags: result['tags'] ?? [],
+          tags: [],
         );
 
         final actualiteAjoutee = await _actualitesRepository.ajouterActualite(nouvelleActualite);
         if (mounted) {
           if (actualiteAjoutee.id.isNotEmpty) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Actualité ajoutée avec succès !'),
-                backgroundColor: Colors.green,
-              ),
-            );
             _chargerDonnees();
           }
         }
@@ -562,7 +510,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
   }
 
   Future<void> _ajouterEvenement() async {
-    // UI Design: Implémenter l'ajout d'événement pour admin
+    // UI Design: Créer un événement général pour l'admin
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
       builder: (context) => _construireDialogueAjoutEvenement(),
@@ -574,7 +522,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
           id: 'event_admin_${DateTime.now().millisecondsSinceEpoch}',
           titre: result['titre'],
           description: result['description'],
-          typeEvenement: 'academique', // UI Design: Type par défaut pour les événements admin
+          typeEvenement: result['typeEvenement'] ?? 'academique',
           lieu: result['lieu'],
           organisateur: 'Administration UQAR',
           associationId: result['associationId'] ?? 'admin_general',
@@ -590,12 +538,6 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
         final succes = await _evenementsRepository.ajouterEvenement(nouvelEvenement);
         if (mounted) {
           if (succes) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Événement ajouté avec succès !'),
-                backgroundColor: Colors.green,
-              ),
-            );
             _chargerDonnees();
           }
         }
@@ -617,6 +559,84 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => DetailsAssociationEcran(association: association),
+      ),
+    );
+  }
+
+  void _afficherMenuEvenement(Evenement evenement) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              evenement.titre,
+              style: StylesTexteApp.moyenTitre,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            ListTile(
+              leading: const Icon(Icons.edit, color: CouleursApp.principal),
+              title: const Text('Modifier'),
+              onTap: () {
+                Navigator.pop(context);
+                _modifierEvenement(evenement);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete, color: Colors.red),
+              title: const Text('Supprimer', style: TextStyle(color: Colors.red)),
+              onTap: () {
+                Navigator.pop(context);
+                _confirmerSuppressionEvenement(evenement);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _afficherMenuActualite(Actualite actualite) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              actualite.titre,
+              style: StylesTexteApp.moyenTitre,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            ListTile(
+              leading: const Icon(Icons.edit, color: CouleursApp.principal),
+              title: const Text('Modifier'),
+              onTap: () {
+                Navigator.pop(context);
+                _modifierActualite(actualite);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete, color: Colors.red),
+              title: const Text('Supprimer', style: TextStyle(color: Colors.red)),
+              onTap: () {
+                Navigator.pop(context);
+                _confirmerSuppressionActualite(actualite);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -683,6 +703,41 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
     }
   }
 
+  void _confirmerSuppressionActualite(Actualite actualite) {
+    showDialog(
+      context: context,
+      builder: (context) => LayoutBuilder(builder: (context, constraints) {
+        final w = MediaQuery.of(context).size.width * 0.9;
+        return ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: w),
+          child: AlertDialog(
+            title: const Text('Confirmer la suppression', style: StylesTexteApp.moyenTitre),
+            content: Text(
+              'Êtes-vous sûr de vouloir supprimer l\'actualité "${actualite.titre}" ?',
+              style: StylesTexteApp.corpsNormal,
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Annuler', style: StylesTexteApp.lienPrincipal),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _supprimerActualite(actualite);
+                },
+                child: Text(
+                  'Supprimer',
+                  style: StylesTexteApp.lienPrincipal.copyWith(color: Colors.red),
+                ),
+              ),
+            ],
+          ),
+        );
+      }),
+    );
+  }
+
   void _confirmerSuppressionAssociation(Association association) {
     showDialog(
       context: context,
@@ -747,16 +802,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
     }
   }
 
-  void _gererActualite(Actualite actualite, String action) {
-    switch (action) {
-      case 'modifier':
-        _modifierActualite(actualite);
-        break;
-      case 'supprimer':
-        _confirmerSuppressionActualite(actualite);
-        break;
-    }
-  }
+
 
   Future<void> _modifierActualite(Actualite actualite) async {
     // UI Design: Dialogue de modification d'actualité
@@ -862,40 +908,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
     }
   }
 
-  void _confirmerSuppressionActualite(Actualite actualite) {
-    showDialog(
-      context: context,
-      builder: (context) => LayoutBuilder(builder: (context, constraints) {
-        final w = MediaQuery.of(context).size.width * 0.9;
-        return ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: w),
-          child: AlertDialog(
-        title: const Text('Confirmer la suppression', style: StylesTexteApp.moyenTitre),
-        content: Text(
-          'Êtes-vous sûr de vouloir supprimer l\'actualité "${actualite.titre}" ?',
-          style: StylesTexteApp.corpsNormal,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Annuler', style: StylesTexteApp.lienPrincipal),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _supprimerActualite(actualite);
-            },
-            child: Text(
-              'Supprimer',
-              style: StylesTexteApp.lienPrincipal.copyWith(color: Colors.red),
-            ),
-          ),
-        ],
-          ),
-        );
-      }),
-    );
-  }
+
 
   void _supprimerActualite(Actualite actualite) async {
     // UI Design: Supprimer l'actualité du repository
@@ -906,22 +919,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
         setState(() {
           _actualites.remove(actualite);
         });
-        
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Actualité "${actualite.titre}" supprimée'),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Erreur lors de la suppression de "${actualite.titre}"'),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        // UI Design: Suppression silencieuse sans SnackBar
       }
     }
   }
@@ -963,16 +961,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
     }
   }
 
-  void _gererEvenement(Evenement evenement, String action) {
-    switch (action) {
-      case 'modifier':
-        _modifierEvenement(evenement);
-        break;
-      case 'supprimer':
-        _confirmerSuppressionEvenement(evenement);
-        break;
-    }
-  }
+
 
   Future<void> _modifierEvenement(Evenement evenement) async {
     // UI Design: Dialogue de modification d'événement
@@ -1223,6 +1212,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
     final TextEditingController titreController = TextEditingController();
     final TextEditingController contenuController = TextEditingController();
     String? associationSelectionnee;
+    String prioriteSelectionnee = 'normale'; // UI Design: Priorité par défaut
     bool estEpinglee = false;
 
     return StatefulBuilder(
@@ -1252,7 +1242,65 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
+                value: prioriteSelectionnee,
+                isExpanded: true, // UI Design: Utiliser toute la largeur disponible
+                decoration: const InputDecoration(
+                  labelText: 'Niveau de priorité *',
+                  border: OutlineInputBorder(),
+                  prefixIcon:  Icon(Icons.priority_high, color: CouleursApp.principal),
+                ),
+                items: const [
+                  DropdownMenuItem(
+                    value: 'normale',
+                    child: Row(
+                      children: [
+                        Icon(Icons.circle, color: Colors.green, size: 16),
+                        SizedBox(width: 8),
+                        Text('Normale'),
+                      ],
+                    ),
+                  ),
+                  DropdownMenuItem(
+                    value: 'moyenne',
+                    child: Row(
+                      children: [
+                        Icon(Icons.circle, color: Colors.orange, size: 16),
+                        SizedBox(width: 8),
+                        Text('Moyenne'),
+                      ],
+                    ),
+                  ),
+                  DropdownMenuItem(
+                    value: 'haute',
+                    child: Row(
+                      children: [
+                        Icon(Icons.circle, color: Colors.red, size: 16),
+                        SizedBox(width: 8),
+                        Text('Haute'),
+                      ],
+                    ),
+                  ),
+                  DropdownMenuItem(
+                    value: 'urgente',
+                    child: Row(
+                      children: [
+                        Icon(Icons.circle, color: Colors.purple, size: 16),
+                        SizedBox(width: 8),
+                        Text('Urgente'),
+                      ],
+                    ),
+                  ),
+                ],
+                onChanged: (value) {
+                  setState(() {
+                    prioriteSelectionnee = value!;
+                  });
+                },
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
                 value: associationSelectionnee,
+                isExpanded: true, // UI Design: Utiliser toute la largeur disponible
                 decoration: const InputDecoration(
                   labelText: 'Association (optionnel)',
                   border: OutlineInputBorder(),
@@ -1442,6 +1490,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 value: associationSelectionnee,
+                isExpanded: true, // UI Design: Utiliser toute la largeur disponible
                 decoration: const InputDecoration(
                   labelText: 'Association (optionnel)',
                   border: OutlineInputBorder(),

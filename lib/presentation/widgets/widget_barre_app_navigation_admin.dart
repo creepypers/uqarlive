@@ -70,87 +70,26 @@ class WidgetBarreAppNavigationAdmin extends StatelessWidget implements Preferred
           ),
           onSelected: (value) => _gererAction(context, value),
           itemBuilder: (context) => [
-            // Section Actions Rapides
-            const PopupMenuItem(
-              value: 'ajouter_menu',
-              child: Row(
-                children: [
-                  Icon(Icons.add_circle, color: Colors.green),
-                  SizedBox(width: 12),
-                  Text('Ajouter Menu', style: TextStyle(fontWeight: FontWeight.w500)),
-                ],
-              ),
-            ),
-            const PopupMenuItem(
-              value: 'modifier_horaire',
-              child: Row(
-                children: [
-                  Icon(Icons.schedule, color: Colors.blue),
-                  SizedBox(width: 12),
-                  Text('Modifier Horaires', style: TextStyle(fontWeight: FontWeight.w500)),
-                ],
-              ),
-            ),
-            const PopupMenuItem(
-              value: 'ajouter_actualite',
-              child: Row(
-                children: [
-                  Icon(Icons.article, color: Colors.orange),
-                  SizedBox(width: 12),
-                  Text('Ajouter Actualité', style: TextStyle(fontWeight: FontWeight.w500)),
-                ],
-              ),
-            ),
+            // Actions essentielles seulement
             const PopupMenuItem(
               value: 'nouvelle_association',
               child: Row(
                 children: [
                   Icon(Icons.group_add, color: Colors.purple),
                   SizedBox(width: 12),
-                  Text('Nouvelle Association', style: TextStyle(fontWeight: FontWeight.w500)),
+                  Text('Nouvelle Association'),
                 ],
               ),
             ),
             const PopupMenuItem(
-              value: 'modifier_association',
+              value: 'ajouter_menu',
               child: Row(
                 children: [
-                  Icon(Icons.edit, color: Colors.indigo),
+                  Icon(Icons.add_circle, color: Colors.green),
                   SizedBox(width: 12),
-                  Text('Modifier Association', style: TextStyle(fontWeight: FontWeight.w500)),
+                  Text('Ajouter Menu'),
                 ],
               ),
-            ),
-            const PopupMenuItem(
-              value: 'divider1',
-              enabled: false,
-              child: Divider(height: 1),
-            ),
-            // Section Actions Générales
-            const PopupMenuItem(
-              value: 'actualiser',
-              child: Row(
-                children: [
-                  Icon(Icons.refresh, color: Colors.teal),
-                  SizedBox(width: 12),
-                  Text('Actualiser', style: TextStyle(fontWeight: FontWeight.w500)),
-                ],
-              ),
-            ),
-            const PopupMenuItem(
-              value: 'parametres',
-              child: Row(
-                children: [
-                  Icon(Icons.settings, color: Colors.grey),
-                  SizedBox(width: 12),
-                  Text('Paramètres', style: TextStyle(fontWeight: FontWeight.w500)),
-                ],
-              ),
-            ),
-            const PopupMenuItem(
-              value: 'divider2',
-              enabled: false,
-              child: Divider(height: 1),
             ),
             const PopupMenuItem(
               value: 'deconnexion',
@@ -158,7 +97,7 @@ class WidgetBarreAppNavigationAdmin extends StatelessWidget implements Preferred
                 children: [
                   Icon(Icons.logout, color: Colors.red),
                   SizedBox(width: 12),
-                  Text('Se déconnecter', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500)),
+                  Text('Se déconnecter'),
                 ],
               ),
             ),

@@ -91,8 +91,8 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
         final utilisateurExistant = await utilisateursRepo.obtenirUtilisateurParCodeEtudiant(nouvelUtilisateur.codeEtudiant);
         if (utilisateurExistant != null) {
           if (mounted) {
-            Navigator.of(context).pop(); // Fermer l'indicateur de chargement
-            _afficherErreur('Ce code permanent est déjà utilisé');
+          Navigator.of(context).pop(); // Fermer l'indicateur de chargement
+          _afficherErreur('Ce code permanent est déjà utilisé');
           }
           return;
         }
@@ -111,46 +111,46 @@ class _InscriptionEcranState extends State<InscriptionEcran> {
           );
 
           if (mounted) {
-            Navigator.of(context).pop(); // Fermer l'indicateur de chargement
+          Navigator.of(context).pop(); // Fermer l'indicateur de chargement
 
-            if (utilisateurAuth != null) {
-              // UI Design: Navigation vers l'accueil avec message de bienvenue
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const AccueilEcran()),
-                (route) => false,
-              );
-              
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Row(
-                    children: [
-                      const Icon(Icons.check_circle, color: Colors.white, size: 20),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text('Bienvenue ${nouvelUtilisateur.prenom} ${nouvelUtilisateur.nom} ! Votre compte a été créé avec succès.'),
-                      ),
-                    ],
-                  ),
-                  backgroundColor: Colors.green,
-                  behavior: SnackBarBehavior.floating,
-                  duration: const Duration(seconds: 4),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          if (utilisateurAuth != null) {
+            // UI Design: Navigation vers l'accueil avec message de bienvenue
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => const AccueilEcran()),
+              (route) => false,
+            );
+            
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: [
+                    const Icon(Icons.check_circle, color: Colors.white, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text('Bienvenue ${nouvelUtilisateur.prenom} ${nouvelUtilisateur.nom} ! Votre compte a été créé avec succès.'),
+                    ),
+                  ],
                 ),
-              );
-            } else {
-              _afficherErreur('Inscription réussie mais erreur de connexion automatique. Veuillez vous connecter manuellement.');
+                backgroundColor: Colors.green,
+                behavior: SnackBarBehavior.floating,
+                duration: const Duration(seconds: 4),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+            );
+          } else {
+            _afficherErreur('Inscription réussie mais erreur de connexion automatique. Veuillez vous connecter manuellement.');
             }
           }
         } else {
           if (mounted) {
-            Navigator.of(context).pop(); // Fermer l'indicateur de chargement
-            _afficherErreur('Erreur lors de la création du compte. Veuillez réessayer.');
+          Navigator.of(context).pop(); // Fermer l'indicateur de chargement
+          _afficherErreur('Erreur lors de la création du compte. Veuillez réessayer.');
           }
         }
       } catch (e) {
         if (mounted) {
-          Navigator.of(context).pop(); // Fermer l'indicateur de chargement
-          _afficherErreur('Erreur technique: ${e.toString()}');
+        Navigator.of(context).pop(); // Fermer l'indicateur de chargement
+        _afficherErreur('Erreur technique: ${e.toString()}');
         }
       }
     }

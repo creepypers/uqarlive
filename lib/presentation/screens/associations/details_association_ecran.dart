@@ -1668,48 +1668,23 @@ class _DetailsAssociationEcranState extends State<DetailsAssociationEcran> {
   }
 
   String _obtenirEmailAssociation() {
-    switch (widget.association.id) {
-      case 'asso_001': // AEI
-        return 'aei@uqar.ca';
-      case 'asso_002': // Club Photo UQAR
-        return 'photo@uqar.ca';
-      case 'asso_003': // Sport UQAR
-        return 'sport@uqar.ca';
-      case 'asso_004': // AGE
-        return 'age@uqar.ca';
-      default:
-        return 'contact@uqar.ca';
-    }
+    // UI Design: Utiliser les vraies données de l'association
+    return widget.association.email ?? 'Non renseigné';
   }
 
   String _obtenirTelephoneAssociation() {
-    switch (widget.association.id) {
-      case 'asso_001': // AEI
-        return '(418) 723-1986';
-      case 'asso_002': // Club Photo UQAR
-        return '(418) 723-1987';
-      case 'asso_003': // Sport UQAR
-        return '(418) 723-1988';
-      case 'asso_004': // AGE
-        return '(418) 723-1989';
-      default:
-        return '(418) 723-1986';
-    }
+    // UI Design: Utiliser les vraies données de l'association
+    return widget.association.telephone ?? 'Non renseigné';
   }
 
   String _obtenirLocalAssociation() {
-    switch (widget.association.id) {
-      case 'asso_001': // AEI
-        return 'Local A-101';
-      case 'asso_002': // Club Photo UQAR
-        return 'Local C-302';
-      case 'asso_003': // Sport UQAR
-        return 'Centre sportif';
-      case 'asso_004': // AGE
-        return 'Local B-201';
-      default:
-        return 'Local à déterminer';
-    }
+    // UI Design: Utiliser les vraies données de l'association
+    return widget.association.localisation ?? 'Non renseigné';
+  }
+
+  String _obtenirHorairesAssociation() {
+    // UI Design: Utiliser les vraies données de l'association
+    return widget.association.horairesBureau ?? 'Non renseigné';
   }
 
   // UI Design: Gestion des inscriptions aux événements
@@ -1768,22 +1743,6 @@ class _DetailsAssociationEcranState extends State<DetailsAssociationEcran> {
       _afficherErreur('Erreur: $e');
     }
   }
-
-  String _obtenirHorairesAssociation() {
-    switch (widget.association.id) {
-      case 'asso_001': // AEI
-        return 'Lun-Ven: 9h-17h';
-      case 'asso_002': // Club Photo UQAR
-        return 'Mar-Jeu: 14h-18h';
-      case 'asso_003': // Sport UQAR
-        return 'Lun-Dim: 7h-22h';
-      case 'asso_004': // AGE
-        return 'Lun-Ven: 10h-16h';
-      default:
-        return 'Horaires variables';
-    }
-  }
-
 
 }
 

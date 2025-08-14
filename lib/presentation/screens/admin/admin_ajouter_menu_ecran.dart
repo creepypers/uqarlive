@@ -629,22 +629,22 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
           await _menusRepository.ajouterMenu(nouveauMenu);
 
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Row(
-                  children: [
-                    const Icon(Icons.check_circle, color: Colors.white, size: 20),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text('Menu "${_nomMenuController.text}" ajouté avec succès !'),
-                    ),
-                  ],
-                ),
-                backgroundColor: Colors.green,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.check_circle, color: Colors.white, size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text('Menu "${_nomMenuController.text}" ajouté avec succès !'),
               ),
-            );
+            ],
+          ),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        ),
+      );
           }
         }
 
