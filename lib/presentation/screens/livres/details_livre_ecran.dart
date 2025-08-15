@@ -6,7 +6,7 @@ import '../../../core/di/service_locator.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../domain/entities/livre.dart';
 import '../../../domain/entities/utilisateur.dart';
-import '../../../domain/repositories/livres_repository.dart';
+import '../../../domain/usercases/livres_repository.dart';
 import '../../../presentation/services/authentification_service.dart';
 import '../../../presentation/services/transactions_service.dart';
 import '../../../presentation/services/messagerie_service.dart';

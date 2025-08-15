@@ -1,6 +1,6 @@
 // Clean Architecture: Service pour la gestion des actualités
 import '../../domain/entities/actualite.dart';
-import '../../domain/repositories/actualites_repository.dart';
+import '../../domain/usercases/actualites_repository.dart';
 import '../../core/di/service_locator.dart';
 
 class ActualitesService {

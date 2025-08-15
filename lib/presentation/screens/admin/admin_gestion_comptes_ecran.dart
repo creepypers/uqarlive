@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/di/service_locator.dart';
 import '../../../domain/entities/utilisateur.dart';
-import '../../../domain/repositories/utilisateurs_repository.dart';
+import '../../../domain/usercases/utilisateurs_repository.dart';
     import '../../../presentation/widgets/widget_barre_app_navigation_admin.dart';
 import '../../../presentation/services/statistiques_service.dart';
 import '../../../presentation/screens/utilisateur/modifier_profil_ecran.dart';

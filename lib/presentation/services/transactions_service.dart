@@ -3,8 +3,8 @@ import '../../core/di/service_locator.dart';
 import '../../domain/entities/transaction.dart';
 import '../../domain/entities/livre.dart';
 import '../../domain/entities/utilisateur.dart';
-import '../../domain/repositories/transactions_repository.dart';
-import '../../domain/repositories/livres_repository.dart';
+import '../../domain/usercases/transactions_repository.dart';
+import '../../domain/usercases/livres_repository.dart';
 
 class TransactionsService {
   static final TransactionsService _instance = TransactionsService._internal();

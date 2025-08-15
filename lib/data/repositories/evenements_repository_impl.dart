@@ -1,5 +1,5 @@
 import '../../domain/entities/evenement.dart';
-import '../../domain/repositories/evenements_repository.dart';
+import '../../domain/usercases/evenements_repository.dart';
 import '../datasources/internal/evenements_datasource_local.dart';
 
 class EvenementsRepositoryImpl implements EvenementsRepository {

@@ -4,8 +4,8 @@ import '../../../../core/di/service_locator.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../domain/entities/actualite.dart';
 
-import '../../../../domain/repositories/actualites_repository.dart';
-import '../../../../domain/repositories/associations_repository.dart';
+import '../../../../domain/usercases/actualites_repository.dart';
+import '../../../../domain/usercases/associations_repository.dart';
 
 import '../../../widgets/widget_barre_app_personnalisee.dart';
 

@@ -8,12 +8,12 @@ import '../../../core/di/service_locator.dart';
 import '../../../domain/entities/utilisateur.dart';
 import '../../../domain/entities/livre.dart';
 import '../../../domain/entities/association.dart';
-import '../../../domain/repositories/livres_repository.dart';
-import '../../../domain/repositories/associations_repository.dart';
+import '../../../domain/usercases/livres_repository.dart';
+import '../../../domain/usercases/associations_repository.dart';
 
-import '../../../domain/repositories/membres_association_repository.dart';
+import '../../../domain/usercases/membres_association_repository.dart';
 import '../../../domain/entities/reservation_salle.dart';
-import '../../../domain/repositories/reservations_salle_repository.dart';
+import '../../../domain/usercases/reservations_salle_repository.dart';
 
 import 'modifier_profil_ecran.dart';
 import '../livres/gerer_livres_ecran.dart';

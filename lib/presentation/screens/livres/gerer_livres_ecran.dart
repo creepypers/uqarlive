@@ -10,7 +10,7 @@ import '../../../domain/entities/livre.dart';
 
 import '../../../domain/entities/utilisateur.dart';
 
-import '../../../domain/repositories/livres_repository.dart';
+import '../../../domain/usercases/livres_repository.dart';
 
 import '../../../presentation/widgets/navbar_widget.dart';
 

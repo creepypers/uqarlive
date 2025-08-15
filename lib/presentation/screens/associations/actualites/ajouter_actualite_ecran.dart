@@ -4,7 +4,7 @@ import '../../../../core/di/service_locator.dart';
 import '../../../../domain/entities/association.dart';
 import '../../../../domain/entities/actualite.dart';
 import '../../../widgets/widget_barre_app_personnalisee.dart';
-import '../../../../domain/repositories/actualites_repository.dart';
+import '../../../../domain/usercases/actualites_repository.dart';
 import '../../../services/authentification_service.dart';
 
 class AjouterActualiteEcran extends StatefulWidget {

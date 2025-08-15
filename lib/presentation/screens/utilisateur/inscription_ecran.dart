@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/di/service_locator.dart';
 import '../../../domain/entities/utilisateur.dart';
-import '../../../domain/repositories/utilisateurs_repository.dart';
+import '../../../domain/usercases/utilisateurs_repository.dart';
 import '../../services/authentification_service.dart';
 import '../accueil_ecran.dart';
 

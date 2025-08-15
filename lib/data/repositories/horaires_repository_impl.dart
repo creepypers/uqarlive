@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../domain/repositories/horaires_repository.dart';
+import '../../domain/usercases/horaires_repository.dart';
 import '../datasources/internal/horaires_datasource_local.dart';
 
 // UI Design: Implémentation du repository pour les horaires de cantine

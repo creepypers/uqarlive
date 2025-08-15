@@ -8,8 +8,8 @@ import '../services/navigation_service.dart';
 import '../services/authentification_service.dart';
 import '../widgets/widget_bouton_conversations.dart';
 import '../../core/di/service_locator.dart';
-import '../../domain/repositories/salles_repository.dart';
-import '../../domain/repositories/reservations_salle_repository.dart';
+import '../../domain/usercases/salles_repository.dart';
+import '../../domain/usercases/reservations_salle_repository.dart';
 import '../../domain/entities/salle.dart';
 import '../../domain/entities/reservation_salle.dart';
 

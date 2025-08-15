@@ -1,5 +1,5 @@
 import '../../domain/entities/transaction.dart';
-import '../../domain/repositories/transactions_repository.dart';
+import '../../domain/usercases/transactions_repository.dart';
 import '../datasources/internal/transactions_datasource_local.dart';
 import '../models/transaction_model.dart';
 

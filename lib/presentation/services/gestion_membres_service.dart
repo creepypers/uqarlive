@@ -2,9 +2,9 @@
 import '../../core/di/service_locator.dart';
 import '../../domain/entities/association.dart';
 import '../../domain/entities/membre_association.dart';
-import '../../domain/repositories/associations_repository.dart';
-import '../../domain/repositories/utilisateurs_repository.dart';
-import '../../domain/repositories/membres_association_repository.dart';
+import '../../domain/usercases/associations_repository.dart';
+import '../../domain/usercases/utilisateurs_repository.dart';
+import '../../domain/usercases/membres_association_repository.dart';
 
 class GestionMembresService {
   static final GestionMembresService _instance = GestionMembresService._internal();

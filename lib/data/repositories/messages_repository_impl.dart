@@ -1,6 +1,6 @@
 // UI Design: Implémentation du repository pour la gestion des messages dans UqarLife
 import '../../domain/entities/message.dart';
-import '../../domain/repositories/messages_repository.dart';
+import '../../domain/usercases/messages_repository.dart';
 import '../datasources/internal/messages_datasource_local.dart';
 import '../models/message_model.dart';
 

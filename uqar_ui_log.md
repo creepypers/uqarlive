@@ -4631,3 +4631,112 @@ Maintenir la cohérence des données entre les entités `Association`, `Utilisat
   - **Marges verticales** : `height: 3` au lieu de 4
 - **Fichier modifié** : `lib/presentation/screens/messagerie/ajouter_contact_ecran.dart`
 - **Résultat** : Aucun débordement, interface parfaitement optimisée et responsive
+
+# UQAR UI Log - Modifications et Décisions de Design
+
+## Modifications Récentes
+
+### 2024 - Suppression Animation Focus Navbar et Menu du Jour Dynamique
+
+#### Navbar Widget (`lib/presentation/widgets/navbar_widget.dart`)
+- **Supprimé** : Animation de focus (halo blanc) autour de l'icône Accueil
+- **Raison** : Simplification de l'interface, suppression des animations distrayantes
+- **Changement** : Icône Accueil affichée directement sans Stack ni Container de focus
+
+#### Écran d'Accueil (`lib/presentation/screens/accueil_ecran.dart`)
+- **Ajouté** : Menu du jour dynamique via `MenusRepository`
+- **Supprimé** : Texte statique "Pâtes à la sauce marinara, salade césar, dessert du jour"
+- **Remplacé par** : Affichage dynamique du nom, prix et badges du menu du jour
+- **Fonctionnalités** :
+  - Chargement automatique du menu du jour depuis le repository
+  - Affichage du prix formaté
+  - Badges VÉG/VEGAN si applicable
+  - État de chargement avec indicateur
+  - Gestion des cas où aucun menu n'est disponible
+
+#### Intégration des Services
+- **Repository** : `MenusRepository` intégré pour la récupération des menus
+- **Méthode** : `obtenirMenusDuJour()` utilisée pour charger le menu actuel
+- **État** : `_menuDuJour` et `_chargementMenuDuJour` ajoutés pour la gestion d'état
+
+## Composants Réutilisables
+
+### Widgets Créés
+- `NavBarWidget` : Navigation bottom avec thème UQAR
+- `WidgetBarreAppPersonnalisee` : AppBar personnalisée avec météo
+- `WidgetCarte` : Cartes réutilisables pour différents types de contenu
+- `WidgetCollection` : Collections horizontales avec gestion d'état
+- `WidgetBoutonConversations` : Bouton flottant pour accéder aux conversations
+
+### Services Intégrés
+- `AuthentificationService` : Gestion des utilisateurs connectés
+- `MeteoService` : Affichage des températures Rimouski/Lévis
+- `EvenementsService` : Gestion des événements d'associations
+- `ActualitesService` : Gestion des actualités dynamiques
+- `MenusRepository` : Gestion des menus de cantine
+
+## Thème et Couleurs UQAR
+
+### Palette de Couleurs
+- **Principal** : `#005499` (Bleu foncé UQAR)
+- **Accent** : `#00A1E4` (Bleu ciel UQAR)
+- **Fond** : `#F8F9FA` (Gris très clair)
+- **Texte** : `#2C2C2C` (Gris foncé)
+- **Blanc** : `#FFFFFF` (Blanc pur)
+
+### Styles de Texte
+- **Titre** : Roboto, 24sp, poids 700
+- **Sous-titre** : Roboto, 18sp, poids 600
+- **Corps** : Roboto, 16sp, poids 400
+- **Légende** : Roboto, 14sp, poids 400
+
+## Décisions de Design
+
+### Responsive Design
+- Utilisation de `MediaQuery` pour les dimensions adaptatives
+- Tailles de police et espacements proportionnels à la largeur d'écran
+- Hauteurs adaptatives pour les collections et cartes
+
+### Accessibilité
+- Gestion des débordements de texte avec `TextOverflow.ellipsis`
+- Indicateurs de chargement pour les états asynchrones
+- Messages d'état vide informatifs
+
+### Performance
+- Chargement parallèle des données avec `Future.wait`
+- Éviter le rechargement inutile avec `_donneesChargees`
+- Gestion d'état locale pour éviter les reconstructions
+
+## Écrans Mise à Jour
+
+### Accueil (`accueil_ecran.dart`)
+- ✅ Section actualités dynamiques
+- ✅ Section livres personnels
+- ✅ Section associations avec rôles
+- ✅ Section événements à venir
+- ✅ Section cantine avec menu du jour dynamique
+- ✅ Météo Rimouski/Lévis
+- ✅ Navigation vers autres sections
+
+### Cantine (`cantine_ecran.dart`)
+- ✅ Menus par catégorie
+- ✅ Recherche et filtres
+- ✅ Horaires dynamiques
+- ✅ Statistiques d'utilisation
+
+### Associations (`associations_ecran.dart`)
+- ✅ Liste des associations
+- ✅ Navigation vers détails
+- ✅ Lien vers actualités
+
+### Administration (`admin_gestion_cantine_ecran.dart`)
+- ✅ Gestion des menus
+- ✅ Définition du menu du jour
+- ✅ Gestion des horaires
+
+## Prochaines Étapes Recommandées
+
+1. **Tests** : Vérifier le bon fonctionnement du menu du jour dynamique
+2. **Optimisation** : Ajouter un cache pour les menus du jour
+3. **UX** : Considérer l'ajout d'animations de transition pour les changements de menu
+4. **Accessibilité** : Ajouter des labels ARIA pour les lecteurs d'écran

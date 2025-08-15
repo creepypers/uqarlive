@@ -6,11 +6,11 @@ import '../../domain/entities/association.dart';
 import '../../domain/entities/utilisateur.dart';
 import '../../domain/entities/actualite.dart';
 import '../../domain/entities/evenement.dart';
-import '../../domain/repositories/livres_repository.dart';
-import '../../domain/repositories/associations_repository.dart';
-import '../../domain/repositories/actualites_repository.dart';
-import '../../domain/repositories/evenements_repository.dart';
-import '../../domain/repositories/membres_association_repository.dart';
+import '../../domain/usercases/livres_repository.dart';
+import '../../domain/usercases/associations_repository.dart';
+import '../../domain/usercases/actualites_repository.dart';
+import '../../domain/usercases/evenements_repository.dart';
+import '../../domain/usercases/membres_association_repository.dart';
 import '../services/authentification_service.dart';
 import 'livres/details_livre_ecran.dart';
 
@@ -25,6 +25,8 @@ import '../widgets/widget_bouton_conversations.dart';
 import '../services/navigation_service.dart';
 import '../services/meteo_service.dart';
 import '../../domain/entities/meteo.dart';
+import '../../domain/entities/menu.dart'; // UI Design: Import pour le type Menu
+import '../../domain/usercases/menus_repository.dart'; // UI Design: Import pour le repository des menus
 
 // UI Design: Page d'accueil UqarLive avec AppBar, sections échange de livres/assos/cantine et navbar
 class AccueilEcran extends StatefulWidget {
@@ -43,6 +45,7 @@ class _AccueilEcranState extends State<AccueilEcran> {
   late final AuthentificationService _authentificationService;
   late final MembresAssociationRepository _membresAssociationRepository;
   late final MeteoService _meteoService;
+  late final MenusRepository _menusRepository; // UI Design: Repository pour les menus du jour
   
   // États des données
   Utilisateur? _utilisateurActuel;
@@ -59,6 +62,8 @@ class _AccueilEcranState extends State<AccueilEcran> {
   bool _donneesChargees = false; // Éviter le rechargement inutile
   Meteo? _meteoRimouski;
   Meteo? _meteoLevis;
+  Menu? _menuDuJour; // UI Design: Menu du jour dynamique
+  bool _chargementMenuDuJour = false; // UI Design: État de chargement du menu du jour
 
   @override
   void initState() {
@@ -101,6 +106,7 @@ class _AccueilEcranState extends State<AccueilEcran> {
           _chargerActualites(), // UI Design: Charger les actualités dynamiques
           _chargerEvenements(), // UI Design: Charger les événements dynamiques
           _chargerMeteo(),
+          _chargerMenuDuJour(), // UI Design: Charger le menu du jour dynamique
         ]);
         _donneesChargees = true;
       } else {
@@ -124,6 +130,7 @@ class _AccueilEcranState extends State<AccueilEcran> {
     _authentificationService = ServiceLocator.obtenirService<AuthentificationService>();
     _membresAssociationRepository = ServiceLocator.obtenirService<MembresAssociationRepository>();
     _meteoService = ServiceLocator.obtenirService<MeteoService>();
+    _menusRepository = ServiceLocator.obtenirService<MenusRepository>(); // UI Design: Initialiser le repository des menus
   }
 
   Future<void> _chargerMesLivres() async {
@@ -993,61 +1000,94 @@ class _AccueilEcranState extends State<AccueilEcran> {
                         ],
                       ),
                       SizedBox(height: screenHeight * 0.01), // UI Design: Espacement adaptatif
-                      Text(
-                        'Pâtes à la sauce marinara, salade césar, dessert du jour',
-                        style: TextStyle(
-                          color: CouleursApp.blanc.withValues(alpha: 0.9),
-                          fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
-                        ),
-                        overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
-                        maxLines: 2,
-                      ),
-                      SizedBox(height: screenHeight * 0.015), // UI Design: Espacement adaptatif
-                      Row(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: screenWidth * 0.02, // UI Design: Padding adaptatif
-                              vertical: screenWidth * 0.01,
-                            ),
-                            decoration: BoxDecoration(
-                              color: CouleursApp.blanc.withValues(alpha: 0.2),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              '12.99\$',
-                              style: TextStyle(
-                                color: CouleursApp.blanc,
-                                fontSize: screenWidth * 0.03, // UI Design: Taille adaptative
-                                fontWeight: FontWeight.bold,
+                      _chargementMenuDuJour
+                        ? const Center(child: CircularProgressIndicator())
+                        : _menuDuJour == null
+                            ? Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.restaurant_menu,
+                                      color: CouleursApp.blanc.withValues(alpha: 0.5),
+                                      size: screenWidth * 0.08, // UI Design: Taille adaptative
+                                    ),
+                                    SizedBox(height: screenHeight * 0.01),
+                                    Text(
+                                      'Aucun menu disponible',
+                                      style: TextStyle(
+                                        color: CouleursApp.blanc.withValues(alpha: 0.7),
+                                        fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
+                                      ),
+                                      overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                                      maxLines: 1,
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    _menuDuJour!.nom,
+                                    style: TextStyle(
+                                      color: CouleursApp.blanc.withValues(alpha: 0.9),
+                                      fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                                    maxLines: 2,
+                                  ),
+                                  SizedBox(height: screenHeight * 0.015), // UI Design: Espacement adaptatif
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: screenWidth * 0.02, // UI Design: Padding adaptatif
+                                          vertical: screenWidth * 0.01,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: CouleursApp.blanc.withValues(alpha: 0.2),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: Text(
+                                          _menuDuJour!.prixFormatte,
+                                          style: TextStyle(
+                                            color: CouleursApp.blanc,
+                                            fontSize: screenWidth * 0.03, // UI Design: Taille adaptative
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                                          maxLines: 1,
+                                        ),
+                                      ),
+                                      if (_menuDuJour!.estVegetarien) ...[
+                                        SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
+                                        Container(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: screenWidth * 0.02, // UI Design: Padding adaptatif
+                                            vertical: screenWidth * 0.01,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.green.withValues(alpha: 0.8),
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                          child: Text(
+                                            _menuDuJour!.estVegan ? 'VEGAN' : 'VÉG',
+                                            style: TextStyle(
+                                              color: CouleursApp.blanc,
+                                              fontSize: screenWidth * 0.025, // UI Design: Taille adaptative
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                            overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                                            maxLines: 1,
+                                          ),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ],
                               ),
-                              overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
-                              maxLines: 1,
-                            ),
-                          ),
-                          SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: screenWidth * 0.02, // UI Design: Padding adaptatif
-                              vertical: screenWidth * 0.01,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.green.withValues(alpha: 0.8),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              'VÉG',
-                              style: TextStyle(
-                                color: CouleursApp.blanc,
-                                fontSize: screenWidth * 0.025, // UI Design: Taille adaptative
-                                fontWeight: FontWeight.bold,
-                              ),
-                              overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
-                              maxLines: 1,
-                            ),
-                          ),
-                        ],
-                      ),
                     ],
                   ),
                 ),
@@ -1140,6 +1180,23 @@ class _AccueilEcranState extends State<AccueilEcran> {
       });
     } catch (e) {
       setState(() => _chargementEvenements = false);
+    }
+  }
+
+  // UI Design: Charger le menu du jour depuis le repository
+  Future<void> _chargerMenuDuJour() async {
+    setState(() => _chargementMenuDuJour = true);
+    try {
+      final menusDuJour = await _menusRepository.obtenirMenusDuJour();
+      if (menusDuJour.isNotEmpty) {
+        setState(() {
+          _menuDuJour = menusDuJour.first; // Prendre le premier menu du jour
+        });
+      }
+    } catch (e) {
+      // Gérer l'erreur
+    } finally {
+      setState(() => _chargementMenuDuJour = false);
     }
   }
 

@@ -4,7 +4,7 @@ import '../../../widgets/widget_barre_app_personnalisee.dart';
 import '../../../../core/di/service_locator.dart';
 import '../../../../domain/entities/association.dart';
 import '../../../../domain/entities/evenement.dart';
-import '../../../../domain/repositories/evenements_repository.dart';
+import '../../../../domain/usercases/evenements_repository.dart';
 
 class AjouterEvenementEcran extends StatefulWidget {
   final Association association;

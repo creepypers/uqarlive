@@ -1,7 +1,7 @@
 // UI Design: Service de messagerie pour UqarLife - Gestion complète des messages
 import '../../domain/entities/message.dart';
-import '../../domain/repositories/messages_repository.dart';
-import '../../domain/repositories/utilisateurs_repository.dart';
+import '../../domain/usercases/messages_repository.dart';
+import '../../domain/usercases/utilisateurs_repository.dart';
 import '../../domain/entities/utilisateur.dart';
 
 class MessagerieService {

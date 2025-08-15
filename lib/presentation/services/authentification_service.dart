@@ -1,7 +1,7 @@
 // UI Design: Service d'authentification pour centraliser la gestion de l'utilisateur connecté
 import '../../core/di/service_locator.dart';
 import '../../domain/entities/utilisateur.dart';
-import '../../domain/repositories/utilisateurs_repository.dart';
+import '../../domain/usercases/utilisateurs_repository.dart';
 
 class AuthentificationService {
   static AuthentificationService? _instance;

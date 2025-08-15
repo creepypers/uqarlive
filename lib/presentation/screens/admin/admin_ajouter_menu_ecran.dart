@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../domain/entities/menu.dart';
-import '../../../domain/repositories/menus_repository.dart';
+import '../../../domain/usercases/menus_repository.dart';
 import '../../../core/di/service_locator.dart';
 import '../../../presentation/widgets/widget_barre_app_navigation_admin.dart';
 

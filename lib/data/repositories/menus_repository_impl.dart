@@ -1,5 +1,5 @@
 import '../../domain/entities/menu.dart';
-import '../../domain/repositories/menus_repository.dart';
+import '../../domain/usercases/menus_repository.dart';
 import '../datasources/internal/menus_datasource_local.dart';
 import '../models/menu_model.dart';
 

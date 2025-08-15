@@ -1,5 +1,5 @@
 import '../../domain/entities/livre.dart';
-import '../../domain/repositories/livres_repository.dart';
+import '../../domain/usercases/livres_repository.dart';
 import '../datasources/internal/livres_datasource_local.dart';
 import '../models/livre_model.dart';
 

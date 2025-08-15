@@ -86,32 +86,16 @@ class NavBarWidget extends StatelessWidget {
     );
   }
 
-  // UI Design: Icône Accueil avec mise en évidence spéciale
+  // UI Design: Icône Accueil sans animation de focus
   Widget _construireIconeAccueil() {
     final estSelectionne = indexSelectionne == 2;
     
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        // Halo de focus pour le bouton Accueil sélectionné
-        if (estSelectionne)
-          Container(
-            width: 35,
-            height: 35,
-            decoration: BoxDecoration(
-              color: CouleursApp.blanc.withValues(alpha: 0.2),
-              shape: BoxShape.circle,
-            ),
-          ),
-        // Icône principale
-        Icon(
-          Icons.home,
-          size: estSelectionne ? 26 : 24,
-          color: estSelectionne 
-              ? CouleursApp.blanc 
-              : CouleursApp.blanc.withValues(alpha: 0.6),
-        ),
-      ],
+    return Icon(
+      Icons.home,
+      size: estSelectionne ? 26 : 24,
+      color: estSelectionne 
+          ? CouleursApp.blanc 
+          : CouleursApp.blanc.withValues(alpha: 0.6),
     );
   }
 } 

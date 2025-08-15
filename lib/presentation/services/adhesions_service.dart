@@ -3,10 +3,10 @@ import '../../core/di/service_locator.dart';
 import '../../domain/entities/demande_adhesion.dart';
 import '../../domain/entities/utilisateur.dart';
 import '../../domain/entities/association.dart';
-import '../../domain/repositories/demandes_adhesion_repository.dart';
-import '../../domain/repositories/membres_association_repository.dart';
-import '../../domain/repositories/associations_repository.dart';
-import '../../domain/repositories/utilisateurs_repository.dart';
+import '../../domain/usercases/demandes_adhesion_repository.dart';
+import '../../domain/usercases/membres_association_repository.dart';
+import '../../domain/usercases/associations_repository.dart';
+import '../../domain/usercases/utilisateurs_repository.dart';
 import 'gestion_membres_service.dart';
 
 class AdhesionsService {

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/di/service_locator.dart';
 import '../../../domain/entities/livre.dart';
-import '../../../domain/repositories/livres_repository.dart';
+import '../../../domain/usercases/livres_repository.dart';
 import 'details_livre_ecran.dart';
 import '../../../presentation/widgets/navbar_widget.dart';
 import '../../../presentation/services/navigation_service.dart';

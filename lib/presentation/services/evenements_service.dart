@@ -1,6 +1,6 @@
 // Clean Architecture: Service pour la gestion des événements
 import '../../domain/entities/evenement.dart';
-import '../../domain/repositories/evenements_repository.dart';
+import '../../domain/usercases/evenements_repository.dart';
 import '../../core/di/service_locator.dart';
 
 class EvenementsService {

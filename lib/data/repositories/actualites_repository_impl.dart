@@ -1,5 +1,5 @@
 import '../../domain/entities/actualite.dart';
-import '../../domain/repositories/actualites_repository.dart';
+import '../../domain/usercases/actualites_repository.dart';
 import '../datasources/internal/actualites_datasource_local.dart';
 
 // UI Design: Implémentation du repository des actualités avec source de données locale

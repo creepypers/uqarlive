@@ -1,13 +1,13 @@
 import '../../core/di/service_locator.dart';
 import '../../domain/entities/utilisateur.dart';
 import '../../domain/entities/association.dart';
-import '../../domain/repositories/actualites_repository.dart';
-import '../../domain/repositories/associations_repository.dart';
-import '../../domain/repositories/evenements_repository.dart';
-import '../../domain/repositories/livres_repository.dart';
-import '../../domain/repositories/menus_repository.dart';
-import '../../domain/repositories/salles_repository.dart';
-import '../../domain/repositories/utilisateurs_repository.dart';
+import '../../domain/usercases/actualites_repository.dart';
+import '../../domain/usercases/associations_repository.dart';
+import '../../domain/usercases/evenements_repository.dart';
+import '../../domain/usercases/livres_repository.dart';
+import '../../domain/usercases/menus_repository.dart';
+import '../../domain/usercases/salles_repository.dart';
+import '../../domain/usercases/utilisateurs_repository.dart';
 
 // UI Design: Service centralisé pour toutes les statistiques de l'application
 class StatistiquesService {

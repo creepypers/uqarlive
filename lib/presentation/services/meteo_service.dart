@@ -1,6 +1,6 @@
 import '../../core/di/service_locator.dart';
 import '../../domain/entities/meteo.dart';
-import '../../domain/repositories/meteo_repository.dart';
+import '../../domain/usercases/meteo_repository.dart';
 
 class MeteoService {
   late final MeteoRepository _meteoRepository;

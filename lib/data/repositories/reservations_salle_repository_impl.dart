@@ -1,5 +1,5 @@
 import '../../domain/entities/reservation_salle.dart';
-import '../../domain/repositories/reservations_salle_repository.dart';
+import '../../domain/usercases/reservations_salle_repository.dart';
 import '../datasources/internal/reservations_salle_datasource_local.dart';
 import '../models/reservation_salle_model.dart';
 
