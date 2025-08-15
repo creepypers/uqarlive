@@ -9,7 +9,6 @@ import '../../../domain/repositories/utilisateurs_repository.dart';
 import '../../services/authentification_service.dart';
 import '../../widgets/widget_barre_app_personnalisee.dart';
 import '../../widgets/widget_collection.dart';
-import '../../widgets/widget_carte.dart';
 import 'conversation_ecran.dart';
 
 class AjouterContactEcran extends StatefulWidget {

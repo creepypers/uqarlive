@@ -286,7 +286,7 @@ class _ConversationsEcranState extends State<ConversationsEcran> {
                   ),
                   prefixIcon: Container(
                     margin: const EdgeInsets.only(left: 8),
-                    child: Icon(
+                    child: const Icon(
                       Icons.search,
                       color: CouleursApp.principal,
                       size: 22,
@@ -418,7 +418,7 @@ class _ConversationsEcranState extends State<ConversationsEcran> {
                       backgroundColor: CouleursApp.principal.withValues(alpha: 0.1),
                       child: Text(
                         initiales,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: CouleursApp.principal,
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
@@ -540,7 +540,7 @@ class _ConversationsEcranState extends State<ConversationsEcran> {
                                 color: CouleursApp.accent.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: Text(
+                              child: const Text(
                                 'Général',
                                 style: TextStyle(
                                   fontSize: 9,
