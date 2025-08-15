@@ -1,13 +1,13 @@
 // UI Design: Écran pour afficher toutes les actualités et événements
 import 'package:flutter/material.dart';
-import '../../../core/di/service_locator.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../domain/entities/actualite.dart';
+import '../../../../core/di/service_locator.dart';
+import '../../../../core/theme/app_theme.dart';
+import '../../../../domain/entities/actualite.dart';
 
-import '../../../domain/repositories/actualites_repository.dart';
-import '../../../domain/repositories/associations_repository.dart';
+import '../../../../domain/repositories/actualites_repository.dart';
+import '../../../../domain/repositories/associations_repository.dart';
 
-import '../../widgets/widget_barre_app_personnalisee.dart';
+import '../../../widgets/widget_barre_app_personnalisee.dart';
 
 class ActualitesEcran extends StatefulWidget {
   const ActualitesEcran({super.key});

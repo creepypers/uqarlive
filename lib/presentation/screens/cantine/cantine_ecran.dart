@@ -9,6 +9,7 @@ import '../../../presentation/widgets/widget_barre_app_personnalisee.dart';
 import '../../../presentation/widgets/widget_carte.dart';
 import '../../../presentation/widgets/widget_collection.dart';
 import '../../../presentation/widgets/widget_section_statistiques.dart';
+import '../../../presentation/widgets/widget_bouton_conversations.dart';
 import '../../../presentation/services/statistiques_service.dart';
 import '../../../presentation/services/navigation_service.dart';
 import 'details_menu_ecran.dart';
@@ -338,6 +339,10 @@ class _CantineEcranState extends State<CantineEcran> {
           ),
         ),
       ),
+
+      // UI Design: Widget réutilisable pour accéder aux conversations
+      floatingActionButton: const WidgetBoutonConversations(),
+
       bottomNavigationBar: NavBarWidget(
         indexSelectionne: 0, // Cantine
         onTap: (index) => NavigationService.gererNavigationNavBar(context, index),

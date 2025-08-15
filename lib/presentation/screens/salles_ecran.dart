@@ -6,6 +6,7 @@ import '../widgets/widget_carte.dart';
 import '../widgets/widget_collection.dart';
 import '../services/navigation_service.dart';
 import '../services/authentification_service.dart';
+import '../widgets/widget_bouton_conversations.dart';
 import '../../core/di/service_locator.dart';
 import '../../domain/repositories/salles_repository.dart';
 import '../../domain/repositories/reservations_salle_repository.dart';
@@ -185,6 +186,7 @@ class _SallesEcranState extends State<SallesEcran> {
           ],
         ),
       ),
+      floatingActionButton: const WidgetBoutonConversations(),
       bottomNavigationBar: NavBarWidget(
         indexSelectionne: 4, // Index pour les salles
         onTap: (index) => NavigationService.gererNavigationNavBar(context, index),

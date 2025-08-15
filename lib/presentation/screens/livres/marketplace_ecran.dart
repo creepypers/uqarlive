@@ -10,6 +10,7 @@ import '../../../presentation/widgets/widget_barre_app_personnalisee.dart';
 import '../../../presentation/widgets/widget_collection.dart';
 import '../../../presentation/widgets/widget_carte.dart';
 import 'gerer_livres_ecran.dart';
+import '../../widgets/widget_bouton_conversations.dart';
 
 import '../../../presentation/services/statistiques_service.dart';
 
@@ -262,6 +263,7 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
           ),
         ),
       ),
+      floatingActionButton: const WidgetBoutonConversations(),
       bottomNavigationBar: NavBarWidget(
         indexSelectionne: 1, // Livres/Marketplace
         onTap: (index) => NavigationService.gererNavigationNavBar(context, index),

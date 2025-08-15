@@ -15,8 +15,8 @@ import '../../../presentation/services/evenements_service.dart';
 import '../../../presentation/services/gestion_membres_service.dart';
 import '../../../presentation/widgets/widget_barre_app_personnalisee.dart';
 import '../../../core/di/service_locator.dart';
-import 'ajouter_actualite_ecran.dart';
-import 'ajouter_evenement_ecran.dart';
+import 'actualites/ajouter_actualite_ecran.dart';
+import 'evenements/ajouter_evenement_ecran.dart';
 
 class GestionAssociationEcran extends StatefulWidget {
   final Association association;

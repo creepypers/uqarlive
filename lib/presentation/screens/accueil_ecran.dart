@@ -15,12 +15,13 @@ import '../services/authentification_service.dart';
 import 'livres/details_livre_ecran.dart';
 
 import 'associations/details_association_ecran.dart';
-import 'actualites/actualites_ecran.dart';
-import 'evenements/evenements_ecran.dart';
+import 'associations/actualites/actualites_ecran.dart';
+import 'associations/evenements/evenements_ecran.dart';
 import '../widgets/navbar_widget.dart';
 import '../widgets/widget_barre_app_personnalisee.dart';
 import '../widgets/widget_carte.dart';
 import '../widgets/widget_collection.dart';
+import '../widgets/widget_bouton_conversations.dart';
 import '../services/navigation_service.dart';
 import '../services/meteo_service.dart';
 import '../../domain/entities/meteo.dart';
@@ -353,6 +354,10 @@ class _AccueilEcranState extends State<AccueilEcran> {
           ),
         ),
       ),
+
+      // UI Design: Widget réutilisable pour accéder aux conversations
+      floatingActionButton: const WidgetBoutonConversations(),
+
       bottomNavigationBar: NavBarWidget(
         indexSelectionne: 2, // Accueil
         onTap: (index) => NavigationService.gererNavigationNavBar(context, index),

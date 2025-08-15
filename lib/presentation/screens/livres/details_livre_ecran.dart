@@ -1,3 +1,5 @@
+// ignore_for_file: unused_import
+
 import 'package:flutter/material.dart';
 
 import '../../../core/di/service_locator.dart';
@@ -7,7 +9,9 @@ import '../../../domain/entities/utilisateur.dart';
 import '../../../domain/repositories/livres_repository.dart';
 import '../../../presentation/services/authentification_service.dart';
 import '../../../presentation/services/transactions_service.dart';
+import '../../../presentation/services/messagerie_service.dart';
 import 'selectionner_livre_echange_ecran.dart';
+import '../messagerie/conversation_ecran.dart';
 
 // UI Design: Page de détails d'un livre avec design UQAR et informations complètes
 class DetailsLivreEcran extends StatefulWidget {
@@ -637,7 +641,7 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: () => _proposerEchange(),
+        onPressed: () => _afficherOptionsContact(),
         style: ElevatedButton.styleFrom(
           backgroundColor: CouleursApp.principal,
           foregroundColor: Colors.white,
@@ -651,12 +655,12 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.swap_horiz,
+            Icon(Icons.contact_support,
                 size: screenWidth * 0.06), // UI Design: Taille adaptative
             SizedBox(
                 width: screenWidth * 0.02), // UI Design: Espacement adaptatif
             Text(
-              'Proposer un échange',
+              'Contacter le propriétaire',
               style: TextStyle(
                 fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
                 fontWeight: FontWeight.bold,
@@ -780,9 +784,137 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
     await _ouvrirSelectionLivreEchange();
   }
 
+  // UI Design: Afficher les options de contact (échange ou message général)
+  Future<void> _afficherOptionsContact() async {
+    if (_utilisateurActuel == null) {
+      _afficherErreur('Vous devez être connecté pour contacter le propriétaire');
+      return;
+    }
+
+    // Vérifier si l'utilisateur a des livres pour l'échange
+    final mesLivres = await _livresRepository.obtenirLivresParProprietaire(_utilisateurActuel!.id);
+    final livresDisponibles = mesLivres.where((livre) => livre.estDisponible && livre.id != widget.livre.id).toList();
+    final peutEchanger = livresDisponibles.isNotEmpty;
+
+    if (mounted) {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) => _construireModalOptionsContact(peutEchanger),
+      );
+    }
+  }
+
   void _contacterProprietaire() {
     // UI Design: Implémenter la messagerie
     _ouvrirMessagerieContact();
+  }
+
+  // UI Design: Construire le modal des options de contact
+  Widget _construireModalOptionsContact(bool peutEchanger) {
+    MediaQuery.of(context);
+
+    return Container(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+        top: 20,
+        left: 20,
+        right: 20,
+      ),
+      decoration: const BoxDecoration(
+        color: CouleursApp.blanc,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Handle
+          Center(
+            child: Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          
+          // Titre
+          Text(
+            'Contacter le propriétaire',
+            style: StylesTexteApp.titre.copyWith(fontSize: 20),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Choisissez comment contacter le propriétaire de "${widget.livre.titre}"',
+            style: StylesTexteApp.champ.copyWith(
+              color: CouleursApp.texteFonce.withValues(alpha: 0.7),
+            ),
+          ),
+          const SizedBox(height: 24),
+          
+          // Option 1: Message général
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Navigator.pop(context);
+                _ouvrirMessagerieContact();
+              },
+              icon: const Icon(Icons.message, color: CouleursApp.blanc),
+              label: const Text('Envoyer un message'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: CouleursApp.principal,
+                foregroundColor: CouleursApp.blanc,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          
+          // Option 2: Proposer un échange (si possible)
+          if (peutEchanger) ...[
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _proposerEchange();
+                },
+                icon: const Icon(Icons.swap_horiz, color: CouleursApp.blanc),
+                label: const Text('Proposer un échange'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: CouleursApp.accent,
+                  foregroundColor: CouleursApp.blanc,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+          
+          // Bouton Annuler
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton(
+              onPressed: () => Navigator.pop(context),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              child: const Text('Annuler'),
+            ),
+          ),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
   }
 
   Widget _construireBoutonAcheter() {
@@ -1013,100 +1145,18 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
       return;
     }
 
-    showDialog(
-      context: context,
-      builder: (context) => _construireDialogueMessage(),
-    );
-  }
-
-  // UI Design: Construire le dialogue de message
-  Widget _construireDialogueMessage() {
-    final TextEditingController controleurMessage = TextEditingController();
-    
-    return AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      title: Text('Contacter ${widget.livre.proprietaire}'),
-      content: SingleChildScrollView(
-        child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Concernant: "${widget.livre.titre}"',
-            style: StylesTexteApp.champ.copyWith(
-              fontWeight: FontWeight.w500,
-              color: CouleursApp.principal,
-            ),
-          ),
-          const SizedBox(height: 16),
-            SizedBox(
-              height: 120, // Hauteur fixe pour éviter le débordement
-              child: TextField(
-            controller: controleurMessage,
-                maxLines: null, // Permet l'expansion
-                expands: true, // Utilise tout l'espace disponible
-            autofocus: true,
-            style: StylesTexteApp.champ,
-            decoration: InputDecoration(
-              hintText: 'Votre message...',
-              hintStyle: StylesTexteApp.champ.copyWith(
-                color: CouleursApp.texteFonce.withValues(alpha: 0.5),
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: CouleursApp.principal.withValues(alpha: 0.3)),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: CouleursApp.principal, width: 2),
-              ),
-              contentPadding: const EdgeInsets.all(16),
-                ),
-            ),
-          ),
-        ],
+    // UI Design: Ouvrir l'écran de messagerie avec le propriétaire du livre
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ConversationEcran(
+          destinataireId: widget.livre.proprietaireId,
+          destinataireNom: widget.livre.proprietaire,
+          destinatairePrenom: '', // Le nom complet est dans proprietaire
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Annuler'),
-        ),
-        ElevatedButton(
-          onPressed: () async {
-            if (controleurMessage.text.trim().isEmpty) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Veuillez saisir un message'),
-                  backgroundColor: Colors.orange,
-                ),
-              );
-              return;
-            }
-
-            Navigator.of(context).pop();
-            await _envoyerMessage(controleurMessage.text.trim());
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: CouleursApp.principal,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-          child: const Text('Envoyer', style: TextStyle(color: CouleursApp.blanc)),
-        ),
-      ],
     );
   }
 
-  // UI Design: Envoyer un message
-  Future<void> _envoyerMessage(String contenu) async {
-    try {
-      // Pour l'instant, on simule l'envoi de message
-      // Dans une vraie implémentation, on aurait un service de messagerie
-      await Future.delayed(const Duration(milliseconds: 500));
-      
-      _afficherInfo('Message envoyé à ${widget.livre.proprietaire} !');
-    } catch (e) {
-      _afficherErreur('Erreur lors de l\'envoi du message: ${e.toString()}');
-    }
-  }
+
 }

@@ -20,6 +20,8 @@ import '../../../presentation/widgets/widget_carte.dart';
 
 import '../../../presentation/widgets/widget_collection.dart';
 
+import '../../../presentation/widgets/widget_bouton_conversations.dart';
+
 import '../../../presentation/services/navigation_service.dart';
 
 import '../../../presentation/services/authentification_service.dart';
@@ -72,8 +74,7 @@ class _GererLivresEcranState extends State<GererLivresEcran> with SingleTickerPr
 
   int _sectionActuelle = 0; // UI Design: Variable pour suivre la section active
   
-  // UI Design: Contrôleur pour les messages de réponse
-  final TextEditingController _messageController = TextEditingController();
+
   
 
   // Variables pour les filtres avancés
@@ -120,7 +121,7 @@ class _GererLivresEcranState extends State<GererLivresEcran> with SingleTickerPr
 
     
 
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this); // UI Design: Corrigé pour 2 onglets
 
     _tabController.addListener(() {
 
@@ -145,7 +146,7 @@ class _GererLivresEcranState extends State<GererLivresEcran> with SingleTickerPr
 
     _tabController.dispose();
 
-    _messageController.dispose();
+
     super.dispose();
 
   }
@@ -177,7 +178,7 @@ class _GererLivresEcranState extends State<GererLivresEcran> with SingleTickerPr
         ).toList();
         
         if (nouvellesTransactions.isNotEmpty && mounted) {
-          _afficherNouveauxMessages(nouvellesTransactions.length);
+    
         }
       } else {
 
@@ -393,8 +394,6 @@ class _GererLivresEcranState extends State<GererLivresEcran> with SingleTickerPr
 
                 Tab(text: 'Mes Livres'),
 
-                Tab(text: 'Messages'),
-
                 Tab(text: 'Échanges'),
 
               ],
@@ -437,11 +436,7 @@ class _GererLivresEcranState extends State<GererLivresEcran> with SingleTickerPr
                    ),
                 ),
 
-                // Tab 2: Messages
-
-                _construireSectionMessages(),
-
-                // Tab 3: Échanges
+                // Tab 2: Échanges
 
                 _construireSectionEchanges(),
 
@@ -454,6 +449,9 @@ class _GererLivresEcranState extends State<GererLivresEcran> with SingleTickerPr
         ],
 
       ),
+
+      // UI Design: Widget réutilisable pour accéder aux conversations
+      floatingActionButton: const WidgetBoutonConversations(),
 
       bottomNavigationBar: NavBarWidget(
 
@@ -756,136 +754,107 @@ class _GererLivresEcranState extends State<GererLivresEcran> with SingleTickerPr
     );
   }
   
-  // UI Design: Section Échanges simplifiée et roundy
+  // UI Design: Section Échanges style Facebook moderne
   Widget _construireSectionEchanges() {
-
     if (_isLoadingTransactions) {
-
-      return const Center(child: CircularProgressIndicator());
-
+      return const Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(CouleursApp.principal),
+        ),
+      );
     }
 
-    
-
     if (_mesTransactions.isEmpty) {
-
       return Center(
-
         child: Column(
-
           mainAxisAlignment: MainAxisAlignment.center,
-
           children: [
-
             Container(
-              width: 120,
-              height: 120,
+              width: 100,
+              height: 100,
               decoration: BoxDecoration(
-                color: CouleursApp.accent.withValues(alpha: 0.1),
+                color: CouleursApp.principal.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
                 Icons.swap_horiz, 
-                size: 60, 
-                color: CouleursApp.accent
+                size: 50, 
+                color: CouleursApp.principal
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Aucun échange en cours',
+              style: StylesTexteApp.titre.copyWith(fontSize: 20),
+              ),
+            const SizedBox(height: 8),
+            Text(
+              'Commencez par proposer vos livres\nou cherchez des livres à échanger',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14,
+                color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                height: 1.4,
               ),
             ),
             const SizedBox(height: 24),
-            Text(
-
-              'Aucun échange en cours',
-
-              style: StylesTexteApp.titre.copyWith(fontSize: 24),
-              ),
-
-            const SizedBox(height: 12),
-            Text(
-
-              'Commencez par proposer vos livres\nou cherchez des livres à échanger',
-
-              textAlign: TextAlign.center,
-
-              style: TextStyle(
-
-                fontSize: 16,
-                color: CouleursApp.texteFonce.withValues(alpha: 0.6),
-                height: 1.5,
-              ),
-
-            ),
-
-            const SizedBox(height: 32),
             ElevatedButton.icon(
-
-              onPressed: () {
-
-                _tabController.animateTo(0); // Retourner à l'onglet Mes Livres
-
-              },
-
-              icon: const Icon(Icons.arrow_back),
-
+              onPressed: () => _tabController.animateTo(0),
+              icon: const Icon(Icons.arrow_back, size: 18),
               label: const Text('Retour aux livres'),
-
               style: ElevatedButton.styleFrom(
-
                 backgroundColor: CouleursApp.principal,
-
-                foregroundColor: CouleursApp.blanc,
-
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                elevation: 3,
+                elevation: 2,
               ),
-
             ),
-
           ],
-
         ),
-
       );
-
     }
 
-    
+    // Grouper les transactions par statut
+    final transactionsEnAttente = _mesTransactions.where((t) => t.statut == 'en_attente').toList();
+    final transactionsEnCours = _mesTransactions.where((t) => t.statut == 'en_cours').toList();
+    final transactionsTerminees = _mesTransactions.where((t) => t.statut == 'terminee').toList();
 
-    return Column(
-
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-
-        // En-tête roundy
+          // En-tête style Facebook
         Container(
-
-          margin: const EdgeInsets.all(16),
-          padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: CouleursApp.accent.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: CouleursApp.accent.withValues(alpha: 0.2),
-              width: 2,
-            ),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                ),
+              ],
           ),
           child: Row(
-
             children: [
-
               Container(
-                padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(10),
                 decoration: const BoxDecoration(
-                  color: CouleursApp.accent,
+                    color: CouleursApp.principal,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
                   Icons.swap_horiz, 
                   color: Colors.white,
-                  size: 24,
+                    size: 20,
                 ),
               ),
-              const SizedBox(width: 16),
+                const SizedBox(width: 12),
               Expanded(
-
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -893,47 +862,418 @@ class _GererLivresEcranState extends State<GererLivresEcran> with SingleTickerPr
                       'Mes Échanges',
                       style: StylesTexteApp.titre.copyWith(
                         fontSize: 18,
-                        color: CouleursApp.accent,
+                          color: CouleursApp.texteFonce,
                       ),
                     ),
                     Text(
                       '${_mesTransactions.length} transaction(s) au total',
                       style: TextStyle(
-                        fontSize: 14,
-                        color: CouleursApp.texteFonce.withValues(alpha: 0.7),
+                          fontSize: 13,
+                          color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                      ),
+                    ),
+                  ],
+                ),
+                ),
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 20),
+
+          // Section En Attente
+          if (transactionsEnAttente.isNotEmpty) ...[
+            _construireSectionStatut('En Attente', transactionsEnAttente, Icons.schedule, Colors.orange),
+            const SizedBox(height: 20),
+          ],
+
+          // Section En Cours
+          if (transactionsEnCours.isNotEmpty) ...[
+            _construireSectionStatut('En Cours', transactionsEnCours, Icons.sync, CouleursApp.principal),
+            const SizedBox(height: 20),
+          ],
+
+          // Section Terminées
+          if (transactionsTerminees.isNotEmpty) ...[
+            _construireSectionStatut('Terminées', transactionsTerminees, Icons.check_circle, Colors.green),
+          ],
+        ],
+      ),
+    );
+  }
+
+  // UI Design: Section par statut style Facebook
+  Widget _construireSectionStatut(String titre, List<Transaction> transactions, IconData icone, Color couleur) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Titre de section
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 12),
+          child: Row(
+            children: [
+              Icon(icone, color: couleur, size: 18),
+              const SizedBox(width: 8),
+              Text(
+                titre,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: CouleursApp.texteFonce,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: couleur.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '${transactions.length}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: couleur,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // Cartes des transactions
+        ...transactions.map((transaction) => _construireCarteTransactionFacebook(transaction, couleur)),
+      ],
+    );
+  }
+
+  // UI Design: Carte de transaction style Facebook moderne
+  Widget _construireCarteTransactionFacebook(Transaction transaction, Color couleurSection) {
+    final estVendeur = transaction.vendeurId == _utilisateurActuel?.id;
+    final estAcheteur = transaction.acheteurId == _utilisateurActuel?.id;
+    
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // En-tête de la carte
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: couleurSection.withValues(alpha: 0.05),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(12),
+                topRight: Radius.circular(12),
+              ),
+            ),
+            child: Row(
+              children: [
+                // Avatar de l'utilisateur
+                CircleAvatar(
+                  radius: 20,
+                  backgroundColor: couleurSection.withValues(alpha: 0.2),
+                  child: Text(
+                    estVendeur 
+                      ? _obtenirInitialesUtilisateur(transaction.acheteurId)
+                      : _obtenirInitialesUtilisateur(transaction.vendeurId),
+                    style: TextStyle(
+                      color: couleurSection,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+        Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        estVendeur 
+                          ? 'Demande d\'échange reçue'
+                          : 'Demande d\'échange envoyée',
+                        // ignore: prefer_const_constructors
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: CouleursApp.texteFonce,
+                        ),
+                      ),
+                      Text(
+                        estVendeur 
+                          ? 'de ${_obtenirInitialesUtilisateur(transaction.acheteurId)}'
+                          : 'vers ${_obtenirInitialesUtilisateur(transaction.vendeurId)}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // Statut avec badge coloré
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: couleurSection,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    _obtenirTexteStatut(transaction.statut),
+                    style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Contenu de la transaction
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Livres impliqués
+                Row(
+                  children: [
+                    // Livre de l'utilisateur
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: CouleursApp.fond,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: CouleursApp.principal.withValues(alpha: 0.2),
+                            width: 1,
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Row(
+                              children: [
+                                Icon(
+                                  Icons.book,
+                                  color: CouleursApp.principal,
+                                  size: 16,
+                                ),
+                                SizedBox(width: 6),
+                                Text(
+                                  'Votre livre',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                    color: CouleursApp.principal,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              _obtenirNomLivre(estVendeur ? transaction.livreId : (transaction.livreEchangeId ?? '')),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: CouleursApp.texteFonce,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    
+                    // Flèche d'échange
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Icon(
+                        Icons.swap_horiz,
+                        color: couleurSection,
+                        size: 24,
+                      ),
+                    ),
+                    
+                    // Livre de l'autre utilisateur
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: CouleursApp.fond,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: couleurSection.withValues(alpha: 0.3),
+                            width: 1,
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.book,
+                                  color: couleurSection,
+                                  size: 16,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  'Livre reçu',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                    color: couleurSection,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              _obtenirNomLivre(estVendeur ? (transaction.livreEchangeId ?? '') : transaction.livreId),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: CouleursApp.texteFonce,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
                 ),
 
-              ),
+                // Message de l'acheteur (si présent)
+                if (transaction.messageAcheteur != null && transaction.messageAcheteur!.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: CouleursApp.fond,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: CouleursApp.texteFonce.withValues(alpha: 0.1),
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.message_outlined,
+                          color: CouleursApp.texteFonce.withValues(alpha: 0.5),
+                          size: 16,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            transaction.messageAcheteur!,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: CouleursApp.texteFonce.withValues(alpha: 0.8),
+                              height: 1.3,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
 
-            ],
-
-          ),
-
-        ),
-
-        
-
-        // Liste des transactions
-
-        Expanded(
-
-          child: SingleChildScrollView(
-            child: Column(
-              children: _mesTransactions.map((transaction) => 
-                _construireCarteTransaction(transaction)
-              ).toList(),
+                // Date et actions
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    // Date
+                    Expanded(
+                      child: Text(
+                        _formaterDate(transaction.dateCreation),
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: CouleursApp.texteFonce.withValues(alpha: 0.5),
+                        ),
+                      ),
+                    ),
+                    
+                    // Actions selon le statut
+                    if (transaction.statut == 'en_attente' && estVendeur) ...[
+                      // Boutons Accepter/Refuser pour le vendeur
+                      OutlinedButton(
+                        onPressed: () => _refuserTransaction(transaction.id),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.red,
+                          side: const BorderSide(color: Colors.red, width: 1),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          minimumSize: const Size(0, 32),
+                        ),
+                        child: const Text('Refuser', style: TextStyle(fontSize: 12)),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: () => _confirmerTransaction(transaction.id),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: couleurSection,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          minimumSize: const Size(0, 32),
+                        ),
+                        child: const Text('Accepter', style: TextStyle(fontSize: 12)),
+                      ),
+                    ] else if (transaction.statut == 'en_attente' && estAcheteur) ...[
+                      // Bouton Annuler pour l'acheteur
+                      OutlinedButton(
+                        onPressed: () => _afficherSucces('Fonctionnalité d\'annulation à implémenter'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                          side: BorderSide(color: CouleursApp.texteFonce.withValues(alpha: 0.3), width: 1),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          minimumSize: const Size(0, 32),
+                        ),
+                        child: const Text('Annuler', style: TextStyle(fontSize: 12)),
+                      ),
+                    ] else if (transaction.statut == 'en_cours') ...[
+                      // Bouton de suivi pour les transactions en cours
+                      OutlinedButton.icon(
+                        onPressed: () => _afficherSucces('Suivi de transaction activé'),
+                        icon: Icon(Icons.visibility, size: 14, color: couleurSection),
+                        label: Text('Suivre', style: TextStyle(fontSize: 12, color: couleurSection)),
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: couleurSection, width: 1),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          minimumSize: const Size(0, 32),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ],
             ),
           ),
-
-        ),
-
-      ],
-
+        ],
+      ),
     );
-
   }
 
   
@@ -1521,8 +1861,8 @@ class _GererLivresEcranState extends State<GererLivresEcran> with SingleTickerPr
       try {
         final livre = await _livresRepository.obtenirLivreParId(livreId);
         if (livre != null && livre.proprietaireId == _utilisateurActuel?.id && mounted) {
-          setState(() {
-            if (!_mesLivres.any((l) => l.id == livreId)) {
+        setState(() {
+          if (!_mesLivres.any((l) => l.id == livreId)) {
               _mesLivres.add(livre);
             }
           });
@@ -2293,7 +2633,7 @@ class _GererLivresEcranState extends State<GererLivresEcran> with SingleTickerPr
       _afficherSucces('Message envoyé avec succès !');
       
       // UI Design: Basculer vers l'onglet Échanges pour voir la réponse
-      _tabController.animateTo(2);
+      _tabController.animateTo(1); // UI Design: Corrigé pour 1 onglet (Échanges)
       
     } catch (e) {
       _afficherErreur('Erreur lors de l\'envoi du message: $e');
@@ -2310,66 +2650,7 @@ class _GererLivresEcranState extends State<GererLivresEcran> with SingleTickerPr
     );
   }
 
-  // UI Design: Méthode pour afficher les nouveaux messages reçus
-  void _afficherNouveauxMessages(int nombreMessages) {
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.message,
-                  color: CouleursApp.principal,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Nouveau(x) message(s)',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Text(
-                      '$nombreMessages nouvelle(s) demande(s) d\'échange',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.white.withValues(alpha: 0.9),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: CouleursApp.accent,
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 4),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          action: SnackBarAction(
-            label: 'Voir',
-            textColor: Colors.white,
-            onPressed: () {
-              // UI Design: Basculer vers l'onglet Messages
-              _tabController.animateTo(1);
-            },
-          ),
-        ),
-      );
-    }
-  }
+
 
   // UI Design: Méthode pour construire le modal de réponse
   Widget _construireModalReponse(Transaction transaction) {
@@ -2440,18 +2721,7 @@ class _GererLivresEcranState extends State<GererLivresEcran> with SingleTickerPr
           ),
           const SizedBox(height: 20),
           
-          // Champ de message
-          TextFormField(
-            controller: _messageController,
-            maxLines: 4,
-            decoration: InputDecoration(
-              labelText: 'Votre message',
-              hintText: 'Tapez votre réponse...',
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-              contentPadding: const EdgeInsets.all(16),
-            ),
-          ),
-          const SizedBox(height: 24),
+
           
           // Boutons d'action
           Row(
@@ -2471,11 +2741,8 @@ class _GererLivresEcranState extends State<GererLivresEcran> with SingleTickerPr
               Expanded(
                 child: ElevatedButton(
                   onPressed: () {
-                    if (_messageController.text.trim().isNotEmpty) {
-                      _envoyerMessageReponse(transaction, _messageController.text.trim());
-                      _messageController.clear();
+                    _envoyerMessageReponse(transaction, 'Réponse automatique via l\'application');
                       Navigator.pop(context);
-                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: CouleursApp.principal,
@@ -2825,6 +3092,8 @@ class _GererLivresEcranState extends State<GererLivresEcran> with SingleTickerPr
     );
 
   }
+
+
 
 }
 

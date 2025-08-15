@@ -8,6 +8,7 @@ import '../../../domain/entities/message.dart';
 import '../../../domain/entities/utilisateur.dart';
 import '../../services/messagerie_service.dart';
 import '../../services/authentification_service.dart';
+import '../../widgets/widget_barre_app_personnalisee.dart';
 
 class ConversationEcran extends StatefulWidget {
   final String destinataireId;
@@ -111,11 +112,15 @@ class _ConversationEcranState extends State<ConversationEcran> {
         typeMessage: 'general',
       );
       
+      // UI Design: Ajouter le message à la liste locale pour l'affichage immédiat
       setState(() {
         _messages.add(nouveauMessage);
       });
       
       _messageController.clear();
+      
+      // UI Design: Recharger les messages depuis le repository pour synchronisation
+      await _chargerMessages();
       
       // UI Design: Faire défiler vers le bas pour voir le nouveau message
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -129,6 +134,22 @@ class _ConversationEcranState extends State<ConversationEcran> {
       });
     } catch (e) {
       _afficherErreur('Erreur lors de l\'envoi du message: $e');
+    }
+  }
+
+  // UI Design: Recharger les messages depuis le repository
+  Future<void> _chargerMessages() async {
+    try {
+      final conversation = await _messagerieService.obtenirConversation(
+        _utilisateurActuelId!,
+        widget.destinataireId,
+      );
+      
+      setState(() {
+        _messages = conversation;
+      });
+    } catch (e) {
+      _afficherErreur('Erreur lors du rechargement des messages: $e');
     }
   }
 
@@ -147,7 +168,11 @@ class _ConversationEcranState extends State<ConversationEcran> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: CouleursApp.fond,
-      appBar: _construireAppBar(),
+      appBar: WidgetBarreAppPersonnalisee(
+      titre: _destinataire?.prenom ?? widget.destinatairePrenom ?? 'Conversation',
+      sousTitre: 'Conversation en cours',
+      afficherBoutonRetour: true,
+    ),
       body: Column(
         children: [
           Expanded(
@@ -165,30 +190,8 @@ class _ConversationEcranState extends State<ConversationEcran> {
     );
   }
 
-  // UI Design: Construire l'AppBar
-  PreferredSizeWidget _construireAppBar() {
-    final nomComplet = _destinataire != null
-        ? '${_destinataire!.prenom} ${_destinataire!.nom}'
-        : widget.destinataireNom != null && widget.destinatairePrenom != null
-            ? '${widget.destinatairePrenom} ${widget.destinataireNom}'
-            : 'Conversation';
+  // UI Design: Construire l'AppBar personnalisé
 
-    return AppBar(
-      title: Text(
-        nomComplet,
-        style: StylesTexteApp.titre.copyWith(
-          color: CouleursApp.blanc,
-          fontSize: 20,
-        ),
-      ),
-      backgroundColor: CouleursApp.principal,
-      elevation: 0,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back, color: CouleursApp.blanc),
-        onPressed: () => Navigator.pop(context),
-      ),
-    );
-  }
 
   // UI Design: Construire la liste des messages
   Widget _construireListeMessages() {

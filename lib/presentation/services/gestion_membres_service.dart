@@ -164,7 +164,7 @@ class GestionMembresService {
         await utilisateursRepo.modifierUtilisateur(utilisateurMiseAJour);
       }
     } catch (e) {
-    
+      throw Exception('Erreur lors de la mise à jour de la cohérence: $e');
     }
   }
 

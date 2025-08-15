@@ -1,13 +1,13 @@
 // UI Design: Écran pour afficher tous les événements avec inscriptions
 import 'package:flutter/material.dart';
-import '../../../core/di/service_locator.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../domain/entities/evenement.dart';
-import '../../../domain/repositories/evenements_repository.dart';
-import '../../../domain/repositories/associations_repository.dart';
-import '../../services/evenements_service.dart';
-import '../../services/authentification_service.dart';
-import '../../widgets/widget_barre_app_personnalisee.dart';
+import '../../../../core/di/service_locator.dart';
+import '../../../../core/theme/app_theme.dart';
+import '../../../../domain/entities/evenement.dart';
+import '../../../../domain/repositories/evenements_repository.dart';
+import '../../../../domain/repositories/associations_repository.dart';
+import '../../../services/evenements_service.dart';
+import '../../../services/authentification_service.dart';
+import '../../../widgets/widget_barre_app_personnalisee.dart';
 
 class EvenementsEcran extends StatefulWidget {
   const EvenementsEcran({super.key});

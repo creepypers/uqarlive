@@ -1,10 +1,10 @@
 // UI Design: Écran d'ajout/modification d'événements pour les chefs d'association
 import 'package:flutter/material.dart';
-
-import '../../../core/di/service_locator.dart';
-import '../../../domain/entities/association.dart';
-import '../../../domain/entities/evenement.dart';
-import '../../../domain/repositories/evenements_repository.dart';
+import '../../../widgets/widget_barre_app_personnalisee.dart';
+import '../../../../core/di/service_locator.dart';
+import '../../../../domain/entities/association.dart';
+import '../../../../domain/entities/evenement.dart';
+import '../../../../domain/repositories/evenements_repository.dart';
 
 class AjouterEvenementEcran extends StatefulWidget {
   final Association association;
@@ -246,11 +246,10 @@ class _AjouterEvenementEcranState extends State<AjouterEvenementEcran> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Créer un événement'),
-        backgroundColor: const Color(0xFF005499),
-        foregroundColor: Colors.white,
-        elevation: 0,
+      appBar: WidgetBarreAppPersonnalisee(
+        titre: 'Créer un événement',
+        sousTitre: 'Association: ${widget.association.nom}',
+        afficherBoutonRetour: true,
       ),
       body: SafeArea(
         child: SingleChildScrollView(

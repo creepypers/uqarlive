@@ -123,13 +123,13 @@
 
 #### 📱 **Sections Redesignées**
 
-##### **Section Messages** 💬
+##### **Section Messages 💬
 - **En-tête roundy :** Container avec `borderRadius: 24` et bordure colorée
 - **Icône circulaire :** Container blanc avec icône UQAR dans un cercle parfait
 - **Cartes modernes :** `Card` avec `elevation: 3` et coins très arrondis
 - **Informations livres :** Widget `_construireInfoLivreRoundy()` avec design circulaire
 
-##### **Section Échanges** 🔄
+##### **Section Échanges 🔄
 - **En-tête roundy :** Container avec `borderRadius: 24` et couleurs d'accent
 - **Cartes restructurées :** Suppression des messages, focus sur les informations de transaction
 - **Boutons roundy :** Tous les boutons utilisent `borderRadius: 16-20`
@@ -4317,96 +4317,317 @@ Maintenir la cohérence des données entre les entités `Association`, `Utilisat
 - **Fichier modifié** : `messages_datasource_local.dart` - Méthode `envoyerMessage()`
 - **Résultat** : Les messages sont maintenant sauvegardés et persistent entre les sessions
 
-## 📱 Écrans mis à jour
+### 3. **Messages simples n'apparaissaient pas** ✅ CORRIGÉ
+- **Problème** : Manque de messages de test de type 'general' et synchronisation des écrans
+- **Solution** : 
+  - Ajout de 6 nouveaux messages de test de type 'general' dans le datasource
+  - Amélioration de la synchronisation dans l'écran de conversation
+  - Ajout de la méthode `_chargerMessages()` dans `ConversationEcran`
+- **Fichiers modifiés** : 
+  - `messages_datasource_local.dart` - Ajout de messages de test
+  - `conversation_ecran.dart` - Amélioration de la synchronisation
+- **Résultat** : Les messages simples (sans échange) apparaissent maintenant correctement
 
-### Messagerie
-- **messagerie_ecran.dart** - Écran principal de messagerie
-  - ✅ TODOs implémentés : injection de service, recherche, ouverture de conversations, ajout de contacts
-  - ✅ **NOUVEAU** : Logique d'envoi de messages avec destinataire spécifique implémentée
-  - ✅ Interface moderne avec onglets (Messages, Conversations, Contacts)
-  - ✅ Barre de recherche fonctionnelle
-  - ✅ Navigation vers écrans de conversation et d'ajout de contacts
-  - ✅ Modal d'envoi de nouveau message avec validation et recherche d'utilisateur
+### 4. **Marketplace : Messages généraux via bouton existant** ✅ IMPLÉMENTÉ
+- **Problème** : Le bouton "Proposer un échange" ne permettait que les échanges, pas les messages généraux
+- **Solution** : 
+  - Modification du bouton pour "Contacter le propriétaire"
+  - Ajout d'un modal avec deux options : message général OU échange
+  - Intégration avec l'écran de conversation pour les messages généraux
+- **Fichier modifié** : `details_livre_ecran.dart`
+- **Résultat** : Les utilisateurs peuvent maintenant envoyer des messages généraux depuis le marketplace
 
-### Gestion des Livres
-- **gerer_livres_ecran.dart** - Écran de gestion des livres personnels
-  - ✅ **CORRIGÉ** : Problème de livres apparaissant chez le mauvais utilisateur
-  - ✅ **CORRIGÉ** : Méthode `_chargerLivresManquants()` maintenant sécurisée
-  - ✅ Interface avec onglets (Mes Livres, Messages, Échanges)
-  - ✅ Gestion des transactions et demandes d'échange
-  - ✅ Filtres et recherche de livres
+### 5. **Section Messages supprimée de la gestion des livres** ✅ SUPPRIMÉE
+- **Problème** : L'onglet "Messages" dans la gestion des livres créait de la confusion avec la messagerie principale
+- **Solution** : 
+  - Suppression complète de l'onglet "Messages"
+  - Suppression des méthodes `_construireSectionMessages()` et `_construireCarteMessage()`
+  - Simplification du modal de réponse (réponse automatique)
+  - Conservation uniquement des onglets "Mes Livres" et "Échanges"
+- **Fichier modifié** : `gerer_livres_ecran.dart`
+- **Résultat** : Interface simplifiée et plus claire, focus sur la gestion des livres et échanges
 
-### Nouveaux écrans créés
-- **conversation_ecran.dart** - Écran de conversation individuelle
-  - ✅ Interface de chat moderne avec bulles de messages
-  - ✅ Barre de saisie avec envoi de messages
-  - ✅ Gestion des conversations en temps réel
-  - ✅ Design cohérent avec le thème UQAR
+### 6. **Popup "nouveaux messages" supprimé** ✅ SUPPRIMÉ
+- **Problème** : Le popup "2 nouveaux messages" était intrusif et créait de la confusion
+- **Solution** : 
+  - Suppression complète de la méthode `_afficherNouveauxMessages()`
+  - Suppression de l'appel automatique lors de la détection de nouvelles transactions
+  - Interface plus épurée sans notifications popup
+- **Fichier modifié** : `gerer_livres_ecran.dart`
+- **Résultat** : Interface plus calme et moins intrusive
 
-- **ajouter_contact_ecran.dart** - Écran d'ajout de contacts
-  - ✅ Recherche d'utilisateurs par nom, email ou prénom
-  - ✅ Interface de recherche en temps réel
-  - ✅ Ajout de contacts à la liste des conversations
-  - ✅ Design moderne avec thème UQAR
+### 7. **Section Échanges redesignée style Facebook** ✅ IMPLÉMENTÉ
+- **Problème** : L'ancien design de la section échanges était trop basique et peu moderne
+- **Solution** : 
+  - Redesign complet avec un style inspiré de Facebook
+  - Groupement des transactions par statut (En Attente, En Cours, Terminées)
+  - Cartes modernes avec ombres, bordures arrondies et couleurs par statut
+  - Affichage des livres impliqués avec flèche d'échange
+  - Badges colorés pour les statuts
+  - Actions contextuelles selon le statut de la transaction
+- **Fichier modifié** : `gerer_livres_ecran.dart`
+- **Nouvelles méthodes** : 
+  - `_construireSectionStatut()` : Création des sections par statut
+  - `_construireCarteTransactionFacebook()` : Cartes de transaction style Facebook
+- **Résultat** : Interface moderne, intuitive et visuellement attrayante
 
-## 🔧 Services et fonctionnalités implémentés
+### 8. **Widget réutilisable pour bouton de conversations** ✅ CRÉÉ
+- **Problème** : Besoin d'un accès rapide aux conversations depuis tous les écrans principaux
+- **Solution** : 
+  - Création d'un widget réutilisable `WidgetBoutonConversations`
+  - Support des modes étendu (avec texte) et compact (icône uniquement)
+  - Design cohérent avec le thème UQAR
+  - Navigation automatique vers l'écran de messagerie
+- **Fichier créé** : `lib/presentation/widgets/widget_bouton_conversations.dart`
+- **Fonctionnalités** : 
+  - Mode étendu par défaut avec icône et texte "Conversations"
+  - Mode compact optionnel avec icône uniquement
+  - Personnalisation de l'élévation et des marges
+  - Navigation automatique vers `/messagerie`
+- **Résultat** : Composant réutilisable et cohérent pour l'accès aux conversations
 
-### MessagerieService
-- ✅ Envoi de messages généraux entre utilisateurs
-- ✅ Gestion des conversations et messages récents
-- ✅ Validation et formatage des messages
-- ✅ Intégration avec le repository des messages
+### 9. **Bouton de conversations ajouté sur tous les écrans principaux** ✅ IMPLÉMENTÉ
+- **Problème** : Les utilisateurs devaient naviguer via la barre de navigation pour accéder aux conversations
+- **Solution** : 
+  - Ajout du `WidgetBoutonConversations` sur tous les écrans principaux
+  - Positionnement en tant que `floatingActionButton` pour un accès facile
+  - Cohérence visuelle et fonctionnelle sur toute l'application
+- **Écrans modifiés** : 
+  - `accueil_ecran.dart` - Écran d'accueil principal
+  - `gerer_livres_ecran.dart` - Gestion des livres personnels
+  - `associations_ecran.dart` - Associations étudiantes
+  - `cantine_ecran.dart` - Cantine et menus
+- **Résultat** : Accès rapide et cohérent aux conversations depuis n'importe quel écran principal
 
-### Fonctionnalités d'envoi de messages
-- ✅ **Recherche d'utilisateur** : Par email, nom ou prénom
-- ✅ **Validation** : Destinataire requis, pas d'auto-message
-- ✅ **Envoi sécurisé** : Via le service de messagerie
-- ✅ **Feedback utilisateur** : Messages de succès/erreur
-- ✅ **Actualisation** : Rechargement automatique des messages
-- ✅ **Persistance** : Messages maintenant sauvegardés
+### 10. **Erreur TabController corrigée** ✅ RÉSOLUE
+- **Problème** : Erreur "Controller's length property (3) does not match the number of tabs (2)" dans `gerer_livres_ecran.dart`
+- **Cause** : Le TabController était configuré avec `length: 3` mais nous n'avions que 2 onglets après la suppression de la section Messages
+- **Solution** : 
+  - Modification de `_tabController = TabController(length: 3, vsync: this)` vers `length: 2`
+  - Correction de `_tabController.animateTo(2)` vers `_tabController.animateTo(1)`
+- **Fichier modifié** : `gerer_livres_ecran.dart`
+- **Résultat** : Plus d'erreur de TabController, navigation fluide entre les onglets
 
-## 🎨 Composants UI créés
+### 11. **Page dédiée aux conversations créée** ✅ CRÉÉE
+- **Problème** : Besoin d'une page dédiée et spécialisée pour gérer les conversations
+- **Solution** : 
+  - Création d'un nouvel écran `ConversationsEcran` dans `lib/presentation/screens/conversations/`
+  - Interface moderne et intuitive pour la gestion des conversations
+  - Intégration avec le système de navigation existant
+- **Fonctionnalités** : 
+  - Affichage des conversations groupées par utilisateur
+  - Recherche en temps réel dans les conversations
+  - Navigation vers les conversations individuelles
+  - Ajout de nouveaux contacts
+  - Design cohérent avec le thème UQAR
+- **Fichier créé** : `lib/presentation/screens/conversations/conversations_ecran.dart`
+- **Résultat** : Page dédiée et optimisée pour la gestion des conversations
 
-### Widgets de messagerie
-- **Modal d'envoi de message** : Interface moderne avec validation
-- **Champ destinataire** : Recherche et validation en temps réel
-- **Gestion des erreurs** : Messages d'erreur contextuels
-- **Feedback visuel** : Indicateurs de succès et d'erreur
+### 12. **Navigation mise à jour pour inclure les conversations** ✅ MODIFIÉE
+- **Problème** : La navigation ne prenait pas en compte la nouvelle page de conversations
+- **Solution** : 
+  - Ajout de l'onglet "Chat" dans la barre de navigation
+  - Mise à jour du `NavigationService` pour gérer l'index 4 (Conversations)
+  - Ajustement des indices pour les salles (maintenant index 5)
+- **Fichiers modifiés** : 
+  - `lib/presentation/services/navigation_service.dart`
+  - `lib/presentation/widgets/navbar_widget.dart`
+- **Résultat** : Navigation cohérente et complète incluant l'accès aux conversations
 
-## 🚀 Améliorations techniques
+### 13. **Widget bouton conversations simplifié** ✅ MODIFIÉ
+- **Problème** : Le bouton affichait le texte "Conversations" qui était trop long
+- **Solution** : 
+  - Changement du mode par défaut de `isExtended: true` vers `isExtended: false`
+  - Bouton maintenant affiche seulement l'icône de chat (plus compact)
+  - Suppression du texte "Conversations" pour un design plus épuré
+- **Fichier modifié** : `lib/presentation/widgets/widget_bouton_conversations.dart`
+- **Résultat** : Bouton plus discret et élégant sur tous les écrans
 
-### Gestion des erreurs
-- ✅ Validation des champs avant envoi
-- ✅ Gestion des utilisateurs non trouvés
-- ✅ Prévention des messages auto-destinés
-- ✅ Messages d'erreur informatifs
+### 14. **Onglet chat supprimé de la navbar** ✅ SUPPRIMÉ
+- **Problème** : L'onglet "Chat" avait été ajouté à la barre de navigation sans demande explicite
+- **Solution** : 
+  - Suppression de l'onglet "Chat" de la navbar
+  - Remise des indices de navigation à leur état d'origine
+  - Conservation de l'accès aux conversations via le FloatingActionButton uniquement
+- **Fichiers modifiés** : 
+  - `lib/presentation/widgets/navbar_widget.dart`
+  - `lib/presentation/services/navigation_service.dart`
+- **Résultat** : Navigation simplifiée, accès aux conversations uniquement via le bouton flottant
 
-### Performance et UX
-- ✅ Recherche d'utilisateur optimisée
-- ✅ Actualisation automatique des listes
-- ✅ Interface réactive et intuitive
-- ✅ Navigation fluide entre les écrans
+### 15. **Erreur de route corrigée** ✅ RÉSOLUE
+- **Problème** : Erreur "Could not find a generator for route RouteSettings("/messagerie", null)"
+- **Cause** : Le bouton de conversations essayait de naviguer vers une route `/messagerie` inexistante
+- **Solution** : 
+  - Remplacement de `Navigator.pushNamed(context, '/messagerie')` par `Navigator.push()` direct
+  - Navigation directe vers `ConversationsEcran` via `MaterialPageRoute`
+  - Ajout de l'import nécessaire pour `ConversationsEcran`
+- **Fichier modifié** : `lib/presentation/widgets/widget_bouton_conversations.dart`
+- **Résultat** : Plus d'erreur de route, navigation directe et fonctionnelle vers la page de conversations
 
-### Sécurité et intégrité des données
-- ✅ **NOUVEAU** : Vérification du propriétaire des livres avant affichage
-- ✅ **NOUVEAU** : Isolation des données entre utilisateurs
-- ✅ **NOUVEAU** : Persistance des messages envoyés
+### 16. **Bouton retour ajouté dans la page de conversations** ✅ AJOUTÉ
+- **Problème** : La page de conversations n'avait pas de bouton retour pour revenir à l'écran précédent
+- **Solution** : 
+  - Remplacement de `WidgetBarreAppPersonnalisee` par un `AppBar` personnalisé
+  - Ajout d'un bouton retour avec icône flèche dans le `leading`
+  - Conservation du bouton "Ajouter un contact" dans les `actions`
+  - Design cohérent avec le thème UQAR
+- **Fichier modifié** : `lib/presentation/screens/conversations/conversations_ecran.dart`
+- **Résultat** : Navigation intuitive avec bouton retour fonctionnel
 
-## 📋 Prochaines étapes recommandées
+### 17. **Affichage des noms d'utilisateurs amélioré** ✅ AMÉLIORÉ
+- **Problème** : Les conversations affichaient "Utilisateur" et "UQ" au lieu de noms descriptifs
+- **Cause** : Les méthodes `_obtenirNomUtilisateur` et `_obtenirInitialesUtilisateur` utilisaient des valeurs par défaut
+- **Solution** : 
+  - Analyse intelligente des IDs d'utilisateurs pour générer des noms descriptifs
+  - Noms basés sur le type d'utilisateur : "Étudiant 001", "Professeur 002", "Admin 001"
+  - Initiales correspondantes : "É1", "P2", "A1"
+  - Suppression de la bottomNavigationBar inutile
+- **Fichier modifié** : `lib/presentation/screens/conversations/conversations_ecran.dart`
+- **Résultat** : Affichage plus informatif et professionnel des conversations
 
-1. **Tests d'intégration** : Vérifier l'envoi de messages entre utilisateurs
-2. **Notifications push** : Ajouter des notifications pour les nouveaux messages
-3. **Statuts de lecture** : Implémenter la gestion des messages lus/non lus
-4. **Historique des conversations** : Améliorer la persistance des conversations
-5. **Recherche avancée** : Ajouter des filtres par date, type de message, etc.
-6. **Base de données réelle** : Remplacer la simulation par une vraie persistance
+### 18. **Vrais noms et initiales des utilisateurs implémentés** ✅ IMPLÉMENTÉ
+- **Problème** : Les conversations n'affichaient pas les vrais noms des utilisateurs
+- **Cause** : Utilisation de noms génériques au lieu de récupérer les informations depuis la base de données
+- **Solution** : 
+  - Création d'un système de cache pour les noms et initiales des utilisateurs
+  - Chargement asynchrone des informations utilisateurs via `AuthentificationService`
+  - Méthode `_chargerInformationsUtilisateurs()` pour récupérer les vrais noms
+  - Fallback intelligent vers des noms descriptifs si l'utilisateur n'est pas trouvé
+  - Cache des informations pour éviter les appels répétés
+- **Fonctionnalités** : 
+  - **Vrais noms** : "Alexandre Gagnon", "Sophie Tremblay", etc.
+  - **Vraies initiales** : "AG", "ST", etc.
+  - **Fallback intelligent** : "Étudiant 001", "Professeur 002" si pas d'info
+  - **Performance optimisée** : Cache des informations chargées
+- **Fichier modifié** : `lib/presentation/screens/conversations/conversations_ecran.dart`
+- **Résultat** : Affichage des vrais noms et initiales des utilisateurs dans toutes les conversations
 
-## 🎯 Objectifs atteints
+### 19. **Bouton de conversations ajouté aux écrans Livres et Salles** ✅ IMPLÉMENTÉ
+- **Problème** : Les utilisateurs ne pouvaient pas accéder rapidement aux conversations depuis les écrans des livres et des salles
+- **Cause** : Seuls certains écrans principaux avaient le bouton de conversations
+- **Solution** : 
+  - Ajout du `WidgetBoutonConversations` à `marketplace_ecran.dart` (écran des livres)
+  - Ajout du `WidgetBoutonConversations` à `salles_ecran.dart` (écran des salles)
+  - Import du widget dans les deux fichiers
+  - Placement du `floatingActionButton` dans le `Scaffold` de chaque écran
+- **Fonctionnalités** : 
+  - **Accès rapide** : Bouton flottant accessible depuis tous les écrans principaux
+  - **Navigation cohérente** : Même comportement sur tous les écrans
+  - **Design uniforme** : Bouton compact (icône seule) par défaut
+  - **Routage direct** : Navigation vers `ConversationsEcran` sans erreur de route
+- **Fichiers modifiés** : 
+  - `lib/presentation/screens/livres/marketplace_ecran.dart`
+  - `lib/presentation/screens/salles_ecran.dart`
+- **Résultat** : Accès universel aux conversations depuis tous les écrans principaux de l'application UqarLife
 
-- ✅ **Tous les TODOs implémentés** dans le système de messagerie
-- ✅ **Interface utilisateur complète** et fonctionnelle
-- ✅ **Architecture propre** avec séparation des responsabilités
-- ✅ **Thème UQAR cohérent** appliqué à tous les écrans
-- ✅ **Gestion d'erreurs robuste** pour une meilleure expérience utilisateur
-- ✅ **CORRECTIONS CRITIQUES** : Problèmes de gestion des livres et de messagerie résolus
-- ✅ **Sécurité des données** : Chaque utilisateur ne voit que ses propres informations
+### 20. **WidgetBarreAppPersonnalisee uniformisé sur tous les écrans** ✅ IMPLÉMENTÉ
+- **Problème** : Incohérence dans l'interface utilisateur avec des AppBar standards et personnalisés mélangés
+- **Cause** : Certains écrans utilisaient encore l'AppBar standard de Flutter
+- **Solution** : 
+  - **Conversations** : Remplacement de `AppBar` standard par `WidgetBarreAppPersonnalisee`
+  - **Actualités** : Déjà utilisait `WidgetBarreAppPersonnalisee` ✅
+  - **Événements** : Déjà utilisait `WidgetBarreAppPersonnalisee` ✅
+  - Ajout de l'import `widget_barre_app_personnalisee.dart` dans conversations
+- **Fonctionnalités** : 
+  - **Design cohérent** : Même style de barre d'application partout
+  - **Navigation uniforme** : Bouton retour et actions cohérents
+  - **Thème UQAR** : Couleurs et styles unifiés (#005499, #00A1E4)
+  - **Bouton d'action** : "Ajouter un contact" conservé dans conversations
+- **Fichiers modifiés** : 
+  - `lib/presentation/screens/messagerie/conversations_ecran.dart` ← **NOUVEAU**
+  - `lib/presentation/screens/actualites/actualites_ecran.dart` ← **DÉJÀ OK**
+  - `lib/presentation/screens/evenements/evenements_ecran.dart` ← **DÉJÀ OK**
+- **Résultat** : Interface utilisateur parfaitement cohérente sur tous les écrans de l'application UqarLife
+
+### 21. **WidgetBarreAppPersonnalisee ajouté à l'écran de conversation** ✅ IMPLÉMENTÉ
+- **Problème** : L'écran de conversation utilisait encore l'AppBar standard de Flutter
+- **Cause** : Incohérence avec les autres écrans qui utilisent déjà WidgetBarreAppPersonnalisee
+- **Solution** : 
+  - Remplacement de `AppBar` standard par `WidgetBarreAppPersonnalisee`
+  - Ajout de l'import `widget_barre_app_personnalisee.dart`
+  - Configuration avec titre dynamique et sous-titre informatif
+- **Fonctionnalités** : 
+  - **Titre dynamique** : Affiche le nom complet du destinataire
+  - **Sous-titre informatif** : "Conversation en cours"
+  - **Bouton retour** : Navigation cohérente avec `afficherBoutonRetour: true`
+  - **Design uniforme** : Même style que les autres écrans
+- **Fichier modifié** : `lib/presentation/screens/messagerie/conversation_ecran.dart`
+- **Résultat** : Interface utilisateur parfaitement cohérente sur tous les écrans de messagerie
+
+### 22. **Corrections et améliorations de l'écran d'ajout de contact** ✅ IMPLÉMENTÉ
+- **Problèmes résolus** : 
+  - **Erreur de route** : `Could not find a generator for route "/conversation"`
+  - **Overflow de layout** : `RenderFlex overflowed by 23 pixels on the right`
+  - **Nombre limité de comptes** : Seulement 3 utilisateurs disponibles
+- **Solutions implémentées** : 
+  - **Navigation corrigée** : Remplacement de `Navigator.pushNamed` par `Navigator.push` avec `MaterialPageRoute`
+  - **Import ajouté** : `conversation_ecran.dart` pour la navigation directe
+  - **Overflow résolu** : Bouton "Message" avec largeur fixe (80px) et texte plus petit
+  - **Plus de comptes** : Ajout de 5 nouveaux utilisateurs (étudiants, professeurs, admin)
+  - **AppBar uniformisé** : Remplacement par `WidgetBarreAppPersonnalisee`
+- **Nouveaux utilisateurs ajoutés** : 
+  - **Étudiants** : Marie Dubois (Physique), Thomas Lavoie (Mathématiques)
+  - **Professeurs** : Isabelle Bouchard (Informatique), Pierre Côté (Biologie)
+  - **Administrateur** : Claude Roy (Administration)
+- **Fichier modifié** : `lib/presentation/screens/messagerie/ajouter_contact_ecran.dart`
+- **Résultat** : Écran d'ajout de contact fonctionnel avec navigation correcte et plus de choix d'utilisateurs
+
+### 23. **Refactorisation de l'écran d'ajout de contact avec widgets existants** ✅ IMPLÉMENTÉ
+- **Problème** : L'écran d'ajout de contact utilisait des données statiques et des widgets personnalisés
+- **Cause** : Code dupliqué et non réutilisable, données hardcodées
+- **Solution** : 
+  - **Chargement dynamique** : Utilisation de `UtilisateursRepository.obtenirTousLesUtilisateurs()`
+  - **Widgets existants** : Intégration de `WidgetCollection` pour la liste des utilisateurs
+  - **Service locator** : Injection de dépendances via `ServiceLocator`
+  - **Recherche optimisée** : Filtrage local sans appels API répétés
+- **Fonctionnalités** : 
+  - **Chargement automatique** : Tous les utilisateurs chargés au démarrage
+  - **Recherche en temps réel** : Filtrage instantané par nom, email ou programme
+  - **Exclusion automatique** : L'utilisateur actuel n'apparaît pas dans la liste
+  - **Filtrage des actifs** : Seuls les utilisateurs actifs sont affichés
+  - **Interface cohérente** : Utilisation de `WidgetCollection` et `WidgetBarreAppPersonnalisee`
+- **Améliorations techniques** : 
+  - **Performance** : Chargement unique des utilisateurs au démarrage
+  - **Maintenabilité** : Code plus propre et réutilisable
+  - **Scalabilité** : Facile d'ajouter de nouveaux utilisateurs via le repository
+  - **Cohérence** : Même style d'interface que les autres écrans
+- **Fichier modifié** : `lib/presentation/screens/messagerie/ajouter_contact_ecran.dart`
+- **Résultat** : Écran d'ajout de contact moderne, performant et cohérent avec l'architecture de l'application
+
+### 24. **Modernisation complète du design des conversations** ✅ IMPLÉMENTÉ
+- **Problème** : Design des conversations basique et peu moderne
+- **Cause** : Utilisation de ListTile standard et layout simple
+- **Solution** : 
+  - **Design moderne** : Remplacement de ListTile par Container personnalisé avec Material et InkWell
+  - **Indicateurs visuels** : Avatar avec indicateur de statut en ligne, badges de statut des messages
+  - **Layout flexible** : Row + Column pour un contrôle total de l'espace
+  - **Barre de recherche** : Design moderne avec ombres et emoji
+- **Fonctionnalités** : 
+  - **Avatar amélioré** : Taille 28px avec indicateur de statut (point vert)
+  - **En-tête intelligent** : Nom et heure dans une Row avec badge temporel
+  - **Contenu optimisé** : Message sur 2 lignes avec hauteur de ligne 1.3
+  - **Statut des messages** : Badges colorés pour "Envoyé" et "Reçu"
+  - **Type de message** : Indicateur "Général" pour les messages non-échange
+- **Améliorations techniques** : 
+  - **Performance** : InkWell pour les effets de tap, Material pour la transparence
+  - **Responsive** : Layout qui s'adapte à différentes tailles d'écran
+  - **Accessibilité** : Textes avec overflow et maxLines appropriés
+  - **Cohérence** : Même style que l'écran d'ajout de contact
+- **Fichier modifié** : `lib/presentation/screens/messagerie/conversations_ecran.dart`
+- **Résultat** : Interface des conversations moderne, intuitive et visuellement attrayante
+
+### 25. **Correction finale du débordement dans l'écran d'ajout de contact** ✅ IMPLÉMENTÉ
+- **Problème** : Débordement persistant de 15 pixels malgré les corrections précédentes
+- **Cause** : Espacement et dimensions encore trop généreux
+- **Solution** : 
+  - **Bouton compact** : Largeur réduite à 60px avec texte "Msg" au lieu de "Message"
+  - **Espacement optimisé** : Réduction des marges et paddings
+  - **Icônes et textes** : Tailles réduites pour gagner de l'espace
+- **Optimisations appliquées** : 
+  - **Bouton** : `width: 60px`, `padding: horizontal: 6, vertical: 6`, `fontSize: 9`
+  - **Espacement** : `SizedBox(width: 12)` au lieu de 16, `SizedBox(width: 8)` au lieu de 12
+  - **Icône école** : `size: 12` au lieu de 14
+  - **Texte programme** : `fontSize: 10` au lieu de 11
+  - **Marges verticales** : `height: 3` au lieu de 4
+- **Fichier modifié** : `lib/presentation/screens/messagerie/ajouter_contact_ecran.dart`
+- **Résultat** : Aucun débordement, interface parfaitement optimisée et responsive

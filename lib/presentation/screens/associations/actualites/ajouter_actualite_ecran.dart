@@ -1,11 +1,11 @@
 // UI Design: Écran d'ajout/modification d'actualités pour les chefs d'association
 import 'package:flutter/material.dart';
-
-import '../../../core/di/service_locator.dart';
-import '../../../domain/entities/association.dart';
-import '../../../domain/entities/actualite.dart';
-import '../../../domain/repositories/actualites_repository.dart';
-import '../../../presentation/services/authentification_service.dart';
+import '../../../../core/di/service_locator.dart';
+import '../../../../domain/entities/association.dart';
+import '../../../../domain/entities/actualite.dart';
+import '../../../widgets/widget_barre_app_personnalisee.dart';
+import '../../../../domain/repositories/actualites_repository.dart';
+import '../../../services/authentification_service.dart';
 
 class AjouterActualiteEcran extends StatefulWidget {
   final Association association;
@@ -153,12 +153,11 @@ class _AjouterActualiteEcranState extends State<AjouterActualiteEcran> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Ajouter une actualité'),
-        backgroundColor: const Color(0xFF005499),
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
+      appBar: WidgetBarreAppPersonnalisee(
+        titre: 'Ajouter une actualité',
+        sousTitre: 'Association: ${widget.association.nom}',
+        afficherBoutonRetour: true,
+        ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),

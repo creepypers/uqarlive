@@ -9,10 +9,11 @@ import '../../widgets/navbar_widget.dart';
 import '../../widgets/widget_barre_app_personnalisee.dart';
 import '../../widgets/widget_carte.dart';
 import '../../widgets/widget_collection.dart';
+import '../../widgets/widget_bouton_conversations.dart';
 import '../../services/navigation_service.dart';
 import '../../../core/utils/associations_utils.dart';
 import 'details_association_ecran.dart';
-import '../actualites/actualites_ecran.dart';
+import 'actualites/actualites_ecran.dart';
 
 // UI Design: Page associations étudiantes UQAR avec filtres et design moderne
 class AssociationsEcran extends StatefulWidget {
@@ -181,6 +182,10 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
           ),
         ),
       ),
+
+      // UI Design: Widget réutilisable pour accéder aux conversations
+      floatingActionButton: const WidgetBoutonConversations(),
+
       bottomNavigationBar: NavBarWidget(
         indexSelectionne: 3, // Associations
         onTap: (index) => NavigationService.gererNavigationNavBar(context, index),
