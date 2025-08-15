@@ -539,14 +539,17 @@ class _ProfilEcranState extends State<ProfilEcran> {
                 else
                   ..._mesLivres.take(3).map((livre) => Padding(
                     padding: const EdgeInsets.only(bottom: 8.0),
-                    child: _construireLivreEnVente(
-                      livre.titre,
-                      livre.prix != null && livre.prix! > 0 
-                        ? '${livre.prix!.toStringAsFixed(2)} €' 
-                        : 'Gratuit',
-                      livre.estDisponible 
-                        ? (livre.prix != null && livre.prix! > 0 ? 'En vente' : 'Disponible')
-                        : 'Vendu',
+                    child: GestureDetector(
+                      onLongPress: () => _gererLivreEnVente(livre),
+                      child: _construireLivreEnVente(
+                        livre.titre,
+                        livre.prix != null && livre.prix! > 0 
+                          ? '\$${livre.prix!.toStringAsFixed(2)}' 
+                          : 'Gratuit',
+                        livre.estDisponible 
+                          ? (livre.prix != null && livre.prix! > 0 ? 'En vente' : 'Disponible')
+                          : 'Vendu',
+                      ),
                     ),
                   )).toList(),
                 
@@ -878,22 +881,12 @@ class _ProfilEcranState extends State<ProfilEcran> {
             maxLines: 1,
           ),
         ),
-        IconButton(
-          icon: Icon(Icons.more_vert, color: CouleursApp.texteFonce.withValues(alpha: 0.5), size: 18),
-          onPressed: () => _gererLivreEnVente(titre),
-        ),
+        // Supprimé le bouton kebab - remplacé par long press
       ],
     );
   }
 
-
-
-
-
-
-
-
-  void _gererLivreEnVente(String titre) {
+  void _gererLivreEnVente(Livre livre) {
     showModalBottomSheet(
       context: context,
       builder: (context) => Container(
@@ -902,14 +895,14 @@ class _ProfilEcranState extends State<ProfilEcran> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Livre - $titre', style: StylesTexteApp.titre.copyWith(fontSize: 18)),
+            Text('Livre - ${livre.titre}', style: StylesTexteApp.titre.copyWith(fontSize: 18)),
             const SizedBox(height: 20),
             ListTile(
               leading: const Icon(Icons.edit, color: CouleursApp.accent),
               title: const Text('Modifier le prix'),
               onTap: () {
                 Navigator.pop(context);
-                _modifierPrixLivre(titre);
+                _modifierPrixLivre(livre);
               },
             ),
             ListTile(
@@ -917,7 +910,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
               title: const Text('Retirer de la vente'),
               onTap: () {
                 Navigator.pop(context);
-                _retirerDeLaVente(titre);
+                _retirerDeLaVente(livre);
               },
             ),
           ],
@@ -926,8 +919,8 @@ class _ProfilEcranState extends State<ProfilEcran> {
     );
   }
 
-  void _modifierPrixLivre(String titre) {
-    final prixController = TextEditingController();
+  void _modifierPrixLivre(Livre livre) {
+    final prixController = TextEditingController(text: livre.prix?.toString() ?? '');
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -935,15 +928,14 @@ class _ProfilEcranState extends State<ProfilEcran> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Livre: $titre'),
+            Text('Livre: ${livre.titre}'),
             const SizedBox(height: 16),
             TextFormField(
               controller: prixController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              decoration: InputDecoration(
-                labelText: 'Nouveau prix (€)',
-                hintText: 'Ex: 12.50',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'Nouveau prix (\$)',
+                border: OutlineInputBorder(),
               ),
             ),
           ],
@@ -954,52 +946,96 @@ class _ProfilEcranState extends State<ProfilEcran> {
             child: const Text('Annuler'),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Prix de "$titre" modifié à ${prixController.text} €'),
-                  backgroundColor: CouleursApp.accent,
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
+              await _sauvegarderNouveauPrix(livre, double.tryParse(prixController.text) ?? 0.0);
             },
-            style: ElevatedButton.styleFrom(backgroundColor: CouleursApp.accent),
-            child: const Text('Confirmer', style: TextStyle(color: CouleursApp.blanc)),
+            child: const Text('Sauvegarder'),
           ),
         ],
       ),
     );
   }
 
-  void _retirerDeLaVente(String titre) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Retirer de la vente'),
-        content: Text('Êtes-vous sûr de vouloir retirer "$titre" de la vente ?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Annuler'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('"$titre" retiré de la vente'),
-                  backgroundColor: Colors.orange,
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-            child: const Text('Oui, retirer', style: TextStyle(color: CouleursApp.blanc)),
-          ),
-        ],
-      ),
-    );
+  Future<void> _sauvegarderNouveauPrix(Livre livre, double nouveauPrix) async {
+    try {
+      // UI Design: Mettre à jour le prix du livre dans le repository
+      final livreModifie = livre.copyWith(prix: nouveauPrix);
+
+      await _livresRepository.modifierLivre(livreModifie);
+      
+      // UI Design: Mettre à jour la liste locale et les statistiques
+      final index = _mesLivres.indexWhere((l) => l.id == livre.id);
+      if (index != -1) {
+        _mesLivres[index] = livreModifie;
+      }
+      
+      // UI Design: Recharger les données pour s'assurer de la cohérence
+      await _rechargerDonnees();
+      
+      // UI Design: Afficher un message de succès
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Prix de "${livre.titre}" mis à jour avec succès !'),
+          backgroundColor: CouleursApp.accent,
+        ),
+      );
+    } catch (e) {
+      // UI Design: Afficher un message d'erreur
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erreur lors de la mise à jour: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<void> _retirerDeLaVente(Livre livre) async {
+    try {
+      // UI Design: Marquer le livre comme non disponible
+      final livreModifie = livre.copyWith(estDisponible: false);
+
+      await _livresRepository.modifierLivre(livreModifie);
+      
+      // UI Design: Mettre à jour la liste locale et les statistiques
+      final index = _mesLivres.indexWhere((l) => l.id == livre.id);
+      if (index != -1) {
+        _mesLivres[index] = livreModifie;
+      }
+      
+      // UI Design: Recharger les données pour s'assurer de la cohérence
+      await _rechargerDonnees();
+      
+      // UI Design: Afficher un message de succès
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('"${livre.titre}" retiré de la vente avec succès !'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+    } catch (e) {
+      // UI Design: Afficher un message d'erreur
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erreur lors du retrait: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  // UI Design: Méthode pour recharger les données après modification
+  Future<void> _rechargerDonnees() async {
+    try {
+      await Future.wait([
+        _chargerStatistiques(),
+        _chargerMesAssociations(),
+        _chargerMesReservations(),
+      ]);
+    } catch (e) {
+      // Gérer l'erreur silencieusement
+    }
   }
 
   // UI Design: Section mes associations - FONCTIONNELLE

@@ -1,6 +1,6 @@
 import '../../domain/entities/association.dart';
 import '../../domain/repositories/associations_repository.dart';
-import '../datasources/associations_datasource_local.dart';
+import '../datasources/internal/associations_datasource_local.dart';
 import '../models/association_model.dart';
 
 // UI Design: Implémentation du repository des associations - couche data

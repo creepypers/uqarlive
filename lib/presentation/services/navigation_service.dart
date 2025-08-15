@@ -32,15 +32,12 @@ class NavigationService {
 
   /// Navigation vers une page avec remplacement (pour éviter accumulation)
   static void _naviguerVers(BuildContext context, Widget destination) {
-    // Vérifier si on est déjà sur la page cible
-    final currentRoute = ModalRoute.of(context)?.settings.name;
-    final targetRoute = destination.runtimeType.toString();
-
-    if (currentRoute != targetRoute) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => destination),
-      );
-    }
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => destination,
+        settings: RouteSettings(name: destination.runtimeType.toString()),
+      ),
+    );
   }
 
   /// Navigation vers l'accueil

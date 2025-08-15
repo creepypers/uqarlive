@@ -22,6 +22,62 @@ Ce document suit l'implémentation de l'architecture Clean Architecture pour l'a
 
 ## Changements récents (2024-12-19)
 
+### 🔄 Création du système de messagerie complet UqarLife
+
+**Architecture Clean Architecture complète**
+- ✅ `lib/domain/entities/message.dart` - Entité Message avec méthodes utilitaires
+- ✅ `lib/data/models/message_model.dart` - Modèle de données pour la couche Data
+- ✅ `lib/data/datasources/internal/messages_datasource_local.dart` - Datasource local avec données d'exemple
+- ✅ `lib/domain/repositories/messages_repository.dart` - Interface du repository
+- ✅ `lib/data/repositories/messages_repository_impl.dart` - Implémentation du repository
+- ✅ `lib/presentation/services/messagerie_service.dart` - Service de messagerie complet
+- ✅ `lib/presentation/screens/messagerie/messagerie_ecran.dart` - Écran de messagerie avec UI moderne
+
+**Fonctionnalités implémentées**
+- 💬 **Envoi de messages** : Contact pour livres, réponses d'échange, messages généraux
+- 📱 **Interface moderne** : 3 onglets (Messages, Conversations, Contacts) avec design UQAR
+- 🔍 **Recherche** : Barre de recherche intégrée pour les messages
+- 📊 **Gestion des états** : Messages lus/non lus, temps écoulé, statuts
+- 🎨 **Design cohérent** : Thème UQAR (#005499, #00A1E4) avec ombres et coins arrondis
+
+**Avantages de l'implémentation**
+- 🏗️ **Architecture respectée** : Séparation stricte des couches Domain → Data → Presentation
+- 📱 **UI/UX moderne** : Interface intuitive avec modals, animations et feedback utilisateur
+- 🔧 **Maintenance facile** : Code modulaire et extensible pour futures fonctionnalités
+- 📚 **Intégration livres** : Système de messagerie lié aux transactions de livres
+
+### 🔄 Refactoring de la méthode _obtenirLivreDepuisDataSource
+
+**Correction d'architecture Clean**
+- ✅ `lib/presentation/screens/livres/gerer_livres_ecran.dart` - Suppression de la duplication de données hardcodées
+- ✅ Remplacement par l'utilisation du repository pattern via `_mesLivres`
+- ✅ Respect de la séparation des couches: Presentation → Domain → Data
+- ✅ Élimination de ~200 lignes de code dupliqué
+
+**Avantages de la refactorisation**
+- 🎯 **Single Source of Truth**: Les données des livres proviennent uniquement du datasource local
+- 🏗️ **Clean Architecture**: Respect strict de la hiérarchie des couches
+- 📱 **Performance**: Élimination de la duplication de données en mémoire
+- 🔧 **Maintenance**: Plus facile de modifier les données des livres
+
+### 🔄 Implémentation de la récupération depuis le service utilisateur
+
+**Résolution du TODO comment**
+- ✅ `lib/presentation/services/authentification_service.dart` - Ajout de méthodes pour récupérer les informations utilisateur par ID
+- ✅ `lib/presentation/screens/livres/gerer_livres_ecran.dart` - Implémentation de la méthode asynchrone `_obtenirInitialesUtilisateurDepuisService`
+- ✅ Respect de l'architecture Clean: Presentation → Service → Repository → Data
+- ✅ Fallback intelligent vers la méthode locale en cas d'erreur
+
+**Méthodes ajoutées au service d'authentification**
+- `obtenirInitialesUtilisateurParId(String utilisateurId)`: Récupère les initiales d'un utilisateur via le repository
+- `obtenirUtilisateurParId(String utilisateurId)`: Récupère les informations complètes d'un utilisateur
+
+**Avantages de l'implémentation**
+- 🎯 **Architecture respectée**: Utilisation du service au lieu de hardcoding
+- 🔄 **Asynchrone**: Support des opérations asynchrones pour la récupération des données
+- 🛡️ **Robuste**: Fallback vers la méthode locale en cas d'erreur
+- 📱 **Performance**: Évite les appels inutiles au service pour les utilisateurs connus
+
 ### 🔄 Modifications massives des logiques de modification
 
 #### Écrans de modification créés/améliorés

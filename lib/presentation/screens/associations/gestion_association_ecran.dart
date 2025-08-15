@@ -5,11 +5,14 @@ import '../../../domain/entities/association.dart';
 import '../../../domain/entities/demande_adhesion.dart';
 import '../../../domain/entities/utilisateur.dart';
 import '../../../domain/entities/evenement.dart';
+import '../../../domain/entities/membre_association.dart';
 import '../../../domain/repositories/utilisateurs_repository.dart';
 import '../../../domain/repositories/evenements_repository.dart';
+import '../../../domain/repositories/membres_association_repository.dart';
 import '../../../presentation/services/adhesions_service.dart';
 import '../../../presentation/services/authentification_service.dart';
 import '../../../presentation/services/evenements_service.dart';
+import '../../../presentation/services/gestion_membres_service.dart';
 import '../../../presentation/widgets/widget_barre_app_personnalisee.dart';
 import '../../../core/di/service_locator.dart';
 import 'ajouter_actualite_ecran.dart';
@@ -33,12 +36,17 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
   late final UtilisateursRepository _utilisateursRepository;
   late final EvenementsRepository _evenementsRepository;
   late final EvenementsService _evenementsService;
+  late final MembresAssociationRepository _membresRepository;
+  late final GestionMembresService _gestionMembresService;
   List<DemandeAdhesion> _demandesAdhesion = [];
   List<Evenement> _evenementsAssociation = [];
+  List<MembreAssociation> _membresAssociation = [];
+  // UI Design: Cache pour optimiser les performances
   final Map<String, Utilisateur> _utilisateursCache = {};
   final Map<String, bool> _evenementsInscrits = {}; // Cache des inscriptions
-  bool _chargement = true;
   bool _chargementEvenements = true;
+  bool _chargementMembres = true;
+  
 
   @override
   void initState() {
@@ -48,14 +56,22 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
     _utilisateursRepository = ServiceLocator.obtenirService<UtilisateursRepository>();
     _evenementsRepository = ServiceLocator.obtenirService<EvenementsRepository>();
     _evenementsService = EvenementsService();
+    _membresRepository = ServiceLocator.obtenirService<MembresAssociationRepository>();
+    _gestionMembresService = ServiceLocator.obtenirService<GestionMembresService>();
     _adhesionsService.initialiser();
+    _gestionMembresService.initialiser();
     _chargerDemandesAdhesion();
     _chargerEvenementsAssociation();
+    _chargerMembresAssociation();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   Future<void> _chargerDemandesAdhesion() async {
     setState(() {
-      _chargement = true;
     });
 
     try {
@@ -63,12 +79,10 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
       final demandes = await _adhesionsService.obtenirDemandesEnAttente(widget.association.id);
       setState(() {
         _demandesAdhesion = demandes;
-        _chargement = false;
       });
     } catch (e) {
       setState(() {
         _demandesAdhesion = [];
-        _chargement = false;
       });
       _afficherErreur('Erreur lors du chargement des demandes: ${e.toString()}');
     }
@@ -134,7 +148,28 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
     }
   }
 
-  // UI Design: Vérifier si l'utilisateur est inscrit à un événement
+  Future<void> _chargerMembresAssociation() async {
+    setState(() {
+      _chargementMembres = true;
+    });
+
+    try {
+      // UI Design: Récupérer les vrais membres de l'association
+      final membres = await _gestionMembresService.obtenirMembresAssociation(widget.association.id);
+      setState(() {
+        _membresAssociation = membres;
+        _chargementMembres = false;
+      });
+    } catch (e) {
+      setState(() {
+        _membresAssociation = [];
+        _chargementMembres = false;
+      });
+      _afficherErreur('Erreur lors du chargement des membres: ${e.toString()}');
+    }
+  }
+
+  // UI Design: Nouvelle méthode pour retirer un membre de l'association// UI Design: Vérifier si l'utilisateur est inscrit à un événement
   bool _estInscritEvenement(String evenementId) {
     return _evenementsInscrits[evenementId] ?? false;
   }
@@ -281,58 +316,113 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
-      appBar: WidgetBarreAppPersonnalisee(
-        titre: 'Gestion Association',
-        sousTitre: widget.association.nom,
-        afficherBoutonRetour: true,
-        afficherProfil: false,
-        hauteurBarre: 90,
-        widgetFin: Container(
-          padding: EdgeInsets.symmetric(
-            horizontal: screenWidth * 0.03,
-            vertical: screenWidth * 0.015,
-          ),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.2),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.admin_panel_settings, color: Colors.white, size: 18),
-              SizedBox(width: screenWidth * 0.015),
-              const Text(
-                'Chef',
-                style: TextStyle(
-                  color: Colors.white, 
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13,
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF8F9FA),
+        appBar: WidgetBarreAppPersonnalisee(
+          titre: 'Gestion Association',
+          sousTitre: widget.association.nom,
+          afficherBoutonRetour: true,
+          afficherProfil: false,
+          hauteurBarre: 90,
+          widgetFin: Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: screenWidth * 0.03,
+              vertical: screenWidth * 0.015,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.admin_panel_settings, color: Colors.white, size: 18),
+                SizedBox(width: screenWidth * 0.015),
+                const Text(
+                  'Chef',
+                  style: TextStyle(
+                    color: Colors.white, 
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.all(screenWidth * 0.05),
+        body: SingleChildScrollView(
           child: Column(
             children: [
-              SizedBox(height: screenHeight * 0.01),
               // Actions rapides
-              _construireActionsRapides(),
-              SizedBox(height: screenHeight * 0.025),
+              Container(
+                margin: EdgeInsets.all(screenWidth * 0.05),
+                child: _construireActionsRapides(),
+              ),
               
-              // Statistiques et demandes
-              _construireStatistiquesEtDemandes(),
-              SizedBox(height: screenHeight * 0.025),
+              // Onglets
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.08),
+                      blurRadius: 15,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: const TabBar(
+                  labelColor: CouleursApp.principal,
+                  unselectedLabelColor: CouleursApp.gris,
+                  indicatorColor: CouleursApp.principal,
+                  indicatorWeight: 3,
+                  tabs: [
+                    Tab(
+                      icon: Icon(Icons.person_add),
+                      text: 'Demandes',
+                    ),
+                    Tab(
+                      icon: Icon(Icons.event),
+                      text: 'Actualités & Événements',
+                    ),
+                    Tab(
+                      icon: Icon(Icons.group),
+                      text: 'Membres',
+                    ),
+                  ],
+                ),
+              ),
               
-              // Événements de l'association
-              _construireEvenementsAssociation(),
+              // Contenu des onglets avec hauteur fixe pour éviter le débordement
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.6, // Hauteur fixe pour éviter le débordement
+                child: TabBarView(
+                  children: [
+                    // Onglet 1: Demandes d'adhésion
+                    SingleChildScrollView(
+                      padding: EdgeInsets.all(screenWidth * 0.05),
+                      child: _construireOngletDemandes(),
+                    ),
+                    
+                    // Onglet 2: Actualités et événements
+                    SingleChildScrollView(
+                      padding: EdgeInsets.all(screenWidth * 0.05),
+                      child: _construireOngletActualitesEvenements(),
+                    ),
+                    
+                    // Onglet 3: Membres
+                    SingleChildScrollView(
+                      padding: EdgeInsets.all(screenWidth * 0.05),
+                      child: _construireOngletMembres(),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -453,82 +543,193 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
     );
   }
 
-  Widget _construireStatistiquesEtDemandes() {
+  Widget _construireOngletDemandes() {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     
-    return Container(
-      padding: EdgeInsets.all(screenWidth * 0.05),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-          // En-tête avec statistiques
-                    Row(
-                      children: [
-              Container(
-                padding: EdgeInsets.all(screenWidth * 0.025),
-                decoration: BoxDecoration(
-                  color: Colors.orange.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(Icons.people_outline, color: Colors.orange, size: 24),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // En-tête avec statistiques
+        Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(screenWidth * 0.025),
+              decoration: BoxDecoration(
+                color: Colors.orange.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
               ),
-              SizedBox(width: screenWidth * 0.04),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Demandes d\'Adhésion',
-                          style: TextStyle(
-                        fontSize: screenWidth * 0.045,
-                            fontWeight: FontWeight.bold,
-                        color: CouleursApp.texteFonce,
-                      ),
-                    ),
-                    Text(
-                      '${_demandesAdhesion.length} en attente',
-                      style: TextStyle(
-                        fontSize: screenWidth * 0.035,
-                        color: CouleursApp.texteFonce.withValues(alpha: 0.7),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-                        if (_chargement)
-                          const SizedBox(
-                  width: 20,
-                  height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(CouleursApp.principal),
-                            ),
-                          ),
-                      ],
-                    ),
-          SizedBox(height: screenHeight * 0.025),
-          
-          // Liste des demandes
-                    if (_demandesAdhesion.isEmpty && !_chargement)
-            _construireEtatVide()
-          else
-            Column(
-              children: _demandesAdhesion.map((demande) => _construireCarteDemande(demande)).toList(),
+              child: const Icon(Icons.person_add_outlined, color: Colors.orange, size: 24),
             ),
-        ],
-      ),
+            SizedBox(width: screenWidth * 0.04),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Demandes d\'Adhésion',
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.045,
+                      fontWeight: FontWeight.bold,
+                      color: CouleursApp.texteFonce,
+                    ),
+                  ),
+                  Text(
+                    '${_demandesAdhesion.length} demande${_demandesAdhesion.length != 1 ? 's' : ''} en attente',
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.035,
+                      color: CouleursApp.texteFonce.withValues(alpha: 0.7),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: screenHeight * 0.025),
+        
+        // Liste des demandes
+        if (_demandesAdhesion.isEmpty)
+          _construireEtatVide()
+        else
+          Column(
+            children: _demandesAdhesion.map((demande) => _construireCarteDemande(demande)).toList(),
+          ),
+      ],
+    );
+  }
+
+  Widget _construireOngletActualitesEvenements() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // En-tête avec statistiques
+        Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(screenWidth * 0.025),
+              decoration: BoxDecoration(
+                color: Colors.blue.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(Icons.event_outlined, color: Colors.blue, size: 24),
+            ),
+            SizedBox(width: screenWidth * 0.04),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Événements à Venir',
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.045,
+                      fontWeight: FontWeight.bold,
+                      color: CouleursApp.texteFonce,
+                    ),
+                  ),
+                  Text(
+                    '${_evenementsAssociation.length} événement${_evenementsAssociation.length != 1 ? 's' : ''}',
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.035,
+                      color: CouleursApp.texteFonce.withValues(alpha: 0.7),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (_chargementEvenements)
+              const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(CouleursApp.principal),
+                ),
+              ),
+          ],
+        ),
+        SizedBox(height: screenHeight * 0.025),
+        
+        // Liste des événements
+        if (_evenementsAssociation.isEmpty && !_chargementEvenements)
+          _construireEtatVideEvenements()
+        else
+          Column(
+            children: _evenementsAssociation.map((evenement) => _construireCarteEvenement(evenement)).toList(),
+          ),
+      ],
+    );
+  }
+
+  Widget _construireOngletMembres() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // En-tête avec statistiques
+        Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(screenWidth * 0.025),
+              decoration: BoxDecoration(
+                color: Colors.purple.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(Icons.group_outlined, color: Colors.purple, size: 24),
+            ),
+            SizedBox(width: screenWidth * 0.04),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Membres de l\'Association',
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.045,
+                      fontWeight: FontWeight.bold,
+                      color: CouleursApp.texteFonce,
+                    ),
+                  ),
+                  Text(
+                    '${_membresAssociation.length} membre${_membresAssociation.length != 1 ? 's' : ''}',
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.035,
+                      color: CouleursApp.texteFonce.withValues(alpha: 0.7),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (_chargementMembres)
+              const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(CouleursApp.principal),
+                ),
+              ),
+          ],
+        ),
+        SizedBox(height: screenHeight * 0.025),
+        
+        // Liste des membres
+        if (_membresAssociation.isEmpty && !_chargementMembres)
+          _construireEtatVideMembres()
+        else
+          SizedBox(
+            height: 300, // Hauteur fixe pour la scrollbar
+            child: ListView.builder(
+              itemCount: _membresAssociation.length,
+              itemBuilder: (context, index) => _construireCarteMembre(_membresAssociation[index]),
+            ),
+          ),
+      ],
     );
   }
 
@@ -560,6 +761,92 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
               color: CouleursApp.texteFonce.withValues(alpha: 0.6),
               fontWeight: FontWeight.w500,
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _construireEtatVideEvenements() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    
+    return Container(
+      padding: EdgeInsets.all(screenWidth * 0.08),
+      child: Column(
+        children: [
+          Container(
+            padding: EdgeInsets.all(screenWidth * 0.06),
+            decoration: BoxDecoration(
+              color: Colors.blue.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(25),
+            ),
+            child: Icon(
+              Icons.event_available_outlined,
+              size: screenWidth * 0.12,
+              color: Colors.blue.withValues(alpha: 0.6),
+            ),
+          ),
+          SizedBox(height: screenHeight * 0.02),
+          Text(
+            'Aucun événement à venir',
+            style: TextStyle(
+              fontSize: screenWidth * 0.04,
+              color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          SizedBox(height: screenHeight * 0.01),
+          Text(
+            'Créez des événements pour engager votre communauté !',
+            style: TextStyle(
+              fontSize: screenWidth * 0.03,
+              color: CouleursApp.texteFonce.withValues(alpha: 0.5),
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _construireEtatVideMembres() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    
+    return Container(
+      padding: EdgeInsets.all(screenWidth * 0.08),
+      child: Column(
+        children: [
+          Container(
+            padding: EdgeInsets.all(screenWidth * 0.06),
+            decoration: BoxDecoration(
+              color: Colors.purple.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(25),
+            ),
+            child: Icon(
+              Icons.group_outlined,
+              size: screenWidth * 0.12,
+              color: Colors.purple.withValues(alpha: 0.6),
+            ),
+          ),
+          SizedBox(height: screenHeight * 0.02),
+          Text(
+            'Aucun membre trouvé',
+            style: TextStyle(
+              fontSize: screenWidth * 0.04,
+              color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          SizedBox(height: screenHeight * 0.01),
+          Text(
+            'Ajoutez des membres pour enrichir votre communauté !',
+            style: TextStyle(
+              fontSize: screenWidth * 0.03,
+              color: CouleursApp.texteFonce.withValues(alpha: 0.5),
+            ),
+            textAlign: TextAlign.center,
           ),
         ],
       ),
@@ -685,128 +972,6 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
             ],
           );
         },
-      ),
-    );
-  }
-
-  Widget _construireEvenementsAssociation() {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-    
-    return Container(
-      padding: EdgeInsets.all(screenWidth * 0.05),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // En-tête avec statistiques
-          Row(
-            children: [
-              Container(
-                padding: EdgeInsets.all(screenWidth * 0.025),
-                decoration: BoxDecoration(
-                  color: Colors.blue.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(Icons.event_outlined, color: Colors.blue, size: 24),
-              ),
-              SizedBox(width: screenWidth * 0.04),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Événements à Venir',
-                      style: TextStyle(
-                        fontSize: screenWidth * 0.045,
-                        fontWeight: FontWeight.bold,
-                        color: CouleursApp.texteFonce,
-                      ),
-                    ),
-                    Text(
-                      '${_evenementsAssociation.length} événement${_evenementsAssociation.length != 1 ? 's' : ''}',
-                      style: TextStyle(
-                        fontSize: screenWidth * 0.035,
-                        color: CouleursApp.texteFonce.withValues(alpha: 0.7),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              if (_chargementEvenements)
-                const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(CouleursApp.principal),
-                  ),
-                ),
-            ],
-          ),
-          SizedBox(height: screenHeight * 0.025),
-          
-          // Liste des événements
-          if (_evenementsAssociation.isEmpty && !_chargementEvenements)
-            _construireEtatVideEvenements()
-          else
-            Column(
-              children: _evenementsAssociation.map((evenement) => _construireCarteEvenement(evenement)).toList(),
-            ),
-        ],
-      ),
-    );
-  }
-
-  Widget _construireEtatVideEvenements() {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-    
-    return Container(
-      padding: EdgeInsets.all(screenWidth * 0.08),
-      child: Column(
-        children: [
-          Container(
-            padding: EdgeInsets.all(screenWidth * 0.06),
-            decoration: BoxDecoration(
-              color: Colors.blue.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(25),
-            ),
-            child: Icon(
-              Icons.event_available_outlined,
-              size: screenWidth * 0.12,
-              color: Colors.blue.withValues(alpha: 0.6),
-            ),
-          ),
-          SizedBox(height: screenHeight * 0.02),
-          Text(
-            'Aucun événement à venir',
-            style: TextStyle(
-              fontSize: screenWidth * 0.04,
-              color: CouleursApp.texteFonce.withValues(alpha: 0.6),
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          SizedBox(height: screenHeight * 0.01),
-          Text(
-            'Créez des événements pour engager votre communauté !',
-            style: TextStyle(
-              fontSize: screenWidth * 0.03,
-              color: CouleursApp.texteFonce.withValues(alpha: 0.5),
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
       ),
     );
   }
@@ -958,5 +1123,530 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
         ],
       ),
     );
+  }
+
+  Widget _construireCarteMembre(MembreAssociation membre) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    
+    return GestureDetector(
+      onLongPress: () => _afficherActionsMembre(membre),
+      child: Container(
+        margin: EdgeInsets.only(bottom: screenHeight * 0.015),
+        padding: EdgeInsets.all(screenWidth * 0.04),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: CouleursApp.principal.withValues(alpha: 0.1)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: FutureBuilder<Utilisateur?>(
+          future: _obtenirUtilisateur(membre.utilisateurId),
+          builder: (context, snapshot) {
+            final utilisateur = snapshot.data;
+            return Row(
+              children: [
+                // Avatar avec couleur selon le rôle
+                Container(
+                  width: screenWidth * 0.12,
+                  height: screenWidth * 0.12,
+                  decoration: BoxDecoration(
+                    color: _obtenirCouleurRole(membre.role),
+                    borderRadius: BorderRadius.circular(screenWidth * 0.06),
+                  ),
+                  child: Center(
+                    child: Icon(
+                      _obtenirIconeRole(membre.role),
+                      color: Colors.white,
+                      size: screenWidth * 0.06,
+                    ),
+                  ),
+                ),
+                SizedBox(width: screenWidth * 0.04),
+                
+                // Informations du membre
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _obtenirNomComplet(utilisateur),
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.04,
+                          fontWeight: FontWeight.bold,
+                          color: CouleursApp.texteFonce,
+                        ),
+                      ),
+                      SizedBox(height: screenHeight * 0.005),
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: screenWidth * 0.025,
+                          vertical: screenWidth * 0.01,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _obtenirCouleurRole(membre.role).withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          membre.roleFormate,
+                          style: TextStyle(
+                            fontSize: screenWidth * 0.03,
+                            color: _obtenirCouleurRole(membre.role),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: screenHeight * 0.005),
+                      Text(
+                        'Membre depuis ${_formaterDate(membre.dateAdhesion)}',
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.03,
+                          color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                
+
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  // Méthodes helper pour les rôles
+  Color _obtenirCouleurRole(String role) {
+    final roleLower = role.toLowerCase();
+    switch (roleLower) {
+      case 'president':
+      case 'président':
+      case 'chef':
+        return Colors.red;
+      case 'vice_president':
+      case 'vice-président':
+      case 'vice président':
+        return Colors.orange;
+      case 'tresorier':
+      case 'trésorier':
+        return Colors.purple;
+      case 'secretaire':
+      case 'secrétaire':
+        return Colors.teal;
+      case 'membre_bureau':
+      case 'membre du bureau':
+        return Colors.indigo;
+      case 'membre':
+      case 'membre actif':
+        return CouleursApp.principal;
+      default:
+        return CouleursApp.gris;
+    }
+  }
+
+  IconData _obtenirIconeRole(String role) {
+    final roleLower = role.toLowerCase();
+    switch (roleLower) {
+      case 'president':
+      case 'président':
+      case 'chef':
+        return Icons.admin_panel_settings;
+      case 'vice_president':
+      case 'vice-président':
+      case 'vice président':
+        return Icons.star;
+      case 'tresorier':
+      case 'trésorier':
+        return Icons.account_balance_wallet;
+      case 'secretaire':
+      case 'secrétaire':
+        return Icons.description;
+      case 'membre_bureau':
+      case 'membre du bureau':
+        return Icons.business;
+      case 'membre':
+      case 'membre actif':
+        return Icons.person;
+      default:
+        return Icons.person_outline;
+    }
+  }
+
+  String _formaterDate(DateTime date) {
+    final maintenant = DateTime.now();
+    final difference = maintenant.difference(date);
+    
+    if (difference.inDays < 1) {
+      return 'aujourd\'hui';
+    } else if (difference.inDays < 7) {
+      return '${difference.inDays} jour${difference.inDays > 1 ? 's' : ''}';
+    } else if (difference.inDays < 30) {
+      final semaines = (difference.inDays / 7).floor();
+      return '$semaines semaine${semaines > 1 ? 's' : ''}';
+    } else if (difference.inDays < 365) {
+      final mois = (difference.inDays / 30).floor();
+      return '$mois mois';
+    } else {
+      final annees = (difference.inDays / 365).floor();
+      return '$annees an${annees > 1 ? 's' : ''}';
+    }
+  }
+
+  // Afficher les actions disponibles pour un membre
+  void _afficherActionsMembre(MembreAssociation membre) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle
+            Container(
+              margin: const EdgeInsets.only(top: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            
+            // En-tête
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: FutureBuilder<Utilisateur?>(
+                future: _obtenirUtilisateur(membre.utilisateurId),
+                builder: (context, snapshot) {
+                  final utilisateur = snapshot.data;
+                  return Row(
+                    children: [
+                      Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: _obtenirCouleurRole(membre.role),
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        child: Center(
+                          child: Icon(
+                            _obtenirIconeRole(membre.role),
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _obtenirNomComplet(utilisateur),
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              membre.roleFormate,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: _obtenirCouleurRole(membre.role),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+            
+            // Actions disponibles
+            if (!membre.estPresident) ...[
+              ListTile(
+                leading: const Icon(Icons.arrow_upward, color: Colors.green),
+                title: const Text('Promouvoir'),
+                subtitle: const Text('Choisir un nouveau rôle'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _afficherModalPromotion(membre);
+                },
+              ),
+            ],
+            
+            if (membre.estMembreBureau && !membre.estPresident) ...[
+              ListTile(
+                leading: const Icon(Icons.arrow_downward, color: Colors.orange),
+                title: const Text('Rétrograder'),
+                subtitle: Text('Passer au rôle de ${_obtenirRolePrecedent(membre.role)}'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _retraderMembre(membre);
+                },
+              ),
+            ],
+            
+            ListTile(
+              leading: const Icon(Icons.delete_outline, color: Colors.red),
+              title: const Text('Retirer de l\'association'),
+              subtitle: const Text('Cette action est irréversible'),
+              onTap: () {
+                Navigator.pop(context);
+                _supprimerMembre(membre);
+              },
+            ),
+            
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Méthodes helper pour les promotions/rétrogradations
+  String _obtenirRolePrecedent(String roleActuel) {
+    final roleLower = roleActuel.toLowerCase();
+    switch (roleLower) {
+      case 'president':
+      case 'président':
+      case 'chef':
+        return 'Vice-Président';
+      case 'vice_president':
+      case 'vice-président':
+      case 'vice président':
+        return 'Trésorier';
+      case 'tresorier':
+      case 'trésorier':
+        return 'Secrétaire';
+      case 'secretaire':
+      case 'secrétaire':
+        return 'Membre du Bureau';
+      case 'membre_bureau':
+      case 'membre du bureau':
+        return 'Membre';
+      default:
+        return 'Membre';
+    }
+  }
+
+  // Afficher le modal de promotion avec dropdown
+  void _afficherModalPromotion(MembreAssociation membre) {
+    String? nouveauRoleSelectionne;
+    
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: const Text(
+            'Promouvoir le membre',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Promouvoir ${_obtenirNomComplet(_utilisateursCache[membre.utilisateurId])}',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Sélectionnez le nouveau rôle :',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<String>(
+                value: nouveauRoleSelectionne,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Nouveau rôle',
+                ),
+                items: _obtenirRolesDisponibles(membre.role).map((role) {
+                  return DropdownMenuItem(
+                    value: role,
+                    child: Row(
+                      children: [
+                        Icon(
+                          _obtenirIconeRole(role),
+                          color: _obtenirCouleurRole(role),
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(role),
+                      ],
+                    ),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    nouveauRoleSelectionne = value;
+                  });
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Veuillez sélectionner un rôle';
+                  }
+                  return null;
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Annuler'),
+            ),
+            ElevatedButton(
+              onPressed: nouveauRoleSelectionne != null
+                  ? () {
+                      Navigator.pop(context);
+                      _promouvoirMembreVersRole(membre, nouveauRoleSelectionne!);
+                    }
+                  : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Promouvoir'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Obtenir la liste des rôles disponibles pour la promotion
+  List<String> _obtenirRolesDisponibles(String roleActuel) {
+    final roleLower = roleActuel.toLowerCase();
+    final rolesDisponibles = <String>[];
+    
+    // Ajouter les rôles selon le rôle actuel
+    if (roleLower == 'membre' || roleLower == 'membre actif') {
+      rolesDisponibles.addAll([
+        'Membre du Bureau',
+        'Secrétaire',
+        'Trésorier',
+        'Vice-Président',
+        'Président',
+      ]);
+    } else if (roleLower == 'membre_bureau' || roleLower == 'membre du bureau') {
+      rolesDisponibles.addAll([
+        'Secrétaire',
+        'Trésorier',
+        'Vice-Président',
+        'Président',
+      ]);
+    } else if (roleLower == 'secretaire' || roleLower == 'secrétaire') {
+      rolesDisponibles.addAll([
+        'Trésorier',
+        'Vice-Président',
+        'Président',
+      ]);
+    } else if (roleLower == 'tresorier' || roleLower == 'trésorier') {
+      rolesDisponibles.addAll([
+        'Vice-Président',
+        'Président',
+      ]);
+    } else if (roleLower == 'vice_president' || roleLower == 'vice-président' || roleLower == 'vice président') {
+      rolesDisponibles.addAll([
+        'Président',
+      ]);
+    }
+    
+    return rolesDisponibles;
+  }
+
+  // Promouvoir un membre vers un rôle spécifique
+  Future<void> _promouvoirMembreVersRole(MembreAssociation membre, String nouveauRole) async {
+    final utilisateurConnecte = _authentificationService.utilisateurActuel;
+    if (utilisateurConnecte == null) {
+      _afficherErreur('Vous devez être connecté pour promouvoir un membre');
+      return;
+    }
+
+    try {
+      final resultat = await _membresRepository.changerRole(membre.id, nouveauRole);
+
+      if (resultat) {
+        _afficherSucces('Membre promu au rôle de $nouveauRole avec succès !');
+        _chargerMembresAssociation();
+      } else {
+        _afficherErreur('Erreur lors de la promotion du membre');
+      }
+    } catch (e) {
+      _afficherErreur('Erreur: $e');
+    }
+  }
+
+  // Méthodes d'action pour les membres
+  Future<void> _retraderMembre(MembreAssociation membre) async {
+    final utilisateurConnecte = _authentificationService.utilisateurActuel;
+    if (utilisateurConnecte == null) {
+      _afficherErreur('Vous devez être connecté pour rétrograder un membre');
+      return;
+    }
+
+    try {
+      final nouveauRole = _obtenirRolePrecedent(membre.role);
+      final resultat = await _membresRepository.changerRole(membre.id, nouveauRole);
+
+      if (resultat) {
+        _afficherSucces('Membre rétrogradé au rôle de $nouveauRole avec succès !');
+        _chargerMembresAssociation();
+      } else {
+        _afficherErreur('Erreur lors de la rétrogradation du membre');
+      }
+    } catch (e) {
+      _afficherErreur('Erreur: $e');
+    }
+  }
+
+  Future<void> _supprimerMembre(MembreAssociation membre) async {
+    final utilisateurConnecte = _authentificationService.utilisateurActuel;
+    if (utilisateurConnecte == null) {
+      _afficherErreur('Vous devez être connecté pour supprimer un membre');
+      return;
+    }
+
+    try {
+      final resultat = await _membresRepository.supprimerMembre(membre.id);
+
+      if (resultat) {
+        _afficherSucces('Membre supprimé avec succès !');
+        _chargerMembresAssociation();
+      } else {
+        _afficherErreur('Erreur lors de la suppression du membre');
+      }
+    } catch (e) {
+      _afficherErreur('Erreur: $e');
+    }
   }
 }

@@ -1,6 +1,6 @@
 import '../../domain/entities/actualite.dart';
 import '../../domain/repositories/actualites_repository.dart';
-import '../datasources/actualites_datasource_local.dart';
+import '../datasources/internal/actualites_datasource_local.dart';
 
 // UI Design: Implémentation du repository des actualités avec source de données locale
 class ActualitesRepositoryImpl implements ActualitesRepository {
@@ -29,9 +29,9 @@ class ActualitesRepositoryImpl implements ActualitesRepository {
   }
 
   @override
-  Future<List<Actualite>> obtenirActualitesParAssociation(String nomAssociation) async {
+  Future<List<Actualite>> obtenirActualitesParAssociation(String associationId) async {
     try {
-      final models = await _datasourceLocal.obtenirActualitesParAssociation(nomAssociation);
+      final models = await _datasourceLocal.obtenirActualitesParAssociation(associationId);
       return models.map((model) => model.toEntity()).toList();
     } catch (e) {
       throw Exception('Erreur lors de la récupération des actualités de l\'association: $e');

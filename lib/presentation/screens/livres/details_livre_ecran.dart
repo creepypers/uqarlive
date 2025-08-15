@@ -807,7 +807,7 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
           elevation: 4,
         ),
         label: Text(
-          'Acheter - ${widget.livre.prix?.toStringAsFixed(2) ?? ''} €',
+          'Acheter - \$${widget.livre.prix?.toStringAsFixed(2) ?? ''}',
           style: TextStyle(
             fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
             fontWeight: FontWeight.bold,
@@ -850,13 +850,13 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
 
     if (success) {
       if (mounted) {
-        _afficherSucces(
-            'Demande d\'achat envoyée ! Le vendeur va recevoir votre demande.');
-        Navigator.of(context).pop(); // Retourner à l'écran précédent
+      _afficherSucces(
+          'Demande d\'achat envoyée ! Le vendeur va recevoir votre demande.');
+      Navigator.of(context).pop(); // Retourner à l'écran précédent
       }
     } else {
       if (mounted) {
-        _afficherErreur('Erreur lors de la création de la demande d\'achat');
+      _afficherErreur('Erreur lors de la création de la demande d\'achat');
       }
     }
   }
@@ -918,7 +918,7 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
               'Livre: ${widget.livre.titre}',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            Text('Prix: ${widget.livre.prix?.toStringAsFixed(2) ?? ''} €'),
+            Text('Prix: \$${widget.livre.prix?.toStringAsFixed(2) ?? ''}'),
             const SizedBox(height: 16),
             const Text(
               'Une demande sera envoyée au vendeur qui pourra la confirmer.',
@@ -959,24 +959,24 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
 
       if (livresDisponibles.isEmpty) {
         if (mounted) {
-          _afficherInfo('Vous n\'avez pas de livres disponibles pour l\'échange. Ajoutez-en dans votre collection !');
+        _afficherInfo('Vous n\'avez pas de livres disponibles pour l\'échange. Ajoutez-en dans votre collection !');
         }
         return;
       }
 
       if (mounted) {
-        final livreSelectionne = await Navigator.of(context).push<Livre>(
-          MaterialPageRoute(
-            builder: (context) => SelectionnerLivreEchangeEcran(
-              livres: livresDisponibles,
-              livreACible: widget.livre,
-            ),
+      final livreSelectionne = await Navigator.of(context).push<Livre>(
+        MaterialPageRoute(
+          builder: (context) => SelectionnerLivreEchangeEcran(
+            livres: livresDisponibles,
+            livreACible: widget.livre,
           ),
-        );
+        ),
+      );
 
-        if (livreSelectionne != null) {
-          // Proposer l'échange
-          await _proposerEchangeAvecLivre(livreSelectionne);
+      if (livreSelectionne != null) {
+        // Proposer l'échange
+        await _proposerEchangeAvecLivre(livreSelectionne);
         }
       }
     } catch (e) {

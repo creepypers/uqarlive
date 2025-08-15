@@ -1,4 +1,4 @@
-import '../../domain/entities/evenement.dart';
+import '../../../domain/entities/evenement.dart';
 
 class EvenementsDatasourceLocal {
   // UI Design: Données dynamiques pour les événements (non-hardcodées)

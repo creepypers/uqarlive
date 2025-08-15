@@ -1,7 +1,7 @@
 // UI Design: Implémentation du repository utilisateurs
 import '../../domain/entities/utilisateur.dart';
 import '../../domain/repositories/utilisateurs_repository.dart';
-import '../datasources/utilisateurs_datasource_local.dart';
+import '../datasources/internal/utilisateurs_datasource_local.dart';
 import '../models/utilisateur_model.dart';
 
 class UtilisateursRepositoryImpl implements UtilisateursRepository {

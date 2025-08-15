@@ -1,6 +1,6 @@
 import '../../domain/entities/salle.dart';
 import '../../domain/repositories/salles_repository.dart';
-import '../datasources/salles_datasource_local.dart';
+import '../datasources/internal/salles_datasource_local.dart';
 
 // Implémentation du repository pour les salles de révision
 class SallesRepositoryImpl implements SallesRepository {

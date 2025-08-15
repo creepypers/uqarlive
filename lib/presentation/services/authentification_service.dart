@@ -74,7 +74,8 @@ class AuthentificationService {
 
   // UI Design: Vérifier si l'utilisateur connecté est admin
   bool get estAdministrateur {
-    return aPrivilege('admin') || _utilisateurActuel?.typeUtilisateur == TypeUtilisateur.administrateur;
+    return aPrivilege(PrivilegesUtilisateur.admin) ||
+        _utilisateurActuel?.typeUtilisateur == TypeUtilisateur.administrateur;
   }
 
   // UI Design: Modifier les privilèges d'un utilisateur (admin seulement)
@@ -89,9 +90,12 @@ class AuthentificationService {
       if (utilisateur == null) return false;
 
       // Vérifier qu'on ne retire pas les privilèges admin du dernier admin
-      if (utilisateur.aPrivilege('admin') && !nouveauxPrivileges.contains('admin')) {
+      if (utilisateur.aPrivilege(PrivilegesUtilisateur.admin) &&
+          !nouveauxPrivileges.contains(PrivilegesUtilisateur.admin)) {
         final tousUtilisateurs = await _utilisateursRepository.obtenirTousLesUtilisateurs();
-        final admins = tousUtilisateurs.where((u) => u.aPrivilege('admin') || u.typeUtilisateur == TypeUtilisateur.administrateur).toList();
+        final admins = tousUtilisateurs.where((u) =>
+            u.aPrivilege(PrivilegesUtilisateur.admin) ||
+            u.typeUtilisateur == TypeUtilisateur.administrateur).toList();
         if (admins.length <= 1) {
           return false; // Ne pas retirer le dernier admin
         }
@@ -112,8 +116,8 @@ class AuthentificationService {
     if (utilisateur == null) return false;
 
     final nouveauxPrivileges = List<String>.from(utilisateur.privileges);
-    if (!nouveauxPrivileges.contains('admin')) {
-      nouveauxPrivileges.add('admin');
+    if (!nouveauxPrivileges.contains(PrivilegesUtilisateur.admin)) {
+      nouveauxPrivileges.add(PrivilegesUtilisateur.admin);
     }
 
     return await modifierPrivileges(utilisateurId, nouveauxPrivileges);
@@ -142,5 +146,32 @@ class AuthentificationService {
   String obtenirNomComplet() {
     if (_utilisateurActuel == null) return 'Utilisateur inconnu';
     return '${_utilisateurActuel!.prenom} ${_utilisateurActuel!.nom}';
+  }
+
+  // UI Design: Obtenir les initiales d'un utilisateur par son ID
+  Future<String> obtenirInitialesUtilisateurParId(String utilisateurId) async {
+    try {
+      if (utilisateurId.isEmpty) return '?';
+      
+      // UI Design: Utiliser le repository pour obtenir les informations de l'utilisateur
+      final utilisateur = await _utilisateursRepository.obtenirUtilisateurParId(utilisateurId);
+      if (utilisateur != null) {
+        return '${utilisateur.prenom[0]}${utilisateur.nom[0]}';
+      }
+      
+      // UI Design: Fallback si l'utilisateur n'est pas trouvé par ID
+      return '??';
+    } catch (e) {
+      return '?';
+    }
+  }
+
+  // UI Design: Obtenir les informations complètes d'un utilisateur par son ID
+  Future<Utilisateur?> obtenirUtilisateurParId(String utilisateurId) async {
+    try {
+      return await _utilisateursRepository.obtenirUtilisateurParId(utilisateurId);
+    } catch (e) {
+      return null;
+    }
   }
 }

@@ -1,5 +1,5 @@
-import '../models/actualite_model.dart';
-import '../../domain/entities/actualite.dart';
+import '../../models/actualite_model.dart';
+import '../../../domain/entities/actualite.dart';
 
 // UI Design: Source de données locale dynamique pour les actualités d'associations
 class ActualitesDatasourceLocal {
@@ -111,7 +111,7 @@ class ActualitesDatasourceLocal {
       'titre': 'Initiation au Ultimate Frisbee',
       'description': 'Découvrez ce sport dynamique et amusant',
       'contenu': 'Le Club de Ultimate UQAR ouvre ses portes aux débutants ! Séance d\'initiation gratuite au gymnase. Matériel fourni, bonne humeur garantie. Venez nombreux !',
-      'nomAssociation': 'Club de Ultimate UQAR',
+      'associationId': 'asso_003', // Sport UQAR
       'auteur': 'Kevin Pelletier',
       'datePublication': '2025-01-09T17:00:00Z',
       'dateEvenement': '2025-01-23T17:30:00Z',
@@ -127,7 +127,7 @@ class ActualitesDatasourceLocal {
       'titre': 'Café-Débat : L\'IA et l\'Avenir du Travail',
       'description': 'Discussion ouverte sur l\'intelligence artificielle',
       'contenu': 'Le Café Philo UQAR vous invite à débattre ! Sujet brûlant : "L\'IA va-t-elle remplacer nos jobs ?" Café et croissants offerts. Tous les points de vue bienvenus.',
-      'nomAssociation': 'Café Philosophique UQAR',
+      'associationId': 'asso_004', // AGE (général)
       'auteur': 'Émilie Lavoie',
       'datePublication': '2025-01-08T13:15:00Z',
       'dateEvenement': '2025-01-21T12:00:00Z',
@@ -172,12 +172,12 @@ class ActualitesDatasourceLocal {
   }
 
   // UI Design: Récupérer les actualités par association
-  Future<List<ActualiteModel>> obtenirActualitesParAssociation(String nomAssociation) async {
+  Future<List<ActualiteModel>> obtenirActualitesParAssociation(String associationId) async {
     _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 400));
     
     return _actualitesStockees
-        .where((data) => data['nomAssociation'] == nomAssociation)
+        .where((data) => data['associationId'] == associationId)
         .map((data) => ActualiteModel.fromMap(data))
         .toList();
   }

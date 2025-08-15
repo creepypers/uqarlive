@@ -20,7 +20,6 @@ class UqarLiveApp extends StatelessWidget {
     return MaterialApp(
       title: 'UqarLive',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
         primaryColor: CouleursApp.principal,
         scaffoldBackgroundColor: CouleursApp.fond,
         colorScheme: ColorScheme.fromSeed(

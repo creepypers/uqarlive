@@ -1,5 +1,6 @@
 import '../../core/di/service_locator.dart';
 import '../../domain/entities/utilisateur.dart';
+import '../../domain/entities/association.dart';
 import '../../domain/repositories/actualites_repository.dart';
 import '../../domain/repositories/associations_repository.dart';
 import '../../domain/repositories/evenements_repository.dart';
@@ -62,7 +63,7 @@ class StatistiquesService {
         totalAssociations: associations.length,
         associationsActives: associations.where((a) => a.estActive).length,
         associationsInactives: associations.where((a) => !a.estActive).length,
-        membresTotal: associations.fold<int>(0, (sum, a) => sum + ((a as dynamic).nombreMembres as num).toInt()),
+        membresTotal: associations.fold<int>(0, (sum, a) => sum + (a as Association).membresActifs.length),
 
         // Actualités
         totalActualites: actualites.length,

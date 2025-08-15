@@ -14,6 +14,7 @@ class Utilisateur {
   final List<String> privileges;
   final DateTime? derniereConnexion;
   final String? photoUrl;
+  final List<String> associationsMembre; // UI Design: Liste des IDs des associations dont l'utilisateur est membre
 
   const Utilisateur({
     required this.id,
@@ -30,6 +31,7 @@ class Utilisateur {
     this.privileges = const [],
     this.derniereConnexion,
     this.photoUrl,
+    this.associationsMembre = const [], // UI Design: Initialiser avec une liste vide
   });
 
   // UI Design: Méthode utilitaire pour vérifier si l'utilisateur est admin
@@ -37,6 +39,12 @@ class Utilisateur {
 
   // UI Design: Méthode utilitaire pour vérifier si l'utilisateur a un privilège spécifique
   bool aPrivilege(String privilege) => privileges.contains(privilege);
+
+  // UI Design: Getter pour vérifier si l'utilisateur est membre d'associations
+  bool get estMembreAssociations => associationsMembre.isNotEmpty;
+
+  // UI Design: Getter pour le nombre d'associations dont l'utilisateur est membre
+  int get nombreAssociations => associationsMembre.length;
 
   // UI Design: Copie avec modifications
   Utilisateur copyWith({
@@ -54,6 +62,7 @@ class Utilisateur {
     List<String>? privileges,
     DateTime? derniereConnexion,
     String? photoUrl,
+    List<String>? associationsMembre, // UI Design: Ajouter associationsMembre
   }) {
     return Utilisateur(
       id: id ?? this.id,
@@ -70,6 +79,7 @@ class Utilisateur {
       privileges: privileges ?? this.privileges,
       derniereConnexion: derniereConnexion ?? this.derniereConnexion,
       photoUrl: photoUrl ?? this.photoUrl,
+      associationsMembre: associationsMembre ?? this.associationsMembre, // UI Design: Copier associationsMembre
     );
   }
 }
@@ -82,6 +92,7 @@ enum TypeUtilisateur {
 
 // UI Design: Constantes pour les privilèges
 class PrivilegesUtilisateur {
+  static const String admin = 'admin';
   static const String gestionComptes = 'gestion_comptes';
   static const String gestionCantine = 'gestion_cantine';
   static const String gestionActualites = 'gestion_actualites';

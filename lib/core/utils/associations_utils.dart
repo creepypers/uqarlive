@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../core/theme/app_theme.dart';
+import '../theme/app_theme.dart';
 
 // UI Design: Utilitaires centralisés pour les associations UQAR
 class AssociationsUtils {

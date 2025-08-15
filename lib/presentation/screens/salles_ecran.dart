@@ -802,14 +802,14 @@ class _SallesEcranState extends State<SallesEcran> {
       if (success) {
         final heuresTexte = heuresSelectionnees.map((h) => '${h}h').join(', ');
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('${salle.nom} modifiée pour $heuresTexte'),
-              backgroundColor: CouleursApp.accent,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
-          );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${salle.nom} modifiée pour $heuresTexte'),
+            backgroundColor: CouleursApp.accent,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        );
         }
         _chargerSalles(); // Recharger les salles
       } else {
@@ -936,14 +936,14 @@ class _SallesEcranState extends State<SallesEcran> {
       if (success) {
         final heuresTexte = heuresSelectionnees.map((h) => '${h}h').join(', ');
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('${salle.nom} réservée pour $heuresTexte'),
-              backgroundColor: Colors.green,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
-          );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${salle.nom} réservée pour $heuresTexte'),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        );
         }
         _chargerSalles(); // Recharger les salles
       } else {
@@ -1005,14 +1005,14 @@ class _SallesEcranState extends State<SallesEcran> {
 
       if (success) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Salle "${salle.nom}" réservée avec succès !'),
-              backgroundColor: Colors.green,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
-          );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Salle "${salle.nom}" réservée avec succès !'),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        );
         }
         _chargerSalles(); // Recharger les salles
       } else {
@@ -1208,14 +1208,14 @@ class _SallesEcranState extends State<SallesEcran> {
       final success = await _reservationsSalleRepository.annulerReservation(reservationActive.id);
       if (success) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Réservation annulée avec succès'),
-              backgroundColor: Colors.orange,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
-          );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Réservation annulée avec succès'),
+            backgroundColor: Colors.orange,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        );
         }
         _chargerSalles(); // Recharger les salles
       } else {

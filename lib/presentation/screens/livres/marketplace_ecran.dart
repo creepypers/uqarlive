@@ -9,6 +9,7 @@ import '../../../presentation/services/navigation_service.dart';
 import '../../../presentation/widgets/widget_barre_app_personnalisee.dart';
 import '../../../presentation/widgets/widget_collection.dart';
 import '../../../presentation/widgets/widget_carte.dart';
+import 'gerer_livres_ecran.dart';
 
 import '../../../presentation/services/statistiques_service.dart';
 
@@ -145,6 +146,15 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
     );
   }
 
+  // UI Design: Ouvrir l'écran des échanges
+  void _ouvrirMesEchanges() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const GererLivresEcran(),
+      ),
+    );
+  }
+
   // UI Design: Construire le dialogue de recherche
   Widget _construireDialogueRecherche() {
     return AlertDialog(
@@ -265,6 +275,10 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
       titre: 'Échange de Livres',
       sousTitre: 'Livres Universitaires',
       onTapFin: _ouvrirRecherche, // UI Design: Recherche implementée
+      widgetFin: IconButton(
+        icon: const Icon(Icons.swap_horiz, color: CouleursApp.blanc),
+        onPressed: _ouvrirMesEchanges,
+      ),
     );
   }
 

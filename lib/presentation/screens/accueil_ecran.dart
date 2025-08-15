@@ -22,6 +22,8 @@ import '../widgets/widget_barre_app_personnalisee.dart';
 import '../widgets/widget_carte.dart';
 import '../widgets/widget_collection.dart';
 import '../services/navigation_service.dart';
+import '../services/meteo_service.dart';
+import '../../domain/entities/meteo.dart';
 
 // UI Design: Page d'accueil UqarLive avec AppBar, sections échange de livres/assos/cantine et navbar
 class AccueilEcran extends StatefulWidget {
@@ -39,6 +41,7 @@ class _AccueilEcranState extends State<AccueilEcran> {
   late final EvenementsRepository _evenementsRepository;
   late final AuthentificationService _authentificationService;
   late final MembresAssociationRepository _membresAssociationRepository;
+  late final MeteoService _meteoService;
   
   // États des données
   Utilisateur? _utilisateurActuel;
@@ -53,12 +56,29 @@ class _AccueilEcranState extends State<AccueilEcran> {
   bool _chargementEvenements = false; // UI Design: État de chargement des événements
   bool _chargementUtilisateur = true;
   bool _donneesChargees = false; // Éviter le rechargement inutile
+  Meteo? _meteoRimouski;
+  Meteo? _meteoLevis;
 
   @override
   void initState() {
     super.initState();
     _initialiserRepositories();
     _chargerDonneesUtilisateur();
+  }
+
+  Future<void> _chargerMeteo() async {
+    try {
+      final rim = await _meteoService.temperatureRimouski();
+      final lev = await _meteoService.temperatureLevis();
+      if (mounted) {
+        setState(() {
+          _meteoRimouski = rim;
+          _meteoLevis = lev;
+        });
+      }
+    } catch (_) {
+      // silencieux si l'API échoue
+    }
   }
 
   Future<void> _chargerDonneesUtilisateur() async {
@@ -79,11 +99,13 @@ class _AccueilEcranState extends State<AccueilEcran> {
           _chargerMesAssociations(),
           _chargerActualites(), // UI Design: Charger les actualités dynamiques
           _chargerEvenements(), // UI Design: Charger les événements dynamiques
+          _chargerMeteo(),
         ]);
         _donneesChargees = true;
       } else {
         // UI Design: Charger les actualités même si l'utilisateur n'est pas connecté
         await _chargerActualites();
+        await _chargerMeteo();
       }
     } catch (e) {
       // Gérer l'erreur
@@ -100,6 +122,7 @@ class _AccueilEcranState extends State<AccueilEcran> {
     _evenementsRepository = ServiceLocator.obtenirService<EvenementsRepository>();
     _authentificationService = ServiceLocator.obtenirService<AuthentificationService>();
     _membresAssociationRepository = ServiceLocator.obtenirService<MembresAssociationRepository>();
+    _meteoService = ServiceLocator.obtenirService<MeteoService>();
   }
 
   Future<void> _chargerMesLivres() async {
@@ -241,32 +264,53 @@ class _AccueilEcranState extends State<AccueilEcran> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                Icons.ac_unit,
-                color: CouleursApp.blanc,
-                size: screenWidth * 0.05, // UI Design: Taille adaptative
-              ),
-              SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
+              Icon(Icons.thermostat, color: CouleursApp.blanc, size: screenWidth * 0.05),
+              SizedBox(width: screenWidth * 0.02),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    '-5°C',
+                    _meteoRimouski != null ? '${_meteoRimouski!.temperatureCelsius.toStringAsFixed(0)}°C' : '—',
                     style: TextStyle(
                       color: CouleursApp.blanc,
-                      fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
+                      fontSize: screenWidth * 0.045,
                       fontWeight: FontWeight.bold,
                     ),
-                    overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                    overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
                   Text(
-                    'Rimouski',
+                    _meteoRimouski?.ville ?? 'Rimouski',
                     style: TextStyle(
                       color: CouleursApp.blanc.withValues(alpha: 0.8),
-                      fontSize: screenWidth * 0.03, // UI Design: Taille adaptative
+                      fontSize: screenWidth * 0.03,
                     ),
-                    overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                ],
+              ),
+              SizedBox(width: screenWidth * 0.04),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    _meteoLevis != null ? '${_meteoLevis!.temperatureCelsius.toStringAsFixed(0)}°C' : '—',
+                    style: TextStyle(
+                      color: CouleursApp.blanc,
+                      fontSize: screenWidth * 0.045,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                  Text(
+                    _meteoLevis?.ville ?? 'Lévis',
+                    style: TextStyle(
+                      color: CouleursApp.blanc.withValues(alpha: 0.8),
+                      fontSize: screenWidth * 0.03,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
                 ],

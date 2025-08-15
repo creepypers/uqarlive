@@ -1,6 +1,6 @@
 import '../../domain/entities/evenement.dart';
 import '../../domain/repositories/evenements_repository.dart';
-import '../datasources/evenements_datasource_local.dart';
+import '../datasources/internal/evenements_datasource_local.dart';
 
 class EvenementsRepositoryImpl implements EvenementsRepository {
   final EvenementsDatasourceLocal _datasource;

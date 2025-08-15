@@ -7,7 +7,6 @@ class Association {
   final String? president;
   final String? vicePresident;
   final String? chefId; // ID du chef/président de l'association
-  final int nombreMembres;
   final String? email;
   final String? telephone;
   final String? siteWeb;
@@ -23,6 +22,7 @@ class Association {
   final double? cotisationAnnuelle;
   final String? descriptionLongue;
   final List<String>? beneficesMembers; // Avantages d'être membre
+  final List<String> membresActifs; // UI Design: Liste des IDs des membres actifs
 
   const Association({
     required this.id,
@@ -32,7 +32,6 @@ class Association {
     this.president,
     this.vicePresident,
     this.chefId,
-    required this.nombreMembres,
     this.email,
     this.telephone,
     this.siteWeb,
@@ -48,15 +47,23 @@ class Association {
     this.cotisationAnnuelle,
     this.descriptionLongue,
     this.beneficesMembers,
+    this.membresActifs = const [], // UI Design: Initialiser avec une liste vide
   });
 
   // Getter pour le nombre de membres formaté
   String get nombreMembresFormatte {
+    final nombreMembres = membresActifs.length;
     if (nombreMembres >= 1000) {
       return '${(nombreMembres / 1000).toStringAsFixed(1)}k';
     }
     return nombreMembres.toString();
   }
+
+  // UI Design: Getter pour vérifier si l'association a des membres
+  bool get aDesMembres => membresActifs.isNotEmpty;
+
+  // UI Design: Getter pour le nombre réel de membres actifs
+  int get nombreMembresReel => membresActifs.length;
 
   // Getter pour vérifier si l'association a des contacts
   bool get aDesContacts => 
@@ -66,21 +73,7 @@ class Association {
   bool get aDesReseauxSociaux => 
       facebook != null || instagram != null;
 
-  // Getter pour obtenir la couleur selon le type
-  String get couleurType {
-    switch (typeAssociation) {
-      case 'etudiante':
-        return '#005499'; // Bleu principal UQAR
-      case 'culturelle':
-        return '#FF6B6B'; // Rouge culture
-      case 'sportive':
-        return '#4ECDC4'; // Vert sport
-      case 'academique':
-        return '#45B7D1'; // Bleu académique
-      default:
-        return '#005499';
-    }
-  }
+  // UI Design: couleurType retiré (utiliser un utilitaire UI pour retourner un Color)
 
   // Méthode pour copier avec modifications
   Association copyWith({
@@ -91,7 +84,6 @@ class Association {
     String? president,
     String? vicePresident,
     String? chefId,
-    int? nombreMembres,
     String? email,
     String? telephone,
     String? siteWeb,
@@ -107,6 +99,7 @@ class Association {
     double? cotisationAnnuelle,
     String? descriptionLongue,
     List<String>? beneficesMembers,
+    List<String>? membresActifs, // UI Design: Ajouter membresActifs
   }) {
     return Association(
       id: id ?? this.id,
@@ -116,7 +109,6 @@ class Association {
       president: president ?? this.president,
       vicePresident: vicePresident ?? this.vicePresident,
       chefId: chefId ?? this.chefId,
-      nombreMembres: nombreMembres ?? this.nombreMembres,
       email: email ?? this.email,
       telephone: telephone ?? this.telephone,
       siteWeb: siteWeb ?? this.siteWeb,
@@ -132,12 +124,13 @@ class Association {
       cotisationAnnuelle: cotisationAnnuelle ?? this.cotisationAnnuelle,
       descriptionLongue: descriptionLongue ?? this.descriptionLongue,
       beneficesMembers: beneficesMembers ?? this.beneficesMembers,
+      membresActifs: membresActifs ?? this.membresActifs, // UI Design: Copier membresActifs
     );
   }
 
   @override
   String toString() {
-    return 'Association(id: $id, nom: $nom, type: $typeAssociation, membres: $nombreMembres, active: $estActive)';
+    return 'Association(id: $id, nom: $nom, type: $typeAssociation, membres: ${membresActifs.length}, active: $estActive)';
   }
 
   @override

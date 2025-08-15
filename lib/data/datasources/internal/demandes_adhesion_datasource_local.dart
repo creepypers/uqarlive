@@ -1,4 +1,4 @@
-import '../models/demande_adhesion_model.dart';
+import '../../models/demande_adhesion_model.dart';
 
 class DemandesAdhesionDatasourceLocal {
   // Simulation de données locales pour les demandes d'adhésion

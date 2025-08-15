@@ -1,4 +1,4 @@
-import '../models/transaction_model.dart';
+import '../../models/transaction_model.dart';
 
 class TransactionsDatasourceLocal {
   // Simulation de données locales pour les transactions
@@ -7,7 +7,7 @@ class TransactionsDatasourceLocal {
     TransactionModel(
       id: 'trans_001',
       livreId: 'livre_002', // Physique Générale
-      vendeurId: 'etud_002', // Marie Dubois
+      vendeurId: 'etud_002', // Sophie Gagnon
       acheteurId: 'etud_001', // Alexandre Martin
       type: 'achat',
       montant: 25.0,
@@ -23,7 +23,7 @@ class TransactionsDatasourceLocal {
     TransactionModel(
       id: 'trans_002',
       livreId: 'livre_005', // Programmation Java
-      vendeurId: 'etud_003', // Pierre Tremblay
+      vendeurId: 'etud_003', // Marc Lavoie
       acheteurId: 'etud_001', // Alexandre Martin
       type: 'echange',
       statut: 'en_attente',
@@ -31,6 +31,62 @@ class TransactionsDatasourceLocal {
       livreEchangeId: 'livre_001', // Calcul Différentiel d'Alexandre
       messageAcheteur: 'Je propose mon livre de Calcul en échange',
       messageVendeur: null,
+    ),
+    // Nouvelles transactions pour tester l'écran des échanges
+    TransactionModel(
+      id: 'trans_003',
+      livreId: '1', // Calcul Différentiel d'Alexandre
+      vendeurId: 'etud_001', // Alexandre Martin
+      acheteurId: 'etud_002', // Sophie Gagnon
+      type: 'echange',
+      statut: 'en_attente',
+      dateCreation: DateTime.now().subtract(const Duration(hours: 6)),
+      livreEchangeId: '2', // Physique Générale de Sophie
+      messageAcheteur: 'Salut ! Je suis intéressée par ton livre de Calcul. Je propose ma Physique Générale en échange. Est-ce que ça te convient ?',
+      messageVendeur: null,
+    ),
+    TransactionModel(
+      id: 'trans_004',
+      livreId: '101', // Introduction à l'Algorithmique d'Alexandre
+      vendeurId: 'etud_001', // Alexandre Martin
+      acheteurId: 'etud_004', // Marie Dubois
+      type: 'achat',
+      montant: 15.0,
+      statut: 'confirmee',
+      dateCreation: DateTime.now().subtract(const Duration(days: 1)),
+      dateConfirmation: DateTime.now().subtract(const Duration(hours: 12)),
+      messageAcheteur: 'Bonjour ! Votre livre est-il toujours disponible ?',
+      messageVendeur: 'Oui, parfait ! On peut se rencontrer demain à la bibliothèque.',
+      lieuRendezVous: 'Bibliothèque UQAR - Salle d\'étude',
+      dateRendezVous: DateTime.now().add(const Duration(days: 1, hours: 14)),
+    ),
+    TransactionModel(
+      id: 'trans_005',
+      livreId: '102', // Physique Quantique d'Alexandre
+      vendeurId: 'etud_001', // Alexandre Martin
+      acheteurId: 'etud_003', // Marc Lavoie
+      type: 'echange',
+      statut: 'en_attente',
+      dateCreation: DateTime.now().subtract(const Duration(hours: 2)),
+      livreEchangeId: '103', // Manuel de Chimie de Marc
+      messageAcheteur: 'Salut Marc ! J\'ai besoin de ton livre de Physique Quantique pour mon cours. Je peux t\'échanger contre mon Manuel de Chimie si ça t\'intéresse.',
+      messageVendeur: null,
+    ),
+    TransactionModel(
+      id: 'trans_006',
+      livreId: '2', // Physique Générale de Sophie
+      vendeurId: 'etud_002', // Sophie Gagnon
+      acheteurId: 'etud_005', // Catherine Roy
+      type: 'achat',
+      montant: 18.0,
+      statut: 'completee',
+      dateCreation: DateTime.now().subtract(const Duration(days: 5)),
+      dateConfirmation: DateTime.now().subtract(const Duration(days: 4)),
+      dateCompletion: DateTime.now().subtract(const Duration(days: 3)),
+      messageAcheteur: 'Bonjour Sophie ! Votre livre de Physique est-il encore disponible ?',
+      messageVendeur: 'Oui, il est en excellent état !',
+      lieuRendezVous: 'Cafétéria UQAR',
+      dateRendezVous: DateTime.now().subtract(const Duration(days: 3, hours: 16)),
     ),
   ];
 

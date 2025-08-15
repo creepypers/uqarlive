@@ -11,7 +11,7 @@ import '../../services/adhesions_service.dart';
 import '../../services/authentification_service.dart';
 import '../../services/evenements_service.dart';
 import '../../../core/di/service_locator.dart';
-import '../../utils/associations_utils.dart';
+import '../../../core/utils/associations_utils.dart';
 import '../../widgets/navbar_widget.dart';
 import '../../widgets/widget_barre_app_personnalisee.dart';
 // import supprimé: widget_section_statistiques.dart non utilisé
@@ -283,7 +283,7 @@ class _DetailsAssociationEcranState extends State<DetailsAssociationEcran> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        '${widget.association.nombreMembresFormatte} membres',
+                        '${widget.association.membresActifs.length} membres',
                         style: TextStyle(
                           color: CouleursApp.blanc,
                           fontSize: screenWidth * 0.03, // UI Design: Taille adaptative
@@ -409,7 +409,7 @@ class _DetailsAssociationEcranState extends State<DetailsAssociationEcran> {
               Expanded(
                 child: _construireCarteStatistiqueAssociation(
                   'Membres',
-                  widget.association.nombreMembresFormatte,
+                  '${widget.association.membresActifs.length}',
                   Icons.groups,
                   couleurAssociation,
                   'Membres actifs',

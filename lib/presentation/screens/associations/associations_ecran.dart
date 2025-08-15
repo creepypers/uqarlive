@@ -10,7 +10,7 @@ import '../../widgets/widget_barre_app_personnalisee.dart';
 import '../../widgets/widget_carte.dart';
 import '../../widgets/widget_collection.dart';
 import '../../services/navigation_service.dart';
-import '../../utils/associations_utils.dart';
+import '../../../core/utils/associations_utils.dart';
 import 'details_association_ecran.dart';
 import '../actualites/actualites_ecran.dart';
 
@@ -195,7 +195,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
     final screenHeight = mediaQuery.size.height;
     
     final totalAssociations = _toutesLesAssociations.length;
-    final totalMembres = _toutesLesAssociations.fold(0, (sum, assoc) => sum + assoc.nombreMembres);
+            final totalMembres = _toutesLesAssociations.fold(0, (sum, assoc) => sum + assoc.membresActifs.length);
     final associationsActives = _toutesLesAssociations.where((a) => a.estActive).length;
     final tauxActivite = totalAssociations > 0 ? (associationsActives / totalAssociations * 100).round() : 0;
 
@@ -262,7 +262,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
               Expanded(
                 child: _construireCarteStatistiqueModerne(
                   'Membres',
-                  '${(totalMembres / 1000).toStringAsFixed(1)}k',
+                  totalMembres.toString(),
                   Icons.people,
                   CouleursApp.accent,
                   'Étudiants impliqués',
@@ -419,7 +419,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
           constructeurElement: (context, association, index) {
             return WidgetCarte.association(
               nom: association.nom,
-              description: '${association.nombreMembresFormatte} membres',
+                              description: '${association.membresActifs.length} membres',
               icone: AssociationsUtils.obtenirIconeType(association.typeAssociation),
               couleurIcone: AssociationsUtils.obtenirCouleurType(association.typeAssociation),
               largeur: screenWidth * 0.75, // UI Design: Largeur adaptative
@@ -690,10 +690,12 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
         SizedBox(height: screenHeight * 0.015), // UI Design: Espacement adaptatif
         SizedBox(
           height: screenHeight * 0.22, // UI Design: Hauteur adaptative
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Padding adaptatif
-            itemCount: _chargementActualites ? 1 : _actualitesRecentes.length,
+          child: _chargementActualites || _actualitesRecentes.isEmpty
+              ? _construirePlaceholderActualites(screenWidth, screenHeight)
+              : ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Padding adaptatif
+                  itemCount: _actualitesRecentes.length,
                   itemBuilder: (context, index) {
                     final actualite = _actualitesRecentes[index];
               return Container(
@@ -828,13 +830,21 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
       // UI Design: Récupérer les actualités récentes de toutes les associations
       final actualites = await _actualitesRepository.obtenirActualites();
       
-      // Trier par date de publication et prendre les 4 plus récentes
-      actualites.sort((a, b) => b.datePublication.compareTo(a.datePublication));
-      
-      setState(() {
-        _actualitesRecentes = actualites.take(4).toList();
-        _chargementActualites = false;
-      });
+      // UI Design: Vérifier que les actualités ne sont pas null et ne sont pas vides
+      if (actualites.isNotEmpty) {
+        // Trier par date de publication et prendre les 4 plus récentes
+        actualites.sort((a, b) => b.datePublication.compareTo(a.datePublication));
+        
+        setState(() {
+          _actualitesRecentes = actualites.take(4).toList();
+          _chargementActualites = false;
+        });
+      } else {
+        setState(() {
+          _actualitesRecentes = [];
+          _chargementActualites = false;
+        });
+      }
     } catch (e) {
       setState(() {
         _actualitesRecentes = [];
@@ -873,6 +883,43 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
     } else {
       return '${date.day}/${date.month}';
     }
+  }
+
+  // UI Design: Placeholder pour les actualités en cours de chargement ou vides
+  Widget _construirePlaceholderActualites(double screenWidth, double screenHeight) {
+    return Container(
+      width: screenWidth * 0.75,
+      margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+      padding: EdgeInsets.all(screenWidth * 0.04),
+      decoration: BoxDecoration(
+        color: CouleursApp.blanc,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: CouleursApp.principal.withValues(alpha: 0.1),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            _chargementActualites ? Icons.hourglass_empty : Icons.newspaper_outlined,
+            color: CouleursApp.principal.withValues(alpha: 0.3),
+            size: screenWidth * 0.08,
+          ),
+          SizedBox(height: screenHeight * 0.01),
+          Text(
+            _chargementActualites ? 'Chargement...' : 'Aucune actualité disponible',
+            style: TextStyle(
+              fontSize: screenWidth * 0.032,
+              color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+              fontWeight: FontWeight.w500,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
   }
 
 

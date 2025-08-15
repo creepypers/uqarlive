@@ -1,16 +1,17 @@
 import 'package:get_it/get_it.dart';
-import '../../data/datasources/actualites_datasource_local.dart';
-import '../../data/datasources/associations_datasource_local.dart';
-import '../../data/datasources/evenements_datasource_local.dart';
-import '../../data/datasources/horaires_datasource_local.dart';
-import '../../data/datasources/livres_datasource_local.dart';
-import '../../data/datasources/menus_datasource_local.dart';
-import '../../data/datasources/salles_datasource_local.dart';
-import '../../data/datasources/utilisateurs_datasource_local.dart';
-import '../../data/datasources/membres_association_datasource_local.dart';
-import '../../data/datasources/reservations_salle_datasource_local.dart';
-import '../../data/datasources/transactions_datasource_local.dart';
-import '../../data/datasources/demandes_adhesion_datasource_local.dart';
+import '../../data/datasources/internal/actualites_datasource_local.dart';
+import '../../data/datasources/internal/associations_datasource_local.dart';
+import '../../data/datasources/internal/evenements_datasource_local.dart';
+import '../../data/datasources/internal/horaires_datasource_local.dart';
+import '../../data/datasources/internal/livres_datasource_local.dart';
+import '../../data/datasources/internal/menus_datasource_local.dart';
+import '../../data/datasources/internal/salles_datasource_local.dart';
+import '../../data/datasources/internal/utilisateurs_datasource_local.dart';
+import '../../data/datasources/internal/membres_association_datasource_local.dart';
+import '../../data/datasources/internal/reservations_salle_datasource_local.dart';
+import '../../data/datasources/internal/transactions_datasource_local.dart';
+import '../../data/datasources/internal/demandes_adhesion_datasource_local.dart';
+import '../../data/datasources/internal/messages_datasource_local.dart';
 import '../../data/repositories/actualites_repository_impl.dart';
 import '../../data/repositories/associations_repository_impl.dart';
 import '../../data/repositories/evenements_repository_impl.dart';
@@ -19,6 +20,12 @@ import '../../presentation/services/statistiques_service.dart';
 import '../../presentation/services/authentification_service.dart';
 import '../../presentation/services/transactions_service.dart';
 import '../../presentation/services/adhesions_service.dart';
+import '../../presentation/services/gestion_membres_service.dart';
+import '../../presentation/services/messagerie_service.dart';
+import '../../data/datasources/external/meteo_datasource_remote.dart';
+import '../../domain/repositories/meteo_repository.dart';
+import '../../data/repositories/meteo_repository_impl.dart';
+import '../../presentation/services/meteo_service.dart';
 
 import '../../data/repositories/livres_repository_impl.dart';
 import '../../data/repositories/menus_repository_impl.dart';
@@ -28,6 +35,7 @@ import '../../data/repositories/membres_association_repository_impl.dart';
 import '../../data/repositories/reservations_salle_repository_impl.dart';
 import '../../data/repositories/transactions_repository_impl.dart';
 import '../../data/repositories/demandes_adhesion_repository_impl.dart';
+import '../../data/repositories/messages_repository_impl.dart';
 import '../../domain/repositories/actualites_repository.dart';
 import '../../domain/repositories/associations_repository.dart';
 import '../../domain/repositories/evenements_repository.dart';
@@ -40,6 +48,7 @@ import '../../domain/repositories/membres_association_repository.dart';
 import '../../domain/repositories/reservations_salle_repository.dart';
 import '../../domain/repositories/transactions_repository.dart';
 import '../../domain/repositories/demandes_adhesion_repository.dart';
+import '../../domain/repositories/messages_repository.dart';
 
 final getIt = GetIt.instance;
 
@@ -80,6 +89,9 @@ class ServiceLocator {
     getIt.registerLazySingleton<DemandesAdhesionDatasourceLocal>(
       () => DemandesAdhesionDatasourceLocal(),
     );
+    getIt.registerLazySingleton<MessagesDatasourceLocal>(
+      () => MessagesDatasourceLocal(),
+    );
 
     // Repositories
     getIt.registerLazySingleton<ActualitesRepository>(
@@ -115,6 +127,12 @@ class ServiceLocator {
     getIt.registerLazySingleton<DemandesAdhesionRepository>(
       () => DemandesAdhesionRepositoryImpl(getIt<DemandesAdhesionDatasourceLocal>()),
     );
+    getIt.registerLazySingleton<MessagesRepository>(
+      () => MessagesRepositoryImpl(getIt<MessagesDatasourceLocal>()),
+    );
+    // Meteo
+    getIt.registerLazySingleton<MeteoDatasourceRemote>(() => MeteoDatasourceRemote());
+    getIt.registerLazySingleton<MeteoRepository>(() => MeteoRepositoryImpl(getIt<MeteoDatasourceRemote>()));
     getIt.registerLazySingleton<EvenementsDatasourceLocal>(
       () => EvenementsDatasourceLocal(),
     );
@@ -136,6 +154,18 @@ class ServiceLocator {
     );
     getIt.registerLazySingleton<AdhesionsService>(
       () => AdhesionsService.instance,
+    );
+    getIt.registerLazySingleton<GestionMembresService>(
+      () => GestionMembresService.instance,
+    );
+    getIt.registerLazySingleton<MeteoService>(
+      () => MeteoService(),
+    );
+    getIt.registerLazySingleton<MessagerieService>(
+      () => MessagerieService(
+        getIt<MessagesRepository>(),
+        getIt<UtilisateursRepository>(),
+      ),
     );
 
   }

@@ -1,4 +1,4 @@
-import '../models/salle_model.dart';
+import '../../models/salle_model.dart';
 
 // Datasource locale pour les salles de révision
 class SallesDatasourceLocal {

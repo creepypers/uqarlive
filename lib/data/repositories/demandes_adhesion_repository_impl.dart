@@ -1,6 +1,6 @@
 import '../../domain/entities/demande_adhesion.dart';
 import '../../domain/repositories/demandes_adhesion_repository.dart';
-import '../datasources/demandes_adhesion_datasource_local.dart';
+import '../datasources/internal/demandes_adhesion_datasource_local.dart';
 import '../models/demande_adhesion_model.dart';
 
 class DemandesAdhesionRepositoryImpl implements DemandesAdhesionRepository {

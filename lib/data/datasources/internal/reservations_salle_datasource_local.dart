@@ -1,4 +1,4 @@
-import '../models/reservation_salle_model.dart';
+import '../../models/reservation_salle_model.dart';
 
 class ReservationsSalleDatasourceLocal {
   // Simulation de données locales pour les réservations de salles

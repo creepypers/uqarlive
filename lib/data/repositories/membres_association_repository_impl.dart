@@ -1,6 +1,6 @@
 import '../../domain/entities/membre_association.dart';
 import '../../domain/repositories/membres_association_repository.dart';
-import '../datasources/membres_association_datasource_local.dart';
+import '../datasources/internal/membres_association_datasource_local.dart';
 import '../models/membre_association_model.dart';
 
 class MembresAssociationRepositoryImpl implements MembresAssociationRepository {

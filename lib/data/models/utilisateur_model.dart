@@ -16,6 +16,7 @@ class UtilisateurModel {
   final List<String> privileges;
   final DateTime? derniereConnexion;
   final String? photoUrl;
+  final List<String> associationsMembre; // UI Design: Liste des IDs des associations dont l'utilisateur est membre
 
   const UtilisateurModel({
     required this.id,
@@ -32,6 +33,7 @@ class UtilisateurModel {
     required this.privileges,
     this.derniereConnexion,
     this.photoUrl,
+    this.associationsMembre = const [], // UI Design: Initialiser avec une liste vide
   });
 
   // UI Design: Création depuis Map (base de données)
@@ -56,6 +58,7 @@ class UtilisateurModel {
           ? DateTime.parse(map['derniereConnexion']) 
           : null,
       photoUrl: map['photoUrl'],
+      associationsMembre: List<String>.from(map['associationsMembre'] ?? []), // UI Design: Parser associationsMembre
     );
   }
 
@@ -76,6 +79,7 @@ class UtilisateurModel {
       'privileges': privileges,
       'derniereConnexion': derniereConnexion?.toIso8601String(),
       'photoUrl': photoUrl,
+      'associationsMembre': associationsMembre, // UI Design: Inclure associationsMembre
     };
   }
 
@@ -96,6 +100,7 @@ class UtilisateurModel {
       privileges: privileges,
       derniereConnexion: derniereConnexion,
       photoUrl: photoUrl,
+      associationsMembre: associationsMembre, // UI Design: Passer associationsMembre
     );
   }
 
@@ -116,6 +121,7 @@ class UtilisateurModel {
       privileges: utilisateur.privileges,
       derniereConnexion: utilisateur.derniereConnexion,
       photoUrl: utilisateur.photoUrl,
+      associationsMembre: utilisateur.associationsMembre, // UI Design: Passer associationsMembre
     );
   }
 
@@ -135,6 +141,7 @@ class UtilisateurModel {
     List<String>? privileges,
     DateTime? derniereConnexion,
     String? photoUrl,
+    List<String>? associationsMembre,
   }) {
     return UtilisateurModel(
       id: id ?? this.id,
@@ -151,6 +158,7 @@ class UtilisateurModel {
       privileges: privileges ?? this.privileges,
       derniereConnexion: derniereConnexion ?? this.derniereConnexion,
       photoUrl: photoUrl ?? this.photoUrl,
+      associationsMembre: associationsMembre ?? this.associationsMembre,
     );
   }
 } 

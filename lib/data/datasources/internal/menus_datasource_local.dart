@@ -195,11 +195,10 @@ class MenusDatasourceLocal {
     // UI Design: Trouver et mettre à jour le menu dans la liste statique
     final index = _menus.indexWhere((m) => m['id'] == menuId);
     
-    if (index != -1) {
-      _menus[index] = menuData;
-      return menuData;
+    if (index == -1) {
+      throw Exception('Menu avec l\'ID $menuId introuvable');
     }
-    
+    _menus[index] = menuData;
     return menuData;
   }
 

@@ -390,7 +390,7 @@ class _CantineEcranState extends State<CantineEcran> {
           'couleur': CouleursApp.accent,
         },
         {
-          'valeur': '${_statistiques!.prixMoyen.toStringAsFixed(2)}€',
+          'valeur': ' 24${_statistiques!.prixMoyen.toStringAsFixed(2)}',
           'label': 'Prix moyen',
           'icone': Icons.payment,
           'couleur': CouleursApp.accent,
@@ -569,7 +569,7 @@ class _CantineEcranState extends State<CantineEcran> {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Text(
-                                    '${_menuDuJourSpecial!.prix.toStringAsFixed(2)}€',
+                                    ' 24${_menuDuJourSpecial!.prix.toStringAsFixed(2)}',
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,

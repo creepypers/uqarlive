@@ -1,6 +1,6 @@
 import '../../domain/entities/menu.dart';
 import '../../domain/repositories/menus_repository.dart';
-import '../datasources/menus_datasource_local.dart';
+import '../datasources/internal/menus_datasource_local.dart';
 import '../models/menu_model.dart';
 
 // UI Design: Implémentation du repository pour les menus de cantine

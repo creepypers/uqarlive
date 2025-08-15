@@ -1,6 +1,6 @@
 import '../../domain/entities/reservation_salle.dart';
 import '../../domain/repositories/reservations_salle_repository.dart';
-import '../datasources/reservations_salle_datasource_local.dart';
+import '../datasources/internal/reservations_salle_datasource_local.dart';
 import '../models/reservation_salle_model.dart';
 
 class ReservationsSalleRepositoryImpl implements ReservationsSalleRepository {

@@ -1,5 +1,5 @@
  // UI Design: Datasource local pour les livres universitaires disponibles à l'échange
-import '../models/livre_model.dart';
+import '../../models/livre_model.dart';
 
 class LivresDatasourceLocal {
   // UI Design: Liste interne des livres avec gestion dynamique

@@ -1,6 +1,6 @@
 import '../../domain/entities/livre.dart';
 import '../../domain/repositories/livres_repository.dart';
-import '../datasources/livres_datasource_local.dart';
+import '../datasources/internal/livres_datasource_local.dart';
 import '../models/livre_model.dart';
 
 // UI Design: Implémentation du repository des livres - couche data

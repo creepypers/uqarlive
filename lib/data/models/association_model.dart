@@ -10,7 +10,6 @@ class AssociationModel extends Association {
     super.president,
     super.vicePresident,
     super.chefId,
-    required super.nombreMembres,
     super.email,
     super.telephone,
     super.siteWeb,
@@ -26,6 +25,7 @@ class AssociationModel extends Association {
     super.cotisationAnnuelle,
     super.descriptionLongue,
     super.beneficesMembers,
+    super.membresActifs,
   });
 
   // Conversion depuis Map vers AssociationModel
@@ -38,7 +38,9 @@ class AssociationModel extends Association {
       president: map['president'],
       vicePresident: map['vicePresident'],
       chefId: map['chefId'],
-      nombreMembres: map['nombreMembres'] ?? 0,
+      membresActifs: map['membresActifs'] != null 
+          ? List<String>.from(map['membresActifs'])
+          : [],
       email: map['email'],
       telephone: map['telephone'],
       siteWeb: map['siteWeb'],
@@ -75,7 +77,7 @@ class AssociationModel extends Association {
       'president': president,
       'vicePresident': vicePresident,
       'chefId': chefId,
-      'nombreMembres': nombreMembres,
+      'membresActifs': membresActifs,
       'email': email,
       'telephone': telephone,
       'siteWeb': siteWeb,
@@ -104,7 +106,7 @@ class AssociationModel extends Association {
       president: association.president,
       vicePresident: association.vicePresident,
       chefId: association.chefId,
-      nombreMembres: association.nombreMembres,
+      membresActifs: association.membresActifs,
       email: association.email,
       telephone: association.telephone,
       siteWeb: association.siteWeb,
@@ -133,7 +135,7 @@ class AssociationModel extends Association {
       president: president,
       vicePresident: vicePresident,
       chefId: chefId,
-      nombreMembres: nombreMembres,
+      membresActifs: membresActifs,
       email: email,
       telephone: telephone,
       siteWeb: siteWeb,
@@ -178,6 +180,7 @@ class AssociationModel extends Association {
     double? cotisationAnnuelle,
     String? descriptionLongue,
     List<String>? beneficesMembers,
+    List<String>? membresActifs,
   }) {
     return AssociationModel(
       id: id ?? this.id,
@@ -186,7 +189,7 @@ class AssociationModel extends Association {
       typeAssociation: typeAssociation ?? this.typeAssociation,
       president: president ?? this.president,
       vicePresident: vicePresident ?? this.vicePresident,
-      nombreMembres: nombreMembres ?? this.nombreMembres,
+      membresActifs: membresActifs ?? this.membresActifs,
       email: email ?? this.email,
       telephone: telephone ?? this.telephone,
       siteWeb: siteWeb ?? this.siteWeb,

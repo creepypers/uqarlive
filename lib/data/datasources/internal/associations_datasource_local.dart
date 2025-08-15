@@ -11,7 +11,7 @@ class AssociationsDatasourceLocal {
         'president': 'Alexandre Martin',
         'vicePresident': 'Marie Dubois',
         'chefId': 'etud_001', // Alexandre Martin
-        'nombreMembres': 3200,
+        'membresActifs': ['etud_001', 'etud_002', 'etud_003', 'etud_004', 'etud_005'],
         'email': 'aeuqar@uqar.ca',
         'telephone': '418-723-1986',
         'siteWeb': 'https://aeuqar.ca',
@@ -50,7 +50,7 @@ class AssociationsDatasourceLocal {
         'president': 'Sophie Gagnon',
         'vicePresident': 'Martin Côté',
         'chefId': 'etud_002', // Sophie Gagnon
-        'nombreMembres': 85,
+        'membresActifs': ['etud_006', 'etud_007', 'etud_008'],
         'email': 'radio@uqar.ca',
         'telephone': '418-724-1446',
         'siteWeb': 'https://radiouqar.ca',
@@ -89,7 +89,7 @@ class AssociationsDatasourceLocal {
         'president': 'Maxime Leblanc',
         'vicePresident': 'Catherine Roy',
         'chefId': 'etud_003', // Maxime Leblanc
-        'nombreMembres': 520,
+        'membresActifs': ['etud_009', 'etud_010', 'etud_011', 'etud_012'],
         'email': 'sport@uqar.ca',
         'telephone': '418-723-1986',
         'siteWeb': null,
@@ -128,7 +128,7 @@ class AssociationsDatasourceLocal {
         'president': 'Alexandre Martin',
         'vicePresident': 'Vincent Michaud',
         'chefId': 'etud_001', // Alexandre Martin
-        'nombreMembres': 180,
+        'membresActifs': ['etud_001', 'etud_002', 'etud_003', 'etud_004', 'etud_005', 'etud_006', 'etud_007', 'etud_008'],
         'email': 'genie@uqar.ca',
         'telephone': '418-724-1525',
         'siteWeb': 'https://genieuqar.ca',
@@ -167,7 +167,7 @@ class AssociationsDatasourceLocal {
         'president': 'Juliette Beaulieu',
         'vicePresident': 'Thomas Côté',
         'chefId': 'etud_001', // Juliette Beaulieu (utilise Alexandre Martin temporairement)
-        'nombreMembres': 45,
+        'membresActifs': ['etud_013', 'etud_014'],
         'email': 'theatre@uqar.ca',
         'telephone': null,
         'siteWeb': null,
@@ -206,7 +206,7 @@ class AssociationsDatasourceLocal {
         'president': 'Laurence Giguère',
         'vicePresident': 'Gabriel Morin',
         'chefId': 'etud_002', // Laurence Giguère (utilise Sophie Gagnon temporairement)
-        'nombreMembres': 120,
+        'membresActifs': ['etud_015', 'etud_016', 'etud_017', 'etud_018'],
         'email': 'eco@uqar.ca',
         'telephone': null,
         'siteWeb': 'https://ecouqar.org',
@@ -245,7 +245,7 @@ class AssociationsDatasourceLocal {
         'president': 'Maria Santos',
         'vicePresident': 'Ahmed Ben Ali',
         'chefId': 'etud_010', // Maria Santos
-        'nombreMembres': 280,
+        'membresActifs': ['etud_019', 'etud_020', 'etud_021', 'etud_022', 'etud_023'],
         'email': 'international@uqar.ca',
         'telephone': '418-723-1544',
         'siteWeb': null,
@@ -284,7 +284,7 @@ class AssociationsDatasourceLocal {
         'president': 'Isabelle Dufour',
         'vicePresident': 'Marc-André Bouchard',
         'chefId': 'etud_011', // Isabelle Dufour
-        'nombreMembres': 380,
+        'membresActifs': ['etud_024', 'etud_025', 'etud_026', 'etud_027', 'etud_028'],
         'email': 'aelies@uqar.ca',
         'telephone': null,
         'siteWeb': null,
@@ -367,7 +367,7 @@ class AssociationsDatasourceLocal {
   List<Map<String, dynamic>> obtenirAssociationsPopulaires({int limite = 5}) {
     final associations = obtenirToutesLesAssociations();
     associations.sort((a, b) => 
-        (b['nombreMembres'] as int).compareTo(a['nombreMembres'] as int));
+        (b['membresActifs'] as List).length.compareTo((a['membresActifs'] as List).length));
     return associations.take(limite).toList();
   }
 

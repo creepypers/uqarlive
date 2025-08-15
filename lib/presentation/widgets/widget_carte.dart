@@ -258,26 +258,31 @@ class WidgetCarte extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    titre,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: CouleursApp.texteFonce,
-                      height: 1.2, // UI Design: Hauteur de ligne pour meilleure lisibilité
+                  Flexible(
+                    child: Text(
+                      titre,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: CouleursApp.texteFonce,
+                        height: 1.1, // UI Design: Hauteur de ligne réduite pour éviter l'overflow
+                      ),
+                      maxLines: 2, // UI Design: Permettre 2 lignes pour les titres longs
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    maxLines: 2, // UI Design: Permettre 2 lignes pour les titres longs
-                    overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    sousTitre,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                  const SizedBox(height: 3), // UI Design: Espacement réduit pour éviter l'overflow
+                  Flexible(
+                    child: Text(
+                      sousTitre,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                        height: 1.0, // UI Design: Hauteur de ligne optimisée
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
@@ -303,7 +308,7 @@ class WidgetCarte extends StatelessWidget {
               ),
               child: Icon(icone, color: couleurIcone, size: tailleIconeAdaptative),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6), // UI Design: Espacement réduit pour éviter l'overflow
             Flexible(
               child: Text(
                 titre,
@@ -311,19 +316,21 @@ class WidgetCarte extends StatelessWidget {
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
                   color: CouleursApp.texteFonce,
+                  height: 1.0, // UI Design: Hauteur de ligne optimisée
                 ),
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            const SizedBox(height: 2),
+            const SizedBox(height: 1), // UI Design: Espacement minimal pour éviter l'overflow
             Flexible(
               child: Text(
                 sousTitre,
                 style: TextStyle(
                   fontSize: 9,
                   color: CouleursApp.texteFonce.withValues(alpha: 0.6),
+                  height: 1.0, // UI Design: Hauteur de ligne optimisée
                 ),
                 textAlign: TextAlign.center,
                 maxLines: 2,
@@ -535,7 +542,7 @@ class WidgetCarte extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Text(
-            '${livre.prix!.toStringAsFixed(2).replaceAll('.', ',')} €',
+            '${livre.prix}',
             style: const TextStyle(
               fontSize: 14,
               color: CouleursApp.accent,

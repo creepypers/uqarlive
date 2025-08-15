@@ -29,7 +29,7 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
   final TextEditingController _controleurTelephone = TextEditingController();
   final TextEditingController _controleurSiteWeb = TextEditingController();
   final TextEditingController _controleurBudget = TextEditingController();
-
+  
   final TextEditingController _controleurLocalisation = TextEditingController();
   final TextEditingController _controleurHoraires = TextEditingController();
   
@@ -647,7 +647,7 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
         activites: _activites, // UI Design: Activités saisies par l'utilisateur
         estActive: _estActive,
         dateCreation: _modeModification ? widget.associationAModifier!.dateCreation : DateTime.now(),
-        nombreMembres: _modeModification ? widget.associationAModifier!.nombreMembres : 0,
+        membresActifs: _modeModification ? widget.associationAModifier!.membresActifs : [],
       );
 
       // UI Design: Appeler les méthodes du repository selon le mode
