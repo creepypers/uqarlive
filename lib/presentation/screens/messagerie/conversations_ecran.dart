@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/di/service_locator.dart';
+import '../../../core/utils/associations_utils.dart';
 import '../../../domain/entities/message.dart';
 import '../../../domain/entities/utilisateur.dart';
 import '../../services/messagerie_service.dart';
@@ -230,8 +231,9 @@ class _ConversationsEcranState extends State<ConversationsEcran> {
       return 'M';
     }
     
-    // UI Design: Utiliser les initiales depuis le cache ou générer un fallback
-    return _initialesUtilisateurs[utilisateurId] ?? _genererInitialesFallback(utilisateurId);
+    // UI Design: Utiliser les initiales depuis le cache ou les utilitaires centralisés
+    return _initialesUtilisateurs[utilisateurId] ?? 
+           TransactionsUtils.obtenirInitialesUtilisateur(utilisateurId);
   }
 
   void _afficherErreur(String message) {

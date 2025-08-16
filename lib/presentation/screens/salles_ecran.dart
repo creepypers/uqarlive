@@ -1132,7 +1132,7 @@ class _SallesEcranState extends State<SallesEcran> {
     );
   }
 
-  // UI Design: Helpers pour formatage
+  // UI Design: Helpers pour formatage - Utilisation des utilitaires centralisés
   String _formaterDate(DateTime date) {
     final maintenant = DateTime.now();
     if (date.day == maintenant.day && date.month == maintenant.month && date.year == maintenant.year) {

@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/di/service_locator.dart';
+import '../../../core/utils/livre_categories.dart';
 import '../../../domain/entities/livre.dart';
 import '../../../domain/usercases/livres_repository.dart';
-import 'details_livre_ecran.dart';
+import '../../../presentation/services/statistiques_service.dart';
 import '../../../presentation/widgets/navbar_widget.dart';
 import '../../../presentation/services/navigation_service.dart';
 import '../../../presentation/widgets/widget_barre_app_personnalisee.dart';
 import '../../../presentation/widgets/widget_collection.dart';
 import '../../../presentation/widgets/widget_carte.dart';
-import 'gerer_livres_ecran.dart';
 import '../../widgets/widget_bouton_conversations.dart';
-
-import '../../../presentation/services/statistiques_service.dart';
+import 'details_livre_ecran.dart';
+import 'gerer_livres_ecran.dart';
 
 // UI Design: Écran marketplace avec widgets ultra-minimalistes
 class MarketplaceEcran extends StatefulWidget {
@@ -32,21 +32,13 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
   bool _chargementLivres = false;
 
   // Variables pour les filtres
-  String _matiereSelectionnee = 'Matières';
-  String _filtreEtat = 'États';
-  String _filtreAnnee = 'Années';
+  String _matiereSelectionnee = 'Toutes';
+  String _filtreEtat = 'Tous';
+  String _filtreAnnee = 'Toutes';
   
   // Variables pour la recherche
   final TextEditingController _controleurRecherche = TextEditingController();
   String _termeRecherche = '';
-
-  final List<String> _matieres = [
-    'Matières', 'Mathématiques', 'Physique', 'Chimie', 'Biologie', 
-    'Informatique', 'Génie', 'Économie', 'Droit', 'Lettres', 'Histoire'
-  ];
-
-  final List<String> _etatsLivre = ['États', 'Excellent', 'Très bon', 'Bon', 'Acceptable'];
-  final List<String> _anneesEtude = ['Années', '1ère année', '2ème année', '3ème année', 'Maîtrise', 'Doctorat'];
 
   @override
   void initState() {
@@ -74,11 +66,7 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
 
     try {
       final results = await Future.wait([
-        _livresRepository.filtrerLivres(
-          matiere: _matiereSelectionnee == 'Matières' ? null : _matiereSelectionnee,
-          etat: _filtreEtat == 'États' ? null : _filtreEtat,
-          annee: _filtreAnnee == 'Années' ? null : _filtreAnnee,
-        ),
+        _livresRepository.obtenirTousLesLivres(),
         _statistiquesService.obtenirStatistiquesGlobales(),
       ]);
 
@@ -88,6 +76,9 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
         _statistiques = results[1] as StatistiquesGlobales;
         _chargementLivres = false;
       });
+      
+      // Appliquer les filtres initiaux
+      _appliquerFiltres();
     } catch (e) {
       setState(() {
         _chargementLivres = false;
@@ -117,19 +108,19 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
     }
 
     // Filtre par matière
-    if (_matiereSelectionnee != 'Matières') {
+    if (_matiereSelectionnee != 'Toutes') {
       livresFiltres = livresFiltres.where((livre) => 
           livre.matiere == _matiereSelectionnee).toList();
     }
 
     // Filtre par état
-    if (_filtreEtat != 'États') {
+    if (_filtreEtat != 'Tous') {
       livresFiltres = livresFiltres.where((livre) => 
           livre.etatLivre == _filtreEtat).toList();
     }
 
     // Filtre par année
-    if (_filtreAnnee != 'Années') {
+    if (_filtreAnnee != 'Toutes') {
       livresFiltres = livresFiltres.where((livre) => 
           livre.anneeEtude == _filtreAnnee).toList();
     }
@@ -308,9 +299,9 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
           height: screenHeight * 0.06, // UI Design: Hauteur adaptative
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: _matieres.length,
+            itemCount: LivreCategories.matieresValides.length + 1, // +1 pour "Toutes"
             itemBuilder: (context, index) {
-              final matiere = _matieres[index];
+              final matiere = index == 0 ? 'Toutes' : LivreCategories.matieresValides[index - 1];
               final estSelectionne = _matiereSelectionnee == matiere;
               
               return Container(
@@ -386,7 +377,7 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
                       setState(() => _filtreEtat = newValue!);
                       _appliquerFiltres(); // UI Design: Utiliser la fonction de filtrage locale
                     },
-                    items: _etatsLivre.map<DropdownMenuItem<String>>((String value) {
+                    items: ['Tous', ...LivreCategories.etatsValides].map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
                         child: Text(
@@ -437,7 +428,7 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
                       setState(() => _filtreAnnee = newValue!);
                       _appliquerFiltres(); // UI Design: Utiliser la fonction de filtrage locale
                     },
-                    items: _anneesEtude.map<DropdownMenuItem<String>>((String value) {
+                    items: ['Toutes', ...LivreCategories.anneesValides].map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
                         child: Text(
@@ -637,7 +628,7 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
             ),
             SizedBox(width: screenWidth * 0.04), // UI Design: Espacement adaptatif
             Text(
-              '(${_livresDisponibles.length})',
+              '(${_livresFiltres.length})',
               style: TextStyle(
                 fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
                 color: CouleursApp.principal.withValues(alpha: 0.7),
@@ -650,7 +641,7 @@ class _MarketplaceEcranState extends State<MarketplaceEcran> {
         ),
         SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
         WidgetCollection<Livre>.grille(
-          elements: _livresDisponibles,
+          elements: _livresFiltres,
           enChargement: _chargementLivres,
           ratioAspect: 0.75, // UI Design: Ajuste de 1.05 à 0.75 pour éviter l'overflow (hauteur plus grande que largeur)
           nombreColonnes: 2,

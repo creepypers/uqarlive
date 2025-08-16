@@ -6,7 +6,7 @@ class TransactionsDatasourceLocal {
     // Transactions d'exemple pour différents utilisateurs
     TransactionModel(
       id: 'trans_001',
-      livreId: 'livre_002', // Physique Générale
+      livreId: '2', // Physique Générale (ID existant)
       vendeurId: 'etud_002', // Sophie Gagnon
       acheteurId: 'etud_001', // Alexandre Martin
       type: 'achat',
@@ -22,13 +22,13 @@ class TransactionsDatasourceLocal {
     ),
     TransactionModel(
       id: 'trans_002',
-      livreId: 'livre_005', // Programmation Java
-      vendeurId: 'etud_003', // Marc Lavoie
+      livreId: '3', // Chimie Organique (ID existant)
+      vendeurId: 'etud_003', // Sarah Bouchard
       acheteurId: 'etud_001', // Alexandre Martin
       type: 'echange',
       statut: 'en_attente',
       dateCreation: DateTime.now().subtract(const Duration(days: 2)),
-      livreEchangeId: 'livre_001', // Calcul Différentiel d'Alexandre
+      livreEchangeId: '1', // Calcul Différentiel d'Alexandre (ID existant)
       messageAcheteur: 'Je propose mon livre de Calcul en échange',
       messageVendeur: null,
     ),
@@ -62,14 +62,14 @@ class TransactionsDatasourceLocal {
     ),
     TransactionModel(
       id: 'trans_005',
-      livreId: '102', // Physique Quantique d'Alexandre
+      livreId: '102', // Algèbre Linéaire d'Alexandre (ID existant)
       vendeurId: 'etud_001', // Alexandre Martin
-      acheteurId: 'etud_003', // Marc Lavoie
+      acheteurId: 'etud_003', // Sarah Bouchard
       type: 'echange',
       statut: 'en_attente',
       dateCreation: DateTime.now().subtract(const Duration(hours: 2)),
-      livreEchangeId: '103', // Manuel de Chimie de Marc
-      messageAcheteur: 'Salut Marc ! J\'ai besoin de ton livre de Physique Quantique pour mon cours. Je peux t\'échanger contre mon Manuel de Chimie si ça t\'intéresse.',
+      livreEchangeId: '3', // Chimie Organique de Sarah (ID existant)
+      messageAcheteur: 'Salut Sarah ! J\'ai besoin de ton livre de Chimie Organique pour mon cours. Je peux t\'échanger contre mon Algèbre Linéaire si ça t\'intéresse.',
       messageVendeur: null,
     ),
     TransactionModel(

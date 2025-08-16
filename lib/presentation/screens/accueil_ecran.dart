@@ -14,6 +14,7 @@ import '../../domain/usercases/membres_association_repository.dart';
 import '../services/authentification_service.dart';
 import 'livres/details_livre_ecran.dart';
 
+import 'associations/associations_ecran.dart';
 import 'associations/details_association_ecran.dart';
 import 'associations/actualites/actualites_ecran.dart';
 import 'associations/evenements/evenements_ecran.dart';
@@ -508,7 +509,7 @@ class _AccueilEcranState extends State<AccueilEcran> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const ActualitesEcran(),
+                    builder: (context) => const AssociationsEcran(),
                   ),
                 );
               },

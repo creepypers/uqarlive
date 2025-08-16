@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/di/service_locator.dart';
+import '../../../core/utils/menu_categories.dart';
 import '../../../domain/entities/menu.dart';
 import '../../../domain/usercases/menus_repository.dart';
 import '../../../domain/usercases/horaires_repository.dart';
@@ -32,29 +33,13 @@ class _CantineEcranState extends State<CantineEcran> {
   List<Menu> _menusFiltres = [];
   Map<String, Map<String, TimeOfDay>> _horaires = {}; // UI Design: Horaires de la cantine
   StatistiquesGlobales? _statistiques;
-  String _categorieSelectionnee = 'menu_jour';
+  String _categorieSelectionnee = MenuCategories.categorieDefaut;
   bool _chargementMenus = false;
   bool _afficheVegetarienUniquement = false;
   
   // Variables pour la recherche
   final TextEditingController _controleurRecherche = TextEditingController();
   String _termeRecherche = '';
-
-  final List<String> _categories = [
-    'menu_jour',
-    'plat', 
-    'snack',
-    'dessert',
-    'boisson',
-  ];
-
-  final Map<String, String> _nomsCategories = {
-    'menu_jour': 'Menus du Jour',
-    'plat': 'Plats',
-    'snack': 'Snacks',
-    'dessert': 'Desserts',
-    'boisson': 'Boissons',
-  };
 
   @override
   void initState() {
@@ -662,9 +647,9 @@ class _CantineEcranState extends State<CantineEcran> {
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Padding adaptatif
-            itemCount: _categories.length,
+            itemCount: MenuCategories.categories.length,
             itemBuilder: (context, index) {
-              final categorie = _categories[index];
+              final categorie = MenuCategories.categories[index];
               final estSelectionne = categorie == _categorieSelectionnee;
               
               return GestureDetector(
@@ -688,7 +673,7 @@ class _CantineEcranState extends State<CantineEcran> {
                     ),
                   ),
                   child: Text(
-                    _nomsCategories[categorie] ?? categorie,
+                    MenuCategories.obtenirNomCategorie(categorie),
                     style: TextStyle(
                       color: estSelectionne 
                           ? CouleursApp.blanc 

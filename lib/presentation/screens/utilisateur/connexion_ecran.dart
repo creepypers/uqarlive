@@ -183,44 +183,44 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
       backgroundColor: CouleursApp.blanc,
       resizeToAvoidBottomInset:
           true, // UI Design: Éviter les débordements avec le clavier
-      body: SafeArea(
-        child: Stack(
-          children: [
-            // Background divisé en 2 parties
-            Column(
-              children: [
-                // Partie supérieure avec dégradé (2/3 du background)
-                Expanded(
-                  flex: 2,
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          CouleursApp.accent.withValues(
-                              alpha: 0.7), // Bleu ciel UQAR transparent
-                          CouleursApp.accent, // Bleu ciel UQAR
-                          CouleursApp.principal, // Bleu foncé UQAR
-                        ],
-                      ),
+      body: Stack(
+        children: [
+          // Background divisé en 2 parties
+          Column(
+            children: [
+              // Partie supérieure avec dégradé (2/3 du background)
+              Expanded(
+                flex: 2,
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        CouleursApp.accent.withValues(
+                            alpha: 0.7), // Bleu ciel UQAR transparent
+                        CouleursApp.accent, // Bleu ciel UQAR
+                        CouleursApp.principal, // Bleu foncé UQAR
+                      ],
                     ),
                   ),
                 ),
-                // Partie inférieure blanche (1/3 du background)
-                Expanded(
-                  flex: 1,
-                  child: Container(
-                    width: double.infinity,
-                    color: CouleursApp.blanc,
-                  ),
+              ),
+              // Partie inférieure blanche (1/3 du background)
+              Expanded(
+                flex: 1,
+                child: Container(
+                  width: double.infinity,
+                  color: CouleursApp.blanc,
                 ),
-              ],
-            ),
+              ),
+            ],
+          ),
 
-            // Contenu par-dessus le background
-            SingleChildScrollView(
+          // Contenu par-dessus le background
+          SafeArea(
+            child: SingleChildScrollView(
               padding: EdgeInsets.only(
                 bottom: viewInsets.bottom +
                     padding
@@ -405,8 +405,8 @@ class _ConnexionEcranState extends State<ConnexionEcran> {
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

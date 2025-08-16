@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/di/service_locator.dart';
+import '../../../core/utils/association_types.dart';
 import '../../../domain/entities/association.dart';
 import '../../../domain/usercases/associations_repository.dart';
 import '../../../presentation/widgets/widget_barre_app_navigation_admin.dart';
@@ -55,16 +56,6 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
   String _chefSelectionne = 'etud_001'; // Alexandre Martin par défaut
   
   // Catégories d'associations
-  final List<Map<String, String>> _categories = const [
-    {'valeur': 'academique', 'libelle': 'Académique'},
-    {'valeur': 'culturelle', 'libelle': 'Culturelle'},
-    {'valeur': 'sportive', 'libelle': 'Sportive'},
-    {'valeur': 'etudiante', 'libelle': 'Étudiante'},
-    {'valeur': 'sociale', 'libelle': 'Sociale'},
-    {'valeur': 'technologie', 'libelle': 'Technologie'},
-    {'valeur': 'environnement', 'libelle': 'Environnement'},
-    {'valeur': 'autre', 'libelle': 'Autre'},
-  ];
   String _categorieSelectionnee = 'academique';
 
   @override
@@ -105,7 +96,7 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
     _estActive = association.estActive;
     
     // Vérifier si la catégorie existe
-    final categorieExiste = _categories.any((cat) => cat['valeur'] == association.typeAssociation);
+    final categorieExiste = AssociationTypes.typesCreation.contains(association.typeAssociation);
     _categorieSelectionnee = categorieExiste ? association.typeAssociation : 'academique';
   }
 
@@ -214,9 +205,9 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
                   borderSide: const BorderSide(color: CouleursApp.principal, width: 2),
                 ),
               ),
-              items: _categories.map((categorie) => DropdownMenuItem(
-                value: categorie['valeur'],
-                child: Text(categorie['libelle']!),
+              items: AssociationTypes.typesCreation.map((categorie) => DropdownMenuItem(
+                value: categorie,
+                child: Text(AssociationTypes.obtenirNomType(categorie)),
               )).toList(),
               onChanged: (valeur) {
                 setState(() {

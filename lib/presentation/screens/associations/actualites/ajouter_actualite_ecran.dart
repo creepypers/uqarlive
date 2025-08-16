@@ -1,6 +1,7 @@
 // UI Design: Écran d'ajout/modification d'actualités pour les chefs d'association
 import 'package:flutter/material.dart';
 import '../../../../core/di/service_locator.dart';
+import '../../../../core/utils/actualite_priorites.dart';
 import '../../../../domain/entities/association.dart';
 import '../../../../domain/entities/actualite.dart';
 import '../../../widgets/widget_barre_app_personnalisee.dart';
@@ -32,7 +33,7 @@ class _AjouterActualiteEcranState extends State<AjouterActualiteEcran> {
   bool _modeModification = false;
   late final ActualitesRepository _actualitesRepository;
 
-  final List<String> _priorites = ['normale', 'importante', 'urgente'];
+
   late final AuthentificationService _authentificationService;
 
   @override
@@ -328,11 +329,11 @@ class _AjouterActualiteEcranState extends State<AjouterActualiteEcran> {
                           ),
                           prefixIcon: const Icon(Icons.priority_high, color: Color(0xFF005499)),
                         ),
-                        items: _priorites.map((priorite) {
+                        items: ActualitePriorites.priorites.map((priorite) {
                           return DropdownMenuItem(
                             value: priorite,
                             child: Text(
-                              priorite.substring(0, 1).toUpperCase() + priorite.substring(1),
+                              ActualitePriorites.obtenirNomPriorite(priorite),
                             ),
                           );
                         }).toList(),

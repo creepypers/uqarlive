@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/association_types.dart';
 import '../../../domain/entities/association.dart';
 import '../../../domain/entities/actualite.dart';
 import '../../../domain/usercases/associations_repository.dart';
@@ -31,20 +32,12 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
   List<Association> _associationsPopulaires = [];
   List<String> _typesAssociations = [];
   List<Actualite> _actualitesRecentes = [];
-  String _typeSelectionne = 'toutes';
+  String _typeSelectionne = AssociationTypes.typeDefaut;
   bool _chargementAssociations = false;
   bool _chargementActualites = false;
   String _recherche = '';
   bool _modeRecherche = false;
   final TextEditingController _controleurRecherche = TextEditingController();
-
-  final Map<String, String> _nomsTypes = {
-    'toutes': 'Toutes',
-    'etudiante': 'Étudiantes',
-    'culturelle': 'Culturelles',
-    'sportive': 'Sportives',
-    'academique': 'Académiques',
-  };
 
   @override
   void initState() {
@@ -517,7 +510,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
               final estSelectionne = type == _typeSelectionne;
               return FilterChip(
                 label: Text(
-                  _nomsTypes[type] ?? type,
+                  AssociationTypes.obtenirNomType(type),
                   style: TextStyle(fontSize: screenWidth * 0.035), // UI Design: Taille adaptative
                 ),
                 selected: estSelectionne,

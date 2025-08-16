@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import '../../../widgets/widget_barre_app_personnalisee.dart';
 import '../../../../core/di/service_locator.dart';
+import '../../../../core/utils/evenement_types.dart';
 import '../../../../domain/entities/association.dart';
 import '../../../../domain/entities/evenement.dart';
 import '../../../../domain/usercases/evenements_repository.dart';
@@ -38,14 +39,7 @@ class _AjouterEvenementEcranState extends State<AjouterEvenementEcran> {
   bool _modeModification = false;
   late final EvenementsRepository _evenementsRepository;
 
-  final List<String> _typesEvenements = [
-    'reunion',
-    'conference',
-    'atelier',
-    'soiree',
-    'tournoi',
-    'autre'
-  ];
+
 
   @override
   void initState() {
@@ -393,11 +387,11 @@ class _AjouterEvenementEcranState extends State<AjouterEvenementEcran> {
                           ),
                           prefixIcon: const Icon(Icons.category, color: Color(0xFF005499)),
                         ),
-                        items: _typesEvenements.map((type) {
+                        items: EvenementTypes.types.map((type) {
                           return DropdownMenuItem(
                             value: type,
                             child: Text(
-                              type.substring(0, 1).toUpperCase() + type.substring(1),
+                              EvenementTypes.obtenirNomType(type),
                             ),
                           );
                         }).toList(),
