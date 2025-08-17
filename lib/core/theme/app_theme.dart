@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 // UI Design: Centralisation du thème UQAR (redondance supprimée)
 
 class StylesTexteApp {
-  // UI Design: Styles de base existants
   static const TextStyle titre = TextStyle(
     fontSize: 32,
     fontWeight: FontWeight.bold,
@@ -24,7 +23,6 @@ class StylesTexteApp {
     decoration: TextDecoration.underline,
   );
 
-  // UI Design: Styles étendus pour tous les widgets
   static const TextStyle titrePage = TextStyle(
     fontSize: 28,
     fontWeight: FontWeight.bold,
@@ -103,7 +101,6 @@ class StylesTexteApp {
   );
 }
 
-// UI Design: Centralisation du thème UQAR complet
 class CouleursApp {
   static const Color principal = Color(0xFF005499); // Bleu foncé UQAR
   static const Color accent = Color(0xFF00A1E4); // Bleu ciel UQAR

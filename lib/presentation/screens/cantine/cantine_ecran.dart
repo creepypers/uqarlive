@@ -650,10 +650,11 @@ class _CantineEcranState extends State<CantineEcran> {
             itemCount: MenuCategories.categories.length,
             itemBuilder: (context, index) {
               final categorie = MenuCategories.categories[index];
-              final estSelectionne = categorie == _categorieSelectionnee;
+              final categorieValue = categorie['value']!;
+              final estSelectionne = categorieValue == _categorieSelectionnee;
               
               return GestureDetector(
-                onTap: () => _changerCategorie(categorie),
+                onTap: () => _changerCategorie(categorieValue),
                 child: Container(
                   margin: EdgeInsets.only(right: screenWidth * 0.03), 
                   padding: EdgeInsets.symmetric(
@@ -673,7 +674,7 @@ class _CantineEcranState extends State<CantineEcran> {
                     ),
                   ),
                   child: Text(
-                    MenuCategories.obtenirNomCategorie(categorie),
+                    categorie['label']!,
                     style: TextStyle(
                       color: estSelectionne 
                           ? CouleursApp.blanc 

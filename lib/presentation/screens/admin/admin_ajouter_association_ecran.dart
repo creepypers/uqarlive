@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/di/service_locator.dart';
 import '../../../core/utils/association_types.dart';
+import '../../../core/utils/utilisateurs_utils.dart';
 import '../../../domain/entities/association.dart';
+import '../../../domain/entities/utilisateur.dart';
 import '../../../domain/usercases/associations_repository.dart';
 import '../../../presentation/widgets/widget_barre_app_navigation_admin.dart';
 
@@ -37,22 +39,12 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
   // Variables d'état
   bool _estActive = true;
   bool _enChargement = false;
+  bool _chargementUtilisateurs = false;
   bool _modeModification = false;
   final List<String> _activites = ['Activités à définir']; 
   
   // Liste des utilisateurs disponibles pour être chef d'association
-  final List<Map<String, String>> _utilisateursDisponibles = [
-    {'id': 'etud_001', 'nom': 'Alexandre Martin'},
-    {'id': 'etud_002', 'nom': 'Sophie Gagnon'},
-    {'id': 'etud_003', 'nom': 'Marc Lavoie'},
-    // Utilisateurs temporaires pour les associations existantes
-    {'id': 'etud_006', 'nom': 'Sophie Gagnon (Club Photo)'},
-    {'id': 'etud_007', 'nom': 'Maxime Leblanc (Sport)'},
-    {'id': 'etud_008', 'nom': 'Juliette Beaulieu (Théâtre)'},
-    {'id': 'etud_009', 'nom': 'Laurence Giguère (Éco)'},
-    {'id': 'etud_010', 'nom': 'Maria Santos (International)'},
-    {'id': 'etud_011', 'nom': 'Isabelle Dufour (AELIES)'},
-  ];
+  List<Utilisateur> _utilisateursDisponibles = [];
   String _chefSelectionne = 'etud_001'; // Alexandre Martin par défaut
   
   // Catégories d'associations
@@ -67,6 +59,9 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
     if (_modeModification) {
       _remplirFormulaire(widget.associationAModifier!);
     }
+    
+    // Charger les utilisateurs disponibles
+    _chargerUtilisateurs();
   }
 
   @override
@@ -81,6 +76,31 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
     _controleurLocalisation.dispose();
     _controleurHoraires.dispose();
     super.dispose();
+  }
+
+  Future<void> _chargerUtilisateurs() async {
+    setState(() {
+      _chargementUtilisateurs = true;
+    });
+    
+    try {
+      final etudiantsActifs = await UtilisateursUtils.obtenirEtudiantsActifs();
+      
+      setState(() {
+        _utilisateursDisponibles = etudiantsActifs;
+        _chargementUtilisateurs = false;
+        // Si aucun utilisateur n'est chargé, utiliser le premier disponible
+        if (_utilisateursDisponibles.isNotEmpty && _chefSelectionne.isEmpty) {
+          _chefSelectionne = _utilisateursDisponibles.first.id;
+        }
+      });
+    } catch (e) {
+      // En cas d'erreur, garder la liste vide
+      setState(() {
+        _utilisateursDisponibles = [];
+        _chargementUtilisateurs = false;
+      });
+    }
   }
 
   void _remplirFormulaire(Association association) {
@@ -238,11 +258,32 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
                   borderSide: const BorderSide(color: CouleursApp.principal, width: 2),
                 ),
               ),
-              items: _utilisateursDisponibles.map((utilisateur) => DropdownMenuItem(
-                value: utilisateur['id'],
-                child: Text(utilisateur['nom']!),
-              )).toList(),
-              onChanged: (valeur) {
+              items: _chargementUtilisateurs 
+                ? [const DropdownMenuItem(
+                    value: null,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        SizedBox(width: 8),
+                        Text('Chargement...'),
+                      ],
+                    ),
+                  )]
+                : _utilisateursDisponibles.isEmpty
+                  ? [const DropdownMenuItem(
+                      value: null,
+                      child: Text('Aucun utilisateur disponible'),
+                    )]
+                  : _utilisateursDisponibles.map((utilisateur) => DropdownMenuItem(
+                      value: utilisateur.id,
+                      child: Text('${utilisateur.prenom} ${utilisateur.nom}'),
+                    )).toList(),
+              onChanged: _chargementUtilisateurs ? null : (valeur) {
                 setState(() {
                   _chefSelectionne = valeur!;
                 });

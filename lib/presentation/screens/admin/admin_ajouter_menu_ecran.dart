@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/menu_categories.dart';
 import '../../../domain/entities/menu.dart';
 import '../../../domain/usercases/menus_repository.dart';
 import '../../../core/di/service_locator.dart';
@@ -37,24 +38,15 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
   bool _estVegan = false;
   bool _isLoading = false;
 
-  // Liste des catégories disponibles
-  final List<Map<String, String>> _categories = const [
-    {'value': 'menu_jour', 'label': 'Menu du jour'},
-    {'value': 'entree', 'label': 'Entrée'},
-    {'value': 'plat_principal', 'label': 'Plat principal'},
-    {'value': 'accompagnement', 'label': 'Accompagnement'},
-    {'value': 'dessert', 'label': 'Dessert'},
-    {'value': 'boisson', 'label': 'Boisson'},
-    {'value': 'snack', 'label': 'Snack'},
-  ];
+  // Catégorie sélectionnée (utilise l'utilitaire MenuCategories)
 
   @override
   void initState() {
     super.initState();
     _menusRepository = ServiceLocator.obtenirService<MenusRepository>();
     if (widget.menuAModifier != null) {
-      // Vérifier si la catégorie existe dans la liste des catégories disponibles
-      final categorieExiste = _categories.any((cat) => cat['value'] == widget.menuAModifier!.categorie);
+      // Vérifier si la catégorie existe dans les catégories disponibles
+      final categorieExiste = MenuCategories.estCategorieValide(widget.menuAModifier!.categorie);
       
       // Pré-remplir les champs si on modifie un menu existant
       _nomMenuController.text = widget.menuAModifier!.nom;
@@ -63,7 +55,7 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
       _caloriesController.text = widget.menuAModifier!.calories?.toString() ?? '';
       _allergenesController.text = widget.menuAModifier!.allergenes ?? '';
       _nutritionInfoController.text = widget.menuAModifier!.nutritionInfo ?? '';
-      _categorieSelectionnee = categorieExiste ? widget.menuAModifier!.categorie : 'plat_principal';
+      _categorieSelectionnee = categorieExiste ? widget.menuAModifier!.categorie : MenuCategories.categorieDefaut;
 
       _estDisponible = widget.menuAModifier!.estDisponible;
       _estVegetarien = widget.menuAModifier!.estVegetarien;
@@ -272,7 +264,7 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
               filled: true,
               fillColor: CouleursApp.blanc,
             ),
-            items: _categories.map((categorie) => DropdownMenuItem(
+            items: MenuCategories.categories.map((categorie) => DropdownMenuItem(
               value: categorie['value'],
               child: Text(categorie['label']!),
             )).toList(),
