@@ -1,0 +1,101 @@
+import 'package:flutter/material.dart';
+import '../../core/theme/app_theme.dart';
+
+// UI Design: NavBar réutilisable avec design UQAR et navigation centralisée
+class NavBarWidget extends StatelessWidget {
+  final int indexSelectionne;
+  final Function(int) onTap;
+
+  const NavBarWidget({
+    super.key,
+    required this.indexSelectionne,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            CouleursApp.accent.withValues(alpha: 0.7), // Bleu ciel UQAR transparent
+            CouleursApp.accent, // Bleu ciel UQAR
+            CouleursApp.principal, // Bleu foncé UQAR
+          ],
+        ),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(30),
+          topRight: Radius.circular(30),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: CouleursApp.principal.withValues(alpha: 0.2),
+            blurRadius: 20,
+            offset: const Offset(0, -5),
+          ),
+        ],
+      ),
+      child: BottomNavigationBar(
+        currentIndex: indexSelectionne,
+        onTap: onTap,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: CouleursApp.blanc,
+        unselectedItemColor: CouleursApp.blanc.withValues(alpha: 0.6),
+        selectedLabelStyle: const TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 13,
+          shadows: [
+            Shadow(
+              offset: Offset(0, 1),
+              blurRadius: 2,
+              color: Colors.black26,
+            ),
+          ],
+        ),
+        unselectedLabelStyle: const TextStyle(
+          fontWeight: FontWeight.w500,
+          fontSize: 12,
+        ),
+        items: [
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.restaurant),
+            label: 'Cantine',
+          ),
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.menu_book), // Icône livres cohérente
+            label: 'Livres',
+          ),
+          BottomNavigationBarItem(
+            icon: _construireIconeAccueil(),
+            label: 'Accueil',
+          ),
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.groups),
+            label: 'Assos',
+          ),
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.meeting_room),
+            label: 'Salles',
+          ),
+        ],
+      ),
+    );
+  }
+
+  // UI Design: Icône Accueil sans animation de focus
+  Widget _construireIconeAccueil() {
+    final estSelectionne = indexSelectionne == 2;
+    
+    return Icon(
+      Icons.home,
+      size: estSelectionne ? 26 : 24,
+      color: estSelectionne 
+          ? CouleursApp.blanc 
+          : CouleursApp.blanc.withValues(alpha: 0.6),
+    );
+  }
+} 
