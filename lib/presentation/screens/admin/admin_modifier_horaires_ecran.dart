@@ -5,7 +5,7 @@ import '../../../domain/usercases/horaires_repository.dart';
 import '../../../presentation/widgets/widget_barre_app_navigation_admin.dart';
 
 class AdminModifierHorairesEcran extends StatefulWidget {
-  final String? jourInitial; // UI Design: Jour à modifier directement
+  final String? jourInitial; 
   
   const AdminModifierHorairesEcran({super.key, this.jourInitial});
 
@@ -81,7 +81,7 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           ),
         );
-        Navigator.pop(context, true); // UI Design: Retourner avec succès
+        Navigator.pop(context, true); 
       }
     } catch (e) {
       if (mounted) {
@@ -145,7 +145,7 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
 
   @override
   Widget build(BuildContext context) {
-    // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
+    
     final mediaQuery = MediaQuery.of(context);
     final screenHeight = mediaQuery.size.height;
     final screenWidth = mediaQuery.size.width;
@@ -154,7 +154,7 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
     
     return Scaffold(
       backgroundColor: CouleursApp.fond,
-      resizeToAvoidBottomInset: true, // UI Design: Éviter les débordements avec le clavier
+      resizeToAvoidBottomInset: true, 
       appBar: const WidgetBarreAppNavigationAdmin(
         titre: 'Modifier Horaires',
         sousTitre: 'Gérer les horaires de la cantine',
@@ -165,18 +165,18 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               padding: EdgeInsets.only(
-                left: screenWidth * 0.04, // UI Design: Padding adaptatif
+                left: screenWidth * 0.04, 
                 right: screenWidth * 0.04,
                 top: screenHeight * 0.02,
-                bottom: viewInsets.bottom + padding.bottom + screenHeight * 0.025, // UI Design: Padding adaptatif pour éviter les débordements
+                bottom: viewInsets.bottom + padding.bottom + screenHeight * 0.025, 
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _construireSectionInformation(),
-                  SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
+                  SizedBox(height: screenHeight * 0.03), 
                   _construireSectionHoraires(),
-                  SizedBox(height: screenHeight * 0.04), // UI Design: Espacement adaptatif
+                  SizedBox(height: screenHeight * 0.04), 
                   _construireBoutonsSauvegarde(),
                 ],
               ),

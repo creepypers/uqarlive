@@ -10,7 +10,7 @@ import '../../widgets/widget_barre_app_personnalisee.dart';
 import 'conversation_ecran.dart';
 import 'ajouter_contact_ecran.dart';
 
-// UI Design: Page dédiée aux conversations avec design moderne
+
 class ConversationsEcran extends StatefulWidget {
   const ConversationsEcran({super.key});
 
@@ -31,7 +31,7 @@ class _ConversationsEcranState extends State<ConversationsEcran> {
   String _recherche = '';
   final TextEditingController _rechercheController = TextEditingController();
   
-  // UI Design: Cache pour les noms et initiales des utilisateurs
+  
   final Map<String, String> _nomsUtilisateurs = {};
   final Map<String, String> _initialesUtilisateurs = {};
 
@@ -75,7 +75,7 @@ class _ConversationsEcranState extends State<ConversationsEcran> {
     try {
       final messages = await _messagerieService.obtenirMessagesUtilisateur(_utilisateurActuelId!);
       
-      // UI Design: Grouper les messages par conversation (par destinataire/expéditeur)
+      
       final Map<String, Message> conversationsMap = {};
       
       for (final message in messages) {
@@ -91,10 +91,10 @@ class _ConversationsEcranState extends State<ConversationsEcran> {
       }
       
       final conversations = conversationsMap.values.toList();
-      // UI Design: Trier par date de message le plus récent
+      
       conversations.sort((a, b) => b.dateEnvoi.compareTo(a.dateEnvoi));
       
-      // UI Design: Charger les informations des utilisateurs pour les conversations
+      
       await _chargerInformationsUtilisateurs(conversations);
       
       setState(() {
@@ -107,7 +107,7 @@ class _ConversationsEcranState extends State<ConversationsEcran> {
     }
   }
 
-  // UI Design: Charger les informations des utilisateurs pour les conversations
+  
   Future<void> _chargerInformationsUtilisateurs(List<Message> conversations) async {
     try {
       for (final message in conversations) {
@@ -115,21 +115,21 @@ class _ConversationsEcranState extends State<ConversationsEcran> {
             ? message.destinataireId 
             : message.expediteurId;
         
-        // UI Design: Charger les informations de l'utilisateur si pas encore en cache
+        
         if (!_nomsUtilisateurs.containsKey(autreUtilisateurId)) {
           final utilisateur = await _authentificationService.obtenirUtilisateurParId(autreUtilisateurId);
           if (utilisateur != null) {
             _nomsUtilisateurs[autreUtilisateurId] = '${utilisateur.prenom} ${utilisateur.nom}';
             _initialesUtilisateurs[autreUtilisateurId] = '${utilisateur.prenom[0]}${utilisateur.nom[0]}';
           } else {
-            // UI Design: Fallback si l'utilisateur n'est pas trouvé
+            
             _nomsUtilisateurs[autreUtilisateurId] = _genererNomFallback(autreUtilisateurId);
             _initialesUtilisateurs[autreUtilisateurId] = _genererInitialesFallback(autreUtilisateurId);
           }
         }
       }
     } catch (e) {
-      // UI Design: En cas d'erreur, utiliser les noms fallback
+      
       for (final message in conversations) {
         final autreUtilisateurId = message.expediteurId == _utilisateurActuelId 
             ? message.destinataireId 
@@ -143,7 +143,7 @@ class _ConversationsEcranState extends State<ConversationsEcran> {
     }
   }
 
-  // UI Design: Générer un nom fallback basé sur l'ID
+  
   String _genererNomFallback(String utilisateurId) {
     if (utilisateurId.startsWith('etud_')) {
       return 'Étudiant ${utilisateurId.substring(5, 8)}';
@@ -155,7 +155,7 @@ class _ConversationsEcranState extends State<ConversationsEcran> {
     return 'Utilisateur ${utilisateurId.substring(0, 3)}';
   }
 
-  // UI Design: Générer des initiales fallback basées sur l'ID
+  
   String _genererInitialesFallback(String utilisateurId) {
     if (utilisateurId.startsWith('etud_')) {
       return 'É${utilisateurId.substring(5, 6)}';
@@ -222,7 +222,7 @@ class _ConversationsEcranState extends State<ConversationsEcran> {
       return 'Moi';
     }
     
-    // UI Design: Utiliser le nom depuis le cache ou générer un fallback
+    
     return _nomsUtilisateurs[utilisateurId] ?? _genererNomFallback(utilisateurId);
   }
 
@@ -231,7 +231,7 @@ class _ConversationsEcranState extends State<ConversationsEcran> {
       return 'M';
     }
     
-    // UI Design: Utiliser les initiales depuis le cache ou les utilitaires centralisés
+    
     return _initialesUtilisateurs[utilisateurId] ?? 
            TransactionsUtils.obtenirInitialesUtilisateur(utilisateurId);
   }

@@ -16,7 +16,7 @@ import '../../../core/utils/associations_utils.dart';
 import 'details_association_ecran.dart';
 import 'actualites/actualites_ecran.dart';
 
-// UI Design: Page associations étudiantes UQAR avec filtres et design moderne
+
 class AssociationsEcran extends StatefulWidget {
   const AssociationsEcran({super.key});
 
@@ -77,7 +77,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
         _chargementAssociations = false;
       });
 
-      // UI Design: Debug - Afficher les données chargées
+      
       
     } catch (e) {
       setState(() {
@@ -120,7 +120,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
 
   @override
   Widget build(BuildContext context) {
-    // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
+    
     final mediaQuery = MediaQuery.of(context);
     final screenHeight = mediaQuery.size.height;
     final screenWidth = mediaQuery.size.width;
@@ -129,7 +129,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
     
     return Scaffold(
       backgroundColor: CouleursApp.fond,
-      resizeToAvoidBottomInset: true, // UI Design: Éviter les débordements avec le clavier
+      resizeToAvoidBottomInset: true, 
       appBar: WidgetBarreAppPersonnalisee(
         titre: 'Associations Étudiantes',
         sousTitre: 'Découvrez la vie étudiante UQAR',
@@ -137,7 +137,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
           icon: Icon(
             _modeRecherche ? Icons.search_off : Icons.search,
             color: CouleursApp.blanc,
-            size: screenWidth * 0.06, // UI Design: Taille adaptative
+            size: screenWidth * 0.06, 
           ),
           onPressed: _basculerRecherche,
         ),
@@ -145,38 +145,38 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.only(
-            bottom: viewInsets.bottom + padding.bottom + screenHeight * 0.025, // UI Design: Padding adaptatif pour éviter les débordements
+            bottom: viewInsets.bottom + padding.bottom + screenHeight * 0.025, 
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Section statistiques
               _construireSectionStatistiques(),
-              SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
+              SizedBox(height: screenHeight * 0.02), 
               
               // Section associations populaires
               if (_associationsPopulaires.isNotEmpty) ...[
                 _construireSectionPopulaires(),
-                SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
+                SizedBox(height: screenHeight * 0.03), 
               ],
               
               // Section actualités récentes
               _construireSectionActualitesRecentes(),
-              SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
+              SizedBox(height: screenHeight * 0.03), 
               
               // Filtres
               _construireFiltres(),
-              SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
+              SizedBox(height: screenHeight * 0.02), 
               
               // Grille des associations
               _construireGrilleAssociations(),
-              SizedBox(height: screenHeight * 0.025), // UI Design: Espacement adaptatif
+              SizedBox(height: screenHeight * 0.025), 
             ],
           ),
         ),
       ),
 
-      // UI Design: Widget réutilisable pour accéder aux conversations
+      
       floatingActionButton: const WidgetBoutonConversations(),
 
       bottomNavigationBar: NavBarWidget(
@@ -186,7 +186,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
     );
   }
 
-  // UI Design: Section statistiques de vie étudiante UQAR modernisée
+  
   Widget _construireSectionStatistiques() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
@@ -297,7 +297,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
     );
   }
 
-  // UI Design: Carte statistique moderne avec animations
+  
   Widget _construireCarteStatistiqueModerne(String titre, String valeur, IconData icone, Color couleur, String description) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
@@ -380,7 +380,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
     );
   }
 
-  // UI Design: Section associations populaires avec WidgetCollection
+  
   Widget _construireSectionPopulaires() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
@@ -390,43 +390,43 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Padding adaptatif
+          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), 
           child: Row(
             children: [
               Icon(
                 Icons.trending_up,
                 color: CouleursApp.principal,
-                size: screenWidth * 0.06, // UI Design: Taille adaptative
+                size: screenWidth * 0.06, 
               ),
-              SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
+              SizedBox(width: screenWidth * 0.02), 
               Text(
                 'Les Plus Populaires',
                 style: StylesTexteApp.titre.copyWith(
-                  fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
+                  fontSize: screenWidth * 0.045, 
                 ),
-                overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                overflow: TextOverflow.ellipsis, 
                 maxLines: 1,
               ),
             ],
           ),
         ),
-        SizedBox(height: screenHeight * 0.015), // UI Design: Espacement adaptatif
+        SizedBox(height: screenHeight * 0.015), 
         WidgetCollection<Association>.listeHorizontale(
           elements: _associationsPopulaires,
-          hauteur: screenHeight * 0.12, // UI Design: Hauteur adaptative
+          hauteur: screenHeight * 0.12, 
           constructeurElement: (context, association, index) {
             return WidgetCarte.association(
               nom: association.nom,
                               description: '${association.membresActifs.length} membres',
               icone: AssociationsUtils.obtenirIconeType(association.typeAssociation),
               couleurIcone: AssociationsUtils.obtenirCouleurType(association.typeAssociation),
-              largeur: screenWidth * 0.75, // UI Design: Largeur adaptative
-              hauteur: screenHeight * 0.1, // UI Design: Hauteur adaptative
+              largeur: screenWidth * 0.75, 
+              hauteur: screenHeight * 0.1, 
               modeHorizontal: true,
               onTap: () => _ouvrirDetailsAssociation(association),
             );
           },
-          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Padding adaptatif
+          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), 
           messageEtatVide: 'Aucune association populaire',
           iconeEtatVide: Icons.trending_up_outlined,
         ),
@@ -434,20 +434,20 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
     );
   }
 
-  // UI Design: Filtres pour les associations
+  
   Widget _construireFiltres() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
     
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Padding adaptatif
+      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), 
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (_modeRecherche) ...[
             Container(
-              padding: EdgeInsets.all(screenWidth * 0.03), // UI Design: Padding adaptatif
+              padding: EdgeInsets.all(screenWidth * 0.03), 
               decoration: BoxDecoration(
                 color: CouleursApp.accent.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
@@ -455,17 +455,17 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.search, color: CouleursApp.accent, size: screenWidth * 0.05), // UI Design: Taille adaptative
-                  SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
+                  Icon(Icons.search, color: CouleursApp.accent, size: screenWidth * 0.05), 
+                  SizedBox(width: screenWidth * 0.02), 
                   Expanded(
                     child: TextField(
                       controller: _controleurRecherche,
-                      style: TextStyle(fontSize: screenWidth * 0.04), // UI Design: Taille adaptative
+                      style: TextStyle(fontSize: screenWidth * 0.04), 
                       decoration: InputDecoration(
                         hintText: 'Rechercher une association...',
                         hintStyle: TextStyle(
                           color: CouleursApp.texteFonce.withValues(alpha: 0.6),
-                          fontSize: screenWidth * 0.04, // UI Design: Taille adaptative
+                          fontSize: screenWidth * 0.04, 
                         ),
                         border: InputBorder.none,
                       ),
@@ -478,7 +478,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
                     ),
                   ),
                   IconButton(
-                    icon: Icon(Icons.clear, color: CouleursApp.accent, size: screenWidth * 0.05), // UI Design: Taille adaptative
+                    icon: Icon(Icons.clear, color: CouleursApp.accent, size: screenWidth * 0.05), 
                     onPressed: () {
                       _controleurRecherche.clear();
                       setState(() {
@@ -490,28 +490,28 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
                 ],
               ),
             ),
-            SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
+            SizedBox(height: screenHeight * 0.02), 
           ],
           Text(
             'Types d\'associations',
             style: StylesTexteApp.titre.copyWith(
               fontWeight: FontWeight.w600,
               color: CouleursApp.texteFonce,
-              fontSize: screenWidth * 0.04, // UI Design: Taille adaptative
+              fontSize: screenWidth * 0.04, 
             ),
-            overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+            overflow: TextOverflow.ellipsis, 
             maxLines: 1,
           ),
-          SizedBox(height: screenHeight * 0.015), // UI Design: Espacement adaptatif
+          SizedBox(height: screenHeight * 0.015), 
           Wrap(
-            spacing: screenWidth * 0.02, // UI Design: Espacement adaptatif
-            runSpacing: screenWidth * 0.02, // UI Design: Espacement adaptatif
+            spacing: screenWidth * 0.02, 
+            runSpacing: screenWidth * 0.02, 
             children: _typesAssociations.map((type) {
               final estSelectionne = type == _typeSelectionne;
               return FilterChip(
                 label: Text(
                   AssociationTypes.obtenirNomType(type),
-                  style: TextStyle(fontSize: screenWidth * 0.035), // UI Design: Taille adaptative
+                  style: TextStyle(fontSize: screenWidth * 0.035), 
                 ),
                 selected: estSelectionne,
                 onSelected: (selected) {
@@ -526,7 +526,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
                 labelStyle: TextStyle(
                   color: estSelectionne ? CouleursApp.accent : CouleursApp.texteFonce,
                   fontWeight: estSelectionne ? FontWeight.w600 : FontWeight.normal,
-                  fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
+                  fontSize: screenWidth * 0.035, 
                 ),
                 side: BorderSide(
                   color: estSelectionne ? CouleursApp.accent : Colors.grey.shade300,
@@ -539,7 +539,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
     );
   }
 
-  // UI Design: Liste verticale des associations avec cartes cliquables
+  
   Widget _construireGrilleAssociations() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
@@ -550,39 +550,39 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
       children: [
         // Titre de section
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Padding adaptatif
+          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), 
           child: Row(
             children: [
               Icon(
                 Icons.groups,
                 color: CouleursApp.principal,
-                size: screenWidth * 0.06, // UI Design: Taille adaptative
+                size: screenWidth * 0.06, 
               ),
-              SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
+              SizedBox(width: screenWidth * 0.02), 
               Expanded(
                 child: Text(
                   'Toutes les Associations',
                   style: StylesTexteApp.titre.copyWith(
-                    fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
+                    fontSize: screenWidth * 0.045, 
                   ),
-                  overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                  overflow: TextOverflow.ellipsis, 
                   maxLines: 1,
                 ),
               ),
               Text(
                 '${_toutesLesAssociations.length}',
                 style: TextStyle(
-                  fontSize: screenWidth * 0.04, // UI Design: Taille adaptative
+                  fontSize: screenWidth * 0.04, 
                   fontWeight: FontWeight.w600,
                   color: CouleursApp.accent,
                 ),
-                overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                overflow: TextOverflow.ellipsis, 
                 maxLines: 1,
               ),
             ],
           ),
         ),
-        SizedBox(height: screenHeight * 0.015), // UI Design: Espacement adaptatif
+        SizedBox(height: screenHeight * 0.015), 
         
         // Liste verticale scrollable
         WidgetCollection<Association>.listeVerticale(
@@ -591,20 +591,20 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
           reduireHauteur: true, // Éviter conflit de scroll avec SingleChildScrollView
           constructeurElement: (context, association, index) {
             return Container(
-              margin: EdgeInsets.only(bottom: screenHeight * 0.015), // UI Design: Espacement adaptatif
+              margin: EdgeInsets.only(bottom: screenHeight * 0.015), 
               child: WidgetCarte.association(
                 nom: association.nom,
                 description: association.description,
                 icone: AssociationsUtils.obtenirIconeType(association.typeAssociation),
                 couleurIcone: AssociationsUtils.obtenirCouleurType(association.typeAssociation),
                 largeur: double.infinity, // Prend toute la largeur
-                hauteur: screenHeight * 0.1, // UI Design: Hauteur adaptative
+                hauteur: screenHeight * 0.1, 
                 modeHorizontal: true, // Mode horizontal pour cartes rectangulaires
                 onTap: () => _ouvrirDetailsAssociation(association), // Cliquable
               ),
             );
           },
-          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Padding adaptatif
+          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), 
           messageEtatVide: _recherche.isNotEmpty && _recherche.trim() != ''
             ? 'Aucune association trouvée pour "$_recherche"'
             : 'Aucune association disponible',
@@ -625,46 +625,46 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
         _controleurRecherche.clear();
       }
     });
-    // UI Design: Filtrer après basculement pour rafraîchir la liste
+    
     if (!_modeRecherche) {
       _filtrerAssociations();
     }
   }
 
-  // UI Design: Section actualités récentes de toutes les associations
+  
   Widget _construireSectionActualitesRecentes() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
     
-    // UI Design: Utiliser les actualités dynamiques chargées
+    
     
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Padding adaptatif
+          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), 
           child: Row(
             children: [
               Icon(
                 Icons.newspaper,
                 color: CouleursApp.accent,
-                size: screenWidth * 0.06, // UI Design: Taille adaptative
+                size: screenWidth * 0.06, 
               ),
-              SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
+              SizedBox(width: screenWidth * 0.02), 
               Expanded(
                 child: Text(
                   'Actualités Récentes',
                   style: StylesTexteApp.titre.copyWith(
-                    fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
+                    fontSize: screenWidth * 0.045, 
                   ),
-                  overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                  overflow: TextOverflow.ellipsis, 
                   maxLines: 1,
                 ),
               ),
               TextButton(
                 onPressed: () {
-                  // UI Design: Navigation vers l'écran actualités
+                  
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -676,30 +676,30 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
                   'Voir tout',
                   style: TextStyle(
                     color: CouleursApp.accent,
-                    fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
+                    fontSize: screenWidth * 0.035, 
                   ),
-                  overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                  overflow: TextOverflow.ellipsis, 
                   maxLines: 1,
                 ),
               ),
             ],
           ),
         ),
-        SizedBox(height: screenHeight * 0.015), // UI Design: Espacement adaptatif
+        SizedBox(height: screenHeight * 0.015), 
         SizedBox(
-          height: screenHeight * 0.22, // UI Design: Hauteur adaptative
+          height: screenHeight * 0.22, 
           child: _chargementActualites || _actualitesRecentes.isEmpty
               ? _construirePlaceholderActualites(screenWidth, screenHeight)
               : ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Padding adaptatif
+                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), 
                   itemCount: _actualitesRecentes.length,
                   itemBuilder: (context, index) {
                     final actualite = _actualitesRecentes[index];
               return Container(
-                width: screenWidth * 0.75, // UI Design: Largeur adaptative
-                margin: EdgeInsets.only(right: screenWidth * 0.04), // UI Design: Marge adaptative
-                padding: EdgeInsets.all(screenWidth * 0.04), // UI Design: Padding adaptatif
+                width: screenWidth * 0.75, 
+                margin: EdgeInsets.only(right: screenWidth * 0.04), 
+                padding: EdgeInsets.all(screenWidth * 0.04), 
                 decoration: BoxDecoration(
                   color: CouleursApp.blanc,
                   borderRadius: BorderRadius.circular(16),
@@ -719,7 +719,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
                       children: [
                         Container(
                           padding: EdgeInsets.symmetric(
-                            horizontal: screenWidth * 0.02, // UI Design: Padding adaptatif
+                            horizontal: screenWidth * 0.02, 
                             vertical: screenWidth * 0.01,
                           ),
                           decoration: BoxDecoration(
@@ -729,11 +729,11 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
                           child: Text(
                             _obtenirNomAssociation(actualite.associationId),
                             style: TextStyle(
-                              fontSize: screenWidth * 0.028, // UI Design: Taille adaptative
+                              fontSize: screenWidth * 0.028, 
                               fontWeight: FontWeight.w600,
                               color: actualite.estEpinglee ? Colors.orange : CouleursApp.principal,
                             ),
-                            overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                            overflow: TextOverflow.ellipsis, 
                             maxLines: 1,
                           ),
                         ),
@@ -741,35 +741,35 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
                         Text(
                           _formaterDate(actualite.datePublication),
                           style: TextStyle(
-                            fontSize: screenWidth * 0.028, // UI Design: Taille adaptative
+                            fontSize: screenWidth * 0.028, 
                             color: CouleursApp.texteFonce.withValues(alpha: 0.6),
                           ),
-                          overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                          overflow: TextOverflow.ellipsis, 
                           maxLines: 1,
                         ),
                       ],
                     ),
-                    SizedBox(height: screenHeight * 0.015), // UI Design: Espacement adaptatif
+                    SizedBox(height: screenHeight * 0.015), 
                     
                     // Titre
                     Text(
                       actualite.titre,
                       style: TextStyle(
-                        fontSize: screenWidth * 0.038, // UI Design: Taille adaptative
+                        fontSize: screenWidth * 0.038, 
                         fontWeight: FontWeight.bold,
                         color: CouleursApp.texteFonce,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    SizedBox(height: screenHeight * 0.01), // UI Design: Espacement adaptatif
+                    SizedBox(height: screenHeight * 0.01), 
                     
                     // Description
                     Expanded(
                       child:                         Text(
                           actualite.description,
                         style: TextStyle(
-                          fontSize: screenWidth * 0.033, // UI Design: Taille adaptative
+                          fontSize: screenWidth * 0.033, 
                           color: CouleursApp.texteFonce.withValues(alpha: 0.8),
                           height: 1.4,
                         ),
@@ -783,7 +783,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () {
-                          // UI Design: Navigation vers l'écran actualités pour voir toutes les actualités
+                          
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -793,7 +793,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
                         },
                         style: TextButton.styleFrom(
                           padding: EdgeInsets.symmetric(
-                            horizontal: screenWidth * 0.03, // UI Design: Padding adaptatif
+                            horizontal: screenWidth * 0.03, 
                             vertical: screenWidth * 0.01,
                           ),
                         ),
@@ -801,10 +801,10 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
                           'Voir plus',
                           style: TextStyle(
                             color: actualite.estEpinglee ? Colors.orange : CouleursApp.principal,
-                            fontSize: screenWidth * 0.03, // UI Design: Taille adaptative
+                            fontSize: screenWidth * 0.03, 
                             fontWeight: FontWeight.w600,
                           ),
-                          overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                          overflow: TextOverflow.ellipsis, 
                           maxLines: 1,
                         ),
                       ),
@@ -825,10 +825,10 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
     });
 
     try {
-      // UI Design: Récupérer les actualités récentes de toutes les associations
+      
       final actualites = await _actualitesRepository.obtenirActualites();
       
-      // UI Design: Vérifier que les actualités ne sont pas null et ne sont pas vides
+      
       if (actualites.isNotEmpty) {
         // Trier par date de publication et prendre les 4 plus récentes
         actualites.sort((a, b) => b.datePublication.compareTo(a.datePublication));
@@ -851,7 +851,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
     }
   }
 
-  // UI Design: Obtenir le nom de l'association à partir de l'ID
+  
   String _obtenirNomAssociation(String? associationId) {
     if (associationId == null || associationId.isEmpty) {
       return 'UQAR - Administration';
@@ -867,7 +867,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
     }
   }
   
-  // UI Design: Formater la date pour l'affichage
+  
   String _formaterDate(DateTime date) {
     final maintenant = DateTime.now();
     final difference = maintenant.difference(date);
@@ -883,7 +883,7 @@ class _AssociationsEcranState extends State<AssociationsEcran> {
     }
   }
 
-  // UI Design: Placeholder pour les actualités en cours de chargement ou vides
+  
   Widget _construirePlaceholderActualites(double screenWidth, double screenHeight) {
     return Container(
       width: screenWidth * 0.75,

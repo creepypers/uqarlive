@@ -3,7 +3,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../domain/entities/livre.dart';
 import '../../../presentation/widgets/widget_barre_app_personnalisee.dart';
 
-// UI Design: Écran complet dédié à la sélection des livres pour échange
+
 class SelectionnerLivreEchangeEcran extends StatelessWidget {
   final List<Livre> livres;
   final Livre livreACible; // Le livre que l'utilisateur veut obtenir
@@ -50,7 +50,7 @@ class SelectionnerLivreEchangeEcran extends StatelessWidget {
     );
   }
 
-  // UI Design: En-tête simplifié avec informations sur l'échange
+  
   Widget _construireEnTeteEchange(double screenWidth, double screenHeight) {
     return Container(
       margin: EdgeInsets.all(screenWidth * 0.04),
@@ -111,7 +111,7 @@ class SelectionnerLivreEchangeEcran extends StatelessWidget {
 
 
 
-  // UI Design: Liste des livres disponibles avec cartes modernisées
+  
   Widget _construireListeLivres(double screenWidth, double screenHeight) {
     if (livres.isEmpty) {
       return Center(
@@ -183,7 +183,7 @@ class SelectionnerLivreEchangeEcran extends StatelessWidget {
     );
   }
 
-  // UI Design: Carte simplifiée et lisible pour chaque livre
+  
   Widget _construireCarteLivreSimple(Livre livre, double screenWidth, BuildContext context) {
     return Card(
       elevation: 1,
@@ -315,7 +315,7 @@ class SelectionnerLivreEchangeEcran extends StatelessWidget {
     }
   }
 
-  // UI Design: Actions finales simplifiées en bas de la page
+  
   Widget _construireActionsFinales(BuildContext context, double screenWidth, double screenHeight, EdgeInsets viewInsets, EdgeInsets padding) {
     return Container(
       padding: EdgeInsets.only(

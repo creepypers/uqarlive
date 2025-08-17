@@ -1,4 +1,4 @@
-// UI Design: Utilitaires pour les catégories de livres - Clean Architecture
+
 class LivreCategories {
   // Matières disponibles pour les livres
   static const List<String> matieres = [

@@ -9,7 +9,7 @@ import '../../domain/usercases/menus_repository.dart';
 import '../../domain/usercases/salles_repository.dart';
 import '../../domain/usercases/utilisateurs_repository.dart';
 
-// UI Design: Service centralisé pour toutes les statistiques de l'application
+
 class StatistiquesService {
   // Repositories
   late final ActualitesRepository _actualitesRepository;
@@ -30,7 +30,7 @@ class StatistiquesService {
     _utilisateursRepository = ServiceLocator.obtenirService<UtilisateursRepository>();
   }
 
-  // UI Design: Statistiques globales de l'application
+  
   Future<StatistiquesGlobales> obtenirStatistiquesGlobales() async {
     try {
       final results = await Future.wait([
@@ -103,7 +103,7 @@ class StatistiquesService {
     }
   }
 
-  // UI Design: Statistiques détaillées pour le dashboard
+  
   Future<StatistiquesDashboard> obtenirStatistiquesDashboard() async {
     final stats = await obtenirStatistiquesGlobales();
     final actualites = await _actualitesRepository.obtenirActualites();
@@ -131,14 +131,14 @@ class StatistiquesService {
     );
   }
 
-  // UI Design: Calcul simple de tendance basé sur le volume total
+  
   int _calculerTendanceHebdomadaire(int total) {
     // Simulation d'une tendance hebdomadaire (5-15% du total)
     return (total * 0.1).round();
   }
 }
 
-// UI Design: Modèle pour les statistiques globales
+
 class StatistiquesGlobales {
   // Utilisateurs
   final int totalUtilisateurs;
@@ -222,7 +222,7 @@ class StatistiquesGlobales {
   });
 }
 
-// UI Design: Modèle pour les statistiques du dashboard
+
 class StatistiquesDashboard {
   final StatistiquesGlobales statistiquesGlobales;
   

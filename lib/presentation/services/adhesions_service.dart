@@ -1,4 +1,4 @@
-// UI Design: Service pour gerer les demandes d'adhesion aux associations
+
 import '../../core/di/service_locator.dart';
 import '../../domain/entities/demande_adhesion.dart';
 import '../../domain/entities/utilisateur.dart';
@@ -58,7 +58,7 @@ class AdhesionsService {
     return _gestionMembresService!;
   }
 
-  // UI Design: Verifier si un utilisateur peut demander l'adhesion
+  
   Future<Map<String, dynamic>> peutDemanderAdhesion(Utilisateur utilisateur, Association association) async {
     // Verification 1: L'association doit etre active
     if (!association.estActive) {
@@ -96,7 +96,7 @@ class AdhesionsService {
     };
   }
 
-  // UI Design: Creer une demande d'adhesion
+  
   Future<bool> creerDemandeAdhesion({
     required String utilisateurId,
     required String associationId,
@@ -116,17 +116,17 @@ class AdhesionsService {
     return await demandesRepo.creerDemande(demande);
   }
 
-  // UI Design: Obtenir les demandes d'un utilisateur
+  
   Future<List<DemandeAdhesion>> obtenirMesDemandes(String utilisateurId) async {
     return await demandesRepo.obtenirDemandesParUtilisateur(utilisateurId);
   }
 
-  // UI Design: Obtenir les demandes en attente pour une association (pour les chefs)
+  
   Future<List<DemandeAdhesion>> obtenirDemandesEnAttente(String associationId) async {
     return await demandesRepo.obtenirDemandesEnAttente(associationId);
   }
 
-  // UI Design: Accepter une demande (chef d'association)
+  
   Future<bool> accepterDemande({
     required String demandeId,
     required String chefId,
@@ -135,7 +135,7 @@ class AdhesionsService {
     final success = await demandesRepo.accepterDemande(demandeId, chefId, messageReponse);
     
     if (success) {
-      // UI Design: Creer automatiquement le membership quand la demande est acceptee
+      
       final demande = await demandesRepo.obtenirDemandeParId(demandeId);
       if (demande != null) {
         // Utiliser le service de gestion des membres pour maintenir la coherence
@@ -155,7 +155,7 @@ class AdhesionsService {
     return success;
   }
 
-  // UI Design: Refuser une demande (chef d'association)
+  
   Future<bool> refuserDemande({
     required String demandeId,
     required String chefId,
@@ -164,27 +164,27 @@ class AdhesionsService {
     return await demandesRepo.refuserDemande(demandeId, chefId, messageReponse);
   }
 
-  // UI Design: Annuler sa propre demande
+  
   Future<bool> annulerDemande(String demandeId) async {
     return await demandesRepo.annulerDemande(demandeId);
   }
 
-  // UI Design: Verifier si un utilisateur est chef d'association
+  
   Future<bool> estChefAssociation(String utilisateurId, String associationId) async {
     return await demandesRepo.estChefAssociation(utilisateurId, associationId);
   }
 
-  // UI Design: Obtenir les statistiques des demandes (pour les chefs)
+  
   Future<Map<String, int>> obtenirStatistiquesDemandes(String associationId) async {
     return await demandesRepo.obtenirStatistiquesDemandes(associationId);
   }
 
-  // UI Design: Compter les demandes en attente (pour les notifications)
+  
   Future<int> compterDemandesEnAttente(String associationId) async {
     return await demandesRepo.compterDemandesEnAttente(associationId);
   }
 
-  // UI Design: Obtenir toutes les associations ou l'utilisateur est chef
+  
   Future<List<String>> obtenirAssociationsGerees(String utilisateurId) async {
     // Pour l'instant, utilisons les donnees hardcodees
     const chefsAssociations = {
@@ -196,12 +196,12 @@ class AdhesionsService {
     return chefsAssociations[utilisateurId] ?? [];
   }
 
-  // UI Design: Obtenir les associations d'un utilisateur
+  
   Future<List<Association>> obtenirAssociationsUtilisateur(String utilisateurId) async {
     return await gestionMembres.obtenirAssociationsUtilisateur(utilisateurId);
   }
 
-  // UI Design: Verifier si un utilisateur est membre d'une association specifique
+  
   Future<bool> estMembreAssociation(String utilisateurId, String associationId) async {
     return await gestionMembres.estMembreAssociation(utilisateurId, associationId);
   }

@@ -1,4 +1,4 @@
-// UI Design: Entité représentant une actualité d'association étudiante
+
 class Actualite {
   final String id;
   final String titre;
@@ -32,16 +32,16 @@ class Actualite {
     required this.nombreLikes,
   });
 
-  // UI Design: Méthode utilitaire pour vérifier si c'est un événement
+  
   bool get estEvenement => dateEvenement != null;
 
-  // UI Design: Méthode utilitaire pour vérifier si l'événement est à venir
+  
   bool get estEvenementAVenir {
     if (!estEvenement) return false;
     return dateEvenement!.isAfter(DateTime.now());
   }
 
-  // UI Design: Copie avec modifications
+  
   Actualite copyWith({
     String? id,
     String? titre,

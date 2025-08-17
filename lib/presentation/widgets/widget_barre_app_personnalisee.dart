@@ -5,7 +5,7 @@ import '../../domain/entities/utilisateur.dart';
 import '../screens/utilisateur/profil_ecran.dart';
 import '../services/authentification_service.dart';
 
-// UI Design: Barre d'application personnalisée réutilisable avec design UQAR
+
 class WidgetBarreAppPersonnalisee extends StatelessWidget implements PreferredSizeWidget {
   final String titre;
   final String sousTitre;
@@ -32,11 +32,11 @@ class WidgetBarreAppPersonnalisee extends StatelessWidget implements PreferredSi
 
   @override
   Widget build(BuildContext context) {
-    // UI Design: Obtenir l'utilisateur connecté pour afficher ses initiales
+    
     final authentificationService = ServiceLocator.obtenirService<AuthentificationService>();
     final utilisateur = utilisateurConnecte ?? authentificationService.utilisateurActuel;
     
-    // UI Design: AppBar UQAR modernisée avec hiérarchie visuelle, dégradé, ombre et bordure
+    
     return Container(
       decoration: BoxDecoration(
         gradient: const LinearGradient(

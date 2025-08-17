@@ -18,7 +18,7 @@ import '../../../presentation/widgets/widget_bouton_conversations.dart';
 import '../../../presentation/widgets/widget_carte.dart';
 import '../../../presentation/widgets/widget_collection.dart';
 
-// UI Design: Écran de gestion des livres personnels de l'utilisateur
+
 
 class GererLivresEcran extends StatefulWidget {
   const GererLivresEcran({super.key});
@@ -50,7 +50,7 @@ class _GererLivresEcranState extends State<GererLivresEcran>
 
   late TabController _tabController;
 
-  int _sectionActuelle = 0; // UI Design: Variable pour suivre la section active
+  int _sectionActuelle = 0; 
 
   // Variables pour les filtres avancés
 
@@ -76,12 +76,12 @@ class _GererLivresEcranState extends State<GererLivresEcran>
     _utilisateurActuel = _authentificationService.utilisateurActuel;
 
     _tabController = TabController(
-        length: 2, vsync: this); // UI Design: Corrigé pour 2 onglets
+        length: 2, vsync: this); 
 
     _tabController.addListener(() {
       setState(() {
         _sectionActuelle =
-            _tabController.index; // UI Design: Mettre à jour la section active
+            _tabController.index; 
       });
     });
 
@@ -107,10 +107,10 @@ class _GererLivresEcranState extends State<GererLivresEcran>
         _mesTransactions = await _transactionsService
             .obtenirMesTransactions(_utilisateurActuel!.id);
 
-        // UI Design: Charger tous les livres manquants des transactions
+        
         await _chargerLivresManquants();
 
-        // UI Design: Détecter les nouveaux messages reçus
+        
         final nouvellesTransactions = _mesTransactions
             .where((t) =>
                 t.vendeurId == _utilisateurActuel?.id &&
@@ -136,13 +136,13 @@ class _GererLivresEcranState extends State<GererLivresEcran>
 
     try {
       if (_utilisateurActuel == null) {
-        // UI Design: Essayer de recharger l'utilisateur depuis le service
+        
 
         await _authentificationService.chargerUtilisateurActuel();
 
         _utilisateurActuel = _authentificationService.utilisateurActuel;
 
-        // UI Design: Si toujours null, simuler la connexion d'Alexandre Martin pour les tests
+        
 
         if (_utilisateurActuel == null) {
           final utilisateurConnecte = await _authentificationService
@@ -153,11 +153,11 @@ class _GererLivresEcranState extends State<GererLivresEcran>
       }
 
       if (_utilisateurActuel != null) {
-        // UI Design: Charger les livres de l'utilisateur
+        
         _mesLivres = await _livresRepository
             .obtenirLivresParProprietaire(_utilisateurActuel!.id);
         
-        // UI Design: Charger aussi les livres des transactions pour éviter "Livre #103"
+        
         await _chargerLivresManquants();
       } else {
         _mesLivres = [];
@@ -174,7 +174,7 @@ class _GererLivresEcranState extends State<GererLivresEcran>
     }
   }
 
-  // UI Design: Méthode pour filtrer les livres selon les critères sélectionnés
+  
 
   List<Livre> get _livresFiltres {
     List<Livre> resultat = _mesLivres;
@@ -292,7 +292,7 @@ class _GererLivresEcranState extends State<GererLivresEcran>
         ],
       ),
 
-      // UI Design: Widget réutilisable pour accéder aux conversations
+      
       floatingActionButton: const WidgetBoutonConversations(),
 
       bottomNavigationBar: NavBarWidget(
@@ -396,7 +396,7 @@ class _GererLivresEcranState extends State<GererLivresEcran>
     );
   }
 
-  // UI Design: Filtre spécialisé pour les matières avec couleurs
+  
   Widget _construireFiltreChipMatiere(String matiere) {
     final estSelectionne = _filtreActuel == 'tous' && matiere == _matiereSelectionnee;
     final couleur = LivresUtils.obtenirCouleurMatiere(matiere);
@@ -431,7 +431,7 @@ class _GererLivresEcranState extends State<GererLivresEcran>
     );
   }
 
-  // UI Design: Filtre spécialisé pour les années d'étude avec couleurs dynamiques
+  
   Widget _construireFiltreChipAnnee(String annee) {
     final estSelectionne = _filtreActuel == 'tous' && annee == _anneeSelectionnee;
     final couleur = LivresUtils.obtenirCouleurAnnee(annee);
@@ -479,7 +479,7 @@ class _GererLivresEcranState extends State<GererLivresEcran>
       enChargement: false,
 
       ratioAspect: 0.75,
-      // UI Design: Même ratio que marketplace pour éviter l'overflow
+      
 
       nombreColonnes: 2,
 
@@ -522,7 +522,7 @@ class _GererLivresEcranState extends State<GererLivresEcran>
     );
   }
 
-  // UI Design: Section Messages simplifiée et roundy
+  
   Widget _construireSectionMessages() {
     final transactionsRecues = _mesTransactions
         .where((t) =>
@@ -584,7 +584,7 @@ class _GererLivresEcranState extends State<GererLivresEcran>
     );
   }
 
-  // UI Design: Section Échanges style Facebook moderne
+  
   Widget _construireSectionEchanges() {
     if (_isLoadingTransactions) {
       return const Center(
@@ -737,7 +737,7 @@ class _GererLivresEcranState extends State<GererLivresEcran>
     );
   }
 
-  // UI Design: Section par statut style Facebook
+  
   Widget _construireSectionStatut(String titre, List<Transaction> transactions,
       IconData icone, Color couleur) {
     return Column(
@@ -785,7 +785,7 @@ class _GererLivresEcranState extends State<GererLivresEcran>
     );
   }
 
-  // UI Design: Carte de transaction style Facebook moderne
+  
   Widget _construireCarteTransactionFacebook(
       Transaction transaction, Color couleurSection) {
     final estVendeur = transaction.vendeurId == _utilisateurActuel?.id;
@@ -1142,7 +1142,7 @@ class _GererLivresEcranState extends State<GererLivresEcran>
     );
   }
 
-  // UI Design: Carte pour afficher un message de demande d'échange style Messenger
+  
   Widget _construireCarteMessage(Transaction transaction) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12, left: 16, right: 16),
@@ -1340,7 +1340,7 @@ class _GererLivresEcranState extends State<GererLivresEcran>
     );
   }
 
-  // UI Design: Carte pour afficher une transaction complète roundy
+  
   Widget _construireCarteTransaction(Transaction transaction) {
     final estVendeur = transaction.vendeurId == _utilisateurActuel?.id;
 
@@ -1549,9 +1549,9 @@ class _GererLivresEcranState extends State<GererLivresEcran>
     );
   }
 
-  // UI Design: Widget helper pour afficher les informations d'un livre
+  
 
-  // UI Design: Widget helper roundy pour afficher les informations d'un livre
+  
   Widget _construireInfoLivreRoundy(
       String titre, String valeur, IconData icone, Color couleur) {
     return Container(
@@ -1610,7 +1610,7 @@ class _GererLivresEcranState extends State<GererLivresEcran>
     );
   }
 
-  // UI Design: Méthode pour obtenir le nom d'un livre à partir de son ID
+  
   String _obtenirNomLivre(String livreId) {
     try {
       // Chercher d'abord dans les livres locaux
@@ -1623,7 +1623,7 @@ class _GererLivresEcranState extends State<GererLivresEcran>
     }
   }
 
-  // UI Design: Charger un livre manquant depuis le repository
+  
   Future<void> _chargerLivreManquant(String livreId) async {
     try {
       final livre = await _livresRepository.obtenirLivreParId(livreId);
@@ -1639,7 +1639,7 @@ class _GererLivresEcranState extends State<GererLivresEcran>
     }
   }
 
-  // UI Design: Méthode pour charger tous les livres manquants des transactions
+  
   Future<void> _chargerLivresManquants() async {
     if (_mesTransactions.isEmpty) return;
 
@@ -1656,7 +1656,7 @@ class _GererLivresEcranState extends State<GererLivresEcran>
       }
     }
 
-    // UI Design: Charger tous les livres manquants (pas seulement ceux de l'utilisateur)
+    
     for (final livreId in idsLivresManquants) {
       try {
         final livre = await _livresRepository.obtenirLivreParId(livreId);
@@ -1685,39 +1685,39 @@ class _GererLivresEcranState extends State<GererLivresEcran>
     }
   }
 
-  // UI Design: Méthodes utilitaires pour les transactions
+  
 
   String _formaterDate(DateTime date) {
     return TransactionsUtils.formaterDateComplete(date);
   }
 
-  // UI Design: Méthode pour formater l'heure style Messenger
+  
   String _formaterHeure(DateTime date) {
     return TransactionsUtils.formaterDate(date);
   }
 
-  // UI Design: Méthode pour obtenir les initiales d'un utilisateur
+  
   String _obtenirInitialesUtilisateur(String? utilisateurId) {
     return TransactionsUtils.obtenirInitialesUtilisateur(utilisateurId);
   }
 
-  // UI Design: Méthode asynchrone pour obtenir les initiales depuis le service utilisateur
+  
   Future<String> _obtenirInitialesUtilisateurDepuisService(
       String? utilisateurId) async {
     if (utilisateurId == null) return '?';
 
     try {
-      // UI Design: Utiliser le service d'authentification pour récupérer les informations utilisateur
+      
       final utilisateur =
           await _authentificationService.obtenirUtilisateurParId(utilisateurId);
       if (utilisateur != null) {
         return '${utilisateur.prenom[0]}${utilisateur.nom[0]}';
       }
 
-      // UI Design: Fallback vers la méthode locale si l'utilisateur n'est pas trouvé
+      
       return _obtenirInitialesUtilisateur(utilisateurId);
     } catch (e) {
-      // UI Design: En cas d'erreur, utiliser la méthode locale comme fallback
+      
       return _obtenirInitialesUtilisateur(utilisateurId);
     }
   }
@@ -2038,11 +2038,11 @@ class _GererLivresEcranState extends State<GererLivresEcran>
     }
   }
 
-  // UI Design: Méthode pour envoyer un message de réponse
+  
   Future<void> _envoyerMessageReponse(
       Transaction transaction, String message) async {
     try {
-      // UI Design: Créer une nouvelle transaction de réponse
+      
       final transactionReponse = Transaction(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         livreId: transaction.livreEchangeId ?? transaction.livreId,
@@ -2055,23 +2055,23 @@ class _GererLivresEcranState extends State<GererLivresEcran>
         messageAcheteur: message,
       );
 
-      // UI Design: Ajouter la transaction à la liste locale
+      
       setState(() {
         _mesTransactions.add(transactionReponse);
       });
 
-      // UI Design: Afficher un message de succès
+      
       _afficherSucces('Message envoyé avec succès !');
 
-      // UI Design: Basculer vers l'onglet Échanges pour voir la réponse
+      
       _tabController
-          .animateTo(1); // UI Design: Corrigé pour 1 onglet (Échanges)
+          .animateTo(1); 
     } catch (e) {
       _afficherErreur('Erreur lors de l\'envoi du message: $e');
     }
   }
 
-  // UI Design: Méthode pour afficher le modal de réponse
+  
   void _afficherModalReponse(Transaction transaction) {
     showModalBottomSheet(
       context: context,
@@ -2081,7 +2081,7 @@ class _GererLivresEcranState extends State<GererLivresEcran>
     );
   }
 
-  // UI Design: Méthode pour construire le modal de réponse
+  
   Widget _construireModalReponse(Transaction transaction) {
     return Container(
       decoration: const BoxDecoration(
@@ -2352,7 +2352,7 @@ class _GererLivresEcranState extends State<GererLivresEcran>
   }
 }
 
-// UI Design: Widget modal séparé pour éviter le problème de clavier qui se ferme
+
 
 class _ModalAjoutLivre extends StatefulWidget {
   final Function(Livre) onLivreAjoute;
@@ -2880,7 +2880,7 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
   }
 }
 
-// UI Design: Widget modal pour modifier un livre existant
+
 
 class _ModalModificationLivre extends StatefulWidget {
   final Livre livre;
@@ -2959,7 +2959,7 @@ class _ModalModificationLivreState extends State<_ModalModificationLivre> {
 
     _livresRepository = ServiceLocator.obtenirService<LivresRepository>();
 
-    // UI Design: Pré-remplir les champs avec les données du livre existant
+    
 
     _titreController = TextEditingController(text: widget.livre.titre);
 

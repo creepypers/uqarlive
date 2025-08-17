@@ -7,7 +7,7 @@ import '../screens/livres/marketplace_ecran.dart';
 
 import '../screens/salles_ecran.dart';
 
-// UI Design: Service de navigation centralisé pour éviter la duplication
+
 class NavigationService {
   /// Gérer la navigation de la NavBar
   static void gererNavigationNavBar(BuildContext context, int index) {

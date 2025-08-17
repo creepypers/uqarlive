@@ -11,7 +11,7 @@ import '../screens/admin/admin_ajouter_association_ecran.dart';
 import '../screens/admin/admin_modifier_horaires_ecran.dart';
 import '../screens/utilisateur/connexion_ecran.dart';
 
-// UI Design: AppBar de navigation entre les différentes sections de gestion admin
+
 class WidgetBarreAppNavigationAdmin extends StatelessWidget implements PreferredSizeWidget {
   final String titre;
   final String? sousTitre;
@@ -430,11 +430,11 @@ class WidgetBarreAppNavigationAdmin extends StatelessWidget implements Preferred
               Navigator.pop(context);
               
               try {
-                // UI Design: Déconnexion via le service d'authentification
+                
                 final authentificationService = ServiceLocator.obtenirService<AuthentificationService>();
                 await authentificationService.deconnecter();
                 
-                // UI Design: Navigation vers l'écran de connexion avec nettoyage complet des routes
+                
                 if (context.mounted) {
                   Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(builder: (context) => const ConnexionEcran()),

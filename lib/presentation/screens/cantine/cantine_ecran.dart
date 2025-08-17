@@ -15,7 +15,7 @@ import '../../../presentation/services/statistiques_service.dart';
 import '../../../presentation/services/navigation_service.dart';
 import 'details_menu_ecran.dart';
 
-// UI Design: Page cantine UQAR avec menus, horaires et design moderne
+
 class CantineEcran extends StatefulWidget {
   const CantineEcran({super.key});
 
@@ -27,11 +27,11 @@ class _CantineEcranState extends State<CantineEcran> {
   // Repository pour accéder aux données des menus
   late final MenusRepository _menusRepository;
   late final StatistiquesService _statistiquesService;
-  late final HorairesRepository _horairesRepository; // UI Design: Horaires dynamiques
-  Menu? _menuDuJourSpecial; // UI Design: Menu du jour spécial défini par l'admin
+  late final HorairesRepository _horairesRepository; 
+  Menu? _menuDuJourSpecial; 
   List<Menu> _tousLesMenus = [];
   List<Menu> _menusFiltres = [];
-  Map<String, Map<String, TimeOfDay>> _horaires = {}; // UI Design: Horaires de la cantine
+  Map<String, Map<String, TimeOfDay>> _horaires = {}; 
   StatistiquesGlobales? _statistiques;
   String _categorieSelectionnee = MenuCategories.categorieDefaut;
   bool _chargementMenus = false;
@@ -57,7 +57,7 @@ class _CantineEcranState extends State<CantineEcran> {
   void _initialiserRepositories() {
     _menusRepository = ServiceLocator.obtenirService<MenusRepository>();
     _statistiquesService = ServiceLocator.obtenirService<StatistiquesService>();
-    _horairesRepository = ServiceLocator.obtenirService<HorairesRepository>(); // UI Design: Horaires dynamiques
+    _horairesRepository = ServiceLocator.obtenirService<HorairesRepository>(); 
   }
 
   Future<void> _chargerDonnees() async {
@@ -68,19 +68,19 @@ class _CantineEcranState extends State<CantineEcran> {
     try {
       final results = await Future.wait([
         _menusRepository.obtenirMenusDuJour(),
-        _menusRepository.obtenirTousLesMenus(), // UI Design: Charger tous les menus pour le filtrage local
+        _menusRepository.obtenirTousLesMenus(), 
         _statistiquesService.obtenirStatistiquesGlobales(),
-        _menusRepository.obtenirMenuDuJourActuel(), // UI Design: Menu du jour spécial
-        _horairesRepository.obtenirTousLesHorairesCantine(), // UI Design: Horaires dynamiques
+        _menusRepository.obtenirMenuDuJourActuel(), 
+        _horairesRepository.obtenirTousLesHorairesCantine(), 
       ]);
 
       setState(() {
         _tousLesMenus = results[1] as List<Menu>;
-        _menusFiltres = results[1] as List<Menu>; // UI Design: Initialiser les menus filtrés
+        _menusFiltres = results[1] as List<Menu>; 
         _statistiques = results[2] as StatistiquesGlobales;
-        _horaires = results[4] as Map<String, Map<String, TimeOfDay>>; // UI Design: Horaires dynamiques
+        _horaires = results[4] as Map<String, Map<String, TimeOfDay>>; 
         
-        // UI Design: Récupérer le menu du jour spécial défini par l'admin
+        
         final menuDuJourId = results[3] as String?;
         if (menuDuJourId != null && menuDuJourId.isNotEmpty) {
           try {
@@ -106,7 +106,7 @@ class _CantineEcranState extends State<CantineEcran> {
 
 
 
-  // UI Design: Implémenter la recherche de menus par nom, description ou catégorie
+  
   void _rechercherMenus(String terme) {
     setState(() {
       _termeRecherche = terme.toLowerCase().trim();
@@ -114,7 +114,7 @@ class _CantineEcranState extends State<CantineEcran> {
     });
   }
 
-  // UI Design: Appliquer tous les filtres (recherche + catégorie + végétarien)
+  
   void _appliquerFiltres() {
     List<Menu> menusFiltres = _tousLesMenus;
 
@@ -145,7 +145,7 @@ class _CantineEcranState extends State<CantineEcran> {
     });
   }
 
-  // UI Design: Ouvrir l'interface de recherche
+  
   void _ouvrirRecherche() {
     showDialog(
       context: context,
@@ -153,7 +153,7 @@ class _CantineEcranState extends State<CantineEcran> {
     );
   }
 
-  // UI Design: Construire le dialogue de recherche
+  
   Widget _construireDialogueRecherche() {
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -226,7 +226,7 @@ class _CantineEcranState extends State<CantineEcran> {
       _categorieSelectionnee = nouvelleCategorie;
     });
     
-    // UI Design: Utiliser le filtrage local au lieu de recharger depuis le repository
+    
     _appliquerFiltres();
   }
 
@@ -234,7 +234,7 @@ class _CantineEcranState extends State<CantineEcran> {
     setState(() {
       _afficheVegetarienUniquement = !_afficheVegetarienUniquement;
     });
-    // UI Design: Utiliser le filtrage local
+    
     _appliquerFiltres();
   }
 
@@ -242,7 +242,7 @@ class _CantineEcranState extends State<CantineEcran> {
 
   @override
   Widget build(BuildContext context) {
-    // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
+    
     final mediaQuery = MediaQuery.of(context);
     final screenHeight = mediaQuery.size.height;
     final screenWidth = mediaQuery.size.width;
@@ -251,7 +251,7 @@ class _CantineEcranState extends State<CantineEcran> {
     
     return Scaffold(
       backgroundColor: CouleursApp.fond,
-      resizeToAvoidBottomInset: true, // UI Design: Éviter les débordements avec le clavier
+      resizeToAvoidBottomInset: true, 
       appBar: WidgetBarreAppPersonnalisee(
         titre: 'Cantine UQAR',
         sousTitre: 'Menus & Horaires',
@@ -261,7 +261,7 @@ class _CantineEcranState extends State<CantineEcran> {
             GestureDetector(
               onTap: _toggleVegetarien,
               child: Container(
-                padding: EdgeInsets.all(screenWidth * 0.025), // UI Design: Padding adaptatif
+                padding: EdgeInsets.all(screenWidth * 0.025), 
                 decoration: BoxDecoration(
                   color: _afficheVegetarienUniquement 
                     ? Colors.green.withValues(alpha: 0.2)
@@ -271,15 +271,15 @@ class _CantineEcranState extends State<CantineEcran> {
                 child: Icon(
                   _afficheVegetarienUniquement ? Icons.eco : Icons.eco_outlined,
                   color: _afficheVegetarienUniquement ? Colors.green : CouleursApp.blanc,
-                  size: screenWidth * 0.06, // UI Design: Taille adaptative
+                  size: screenWidth * 0.06, 
                 ),
               ),
             ),
-            SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
+            SizedBox(width: screenWidth * 0.02), 
             GestureDetector(
-              onTap: _ouvrirRecherche, // UI Design: Recherche implementée
+              onTap: _ouvrirRecherche, 
               child: Container(
-                padding: EdgeInsets.all(screenWidth * 0.025), // UI Design: Padding adaptatif
+                padding: EdgeInsets.all(screenWidth * 0.025), 
                 decoration: BoxDecoration(
                   color: CouleursApp.blanc.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(20),
@@ -287,7 +287,7 @@ class _CantineEcranState extends State<CantineEcran> {
                 child: Icon(
                   Icons.search,
                   color: CouleursApp.blanc,
-                  size: screenWidth * 0.06, // UI Design: Taille adaptative
+                  size: screenWidth * 0.06, 
                 ),
               ),
             ),
@@ -297,35 +297,35 @@ class _CantineEcranState extends State<CantineEcran> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.only(
-            bottom: viewInsets.bottom + padding.bottom + screenHeight * 0.025, // UI Design: Padding adaptatif pour éviter les débordements
+            bottom: viewInsets.bottom + padding.bottom + screenHeight * 0.025, 
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Section infos cantine
               _construireSectionInfos(),
-              SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
+              SizedBox(height: screenHeight * 0.02), 
               
               // Section menu du jour spécial (défini par l'admin)
               if (_menuDuJourSpecial != null) ...[
                 _construireSectionMenuDuJourSpecial(),
-                SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
+                SizedBox(height: screenHeight * 0.03), 
               ],
               
               
               // Filtres et catégories
               _construireFiltres(),
-              SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
+              SizedBox(height: screenHeight * 0.02), 
               
               // Grille des menus
               _construireGrilleMenus(),
-              SizedBox(height: screenHeight * 0.025), // UI Design: Espacement adaptatif
+              SizedBox(height: screenHeight * 0.025), 
             ],
           ),
         ),
       ),
 
-      // UI Design: Widget réutilisable pour accéder aux conversations
+      
       floatingActionButton: const WidgetBoutonConversations(),
 
       bottomNavigationBar: NavBarWidget(
@@ -335,13 +335,13 @@ class _CantineEcranState extends State<CantineEcran> {
     );
   }
 
-  // UI Design: Section avec infos et horaires de la cantine - Données dynamiques
+  
   Widget _construireSectionInfos() {
     if (_statistiques == null) {
       return const SizedBox.shrink();
     }
 
-    // UI Design: Obtenir les horaires du jour actuel
+    
     final maintenant = DateTime.now();
     final jourActuel = _obtenirJourSemaine(maintenant.weekday);
     final horairesDuJour = _horaires[jourActuel];
@@ -356,7 +356,7 @@ class _CantineEcranState extends State<CantineEcran> {
       if (ouverture != null && fermeture != null) {
         horairesText = '${_formatterHeure(ouverture)} - ${_formatterHeure(fermeture)}';
         
-        // UI Design: Vérifier si c'est ouvert maintenant
+        
         final heureActuelle = TimeOfDay.now();
         final estOuvert = _estDansCreneauHoraire(heureActuelle, ouverture, fermeture);
         horairesColor = estOuvert ? Colors.green : CouleursApp.accent;
@@ -395,7 +395,7 @@ class _CantineEcranState extends State<CantineEcran> {
     );
   }
 
-  // UI Design: Section menu du jour spécial défini par l'admin
+  
   Widget _construireSectionMenuDuJourSpecial() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
@@ -621,7 +621,7 @@ class _CantineEcranState extends State<CantineEcran> {
     );
   }
 
-  // UI Design: Section menus du jour avec WidgetCollection optimisé/ UI Design: Filtres et catégories
+  
   Widget _construireFiltres() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
@@ -631,22 +631,22 @@ class _CantineEcranState extends State<CantineEcran> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Padding adaptatif
+          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), 
           child: Text(
             'Catégories',
             style: StylesTexteApp.titre.copyWith(
-              fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
+              fontSize: screenWidth * 0.045, 
             ),
-            overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+            overflow: TextOverflow.ellipsis, 
             maxLines: 1,
           ),
         ),
-        SizedBox(height: screenHeight * 0.015), // UI Design: Espacement adaptatif
+        SizedBox(height: screenHeight * 0.015), 
         SizedBox(
-          height: screenHeight * 0.05, // UI Design: Hauteur adaptative
+          height: screenHeight * 0.05, 
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Padding adaptatif
+            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), 
             itemCount: MenuCategories.categories.length,
             itemBuilder: (context, index) {
               final categorie = MenuCategories.categories[index];
@@ -655,9 +655,9 @@ class _CantineEcranState extends State<CantineEcran> {
               return GestureDetector(
                 onTap: () => _changerCategorie(categorie),
                 child: Container(
-                  margin: EdgeInsets.only(right: screenWidth * 0.03), // UI Design: Marge adaptative
+                  margin: EdgeInsets.only(right: screenWidth * 0.03), 
                   padding: EdgeInsets.symmetric(
-                    horizontal: screenWidth * 0.04, // UI Design: Padding adaptatif
+                    horizontal: screenWidth * 0.04, 
                     vertical: screenHeight * 0.01,
                   ),
                   decoration: BoxDecoration(
@@ -679,9 +679,9 @@ class _CantineEcranState extends State<CantineEcran> {
                           ? CouleursApp.blanc 
                           : CouleursApp.principal,
                       fontWeight: FontWeight.w600,
-                      fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
+                      fontSize: screenWidth * 0.035, 
                     ),
-                    overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                    overflow: TextOverflow.ellipsis, 
                     maxLines: 1,
                   ),
                 ),
@@ -693,25 +693,25 @@ class _CantineEcranState extends State<CantineEcran> {
     );
   }
 
-  // UI Design: Grille des menus avec WidgetCollection
+  
   Widget _construireGrilleMenus() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
     
     return WidgetCollection<Menu>.grille(
-      elements: _menusFiltres, // UI Design: Utiliser les menus filtrés pour l'affichage
+      elements: _menusFiltres, 
       enChargement: _chargementMenus,
       nombreColonnes: 2,
-      espacementColonnes: screenWidth * 0.04, // UI Design: Espacement adaptatif
-      espacementLignes: screenHeight * 0.02, // UI Design: Espacement adaptatif
+      espacementColonnes: screenWidth * 0.04, 
+      espacementLignes: screenHeight * 0.02, 
       constructeurElement: (context, menu, index) {
         return WidgetCarte.menu(
           menu: menu,
           onTap: () => _ouvrirDetailsMenu(menu),
         );
       },
-      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // UI Design: Padding adaptatif
+      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), 
       messageEtatVide: _afficheVegetarienUniquement 
         ? 'Aucun menu végétarien disponible'
         : 'Aucun menu disponible dans cette catégorie',
@@ -730,7 +730,7 @@ class _CantineEcranState extends State<CantineEcran> {
     );
   }
 
-  // UI Design: Méthodes utilitaires pour les horaires
+  
   String _obtenirJourSemaine(int weekday) {
     const jours = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
     return jours[weekday - 1];

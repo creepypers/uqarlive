@@ -5,7 +5,7 @@ import '../../../domain/usercases/menus_repository.dart';
 import '../../../core/di/service_locator.dart';
 import '../../../presentation/widgets/widget_barre_app_navigation_admin.dart';
 
-// UI Design: Écran d'ajout/modification de menu pour la cantine
+
 class AdminAjouterMenuEcran extends StatefulWidget {
   final Menu? menuAModifier;
   
@@ -84,7 +84,7 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
 
   @override
   Widget build(BuildContext context) {
-    // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
+    
     final mediaQuery = MediaQuery.of(context);
     final screenHeight = mediaQuery.size.height;
     final screenWidth = mediaQuery.size.width;
@@ -95,7 +95,7 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
     
     return Scaffold(
       backgroundColor: CouleursApp.fond,
-      resizeToAvoidBottomInset: true, // UI Design: Éviter les débordements avec le clavier
+      resizeToAvoidBottomInset: true, 
       appBar: WidgetBarreAppNavigationAdmin(
         titre: estModification ? 'Modifier le Menu' : 'Ajouter un Menu',
         sousTitre: estModification 
@@ -106,10 +106,10 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.only(
-            left: screenWidth * 0.04, // UI Design: Padding adaptatif
+            left: screenWidth * 0.04, 
             right: screenWidth * 0.04,
             top: screenHeight * 0.02,
-            bottom: viewInsets.bottom + padding.bottom + screenHeight * 0.025, // UI Design: Padding adaptatif pour éviter les débordements
+            bottom: viewInsets.bottom + padding.bottom + screenHeight * 0.025, 
           ),
           child: Form(
             key: _formKey,
@@ -139,7 +139,7 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
     );
   }
 
-  // UI Design: Section d'information
+  
   Widget _construireSectionInformation() {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -187,7 +187,7 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
     );
   }
 
-  // UI Design: Section informations du menu
+  
   Widget _construireSectionInformationsMenu() {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -326,7 +326,7 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
     );
   }
 
-  // UI Design: Section options et disponibilité
+  
   Widget _construireSectionOptions() {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -413,7 +413,7 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
     );
   }
 
-  // UI Design: Boutons d'action
+  
   Widget _construireBoutonsAction() {
     return Column(
       children: [
@@ -679,7 +679,7 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
     }
   }
 
-  // UI Design: Ajouter le menu au menu du jour
+  
   void _ajouterAuMenuDuJour() async {
     if (widget.menuAModifier == null) return;
 
@@ -688,7 +688,7 @@ class _AdminAjouterMenuEcranState extends State<AdminAjouterMenuEcran> {
     });
 
     try {
-      // UI Design: Définir ce menu comme menu du jour en utilisant le repository
+      
       await _menusRepository.definirMenuDuJour(widget.menuAModifier!.id);
 
       setState(() {

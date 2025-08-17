@@ -1,4 +1,4 @@
-// UI Design: Écran d'ajout d'association avec formulaire complet et validation
+
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/di/service_locator.dart';
@@ -38,7 +38,7 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
   bool _estActive = true;
   bool _enChargement = false;
   bool _modeModification = false;
-  final List<String> _activites = ['Activités à définir']; // UI Design: Liste des activités modifiable
+  final List<String> _activites = ['Activités à définir']; 
   
   // Liste des utilisateurs disponibles pour être chef d'association
   final List<Map<String, String>> _utilisateursDisponibles = [
@@ -102,7 +102,7 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
 
   @override
   Widget build(BuildContext context) {
-    // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
+    
     final mediaQuery = MediaQuery.of(context);
     final screenHeight = mediaQuery.size.height;
     final screenWidth = mediaQuery.size.width;
@@ -111,7 +111,7 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
     
     return Scaffold(
       backgroundColor: CouleursApp.fond,
-      resizeToAvoidBottomInset: true, // UI Design: Éviter les débordements avec le clavier
+      resizeToAvoidBottomInset: true, 
       appBar: WidgetBarreAppNavigationAdmin(
         titre: _modeModification ? 'Modifier Association' : 'Ajouter Association',
         sousTitre: _modeModification 
@@ -124,10 +124,10 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               padding: EdgeInsets.only(
-                left: screenWidth * 0.04, // UI Design: Padding adaptatif
+                left: screenWidth * 0.04, 
                 right: screenWidth * 0.04,
                 top: screenHeight * 0.02,
-                bottom: viewInsets.bottom + padding.bottom + screenHeight * 0.025, // UI Design: Padding adaptatif pour éviter les débordements
+                bottom: viewInsets.bottom + padding.bottom + screenHeight * 0.025, 
               ),
             child: Form(
               key: _cleFormulaire,
@@ -149,7 +149,7 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
     );
   }
 
-  // UI Design: Section des informations générales
+  
   Widget _construireSectionInformationsGenerales() {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -226,7 +226,7 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
                         // Chef de l'association
             DropdownButtonFormField<String>(
               value: _chefSelectionne,
-              isExpanded: true, // UI Design: Utiliser toute la largeur disponible
+              isExpanded: true, 
               decoration: InputDecoration(
                 labelText: 'Chef de l\'association *',
                 prefixIcon: const Icon(Icons.person, color: CouleursApp.principal),
@@ -288,7 +288,7 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
     );
   }
 
-  // UI Design: Section des informations de contact
+  
   Widget _construireSectionContact() {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -415,7 +415,7 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
     );
   }
 
-  // UI Design: Section des paramètres
+  
   Widget _construireSectionParametres() {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -572,7 +572,7 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
     );
   }
 
-  // UI Design: Boutons d'action avec design UQAR
+  
   Widget _construireBoutonsAction() {
     return Row(
       children: [
@@ -628,20 +628,20 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
         nom: _controleurNom.text.trim(),
         description: _controleurDescription.text.trim(),
         typeAssociation: _categorieSelectionnee,
-        chefId: _chefSelectionne, // UI Design: Chef obligatoire
+        chefId: _chefSelectionne, 
         email: _controleurEmail.text.trim().isEmpty ? null : _controleurEmail.text.trim(),
         telephone: _controleurTelephone.text.trim().isEmpty ? null : _controleurTelephone.text.trim(),
         siteWeb: _controleurSiteWeb.text.trim().isEmpty ? null : _controleurSiteWeb.text.trim(),
         localisation: _controleurLocalisation.text.trim().isEmpty ? null : _controleurLocalisation.text.trim(),
         horairesBureau: _controleurHoraires.text.trim().isEmpty ? null : _controleurHoraires.text.trim(),
         cotisationAnnuelle: _controleurBudget.text.trim().isEmpty ? null : double.parse(_controleurBudget.text.trim()),
-        activites: _activites, // UI Design: Activités saisies par l'utilisateur
+        activites: _activites, 
         estActive: _estActive,
         dateCreation: _modeModification ? widget.associationAModifier!.dateCreation : DateTime.now(),
         membresActifs: _modeModification ? widget.associationAModifier!.membresActifs : [],
       );
 
-      // UI Design: Appeler les méthodes du repository selon le mode
+      
       bool succes = false;
       if (_modeModification) {
         succes = await _associationsRepository.mettreAJourAssociation(association);
@@ -682,7 +682,7 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
     }
   }
 
-  // UI Design: Ajouter une nouvelle activité
+  
   void _ajouterActivite() {
     showDialog(
       context: context,
@@ -738,7 +738,7 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
     );
   }
 
-  // UI Design: Supprimer une activité
+  
   void _supprimerActivite(int index) {
     if (index >= 0 && index < _activites.length) {
       final activite = _activites[index];

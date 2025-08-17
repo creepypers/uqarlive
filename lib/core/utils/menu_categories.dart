@@ -1,4 +1,4 @@
-// UI Design: Utilitaires pour les catégories de menus - Clean Architecture
+
 class MenuCategories {
   // Catégories disponibles pour les menus
   static const List<String> categories = [

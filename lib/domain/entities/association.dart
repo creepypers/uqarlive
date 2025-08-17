@@ -1,4 +1,4 @@
-// UI Design: Entité Association pour les associations étudiantes UQAR
+
 class Association {
   final String id;
   final String nom;
@@ -22,7 +22,7 @@ class Association {
   final double? cotisationAnnuelle;
   final String? descriptionLongue;
   final List<String>? beneficesMembers; // Avantages d'être membre
-  final List<String> membresActifs; // UI Design: Liste des IDs des membres actifs
+  final List<String> membresActifs; 
 
   const Association({
     required this.id,
@@ -47,7 +47,7 @@ class Association {
     this.cotisationAnnuelle,
     this.descriptionLongue,
     this.beneficesMembers,
-    this.membresActifs = const [], // UI Design: Initialiser avec une liste vide
+    this.membresActifs = const [], 
   });
 
   // Getter pour le nombre de membres formaté
@@ -59,10 +59,10 @@ class Association {
     return nombreMembres.toString();
   }
 
-  // UI Design: Getter pour vérifier si l'association a des membres
+  
   bool get aDesMembres => membresActifs.isNotEmpty;
 
-  // UI Design: Getter pour le nombre réel de membres actifs
+  
   int get nombreMembresReel => membresActifs.length;
 
   // Getter pour vérifier si l'association a des contacts
@@ -73,7 +73,7 @@ class Association {
   bool get aDesReseauxSociaux => 
       facebook != null || instagram != null;
 
-  // UI Design: couleurType retiré (utiliser un utilitaire UI pour retourner un Color)
+  
 
   // Méthode pour copier avec modifications
   Association copyWith({
@@ -99,7 +99,7 @@ class Association {
     double? cotisationAnnuelle,
     String? descriptionLongue,
     List<String>? beneficesMembers,
-    List<String>? membresActifs, // UI Design: Ajouter membresActifs
+    List<String>? membresActifs, 
   }) {
     return Association(
       id: id ?? this.id,
@@ -124,7 +124,7 @@ class Association {
       cotisationAnnuelle: cotisationAnnuelle ?? this.cotisationAnnuelle,
       descriptionLongue: descriptionLongue ?? this.descriptionLongue,
       beneficesMembers: beneficesMembers ?? this.beneficesMembers,
-      membresActifs: membresActifs ?? this.membresActifs, // UI Design: Copier membresActifs
+      membresActifs: membresActifs ?? this.membresActifs, 
     );
   }
 

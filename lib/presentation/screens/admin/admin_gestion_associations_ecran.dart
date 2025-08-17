@@ -1,4 +1,4 @@
-// UI Design: Écran de gestion des associations avec sous-sections pour actualités, événements et membres
+
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
@@ -81,12 +81,11 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
 
   @override
   Widget build(BuildContext context) {
-    // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
     final screenWidth = MediaQuery.of(context).size.width;
     
     return Scaffold(
       backgroundColor: CouleursApp.fond,
-      resizeToAvoidBottomInset: true, // UI Design: Éviter les débordements avec le clavier
+      resizeToAvoidBottomInset: true,
       appBar: const WidgetBarreAppNavigationAdmin(
         titre: 'Gestion Associations',
         sousTitre: 'Gérer les associations, actualités et événements',
@@ -97,7 +96,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
-                // UI Design: Barre d'onglets avec thème UQAR
+
                 Container(
                   color: CouleursApp.blanc,
                   child: TabBar(
@@ -106,30 +105,30 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
                     unselectedLabelColor: Colors.grey,
                     indicatorColor: CouleursApp.principal,
                     labelStyle: TextStyle(
-                      fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
+                      fontSize: screenWidth * 0.035,
                       fontWeight: FontWeight.w600,
                     ),
                     unselectedLabelStyle: TextStyle(
-                      fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
+                      fontSize: screenWidth * 0.035,
                       fontWeight: FontWeight.normal,
                     ),
                     tabs: [
                       Tab(
-                        icon: Icon(Icons.groups, size: screenWidth * 0.06), // UI Design: Taille adaptative
+                        icon: Icon(Icons.groups, size: screenWidth * 0.06),
                         text: 'Associations',
                       ),
                       Tab(
-                        icon: Icon(Icons.newspaper, size: screenWidth * 0.06), // UI Design: Taille adaptative
+                        icon: Icon(Icons.newspaper, size: screenWidth * 0.06),
                         text: 'Actualités',
                       ),
                       Tab(
-                        icon: Icon(Icons.event, size: screenWidth * 0.06), // UI Design: Taille adaptative
+                        icon: Icon(Icons.event, size: screenWidth * 0.06),
                         text: 'Événements',
                       ),
                     ],
                   ),
                 ),
-                // UI Design: Contenu des onglets
+
                 Expanded(
                   child: TabBarView(
                     controller: _tabController,
@@ -147,12 +146,12 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
         onPressed: () => _ajouterAssociation(),
         backgroundColor: CouleursApp.principal,
         foregroundColor: CouleursApp.blanc,
-        child: Icon(Icons.add, size: screenWidth * 0.06), // UI Design: Taille adaptative
+        child: Icon(Icons.add, size: screenWidth * 0.06),
       ),
     );
   }
 
-  // UI Design: Onglet des associations
+
   Widget _construireOngletAssociations() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -193,8 +192,8 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
                       description: association.description,
                       icone: Icons.groups,
                       couleurIcone: CouleursApp.principal,
-                      onTap: () => _modifierAssociation(association), // UI Design: Clic direct pour modifier
-                      largeur: (MediaQuery.of(context).size.width - 48) / 2 - 6, // UI Design: Largeur calculée pour éviter le débordement
+                      onTap: () => _modifierAssociation(association),
+                      largeur: (MediaQuery.of(context).size.width - 48) / 2 - 6,
                       hauteur: 120,
                     ),
                   );
@@ -208,7 +207,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
     );
   }
 
-  // UI Design: Onglet des actualités
+
   Widget _construireOngletActualites() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -289,7 +288,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
     );
   }
 
-  // UI Design: Onglet des événements
+
   Widget _construireOngletEvenements() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -419,7 +418,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
     );
   }
 
-  // UI Design: Message vide réutilisable
+
   Widget _construireMessageVide(String message, IconData icone) {
     return Center(
       child: Padding(
@@ -464,12 +463,12 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
     );
     
     if (resultat == true) {
-      _chargerDonnees(); // Recharger les données après ajout
+      _chargerDonnees();
     }
   }
 
   Future<void> _ajouterActualite() async {
-    // UI Design: Créer une actualité générale pour l'admin
+
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
       builder: (context) => _construireDialogueAjoutActualite(),
@@ -512,7 +511,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
   }
 
   Future<void> _ajouterEvenement() async {
-    // UI Design: Créer un événement général pour l'admin
+
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
       builder: (context) => _construireDialogueAjoutEvenement(),
@@ -557,7 +556,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
   }
 
   void _ouvrirDetailsAssociation(Association association) {
-    // UI Design: Navigation vers les détails de l'association
+
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => DetailsAssociationEcran(association: association),
@@ -701,7 +700,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
     );
     
     if (resultat == true) {
-      _chargerDonnees(); // Recharger les données après modification
+      _chargerDonnees();
     }
   }
 
@@ -776,7 +775,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
   }
 
   void _supprimerAssociation(Association association) async {
-    // UI Design: Supprimer l'association du repository
+
     final succes = await _associationsRepository.supprimerAssociation(association.id);
     
     if (mounted) {
@@ -807,7 +806,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
 
 
   Future<void> _modifierActualite(Actualite actualite) async {
-    // UI Design: Dialogue de modification d'actualité
+
     await _ouvrirDialogueModificationActualite(actualite);
   }
 
@@ -913,7 +912,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
 
 
   void _supprimerActualite(Actualite actualite) async {
-    // UI Design: Supprimer l'actualité du repository
+
     final succes = await _actualitesRepository.supprimerActualite(actualite.id);
     
     if (mounted) {
@@ -921,7 +920,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
         setState(() {
           _actualites.remove(actualite);
         });
-        // UI Design: Suppression silencieuse sans SnackBar
+
       }
     }
   }
@@ -930,7 +929,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
     return '${date.day}/${date.month}/${date.year}';
   }
 
-  // UI Design: Méthodes utilitaires pour les événements
+
   Color _obtenirCouleurStatut(String statut) {
     switch (statut) {
       case 'À venir':
@@ -966,7 +965,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
 
 
   Future<void> _modifierEvenement(Evenement evenement) async {
-    // UI Design: Dialogue de modification d'événement
+
     await _ouvrirDialogueModificationEvenement(evenement);
   }
 
@@ -1181,7 +1180,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
   }
 
   void _supprimerEvenement(Evenement evenement) async {
-    // UI Design: Supprimer l'événement du repository
+
     final succes = await _evenementsRepository.supprimerEvenement(evenement.id);
     
     if (mounted) {
@@ -1209,12 +1208,12 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
     }
   }
 
-  // UI Design: Dialogue pour l'ajout d'actualité par admin
+
   Widget _construireDialogueAjoutActualite() {
     final TextEditingController titreController = TextEditingController();
     final TextEditingController contenuController = TextEditingController();
     String? associationSelectionnee;
-    String prioriteSelectionnee = 'normale'; // UI Design: Priorité par défaut
+    String prioriteSelectionnee = 'normale';
     bool estEpinglee = false;
 
     return StatefulBuilder(
@@ -1245,7 +1244,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 value: prioriteSelectionnee,
-                isExpanded: true, // UI Design: Utiliser toute la largeur disponible
+                isExpanded: true,
                 decoration: const InputDecoration(
                   labelText: 'Niveau de priorité *',
                   border: OutlineInputBorder(),
@@ -1302,7 +1301,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 value: associationSelectionnee,
-                isExpanded: true, // UI Design: Utiliser toute la largeur disponible
+                isExpanded: true,
                 decoration: const InputDecoration(
                   labelText: 'Association (optionnel)',
                   border: OutlineInputBorder(),
@@ -1368,7 +1367,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
     );
   }
 
-  // UI Design: Dialogue pour l'ajout d'événement par admin
+
   Widget _construireDialogueAjoutEvenement() {
     final TextEditingController titreController = TextEditingController();
     final TextEditingController descriptionController = TextEditingController();
@@ -1492,7 +1491,7 @@ class _AdminGestionAssociationsEcranState extends State<AdminGestionAssociations
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 value: associationSelectionnee,
-                isExpanded: true, // UI Design: Utiliser toute la largeur disponible
+                isExpanded: true,
                 decoration: const InputDecoration(
                   labelText: 'Association (optionnel)',
                   border: OutlineInputBorder(),

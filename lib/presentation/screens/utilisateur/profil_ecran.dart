@@ -24,7 +24,7 @@ import '../associations/details_association_ecran.dart';
 import 'connexion_ecran.dart';
 
 
-// UI Design: Page profil utilisateur avec informations personnelles et statistiques - OPTIMISÉ avec widgets réutilisables
+
 class ProfilEcran extends StatefulWidget {
   const ProfilEcran({super.key});
 
@@ -79,7 +79,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
     setState(() => _chargementEnCours = false);
   }
 
-  // UI Design: Charger les vraies statistiques de l'utilisateur
+  
   Future<void> _chargerStatistiques() async {
     if (_utilisateurActuel == null) return;
     
@@ -98,7 +98,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
     }
   }
 
-  // UI Design: Charger les vraies associations de l'utilisateur
+  
   Future<void> _chargerMesAssociations() async {
     if (_utilisateurActuel == null) return;
     
@@ -135,9 +135,9 @@ class _ProfilEcranState extends State<ProfilEcran> {
     }
   }
 
-  // UI Design: Méthode retirée - utilisation directe de _mesLivres dans l'interface
+  
 
-  // UI Design: Charger les vraies réservations de salles de l'utilisateur
+  
   Future<void> _chargerMesReservations() async {
     if (_utilisateurActuel == null) return;
     
@@ -158,18 +158,18 @@ class _ProfilEcranState extends State<ProfilEcran> {
 
   @override
   Widget build(BuildContext context) {
-    // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
+    
     final mediaQuery = MediaQuery.of(context);
     final screenHeight = mediaQuery.size.height;
     final screenWidth = mediaQuery.size.width;
     final padding = mediaQuery.padding;
     final viewInsets = mediaQuery.viewInsets;
     
-    // UI Design: Affichage d'un indicateur de chargement si les données ne sont pas encore disponibles
+    
     if (_chargementEnCours || _utilisateurActuel == null) {
       return const Scaffold(
         backgroundColor: CouleursApp.fond,
-        resizeToAvoidBottomInset: true, // UI Design: Éviter les débordements avec le clavier
+        resizeToAvoidBottomInset: true, 
         body: SafeArea(
           child: Center(child: CircularProgressIndicator()),
         ),
@@ -178,14 +178,14 @@ class _ProfilEcranState extends State<ProfilEcran> {
 
     return Scaffold(
       backgroundColor: CouleursApp.fond,
-      resizeToAvoidBottomInset: true, // UI Design: Éviter les débordements avec le clavier
+      resizeToAvoidBottomInset: true, 
       appBar: WidgetBarreAppPersonnalisee(
-        titre: '${_utilisateurActuel!.prenom} ${_utilisateurActuel!.nom}', // UI Design: Nom dynamique
-        sousTitre: '${_utilisateurActuel!.codeEtudiant}\n${_utilisateurActuel!.programme}', // UI Design: Informations dynamiques
+        titre: '${_utilisateurActuel!.prenom} ${_utilisateurActuel!.nom}', 
+        sousTitre: '${_utilisateurActuel!.codeEtudiant}\n${_utilisateurActuel!.programme}', 
         hauteurBarre: 140,
         afficherProfil: false,
         afficherBoutonRetour: true,
-        utilisateurConnecte: _utilisateurActuel, // UI Design: Passer l'utilisateur connecté pour les initiales
+        utilisateurConnecte: _utilisateurActuel, 
         widgetFin: Container(
           width: 74,
           height: 74,
@@ -213,7 +213,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
           ),
           child: Center(
             child: Text(
-              _authentificationService.obtenirInitiales(), // UI Design: Initiales dynamiques
+              _authentificationService.obtenirInitiales(), 
               style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -226,19 +226,19 @@ class _ProfilEcranState extends State<ProfilEcran> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.only(
-            bottom: padding.bottom + viewInsets.bottom + 16, // UI Design: Padding adaptatif pour éviter les débordements
+            bottom: padding.bottom + viewInsets.bottom + 16, 
             left: 16,
             right: 16,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
+              SizedBox(height: screenHeight * 0.02), 
               
               // Section statistiques dynamiques - UI Design: Basées sur l'utilisateur connecté
               Container(
-                margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.02), // UI Design: Marges adaptatives
-                padding: EdgeInsets.all(screenWidth * 0.04), // UI Design: Padding adaptatif
+                margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.02), 
+                padding: EdgeInsets.all(screenWidth * 0.04), 
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
@@ -267,23 +267,23 @@ class _ProfilEcranState extends State<ProfilEcran> {
                   ],
                 ),
               ),
-              SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
+              SizedBox(height: screenHeight * 0.03), 
               
               // Section mes livres - VERSION OPTIMISÉE
               _construireSectionLivres(context),
-              SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
+              SizedBox(height: screenHeight * 0.03), 
               
               // Section mes réservations - MISE À JOUR
               _construireSectionReservations(context),
-              SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
+              SizedBox(height: screenHeight * 0.03), 
               
               // Section mes associations - VERSION OPTIMISÉE
               _construireSectionAssociations(context),
-              SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
+              SizedBox(height: screenHeight * 0.03), 
               
               // Section actions - BOUTONS PRINCIPAUX
               _construireSectionActions(context),
-              SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
+              SizedBox(height: screenHeight * 0.02), 
             ],
           ),
         ),
@@ -295,7 +295,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
     );
   }
 
-  // UI Design: Formatter la date pour l'affichage
+  
   String _formaterDate(DateTime date) {
     final maintenant = DateTime.now();
     final difference = date.difference(maintenant).inDays;
@@ -307,7 +307,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
     return '${date.day}/${date.month}';
   }
 
-  // UI Design: Obtenir le nom de la salle à partir de son ID
+  
   String _obtenirNomSalle(String salleId) {
     final nomsDesalles = {
       'salle_001': 'Salle A-101',
@@ -321,7 +321,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
     return nomsDesalles[salleId] ?? 'Salle inconnue';
   }
 
-  // UI Design: Obtenir la couleur du statut de réservation
+  
   Color _obtenirCouleurStatutReservation(String statut) {
     switch (statut) {
       case 'Confirmée':
@@ -337,7 +337,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
     }
   }
 
-  // UI Design: Formatter l'heure pour l'affichage
+  
   String _formaterHeure(DateTime dateTime) {
     return '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
   }
@@ -379,7 +379,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
             onPressed: () async {
               Navigator.pop(context);
               
-              // UI Design: Utiliser le service d'authentification pour se déconnecter
+              
               await _authentificationService.deconnecter();
               
               // Retour à l'écran de connexion
@@ -407,9 +407,9 @@ class _ProfilEcranState extends State<ProfilEcran> {
 
 
 
-  // UI Design: Helper pour créer une statistique
+  
   Widget _construireStatistique(String valeur, String label, IconData icone, Color couleur) {
-    return Flexible( // UI Design: Widget flexible pour éviter les débordements
+    return Flexible( 
       child: Column(
         children: [
           Container(
@@ -428,7 +428,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
                       fontWeight: FontWeight.bold,
               color: couleur,
             ),
-            overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+            overflow: TextOverflow.ellipsis, 
             maxLines: 1,
           ),
             Text(
@@ -438,7 +438,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
               color: CouleursApp.texteFonce.withValues(alpha: 0.7),
             ),
             textAlign: TextAlign.center,
-            overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+            overflow: TextOverflow.ellipsis, 
             maxLines: 2,
           ),
         ],
@@ -446,14 +446,14 @@ class _ProfilEcranState extends State<ProfilEcran> {
     );
   }
 
-  // UI Design: Section mes livres - FONCTIONNELLE
+  
   Widget _construireSectionLivres(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.02), // UI Design: Marges adaptatives
-      padding: EdgeInsets.all(screenWidth * 0.04), // UI Design: Padding adaptatif
+      margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.02), 
+      padding: EdgeInsets.all(screenWidth * 0.04), 
       decoration: BoxDecoration(
         color: CouleursApp.blanc,
         borderRadius: BorderRadius.circular(16),
@@ -472,11 +472,11 @@ class _ProfilEcranState extends State<ProfilEcran> {
             children: [
               const Icon(Icons.menu_book, color: CouleursApp.principal, size: 24),
               const SizedBox(width: 12),
-              Expanded( // UI Design: Widget flexible pour éviter les débordements
+              Expanded( 
                 child: Text(
                   'Mes Livres', 
                   style: StylesTexteApp.titre.copyWith(fontSize: 18),
-                  overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                  overflow: TextOverflow.ellipsis, 
                   maxLines: 1,
                 ),
               ),
@@ -494,7 +494,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
           ),
           const SizedBox(height: 20),
           
-          // UI Design: Sous-section livres en vente intégrée
+          
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -509,7 +509,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
                   children: [
                     Icon(Icons.menu_book, color: CouleursApp.principal, size: 20),
                     SizedBox(width: 8),
-                    Expanded( // UI Design: Widget flexible pour éviter les débordements
+                    Expanded( 
                       child: Text(
                         'Mes Livres Récents',
                         style: TextStyle(
@@ -517,7 +517,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
                           fontWeight: FontWeight.w600,
                           color: CouleursApp.principal,
                         ),
-                        overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                        overflow: TextOverflow.ellipsis, 
                         maxLines: 1,
                       ),
                     ),
@@ -586,21 +586,21 @@ class _ProfilEcranState extends State<ProfilEcran> {
     );
   }
 
-  // UI Design: Helper pour info livre
+  
   Widget _construireInfoLivre(String nombre, String type, Color couleur) {
-    return Flexible( // UI Design: Widget flexible pour éviter les débordements
+    return Flexible( 
       child: Column(
         children: [
           Text(
             nombre,
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: couleur),
-            overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+            overflow: TextOverflow.ellipsis, 
             maxLines: 1,
           ),
           Text(
             type,
             style: TextStyle(fontSize: 12, color: CouleursApp.texteFonce.withValues(alpha: 0.6)),
-            overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+            overflow: TextOverflow.ellipsis, 
             maxLines: 1,
             textAlign: TextAlign.center,
           ),
@@ -609,7 +609,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
     );
   }
 
-  // UI Design: Section mes réservations - MISE À JOUR
+  
   Widget _construireSectionReservations(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
@@ -627,8 +627,8 @@ class _ProfilEcranState extends State<ProfilEcran> {
         : <ReservationSalle>[];
     
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.02), // UI Design: Marges adaptatives
-      padding: EdgeInsets.all(screenWidth * 0.04), // UI Design: Padding adaptatif
+      margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.02), 
+      padding: EdgeInsets.all(screenWidth * 0.04), 
       decoration: BoxDecoration(
         color: CouleursApp.blanc,
         borderRadius: BorderRadius.circular(16),
@@ -647,11 +647,11 @@ class _ProfilEcranState extends State<ProfilEcran> {
             children: [
               const Icon(Icons.event_seat, color: CouleursApp.accent, size: 24),
               const SizedBox(width: 12),
-              Expanded( // UI Design: Widget flexible pour éviter les débordements
+              Expanded( 
                 child: Text(
                   'Mes Réservations', 
                   style: StylesTexteApp.titre.copyWith(fontSize: 18),
-                  overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                  overflow: TextOverflow.ellipsis, 
                   maxLines: 1,
                 ),
               ),
@@ -727,7 +727,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
     );
   }
 
-  // UI Design: Helper moderne pour une réservation
+  
   Widget _construireReservationModerne(ReservationSalle reservation) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
@@ -819,7 +819,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
     );
   }
 
-  // UI Design: Helper pour obtenir le libellé du statut
+  
   String _obtenirLibelleStatut(String statut) {
     switch (statut) {
       case 'en_attente':
@@ -835,7 +835,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
     }
   }
 
-  // UI Design: Helper pour un livre en vente
+  
   Widget _construireLivreEnVente(String titre, String prix, String statut) {
     return Row(
       children: [
@@ -848,13 +848,13 @@ class _ProfilEcranState extends State<ProfilEcran> {
               Text(
                 titre,
                 style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: CouleursApp.texteFonce),
-                overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                overflow: TextOverflow.ellipsis, 
                 maxLines: 1,
               ),
               Text(
                 prix,
                 style: const TextStyle(fontSize: 12, color: CouleursApp.accent, fontWeight: FontWeight.w600),
-                overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                overflow: TextOverflow.ellipsis, 
                 maxLines: 1,
               ),
             ],
@@ -879,7 +879,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
                      Colors.grey,
               fontWeight: FontWeight.w600,
             ),
-            overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+            overflow: TextOverflow.ellipsis, 
             maxLines: 1,
           ),
         ),
@@ -961,21 +961,21 @@ class _ProfilEcranState extends State<ProfilEcran> {
 
   Future<void> _sauvegarderNouveauPrix(Livre livre, double nouveauPrix) async {
     try {
-      // UI Design: Mettre à jour le prix du livre dans le repository
+      
       final livreModifie = livre.copyWith(prix: nouveauPrix);
 
       await _livresRepository.modifierLivre(livreModifie);
       
-      // UI Design: Mettre à jour la liste locale et les statistiques
+      
       final index = _mesLivres.indexWhere((l) => l.id == livre.id);
       if (index != -1) {
         _mesLivres[index] = livreModifie;
       }
       
-      // UI Design: Recharger les données pour s'assurer de la cohérence
+      
       await _rechargerDonnees();
       
-      // UI Design: Afficher un message de succès
+      
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Prix de "${livre.titre}" mis à jour avec succès !'),
@@ -983,7 +983,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
         ),
       );
     } catch (e) {
-      // UI Design: Afficher un message d'erreur
+      
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Erreur lors de la mise à jour: $e'),
@@ -995,21 +995,21 @@ class _ProfilEcranState extends State<ProfilEcran> {
 
   Future<void> _retirerDeLaVente(Livre livre) async {
     try {
-      // UI Design: Marquer le livre comme non disponible
+      
       final livreModifie = livre.copyWith(estDisponible: false);
 
       await _livresRepository.modifierLivre(livreModifie);
       
-      // UI Design: Mettre à jour la liste locale et les statistiques
+      
       final index = _mesLivres.indexWhere((l) => l.id == livre.id);
       if (index != -1) {
         _mesLivres[index] = livreModifie;
       }
       
-      // UI Design: Recharger les données pour s'assurer de la cohérence
+      
       await _rechargerDonnees();
       
-      // UI Design: Afficher un message de succès
+      
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('"${livre.titre}" retiré de la vente avec succès !'),
@@ -1017,7 +1017,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
         ),
       );
     } catch (e) {
-      // UI Design: Afficher un message d'erreur
+      
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Erreur lors du retrait: $e'),
@@ -1027,7 +1027,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
     }
   }
 
-  // UI Design: Méthode pour recharger les données après modification
+  
   Future<void> _rechargerDonnees() async {
     try {
       await Future.wait([
@@ -1040,14 +1040,14 @@ class _ProfilEcranState extends State<ProfilEcran> {
     }
   }
 
-  // UI Design: Section mes associations - FONCTIONNELLE
+  
   Widget _construireSectionAssociations(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.02), // UI Design: Marges adaptatives
-      padding: EdgeInsets.all(screenWidth * 0.04), // UI Design: Padding adaptatif
+      margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.02), 
+      padding: EdgeInsets.all(screenWidth * 0.04), 
       decoration: BoxDecoration(
         color: CouleursApp.blanc,
         borderRadius: BorderRadius.circular(16),
@@ -1066,11 +1066,11 @@ class _ProfilEcranState extends State<ProfilEcran> {
             children: [
               const Icon(Icons.groups, color: CouleursApp.principal, size: 24),
               const SizedBox(width: 12),
-              Expanded( // UI Design: Widget flexible pour éviter les débordements
+              Expanded( 
                 child: Text(
                   'Mes Associations', 
                   style: StylesTexteApp.titre.copyWith(fontSize: 18),
-                  overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                  overflow: TextOverflow.ellipsis, 
                   maxLines: 1,
                 ),
               ),
@@ -1137,7 +1137,7 @@ class _ProfilEcranState extends State<ProfilEcran> {
     );
   }
 
-  // UI Design: Helper pour association
+  
   Widget _construireAssociation(String nom, String statut, IconData icone, Color couleur) {
     return Row(
       children: [
@@ -1150,13 +1150,13 @@ class _ProfilEcranState extends State<ProfilEcran> {
               Text(
                 nom,
                 style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: CouleursApp.texteFonce),
-                overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                overflow: TextOverflow.ellipsis, 
                 maxLines: 1,
               ),
               Text(
                 statut,
                 style: TextStyle(fontSize: 12, color: CouleursApp.texteFonce.withValues(alpha: 0.6)),
-                overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                overflow: TextOverflow.ellipsis, 
                 maxLines: 1,
               ),
             ],
@@ -1166,20 +1166,20 @@ class _ProfilEcranState extends State<ProfilEcran> {
     );
   }
 
-  // UI Design: Calculer la durée d'inscription dynamiquement
+  
   String _calculerDureeInscription() {
     if (_utilisateurActuel == null) return '0';
     final difference = DateTime.now().difference(_utilisateurActuel!.dateInscription);
     return (difference.inDays / 30).round().toString();
   }
 
-  // UI Design: Section actions - BOUTONS PRINCIPAUX
+  
   Widget _construireSectionActions(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02), // UI Design: Marges adaptatives
+      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02), 
       child: Column(
         children: [
           SizedBox(

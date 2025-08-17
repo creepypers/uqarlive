@@ -1,4 +1,4 @@
-// UI Design: Écran de gestion des comptes utilisateurs avec design moderne et épuré
+
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/di/service_locator.dart';
@@ -99,7 +99,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
 
   @override
   Widget build(BuildContext context) {
-    // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
+    
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     
@@ -149,7 +149,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
     );
   }
 
-  // UI Design: Section des statistiques avec design moderne
+  
   Widget _construireStatistiquesModernes() {
     if (_statistiques == null) return const SizedBox.shrink();
     
@@ -256,7 +256,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
     );
   }
 
-  // UI Design: Carte statistique moderne
+  
   Widget _construireCarteStatistique(String titre, String valeur, IconData icone, Color couleur) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
@@ -302,7 +302,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
     );
   }
 
-  // UI Design: Barre de recherche moderne
+  
   Widget _construireBarreRechercheModerne() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
@@ -398,7 +398,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
     );
   }
 
-  // UI Design: Onglets modernes
+  
   Widget _construireOngletsModernes() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
@@ -454,7 +454,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
     );
   }
 
-  // UI Design: Liste des utilisateurs avec design moderne
+  
   Widget _construireListeUtilisateurs(String typeFiltre) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
@@ -487,7 +487,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
     );
   }
 
-  // UI Design: Carte utilisateur moderne et épurée
+  
   Widget _construireCarteUtilisateurModerne(Utilisateur utilisateur) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
@@ -624,7 +624,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
                     ],
                   ),
                 ),
-                // UI Design: Appui long pour les actions (invisible)
+                
                 const SizedBox.shrink(),
               ],
             ),
@@ -636,7 +636,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
 
 
 
-  // UI Design: Badge de statut moderne
+  
   Widget _construireBadgeStatutModerne(Utilisateur utilisateur) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
@@ -668,7 +668,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
     );
   }
 
-  // UI Design: Message vide moderne
+  
   Widget _construireMessageVideModerne() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
@@ -739,7 +739,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
     );
   }
 
-  // UI Design: Méthodes utilitaires
+  
   Color _obtenirCouleurTypeUtilisateur(TypeUtilisateur type) {
     switch (type) {
       case TypeUtilisateur.administrateur: return CouleursApp.accent;
@@ -754,14 +754,14 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
     }
   }
 
-  // UI Design: Méthodes d'interaction
+  
   void _afficherDetailsUtilisateur(Utilisateur utilisateur) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => ModifierProfilEcran(
           utilisateur: utilisateur, 
-          modeAdmin: true, // UI Design: Mode admin permet de modifier le code permanent
+          modeAdmin: true, 
         ),
       ),
     ).then((resultat) {
@@ -1093,7 +1093,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
       context,
       MaterialPageRoute(
         builder: (context) => const ModifierProfilEcran(
-          modeAdmin: true, // UI Design: Mode admin pour créer un utilisateur complet
+          modeAdmin: true, 
         ),
       ),
     ).then((resultat) {

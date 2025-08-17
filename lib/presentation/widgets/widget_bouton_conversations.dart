@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
 import '../screens/messagerie/conversations_ecran.dart';
 
-// UI Design: Widget réutilisable pour le bouton de conversations
+
 class WidgetBoutonConversations extends StatelessWidget {
   final VoidCallback? onPressed;
   final bool isExtended;
@@ -12,7 +12,7 @@ class WidgetBoutonConversations extends StatelessWidget {
   const WidgetBoutonConversations({
     super.key,
     this.onPressed,
-    this.isExtended = false, // UI Design: Par défaut, mode compact sans texte
+    this.isExtended = false, 
     this.elevation = 6,
     this.margin,
   });
@@ -35,7 +35,7 @@ class WidgetBoutonConversations extends StatelessWidget {
     }
   
 
-  // UI Design: Navigation vers l'écran de conversations
+  
   void _ouvrirConversations(BuildContext context) {
     Navigator.push(
       context,

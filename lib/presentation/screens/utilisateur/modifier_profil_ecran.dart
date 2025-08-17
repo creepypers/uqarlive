@@ -8,10 +8,10 @@ import '../../../presentation/widgets/widget_barre_app_personnalisee.dart';
 import '../../../presentation/services/navigation_service.dart';
 
 
-// UI Design: Page de modification du profil utilisateur avec formulaires complets
+
 class ModifierProfilEcran extends StatefulWidget {
   final Utilisateur? utilisateur;
-  final bool modeAdmin; // UI Design: Mode admin permet de modifier le code permanent
+  final bool modeAdmin; 
   
   const ModifierProfilEcran({super.key, this.utilisateur, this.modeAdmin = false});
 
@@ -65,7 +65,7 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
   }
 
   void _chargerDonneesProfil() {
-    // UI Design: Charger les données selon le mode (création ou modification)
+    
     if (widget.utilisateur != null) {
       // Mode modification : charger les données de l'utilisateur sélectionné
       final user = widget.utilisateur!;
@@ -76,7 +76,7 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
       _codePermanentController.text = user.codeEtudiant;
       _programmeController.text = user.programme;
       _typeUtilisateurSelectionne = user.typeUtilisateur;
-      // UI Design: Les privilèges sont déterminés automatiquement par le type
+      
     } else {
       // Mode création : champs vides pour nouvel utilisateur
       _nomController.clear();
@@ -88,13 +88,13 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
       _motDePasseController.clear();
       _confirmerMotDePasseController.clear();
       _typeUtilisateurSelectionne = TypeUtilisateur.etudiant;
-      // UI Design: Pas de privilèges spécifiques pour les nouveaux utilisateurs
+      
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
+    
     final mediaQuery = MediaQuery.of(context);
     final screenHeight = mediaQuery.size.height;
     final screenWidth = mediaQuery.size.width;
@@ -103,23 +103,23 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
     
     return Scaffold(
       backgroundColor: CouleursApp.fond,
-      resizeToAvoidBottomInset: true, // UI Design: Éviter les débordements avec le clavier
+      resizeToAvoidBottomInset: true, 
       appBar: WidgetBarreAppPersonnalisee(
         titre: widget.utilisateur != null ? 'Modifier le profil' : 'Créer un utilisateur',
         sousTitre: widget.utilisateur != null ? 'Mise à jour des informations' : 'Création d\'un nouvel utilisateur',
         afficherProfil: false,
         widgetFin: IconButton(
-          icon: Icon(Icons.arrow_back, color: CouleursApp.blanc, size: screenWidth * 0.06), // UI Design: Taille adaptative
+          icon: Icon(Icons.arrow_back, color: CouleursApp.blanc, size: screenWidth * 0.06), 
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.only(
-            bottom: viewInsets.bottom + padding.bottom + screenHeight * 0.025, // UI Design: Padding adaptatif pour éviter les débordements
+            bottom: viewInsets.bottom + padding.bottom + screenHeight * 0.025, 
           ),
           child: Padding(
-            padding: EdgeInsets.all(screenWidth * 0.04), // UI Design: Padding adaptatif
+            padding: EdgeInsets.all(screenWidth * 0.04), 
             child: Form(
               key: _formKey,
               child: Column(
@@ -127,28 +127,28 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
                 children: [
                   // Section informations personnelles
                   _construireSectionInfosPersonnelles(),
-                  SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
+                  SizedBox(height: screenHeight * 0.03), 
                   
                   // Section informations académiques
                   _construireSectionInfosAcademiques(),
-                  SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
+                  SizedBox(height: screenHeight * 0.03), 
                   
                   // Section sécurité (mot de passe) - seulement en mode création ou admin
                   if (widget.utilisateur == null || widget.modeAdmin) ...[
                     _construireSectionSecurite(),
-                    SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
+                    SizedBox(height: screenHeight * 0.03), 
                   ],
                   
                   // Section administration - seulement en mode admin
                   if (widget.modeAdmin) ...[
                     _construireSectionAdministration(),
-                    SizedBox(height: screenHeight * 0.04), // UI Design: Espacement adaptatif
+                    SizedBox(height: screenHeight * 0.04), 
                   ] else
                     SizedBox(height: screenHeight * 0.01),
                   
                   // Boutons d'action
                   _construireBoutonsAction(),
-                  SizedBox(height: screenHeight * 0.025), // UI Design: Espacement adaptatif
+                  SizedBox(height: screenHeight * 0.025), 
                 ],
               ),
             ),
@@ -162,14 +162,14 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
     );
   }
 
-  // UI Design: Section informations personnelles
+  
   Widget _construireSectionInfosPersonnelles() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
     
     return Container(
-      padding: EdgeInsets.all(screenWidth * 0.05), // UI Design: Padding adaptatif
+      padding: EdgeInsets.all(screenWidth * 0.05), 
       decoration: BoxDecoration(
         color: CouleursApp.blanc,
         borderRadius: BorderRadius.circular(16),
@@ -189,20 +189,20 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
               Icon(
                 Icons.person_outline,
                 color: CouleursApp.principal,
-                size: screenWidth * 0.06, // UI Design: Taille adaptative
+                size: screenWidth * 0.06, 
               ),
-              SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
+              SizedBox(width: screenWidth * 0.02), 
               Text(
                 'Informations personnelles',
                 style: StylesTexteApp.titre.copyWith(
-                  fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
+                  fontSize: screenWidth * 0.045, 
                 ),
-                overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                overflow: TextOverflow.ellipsis, 
                 maxLines: 1,
               ),
             ],
           ),
-          SizedBox(height: screenHeight * 0.025), // UI Design: Espacement adaptatif
+          SizedBox(height: screenHeight * 0.025), 
           
           // Nom et Prénom
           Row(
@@ -220,7 +220,7 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
                   },
                 ),
               ),
-              SizedBox(width: screenWidth * 0.04), // UI Design: Espacement adaptatif
+              SizedBox(width: screenWidth * 0.04), 
               Expanded(
                 child: _construireChampTexte(
                   controller: _prenomController,
@@ -236,7 +236,7 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
               ),
             ],
           ),
-          SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
+          SizedBox(height: screenHeight * 0.02), 
           
           // Email
           _construireChampTexte(
@@ -254,7 +254,7 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
               return null;
             },
           ),
-          SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
+          SizedBox(height: screenHeight * 0.02), 
           
           // Téléphone
           _construireChampTexte(
@@ -276,14 +276,14 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
     );
   }
 
-  // UI Design: Section informations académiques
+  
   Widget _construireSectionInfosAcademiques() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
     
     return Container(
-      padding: EdgeInsets.all(screenWidth * 0.05), // UI Design: Padding adaptatif
+      padding: EdgeInsets.all(screenWidth * 0.05), 
       decoration: BoxDecoration(
         color: CouleursApp.blanc,
         borderRadius: BorderRadius.circular(16),
@@ -303,27 +303,27 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
               Icon(
                 Icons.school,
                 color: CouleursApp.accent,
-                size: screenWidth * 0.06, // UI Design: Taille adaptative
+                size: screenWidth * 0.06, 
               ),
-              SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
+              SizedBox(width: screenWidth * 0.02), 
               Text(
                 'Informations académiques',
                 style: StylesTexteApp.titre.copyWith(
-                  fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
+                  fontSize: screenWidth * 0.045, 
                 ),
-                overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                overflow: TextOverflow.ellipsis, 
                 maxLines: 1,
               ),
             ],
           ),
-          SizedBox(height: screenHeight * 0.025), // UI Design: Espacement adaptatif
+          SizedBox(height: screenHeight * 0.025), 
           
           // Code permanent - modifiable par les admins
           _construireChampTexte(
             controller: _codePermanentController,
             label: 'Code permanent',
             icone: Icons.badge,
-            enabled: widget.modeAdmin || widget.utilisateur == null, // UI Design: Modifiable par les admins
+            enabled: widget.modeAdmin || widget.utilisateur == null, 
             helperText: widget.modeAdmin ? 'Modifiable par les administrateurs' : null,
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -335,7 +335,7 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
               return null;
             },
           ),
-          SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
+          SizedBox(height: screenHeight * 0.02), 
           
           // Programme d'études
           _construireChampTexte(
@@ -354,7 +354,7 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
     );
   }
 
-  // UI Design: Boutons d'action
+  
   Widget _construireBoutonsAction() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
@@ -370,7 +370,7 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
             style: ElevatedButton.styleFrom(
               backgroundColor: CouleursApp.principal,
               foregroundColor: CouleursApp.blanc,
-              padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02), // UI Design: Padding adaptatif
+              padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02), 
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
@@ -378,8 +378,8 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
             ),
             child: _isLoading
                 ? SizedBox(
-                    height: screenWidth * 0.05, // UI Design: Taille adaptative
-                    width: screenWidth * 0.05, // UI Design: Taille adaptative
+                    height: screenWidth * 0.05, 
+                    width: screenWidth * 0.05, 
                     child: const CircularProgressIndicator(
                       color: CouleursApp.blanc,
                       strokeWidth: 2,
@@ -388,22 +388,22 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
                 : Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.save, size: screenWidth * 0.05), // UI Design: Taille adaptative
-                      SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
+                      Icon(Icons.save, size: screenWidth * 0.05), 
+                      SizedBox(width: screenWidth * 0.02), 
                       Text(
                         'Sauvegarder les modifications',
                         style: TextStyle(
-                          fontSize: screenWidth * 0.04, // UI Design: Taille adaptative
+                          fontSize: screenWidth * 0.04, 
                           fontWeight: FontWeight.bold,
                         ),
-                        overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                        overflow: TextOverflow.ellipsis, 
                         maxLines: 1,
                       ),
                     ],
                   ),
           ),
         ),
-        SizedBox(height: screenHeight * 0.015), // UI Design: Espacement adaptatif
+        SizedBox(height: screenHeight * 0.015), 
         
         // Bouton annuler
         SizedBox(
@@ -413,7 +413,7 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
             style: OutlinedButton.styleFrom(
               foregroundColor: CouleursApp.principal,
               side: const BorderSide(color: CouleursApp.principal),
-              padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02), // UI Design: Padding adaptatif
+              padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02), 
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
@@ -421,15 +421,15 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.cancel, size: screenWidth * 0.05), // UI Design: Taille adaptative
-                SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
+                Icon(Icons.cancel, size: screenWidth * 0.05), 
+                SizedBox(width: screenWidth * 0.02), 
                 Text(
                   'Annuler',
                   style: TextStyle(
-                    fontSize: screenWidth * 0.04, // UI Design: Taille adaptative
+                    fontSize: screenWidth * 0.04, 
                     fontWeight: FontWeight.bold,
                   ),
-                  overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                  overflow: TextOverflow.ellipsis, 
                   maxLines: 1,
                 ),
               ],
@@ -440,14 +440,14 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
     );
   }
 
-  // UI Design: Section sécurité (mot de passe)
+  
   Widget _construireSectionSecurite() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
     
     return Container(
-      padding: EdgeInsets.all(screenWidth * 0.05), // UI Design: Padding adaptatif
+      padding: EdgeInsets.all(screenWidth * 0.05), 
       decoration: BoxDecoration(
         color: CouleursApp.blanc,
         borderRadius: BorderRadius.circular(16),
@@ -467,20 +467,20 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
               Icon(
                 Icons.security,
                 color: Colors.orange,
-                size: screenWidth * 0.06, // UI Design: Taille adaptative
+                size: screenWidth * 0.06, 
               ),
-              SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
+              SizedBox(width: screenWidth * 0.02), 
               Text(
                 'Sécurité',
                 style: StylesTexteApp.titre.copyWith(
-                  fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
+                  fontSize: screenWidth * 0.045, 
                 ),
-                overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                overflow: TextOverflow.ellipsis, 
                 maxLines: 1,
               ),
             ],
           ),
-          SizedBox(height: screenHeight * 0.025), // UI Design: Espacement adaptatif
+          SizedBox(height: screenHeight * 0.025), 
           
           // Mot de passe
           _construireChampTexte(
@@ -505,7 +505,7 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
               return null;
             },
           ),
-          SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
+          SizedBox(height: screenHeight * 0.02), 
           
           // Confirmation mot de passe
           _construireChampTexte(
@@ -537,14 +537,14 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
     );
   }
 
-  // UI Design: Section administration (privilèges et type)
+  
   Widget _construireSectionAdministration() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
     
     return Container(
-      padding: EdgeInsets.all(screenWidth * 0.05), // UI Design: Padding adaptatif
+      padding: EdgeInsets.all(screenWidth * 0.05), 
       decoration: BoxDecoration(
         color: CouleursApp.blanc,
         borderRadius: BorderRadius.circular(16),
@@ -564,20 +564,20 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
               Icon(
                 Icons.admin_panel_settings,
                 color: Colors.red,
-                size: screenWidth * 0.06, // UI Design: Taille adaptative
+                size: screenWidth * 0.06, 
               ),
-              SizedBox(width: screenWidth * 0.02), // UI Design: Espacement adaptatif
+              SizedBox(width: screenWidth * 0.02), 
               Text(
                 'Administration',
                 style: StylesTexteApp.titre.copyWith(
-                  fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
+                  fontSize: screenWidth * 0.045, 
                 ),
-                overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                overflow: TextOverflow.ellipsis, 
                 maxLines: 1,
               ),
             ],
           ),
-          SizedBox(height: screenHeight * 0.025), // UI Design: Espacement adaptatif
+          SizedBox(height: screenHeight * 0.025), 
           
           // Type d'utilisateur
           Text(
@@ -621,7 +621,7 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
                   if (newValue != null) {
                     setState(() {
                       _typeUtilisateurSelectionne = newValue;
-                      // UI Design: Promotion simple admin/étudiant
+                      
                     });
                   }
                 },
@@ -657,13 +657,13 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
       enabled: enabled,
       validator: validator,
       obscureText: obscureText,
-      style: TextStyle(fontSize: screenWidth * 0.04), // UI Design: Taille adaptative
+      style: TextStyle(fontSize: screenWidth * 0.04), 
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: TextStyle(fontSize: screenWidth * 0.04), // UI Design: Taille adaptative
+        labelStyle: TextStyle(fontSize: screenWidth * 0.04), 
         helperText: helperText,
         helperStyle: TextStyle(fontSize: screenWidth * 0.032, color: CouleursApp.accent),
-        prefixIcon: Icon(icone, color: enabled ? CouleursApp.principal : Colors.grey, size: screenWidth * 0.05), // UI Design: Taille adaptative
+        prefixIcon: Icon(icone, color: enabled ? CouleursApp.principal : Colors.grey, size: screenWidth * 0.05), 
         suffixIcon: suffixIcon,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -688,8 +688,8 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
         filled: true,
         fillColor: enabled ? CouleursApp.blanc : Colors.grey.withValues(alpha: 0.1),
         contentPadding: EdgeInsets.symmetric(
-          horizontal: screenWidth * 0.04, // UI Design: Padding adaptatif
-          vertical: screenWidth * 0.03, // UI Design: Padding adaptatif
+          horizontal: screenWidth * 0.04, 
+          vertical: screenWidth * 0.03, 
         ),
       ),
     );
@@ -705,10 +705,10 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
 
       try {
         if (widget.utilisateur == null) {
-          // UI Design: Création d'un nouvel utilisateur
+          
           await _creerNouvelUtilisateur();
         } else {
-          // UI Design: Modification d'un utilisateur existant
+          
           await _modifierUtilisateurExistant();
         }
 
@@ -771,7 +771,7 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
   }
 
   Future<void> _creerNouvelUtilisateur() async {
-    // UI Design: Créer un nouvel utilisateur avec toutes les informations
+    
     final nouvelUtilisateur = Utilisateur(
       id: 'user_${DateTime.now().millisecondsSinceEpoch}',
       nom: _nomController.text.trim(),
@@ -780,7 +780,7 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
       telephone: _telephoneController.text.trim(),
       codeEtudiant: _codePermanentController.text.trim(),
       programme: _programmeController.text.trim(),
-      niveauEtude: 'Baccalauréat', // UI Design: Valeur par défaut pour nouveau utilisateur
+      niveauEtude: 'Baccalauréat', 
       typeUtilisateur: _typeUtilisateurSelectionne,
       privileges: _typeUtilisateurSelectionne == TypeUtilisateur.administrateur ? ['admin'] : [],
       estActif: true,
@@ -792,11 +792,11 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
       throw Exception('Impossible de créer l\'utilisateur');
     }
 
-    // UI Design: Le compte d'authentification sera créé automatiquement par le système
+    
   }
 
   Future<void> _modifierUtilisateurExistant() async {
-    // UI Design: Modifier l'utilisateur existant
+    
     final utilisateurModifie = widget.utilisateur!.copyWith(
       nom: _nomController.text.trim(),
       prenom: _prenomController.text.trim(),
@@ -813,6 +813,6 @@ class _ModifierProfilEcranState extends State<ModifierProfilEcran> {
       throw Exception('Impossible de modifier l\'utilisateur');
     }
 
-    // UI Design: La modification du mot de passe sera gérée par le système d'authentification
+    
   }
 } 

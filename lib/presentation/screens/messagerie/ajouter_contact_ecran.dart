@@ -1,4 +1,4 @@
-// UI Design: Écran pour ajouter des contacts dans la messagerie UqarLife
+
 // ignore_for_file: unnecessary_string_escapes, prefer_const_constructors
 
 import 'package:flutter/material.dart';
@@ -40,14 +40,14 @@ class _AjouterContactEcranState extends State<AjouterContactEcran> {
     super.dispose();
   }
 
-  // UI Design: Initialiser les services
+  
   Future<void> _initialiserServices() async {
     try {
       _authentificationService = AuthentificationService.instance;
       _utilisateursRepository = ServiceLocator.obtenirService<UtilisateursRepository>();
       _utilisateurActuelId = _authentificationService.utilisateurActuel?.id;
       
-      // UI Design: Charger tous les utilisateurs au démarrage
+      
       await _chargerTousUtilisateurs();
       
       setState(() {});
@@ -56,20 +56,20 @@ class _AjouterContactEcranState extends State<AjouterContactEcran> {
     }
   }
 
-  // UI Design: Charger tous les utilisateurs
+  
   Future<void> _chargerTousUtilisateurs() async {
     try {
       setState(() => _isLoading = true);
       
-      // UI Design: Charger tous les utilisateurs depuis le repository
+      
       final utilisateurs = await _utilisateursRepository.obtenirTousLesUtilisateurs();
       
-      // UI Design: Exclure l'utilisateur actuel et filtrer les utilisateurs actifs
+      
       _tousUtilisateurs = utilisateurs
           .where((u) => u.id != _utilisateurActuelId && u.estActif)
           .toList();
       
-      // UI Design: Initialiser la liste filtrée avec tous les utilisateurs
+      
       _utilisateursFiltres = List.from(_tousUtilisateurs);
       
       setState(() => _isLoading = false);
@@ -79,7 +79,7 @@ class _AjouterContactEcranState extends State<AjouterContactEcran> {
     }
   }
 
-  // UI Design: Rechercher des utilisateurs
+  
   void _rechercherUtilisateurs(String query) {
     if (query.trim().isEmpty) {
       setState(() => _utilisateursFiltres = _tousUtilisateurs);
@@ -100,7 +100,7 @@ class _AjouterContactEcranState extends State<AjouterContactEcran> {
     setState(() => _utilisateursFiltres = utilisateursFiltres);
   }
 
-  // UI Design: Démarrer une conversation avec un utilisateur
+  
   void _demarrerConversation(Utilisateur utilisateur) {
     Navigator.push(
       context,
@@ -114,7 +114,7 @@ class _AjouterContactEcranState extends State<AjouterContactEcran> {
     );
   }
 
-  // UI Design: Afficher une erreur
+  
   void _afficherErreur(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -141,7 +141,7 @@ class _AjouterContactEcranState extends State<AjouterContactEcran> {
     );
   }
 
-  // UI Design: Construire l'AppBar personnalisé
+  
   PreferredSizeWidget _construireAppBar() {
     return WidgetBarreAppPersonnalisee(
       titre: 'Ajouter un contact',
@@ -150,7 +150,7 @@ class _AjouterContactEcranState extends State<AjouterContactEcran> {
     );
   }
 
-  // UI Design: Construire la barre de recherche
+  
   Widget _construireBarreRecherche() {
     return Container(
       margin: const EdgeInsets.all(16),
@@ -184,7 +184,7 @@ class _AjouterContactEcranState extends State<AjouterContactEcran> {
     );
   }
 
-  // UI Design: Construire la liste des utilisateurs
+  
   Widget _construireListeUtilisateurs() {
     if (_isLoading) {
       return const Center(
@@ -202,7 +202,7 @@ class _AjouterContactEcranState extends State<AjouterContactEcran> {
       }
     }
 
-    // UI Design: Utiliser WidgetCollection pour afficher la liste
+    
     return WidgetCollection<Utilisateur>.listeVerticale(
       elements: _utilisateursFiltres,
       enChargement: false,
@@ -214,7 +214,7 @@ class _AjouterContactEcranState extends State<AjouterContactEcran> {
     );
   }
 
-  // UI Design: Construire l'état vide
+  
   Widget _construireEtatVide() {
     return Center(
       child: Column(
@@ -253,7 +253,7 @@ class _AjouterContactEcranState extends State<AjouterContactEcran> {
     );
   }
 
-  // UI Design: Construire l'état aucun résultat
+  
   Widget _construireAucunResultat() {
     return Center(
       child: Column(
@@ -292,7 +292,7 @@ class _AjouterContactEcranState extends State<AjouterContactEcran> {
     );
   }
 
-  // UI Design: Construire une carte d'utilisateur avec layout flexible
+  
   Widget _construireCarteUtilisateur(Utilisateur utilisateur) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),

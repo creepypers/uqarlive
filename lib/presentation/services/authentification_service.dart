@@ -1,4 +1,4 @@
-// UI Design: Service d'authentification pour centraliser la gestion de l'utilisateur connecté
+
 import '../../core/di/service_locator.dart';
 import '../../domain/entities/utilisateur.dart';
 import '../../domain/usercases/utilisateurs_repository.dart';
@@ -17,13 +17,13 @@ class AuthentificationService {
 
   Utilisateur? _utilisateurActuel;
 
-  // UI Design: Getter pour l'utilisateur connecté
+  
   Utilisateur? get utilisateurActuel => _utilisateurActuel;
   
-  // UI Design: Vérifier si un utilisateur est connecté
+  
   bool get estConnecte => _utilisateurActuel != null;
   
-  // UI Design: Authentifier un utilisateur
+  
   Future<Utilisateur?> authentifier(String email, String motDePasse) async {
     try {
       final utilisateur = await _utilisateursRepository.authentifierUtilisateur(email, motDePasse);
@@ -34,7 +34,7 @@ class AuthentificationService {
     }
   }
 
-  // UI Design: Charger l'utilisateur actuel (au démarrage de l'app)
+  
   Future<void> chargerUtilisateurActuel() async {
     try {
       _utilisateurActuel = await _utilisateursRepository.obtenirUtilisateurActuel();
@@ -43,7 +43,7 @@ class AuthentificationService {
     }
   }
 
-  // UI Design: Déconnecter l'utilisateur
+  
   Future<void> deconnecter() async {
     try {
       await _utilisateursRepository.deconnecterUtilisateur();
@@ -53,7 +53,7 @@ class AuthentificationService {
     }
   }
 
-  // UI Design: Mettre à jour l'utilisateur actuel après modification
+  
   Future<void> actualiserUtilisateurActuel() async {
     if (_utilisateurActuel != null) {
       try {
@@ -67,18 +67,18 @@ class AuthentificationService {
     }
   }
 
-  // UI Design: Vérifier si l'utilisateur connecté a un privilège spécifique
+  
   bool aPrivilege(String privilege) {
     return _utilisateurActuel?.aPrivilege(privilege) ?? false;
   }
 
-  // UI Design: Vérifier si l'utilisateur connecté est admin
+  
   bool get estAdministrateur {
     return aPrivilege(PrivilegesUtilisateur.admin) ||
         _utilisateurActuel?.typeUtilisateur == TypeUtilisateur.administrateur;
   }
 
-  // UI Design: Modifier les privilèges d'un utilisateur (admin seulement)
+  
   Future<bool> modifierPrivileges(String utilisateurId, List<String> nouveauxPrivileges) async {
     // Vérifier que l'utilisateur connecté est admin
     if (!estAdministrateur) {
@@ -108,7 +108,7 @@ class AuthentificationService {
     }
   }
 
-  // UI Design: Promouvoir un utilisateur admin (admin seulement)
+  
   Future<bool> promouvoirAdmin(String utilisateurId) async {
     if (!estAdministrateur) return false;
 
@@ -123,7 +123,7 @@ class AuthentificationService {
     return await modifierPrivileges(utilisateurId, nouveauxPrivileges);
   }
 
-  // UI Design: Rétrograder un admin (admin seulement, sauf dernier admin)
+  
   Future<bool> retrograderAdmin(String utilisateurId) async {
     if (!estAdministrateur) return false;
 
@@ -136,37 +136,37 @@ class AuthentificationService {
     return await modifierPrivileges(utilisateurId, nouveauxPrivileges);
   }
 
-  // UI Design: Obtenir les initiales de l'utilisateur pour l'avatar
+  
   String obtenirInitiales() {
     if (_utilisateurActuel == null) return '??';
     return '${_utilisateurActuel!.prenom[0]}${_utilisateurActuel!.nom[0]}';
   }
 
-  // UI Design: Obtenir le nom complet de l'utilisateur
+  
   String obtenirNomComplet() {
     if (_utilisateurActuel == null) return 'Utilisateur inconnu';
     return '${_utilisateurActuel!.prenom} ${_utilisateurActuel!.nom}';
   }
 
-  // UI Design: Obtenir les initiales d'un utilisateur par son ID
+  
   Future<String> obtenirInitialesUtilisateurParId(String utilisateurId) async {
     try {
       if (utilisateurId.isEmpty) return '?';
       
-      // UI Design: Utiliser le repository pour obtenir les informations de l'utilisateur
+      
       final utilisateur = await _utilisateursRepository.obtenirUtilisateurParId(utilisateurId);
       if (utilisateur != null) {
         return '${utilisateur.prenom[0]}${utilisateur.nom[0]}';
       }
       
-      // UI Design: Fallback si l'utilisateur n'est pas trouvé par ID
+      
       return '??';
     } catch (e) {
       return '?';
     }
   }
 
-  // UI Design: Obtenir les informations complètes d'un utilisateur par son ID
+  
   Future<Utilisateur?> obtenirUtilisateurParId(String utilisateurId) async {
     try {
       return await _utilisateursRepository.obtenirUtilisateurParId(utilisateurId);

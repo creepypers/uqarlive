@@ -1,4 +1,4 @@
-// UI Design: Service pour gerer la coherence bidirectionnelle des membres d'associations
+
 import '../../core/di/service_locator.dart';
 import '../../domain/entities/association.dart';
 import '../../domain/entities/membre_association.dart';
@@ -41,7 +41,7 @@ class GestionMembresService {
     return _membresRepository!;
   }
 
-  // UI Design: Ajouter un membre a une association
+  
   Future<bool> ajouterMembreAssociation({
     required String utilisateurId,
     required String associationId,
@@ -77,7 +77,7 @@ class GestionMembresService {
     }
   }
 
-  // UI Design: Retirer un membre d'une association
+  
   Future<bool> retirerMembreAssociation({
     required String utilisateurId,
     required String associationId,
@@ -104,7 +104,7 @@ class GestionMembresService {
     }
   }
 
-  // UI Design: Methode privee pour maintenir la coherence bidirectionnelle
+  
   Future<void> _mettreAJourCoherenceMembre({
     required String utilisateurId,
     required String associationId,
@@ -168,12 +168,12 @@ class GestionMembresService {
     }
   }
 
-  // UI Design: Obtenir la liste des membres d'une association
+  
   Future<List<MembreAssociation>> obtenirMembresAssociation(String associationId) async {
     return await membresRepo.obtenirMembresParAssociation(associationId);
   }
 
-  // UI Design: Obtenir les associations d'un utilisateur
+  
   Future<List<Association>> obtenirAssociationsUtilisateur(String utilisateurId) async {
     final utilisateur = await utilisateursRepo.obtenirUtilisateurParId(utilisateurId);
     if (utilisateur == null || utilisateur.associationsMembre.isEmpty) {
@@ -191,7 +191,7 @@ class GestionMembresService {
     return associations;
   }
 
-  // UI Design: Verifier si un utilisateur est membre d'une association specifique
+  
   Future<bool> estMembreAssociation(String utilisateurId, String associationId) async {
     final utilisateur = await utilisateursRepo.obtenirUtilisateurParId(utilisateurId);
     if (utilisateur == null) return false;
@@ -199,19 +199,19 @@ class GestionMembresService {
     return utilisateur.associationsMembre.contains(associationId);
   }
 
-  // UI Design: Obtenir le nombre de membres d'une association
+  
   Future<int> obtenirNombreMembres(String associationId) async {
     final association = await associationsRepo.obtenirAssociationParId(associationId);
     return association?.membresActifs.length ?? 0;
   }
 
-  // UI Design: Obtenir le nombre d'associations d'un utilisateur
+  
   Future<int> obtenirNombreAssociations(String utilisateurId) async {
     final utilisateur = await utilisateursRepo.obtenirUtilisateurParId(utilisateurId);
     return utilisateur?.associationsMembre.length ?? 0;
   }
 
-  // UI Design: Synchroniser les listes de membres (pour la maintenance)
+  
   Future<bool> synchroniserListesMembres() async {
     try {
       final associations = await associationsRepo.obtenirToutesLesAssociations();

@@ -1,4 +1,4 @@
-// UI Design: Écran de gestion de la cantine pour les administrateurs
+
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
@@ -27,7 +27,7 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
   List<Menu> _menus = [];
   Map<String, Map<String, String>> _horaires = {};
   bool _chargementEnCours = true;
-  String? _menuDuJourId; // UI Design: Menu du jour sélectionné
+  String? _menuDuJourId; 
 
   @override
   void initState() {
@@ -69,7 +69,7 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
 
   @override
   Widget build(BuildContext context) {
-    // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
+    
     final mediaQuery = MediaQuery.of(context);
     final screenHeight = mediaQuery.size.height;
     final screenWidth = mediaQuery.size.width;
@@ -78,7 +78,7 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
     
     return Scaffold(
       backgroundColor: CouleursApp.fond,
-      resizeToAvoidBottomInset: true, // UI Design: Éviter les débordements avec le clavier
+      resizeToAvoidBottomInset: true, 
       appBar: const WidgetBarreAppNavigationAdmin(
         titre: 'Gestion Cantine',
         sousTitre: 'Menus et horaires',
@@ -89,20 +89,20 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
             ? const Center(child: CircularProgressIndicator())
             : SingleChildScrollView(
                 padding: EdgeInsets.only(
-                  left: screenWidth * 0.04, // UI Design: Padding adaptatif
+                  left: screenWidth * 0.04, 
                   right: screenWidth * 0.04,
                   top: screenHeight * 0.02,
-                  bottom: viewInsets.bottom + padding.bottom + screenHeight * 0.025, // UI Design: Padding adaptatif pour éviter les débordements
+                  bottom: viewInsets.bottom + padding.bottom + screenHeight * 0.025, 
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _construireStatutCantine(),
-                    SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
+                    SizedBox(height: screenHeight * 0.03), 
                     _construireGestionMenuDuJour(),
-                    SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
+                    SizedBox(height: screenHeight * 0.03), 
                     _construireGestionHoraires(),
-                    SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
+                    SizedBox(height: screenHeight * 0.03), 
                     _construireGestionMenus(),
                   ],
                 ),
@@ -112,12 +112,12 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
       floatingActionButton: FloatingActionButton(
         onPressed: _ajouterNouveauMenu,
         backgroundColor: CouleursApp.principal,
-        child: Icon(Icons.add, color: Colors.white, size: screenWidth * 0.06), // UI Design: Taille adaptative
+        child: Icon(Icons.add, color: Colors.white, size: screenWidth * 0.06), 
       ),
     );
   }
 
-  // UI Design: Statut en temps réel de la cantine avec widget réutilisable
+  
   Widget _construireStatutCantine() {
     final maintenant = DateTime.now();
     final jourActuel = _obtenirJourSemaine(maintenant.weekday);
@@ -158,11 +158,11 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
     );
   }
 
-  // UI Design: Gestion moderne du menu du jour avec design premium
+  
   Widget _construireGestionMenuDuJour() {
     Menu? menuDuJour;
     
-    // UI Design: Rechercher le menu du jour sélectionné
+    
     if (_menuDuJourId != null && _menuDuJourId!.isNotEmpty) {
       try {
         menuDuJour = _menus.firstWhere((menu) => menu.id == _menuDuJourId);
@@ -512,7 +512,7 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
     );
   }
 
-  // UI Design: Gestion des horaires d'ouverture
+  
   Widget _construireGestionHoraires() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -520,14 +520,14 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Expanded( // UI Design: Utiliser Expanded pour le titre
+            const Expanded( 
               child: Text(
                 'Horaires d\'Ouverture',
                 style: StylesTexteApp.grandTitre,
               ),
             ),
-            const SizedBox(width: 8), // UI Design: Espacement
-            Flexible( // UI Design: Utiliser Flexible pour le bouton
+            const SizedBox(width: 8), 
+            Flexible( 
               child: ElevatedButton.icon(
                 onPressed: _modifierTousLesHoraires,
                 icon: const Icon(Icons.edit, size: 16),
@@ -535,7 +535,7 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: CouleursApp.accent,
                   foregroundColor: CouleursApp.blanc,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), // UI Design: Padding réduit
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), 
                 ),
               ),
             ),
@@ -562,8 +562,8 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
                         child: Text(
                           jour,
                           style: StylesTexteApp.moyenTitre,
-                          maxLines: 1, // UI Design: Limiter à une ligne
-                          overflow: TextOverflow.ellipsis, // UI Design: Gérer le débordement
+                          maxLines: 1, 
+                          overflow: TextOverflow.ellipsis, 
                         ),
                       ),
                       if (estFerme)
@@ -579,20 +579,20 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
                           ),
                         )
                       else
-                        Expanded( // UI Design: Utiliser Expanded pour éviter le débordement
+                        Expanded( 
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end, // UI Design: Aligner à droite
+                            mainAxisAlignment: MainAxisAlignment.end, 
                             children: [
-                              Flexible( // UI Design: Utiliser Flexible pour le texte
+                              Flexible( 
                                 child: Text(
                                   '${horaire['ouverture']} - ${horaire['fermeture']}',
                                   style: StylesTexteApp.corpsNormal,
-                                  maxLines: 1, // UI Design: Limiter à une ligne
-                                  overflow: TextOverflow.ellipsis, // UI Design: Gérer le débordement
+                                  maxLines: 1, 
+                                  overflow: TextOverflow.ellipsis, 
                                 ),
                               ),
-                              const SizedBox(width: 4), // UI Design: Espacement réduit
-                              SizedBox( // UI Design: Utiliser SizedBox pour contraindre le bouton
+                              const SizedBox(width: 4), 
+                              SizedBox( 
                                 width: 32,
                                 height: 32,
                                 child: IconButton(
@@ -602,7 +602,7 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
                                     size: 16,
                                     color: CouleursApp.accent,
                                   ),
-                                  padding: EdgeInsets.zero, // UI Design: Supprimer le padding
+                                  padding: EdgeInsets.zero, 
                                   constraints: const BoxConstraints(
                                     minWidth: 32,
                                     minHeight: 32,
@@ -625,7 +625,7 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
     );
   }
 
-  // UI Design: Gestion des menus
+  
   Widget _construireGestionMenus() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -721,7 +721,7 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
 
 
 
-  // UI Design: Méthodes utilitaires
+  
   String _obtenirJourSemaine(int weekday) {
     const jours = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
     return jours[weekday - 1];
@@ -759,14 +759,14 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
       // Note: Cette méthode devrait être async pour gérer les appels au repository
       // Pour l'instant, retourner une valeur par défaut
       if (prochainJour == 'Lundi') {
-        return 'Lundi à 08:00'; // UI Design: Simplifier pour l'affichage
+        return 'Lundi à 08:00'; 
       }
     }
     
     return 'Fermé ce week-end';
   }
 
-  // UI Design: Convertir les horaires TimeOfDay en String pour l'affichage
+  
   Map<String, Map<String, String>> _convertirHorairesEnString(Map<String, Map<String, TimeOfDay>> horairesTimeOfDay) {
     final Map<String, Map<String, String>> horairesString = {};
     
@@ -785,7 +785,7 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
     return '${heure.hour}:$minute';
   }
 
-  // UI Design: Actions de gestion
+  
 
   void _modifierHoraireJour(String jour) async {
     final resultat = await Navigator.push(
@@ -795,7 +795,7 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
       ),
     );
     
-    // UI Design: Recharger les données si modification réussie
+    
     if (resultat == true) {
       await _chargerDonnees();
     }
@@ -809,7 +809,7 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
       ),
     );
     
-    // UI Design: Recharger les données si modification réussie
+    
     if (resultat == true) {
       await _chargerDonnees();
     }
@@ -1081,7 +1081,7 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
 
 
 
-  // UI Design: Actualiser la liste des menus
+  
   Future<void> _actualiserMenus() async {
     await _chargerDonnees();
     if (mounted) {
@@ -1095,7 +1095,7 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
     }
   }
 
-  // UI Design: Dupliquer un menu existant
+  
   void _dupliquerMenu(Menu menu) async {
     try {
       // Créer une copie du menu avec un nouvel ID et un nom modifié
@@ -1149,7 +1149,7 @@ class _AdminGestionCantineEcranState extends State<AdminGestionCantineEcran> {
 
 
 
-  // UI Design: Retirer le menu du jour via le repository
+  
   void _retirerMenuDuJour() async {
     showDialog(
       context: context,

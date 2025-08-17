@@ -1,4 +1,4 @@
-// UI Design: Service pour gérer les transactions de livres
+
 import '../../core/di/service_locator.dart';
 import '../../domain/entities/transaction.dart';
 import '../../domain/entities/livre.dart';
@@ -34,7 +34,7 @@ class TransactionsService {
     return _livresRepository!;
   }
 
-  // UI Design: Vérifier si un utilisateur peut acheter un livre
+  
   Future<Map<String, dynamic>> peutAcheterLivre(Utilisateur utilisateur, Livre livre) async {
     // Vérification 1: L'utilisateur ne peut pas acheter son propre livre
     if (utilisateur.id == livre.proprietaireId) {
@@ -80,7 +80,7 @@ class TransactionsService {
     };
   }
 
-  // UI Design: Créer une transaction d'achat
+  
   Future<bool> creerTransactionAchat({
     required String livreId,
     required String vendeurId,
@@ -103,7 +103,7 @@ class TransactionsService {
     return await transactionsRepository.creerTransaction(transaction);
   }
 
-  // UI Design: Créer une transaction d'échange
+  
   Future<bool> creerTransactionEchange({
     required String livreId,
     required String vendeurId,
@@ -126,7 +126,7 @@ class TransactionsService {
     return await transactionsRepository.creerTransaction(transaction);
   }
 
-  // UI Design: Obtenir les transactions d'un utilisateur
+  
   Future<List<Transaction>> obtenirMesTransactions(String utilisateurId) async {
     final achats = await transactionsRepository.obtenirTransactionsParAcheteur(utilisateurId);
     final ventes = await transactionsRepository.obtenirTransactionsParVendeur(utilisateurId);
@@ -137,12 +137,12 @@ class TransactionsService {
     return toutes;
   }
 
-  // UI Design: Confirmer une transaction (côté vendeur)
+  
   Future<bool> confirmerTransaction(String transactionId) async {
     return await transactionsRepository.confirmerTransaction(transactionId);
   }
 
-  // UI Design: Compléter une transaction
+  
   Future<bool> completerTransaction(String transactionId) async {
     final success = await transactionsRepository.completerTransaction(transactionId);
     
@@ -157,12 +157,12 @@ class TransactionsService {
     return success;
   }
 
-  // UI Design: Annuler une transaction
+  
   Future<bool> annulerTransaction(String transactionId) async {
     return await transactionsRepository.annulerTransaction(transactionId);
   }
 
-  // UI Design: Proposer un échange (alias pour creerTransactionEchange)
+  
   Future<bool> proposerEchange(
     String acheteurId,
     String livreEchangeId,
@@ -182,7 +182,7 @@ class TransactionsService {
     );
   }
 
-  // UI Design: Obtenir les statistiques de transactions
+  
   Future<Map<String, int>> obtenirStatistiques(String utilisateurId) async {
     return await transactionsRepository.obtenirStatistiquesTransactions(utilisateurId);
   }

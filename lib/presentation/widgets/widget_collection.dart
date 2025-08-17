@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
 
-// UI Design: Widget Collection unifié avec gestion d'états intégrée
+
 class WidgetCollection<T> extends StatelessWidget {
   final List<T> elements;
   final bool enChargement;
