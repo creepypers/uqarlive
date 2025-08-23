@@ -1,5 +1,4 @@
-// UI Design: Écran d'ajout/modification d'actualités pour les chefs d'association
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../../../core/di/service_locator.dart';
 import '../../../../core/utils/actualite_priorites.dart';
 import '../../../../domain/entities/association.dart';
@@ -7,21 +6,17 @@ import '../../../../domain/entities/actualite.dart';
 import '../../../widgets/widget_barre_app_personnalisee.dart';
 import '../../../../domain/usercases/actualites_repository.dart';
 import '../../../services/authentification_service.dart';
-
 class AjouterActualiteEcran extends StatefulWidget {
   final Association association;
-  final Actualite? actualiteAModifier; // UI Design: Support de la modification
-
+  final Actualite? actualiteAModifier; 
   const AjouterActualiteEcran({
     Key? key,
     required this.association,
     this.actualiteAModifier,
   }) : super(key: key);
-
   @override
   State<AjouterActualiteEcran> createState() => _AjouterActualiteEcranState();
 }
-
 class _AjouterActualiteEcranState extends State<AjouterActualiteEcran> {
   final _formKey = GlobalKey<FormState>();
   final _titreController = TextEditingController();
@@ -32,22 +27,17 @@ class _AjouterActualiteEcranState extends State<AjouterActualiteEcran> {
   bool _chargement = false;
   bool _modeModification = false;
   late final ActualitesRepository _actualitesRepository;
-
-
   late final AuthentificationService _authentificationService;
-
   @override
   void initState() {
     super.initState();
     _actualitesRepository = ServiceLocator.obtenirService<ActualitesRepository>();
     _authentificationService = ServiceLocator.obtenirService<AuthentificationService>();
     _modeModification = widget.actualiteAModifier != null;
-    
     if (_modeModification) {
       _remplirFormulaire(widget.actualiteAModifier!);
     }
   }
-
   void _remplirFormulaire(Actualite actualite) {
     _titreController.text = actualite.titre;
     _descriptionController.text = actualite.description;
@@ -55,7 +45,6 @@ class _AjouterActualiteEcranState extends State<AjouterActualiteEcran> {
     _priorite = actualite.priorite;
     _estEpinglee = actualite.estEpinglee;
   }
-
   @override
   void dispose() {
     _titreController.dispose();
@@ -63,14 +52,11 @@ class _AjouterActualiteEcranState extends State<AjouterActualiteEcran> {
     _contenuController.dispose();
     super.dispose();
   }
-
   Future<void> _sauvegarderActualite() async {
     if (!_formKey.currentState!.validate()) return;
-
     setState(() {
       _chargement = true;
     });
-
     try {
       final actualite = Actualite(
         id: _modeModification ? widget.actualiteAModifier!.id : 'actu_${DateTime.now().millisecondsSinceEpoch}',
@@ -88,7 +74,6 @@ class _AjouterActualiteEcranState extends State<AjouterActualiteEcran> {
         nombreLikes: _modeModification ? widget.actualiteAModifier!.nombreLikes : 0,
         tags: _modeModification ? widget.actualiteAModifier!.tags : [],
       );
-
       bool succes = false;
       if (_modeModification) {
         succes = await _actualitesRepository.mettreAJourActualite(actualite);
@@ -96,11 +81,9 @@ class _AjouterActualiteEcranState extends State<AjouterActualiteEcran> {
         final actualiteAjoutee = await _actualitesRepository.ajouterActualite(actualite);
         succes = actualiteAjoutee.id.isNotEmpty;
       }
-
       if (!succes) {
         throw Exception('Échec de l\'opération');
       }
-
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -149,10 +132,8 @@ class _AjouterActualiteEcranState extends State<AjouterActualiteEcran> {
       }
     }
   }
-
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: WidgetBarreAppPersonnalisee(
         titre: 'Ajouter une actualité',
@@ -167,7 +148,6 @@ class _AjouterActualiteEcranState extends State<AjouterActualiteEcran> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // UI Design: En-tête avec informations de l'association
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(20.0),
@@ -228,8 +208,6 @@ class _AjouterActualiteEcranState extends State<AjouterActualiteEcran> {
                   ),
                 ),
                 const SizedBox(height: 24),
-
-                // UI Design: Formulaire d'ajout d'actualité
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(20.0),
@@ -256,7 +234,6 @@ class _AjouterActualiteEcranState extends State<AjouterActualiteEcran> {
                         ),
                       ),
                       const SizedBox(height: 20),
-
                       // Titre
                       TextFormField(
                         controller: _titreController,
@@ -283,7 +260,6 @@ class _AjouterActualiteEcranState extends State<AjouterActualiteEcran> {
                         },
                       ),
                       const SizedBox(height: 16),
-
                       // Description
                       TextFormField(
                         controller: _descriptionController,
@@ -311,7 +287,6 @@ class _AjouterActualiteEcranState extends State<AjouterActualiteEcran> {
                         },
                       ),
                       const SizedBox(height: 20),
-
                       // Priorité
                       DropdownButtonFormField<String>(
                         value: _priorite,
@@ -344,7 +319,6 @@ class _AjouterActualiteEcranState extends State<AjouterActualiteEcran> {
                         },
                       ),
                       const SizedBox(height: 16),
-
                       // Épingler l'actualité
                       CheckboxListTile(
                         title: const Text('Épingler cette actualité'),
@@ -362,8 +336,6 @@ class _AjouterActualiteEcranState extends State<AjouterActualiteEcran> {
                   ),
                 ),
                 const SizedBox(height: 24),
-
-                // UI Design: Bouton de sauvegarde
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(

@@ -1,14 +1,8 @@
-import '../../models/actualite_model.dart';
+﻿import '../../models/actualite_model.dart';
 import '../../../domain/entities/actualite.dart';
-
-// UI Design: Source de données locale dynamique pour les actualités d'associations
 class ActualitesDatasourceLocal {
-  
-  // UI Design: Données dynamiques d'actualités d'associations étudiantes UQAR (non-hardcodées)
   static final List<Map<String, dynamic>> _actualitesStockees = [];
   static bool _donneesSeedees = false;
-
-  // UI Design: Données de démarrage par défaut (utilisées seulement si aucune actualité n'existe)
   static final List<Map<String, dynamic>> _actualitesParDefaut = [
     {
       'id': '1',
@@ -139,8 +133,6 @@ class ActualitesDatasourceLocal {
       'nombreLikes': 76,
     }
   ];
-
-  // UI Design: Initialiser les données par défaut si nécessaire
   void _initialiserDonnees() {
     if (!_donneesSeedees && _actualitesStockees.isEmpty) {
       // Charger les données par défaut seulement si aucune actualité n'existe
@@ -148,45 +140,33 @@ class ActualitesDatasourceLocal {
       _donneesSeedees = true;
     }
   }
-
-  // UI Design: Récupérer toutes les actualités
   Future<List<ActualiteModel>> obtenirToutesLesActualites() async {
     _initialiserDonnees();
     // Simuler un délai réseau
     await Future.delayed(const Duration(milliseconds: 500));
-    
     return _actualitesStockees
         .map((data) => ActualiteModel.fromMap(data))
         .toList();
   }
-
-  // UI Design: Récupérer les actualités épinglées
   Future<List<ActualiteModel>> obtenirActualitesEpinglees() async {
     _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 300));
-    
     return _actualitesStockees
         .where((data) => data['estEpinglee'] == true)
         .map((data) => ActualiteModel.fromMap(data))
         .toList();
   }
-
-  // UI Design: Récupérer les actualités par association
   Future<List<ActualiteModel>> obtenirActualitesParAssociation(String associationId) async {
     _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 400));
-    
     return _actualitesStockees
         .where((data) => data['associationId'] == associationId)
         .map((data) => ActualiteModel.fromMap(data))
         .toList();
   }
-
-  // UI Design: Rechercher des actualités
   Future<List<ActualiteModel>> rechercherActualites(String terme) async {
     _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 600));
-    
     final termeMinuscule = terme.toLowerCase();
     return _actualitesStockees
         .where((data) {
@@ -200,25 +180,18 @@ class ActualitesDatasourceLocal {
         .map((data) => ActualiteModel.fromMap(data))
         .toList();
   }
-
-  // UI Design: Récupérer une actualité par ID
   Future<ActualiteModel?> obtenirActualiteParId(String id) async {
     _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 300));
-    
     final data = _actualitesStockees.firstWhere(
       (actualite) => actualite['id'] == id,
       orElse: () => <String, dynamic>{},
     );
-    
     return data.isNotEmpty ? ActualiteModel.fromMap(data) : null;
   }
-
-  // UI Design: Liker une actualité (dynamique)
   Future<bool> likerActualite(String id) async {
     _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 200));
-    
     final index = _actualitesStockees.indexWhere((data) => data['id'] == id);
     if (index != -1) {
       _actualitesStockees[index]['nombreLikes'] = 
@@ -227,12 +200,9 @@ class ActualitesDatasourceLocal {
     }
     return false;
   }
-
-  // UI Design: Marquer une actualité comme vue
   Future<bool> marquerCommeVue(String id) async {
     _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 100));
-    
     final index = _actualitesStockees.indexWhere((data) => data['id'] == id);
     if (index != -1) {
       _actualitesStockees[index]['nombreVues'] = 
@@ -241,8 +211,6 @@ class ActualitesDatasourceLocal {
     }
     return false;
   }
-
-  // Clean Architecture: Ajouter une actualité (dynamique)
   Future<ActualiteModel> ajouterActualite(Actualite actualite) async {
     _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 200));
@@ -250,8 +218,6 @@ class ActualitesDatasourceLocal {
     _actualitesStockees.add(model.toMap());
     return model;
   }
-
-  // Clean Architecture: Mettre à jour une actualité (dynamique)
   Future<ActualiteModel> mettreAJourActualite(Actualite actualite) async {
     _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 200));
@@ -264,8 +230,6 @@ class ActualitesDatasourceLocal {
     }
     return model;
   }
-
-  // Clean Architecture: Supprimer une actualité (dynamique)
   Future<bool> supprimerActualite(String id) async {
     _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 150));
@@ -273,8 +237,6 @@ class ActualitesDatasourceLocal {
     _actualitesStockees.removeWhere((a) => a['id'] == id);
     return _actualitesStockees.length < before;
   }
-
-  // Clean Architecture: Récupérer par priorité (dynamique)
   Future<List<ActualiteModel>> obtenirActualitesParPriorite(String priorite) async {
     _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 250));
@@ -283,17 +245,13 @@ class ActualitesDatasourceLocal {
         .map((data) => ActualiteModel.fromMap(data))
         .toList();
   }
-
-  // UI Design: Méthodes utilitaires pour la gestion dynamique
   static void effacerToutesLesActualites() {
     _actualitesStockees.clear();
     _donneesSeedees = false;
   }
-
   static void rechargerDonneesParDefaut() {
     _actualitesStockees.clear();
     _donneesSeedees = false;
   }
-
   static int get nombreActualites => _actualitesStockees.length;
 } 

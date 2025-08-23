@@ -1,34 +1,26 @@
-// UI Design: Écran pour afficher toutes les actualités et événements
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../../../core/di/service_locator.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../domain/entities/actualite.dart';
-
 import '../../../../domain/usercases/actualites_repository.dart';
 import '../../../../domain/usercases/associations_repository.dart';
-
 import '../../../widgets/widget_barre_app_personnalisee.dart';
-
 class ActualitesEcran extends StatefulWidget {
   const ActualitesEcran({super.key});
-
   @override
   State<ActualitesEcran> createState() => _ActualitesEcranState();
 }
-
 class _ActualitesEcranState extends State<ActualitesEcran>
     with SingleTickerProviderStateMixin {
   late final ActualitesRepository _actualitesRepository;
   late final AssociationsRepository _associationsRepository;
   late TabController _tabController;
-
   List<Actualite> _toutesActualites = [];
   List<Actualite> _actualitesEpinglees = [];
   List<Actualite> _actualitesNormales = [];
   bool _chargement = true;
   String _filtrePriorite = 'toutes';
   final Map<String, String> _nomsAssociations = {}; // Cache des noms d'associations
-
   @override
   void initState() {
     super.initState();
@@ -36,21 +28,17 @@ class _ActualitesEcranState extends State<ActualitesEcran>
     _tabController = TabController(length: 3, vsync: this);
     _chargerActualites();
   }
-
   @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
   }
-
   void _initialiserServices() {
     _actualitesRepository = ServiceLocator.obtenirService<ActualitesRepository>();
     _associationsRepository = ServiceLocator.obtenirService<AssociationsRepository>();
   }
-
   Future<void> _chargerActualites() async {
     setState(() => _chargement = true);
-
     try {
       // Charger les actualités et les associations en parallèle
       final futures = await Future.wait([
@@ -58,18 +46,15 @@ class _ActualitesEcranState extends State<ActualitesEcran>
         _actualitesRepository.obtenirActualitesEpinglees(),
         _associationsRepository.obtenirAssociationsPopulaires(limite: 50),
       ]);
-
       final actualites = futures[0] as List<Actualite>;
       final actualitesEpinglees = futures[1] as List<Actualite>;
       final associations = futures[2] as List;
-
       // Construire le cache des noms d'associations
       _nomsAssociations.clear();
       _nomsAssociations['admin_general'] = 'UQAR - Administration';
       for (final association in associations) {
         _nomsAssociations[association.id] = association.nom;
       }
-
       setState(() {
         _toutesActualites = actualites;
         _actualitesEpinglees = actualitesEpinglees;
@@ -88,12 +73,10 @@ class _ActualitesEcranState extends State<ActualitesEcran>
       }
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
-
     return Scaffold(
       backgroundColor: CouleursApp.fond,
       appBar: const WidgetBarreAppPersonnalisee(
@@ -167,12 +150,10 @@ class _ActualitesEcranState extends State<ActualitesEcran>
       ),
     );
   }
-
   Widget _construireBoutonFiltre(String valeur, String libelle) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final estSelectionne = _filtrePriorite == valeur;
-
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -205,19 +186,16 @@ class _ActualitesEcranState extends State<ActualitesEcran>
       ),
     );
   }
-
   List<Actualite> _obtenirActualitesFiltrees(List<Actualite> actualites) {
     if (_filtrePriorite == 'toutes') {
       return actualites;
     }
     return actualites.where((a) => a.priorite == _filtrePriorite).toList();
   }
-
   Widget _construireListeActualites(List<Actualite> actualites) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
-
     if (_chargement) {
       return const Center(
         child: CircularProgressIndicator(
@@ -225,7 +203,6 @@ class _ActualitesEcranState extends State<ActualitesEcran>
         ),
       );
     }
-
     if (actualites.isEmpty) {
       return Center(
         child: Column(
@@ -258,7 +235,6 @@ class _ActualitesEcranState extends State<ActualitesEcran>
         ),
       );
     }
-
     return RefreshIndicator(
       onRefresh: _chargerActualites,
       color: CouleursApp.principal,
@@ -272,12 +248,10 @@ class _ActualitesEcranState extends State<ActualitesEcran>
       ),
     );
   }
-
   Widget _construireCarteActualite(Actualite actualite) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
-
     return Container(
       margin: EdgeInsets.only(bottom: screenHeight * 0.02),
       decoration: BoxDecoration(
@@ -445,11 +419,9 @@ class _ActualitesEcranState extends State<ActualitesEcran>
       ),
     );
   }
-
   String _formaterDateActualite(DateTime datePublication) {
     final maintenant = DateTime.now();
     final difference = maintenant.difference(datePublication);
-
     if (difference.inDays == 0) {
       return 'Aujourd\'hui';
     } else if (difference.inDays == 1) {
@@ -463,7 +435,6 @@ class _ActualitesEcranState extends State<ActualitesEcran>
       return '${datePublication.day}/${datePublication.month}/${datePublication.year}';
     }
   }
-
   String _obtenirNomAssociation(String associationId) {
     // Utiliser le cache des noms d'associations
     return _nomsAssociations[associationId] ?? 'Association';

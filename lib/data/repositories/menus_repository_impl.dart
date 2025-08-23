@@ -1,14 +1,10 @@
-import '../../domain/entities/menu.dart';
+﻿import '../../domain/entities/menu.dart';
 import '../../domain/usercases/menus_repository.dart';
 import '../datasources/internal/menus_datasource_local.dart';
 import '../models/menu_model.dart';
-
-// UI Design: Implémentation du repository pour les menus de cantine
 class MenusRepositoryImpl implements MenusRepository {
   final MenusDatasourceLocal _datasourceLocal;
-
   MenusRepositoryImpl(this._datasourceLocal);
-
   @override
   Future<List<Menu>> obtenirMenusDisponibles() async {
     try {
@@ -18,7 +14,6 @@ class MenusRepositoryImpl implements MenusRepository {
       throw Exception('Erreur lors du chargement des menus disponibles: $e');
     }
   }
-
   @override
   Future<List<Menu>> obtenirMenusParCategorie(String categorie) async {
     try {
@@ -28,7 +23,6 @@ class MenusRepositoryImpl implements MenusRepository {
       throw Exception('Erreur lors du chargement des menus par catégorie: $e');
     }
   }
-
   @override
   Future<List<Menu>> obtenirMenusDuJour() async {
     try {
@@ -38,7 +32,6 @@ class MenusRepositoryImpl implements MenusRepository {
       throw Exception('Erreur lors du chargement des menus du jour: $e');
     }
   }
-
   @override
   Future<List<Menu>> obtenirMenusVegetariens({bool veganUniquement = false}) async {
     try {
@@ -48,7 +41,6 @@ class MenusRepositoryImpl implements MenusRepository {
       throw Exception('Erreur lors du chargement des menus végétariens: $e');
     }
   }
-
   @override
   Future<List<Menu>> rechercherMenus(String recherche) async {
     try {
@@ -58,7 +50,6 @@ class MenusRepositoryImpl implements MenusRepository {
       throw Exception('Erreur lors de la recherche de menus: $e');
     }
   }
-
   @override
   Future<Menu?> obtenirMenuParId(String id) async {
     try {
@@ -69,7 +60,6 @@ class MenusRepositoryImpl implements MenusRepository {
       throw Exception('Erreur lors du chargement du menu par ID: $e');
     }
   }
-
   @override
   Future<List<String>> obtenirCategories() async {
     try {
@@ -78,7 +68,6 @@ class MenusRepositoryImpl implements MenusRepository {
       throw Exception('Erreur lors du chargement des catégories: $e');
     }
   }
-
   @override
   Future<List<Menu>> obtenirMenusPopulaires() async {
     try {
@@ -88,7 +77,6 @@ class MenusRepositoryImpl implements MenusRepository {
       throw Exception('Erreur lors du chargement des menus populaires: $e');
     }
   }
-
   @override
   Future<List<Menu>> obtenirTousLesMenus() async {
     try {
@@ -98,7 +86,6 @@ class MenusRepositoryImpl implements MenusRepository {
       throw Exception('Erreur lors du chargement de tous les menus: $e');
     }
   }
-
   @override
   Future<Menu> ajouterMenu(Menu menu) async {
     try {
@@ -109,7 +96,6 @@ class MenusRepositoryImpl implements MenusRepository {
       throw Exception('Erreur lors de l\'ajout du menu: $e');
     }
   }
-
   @override
   Future<Menu> mettreAJourMenu(Menu menu) async {
     try {
@@ -120,7 +106,6 @@ class MenusRepositoryImpl implements MenusRepository {
       throw Exception('Erreur lors de la mise à jour du menu: $e');
     }
   }
-
   @override
   Future<bool> supprimerMenu(String menuId) async {
     try {
@@ -129,7 +114,6 @@ class MenusRepositoryImpl implements MenusRepository {
       throw Exception('Erreur lors de la suppression du menu: $e');
     }
   }
-
   @override
   Future<void> definirMenuDuJour(String menuId) async {
     try {
@@ -138,7 +122,6 @@ class MenusRepositoryImpl implements MenusRepository {
       throw Exception('Erreur lors de la définition du menu du jour: $e');
     }
   }
-
   @override
   Future<String?> obtenirMenuDuJourActuel() async {
     try {

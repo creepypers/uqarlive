@@ -1,5 +1,4 @@
-// UI Design: Entité Association pour les associations étudiantes UQAR
-class Association {
+﻿class Association {
   final String id;
   final String nom;
   final String description;
@@ -22,8 +21,7 @@ class Association {
   final double? cotisationAnnuelle;
   final String? descriptionLongue;
   final List<String>? beneficesMembers; // Avantages d'être membre
-  final List<String> membresActifs; // UI Design: Liste des IDs des membres actifs
-
+  final List<String> membresActifs; 
   const Association({
     required this.id,
     required this.nom,
@@ -47,9 +45,8 @@ class Association {
     this.cotisationAnnuelle,
     this.descriptionLongue,
     this.beneficesMembers,
-    this.membresActifs = const [], // UI Design: Initialiser avec une liste vide
+    this.membresActifs = const [], 
   });
-
   // Getter pour le nombre de membres formaté
   String get nombreMembresFormatte {
     final nombreMembres = membresActifs.length;
@@ -58,23 +55,14 @@ class Association {
     }
     return nombreMembres.toString();
   }
-
-  // UI Design: Getter pour vérifier si l'association a des membres
   bool get aDesMembres => membresActifs.isNotEmpty;
-
-  // UI Design: Getter pour le nombre réel de membres actifs
   int get nombreMembresReel => membresActifs.length;
-
   // Getter pour vérifier si l'association a des contacts
   bool get aDesContacts => 
       email != null || telephone != null || siteWeb != null;
-
   // Getter pour vérifier si l'association a des réseaux sociaux
   bool get aDesReseauxSociaux => 
       facebook != null || instagram != null;
-
-  // UI Design: couleurType retiré (utiliser un utilitaire UI pour retourner un Color)
-
   // Méthode pour copier avec modifications
   Association copyWith({
     String? id,
@@ -99,7 +87,7 @@ class Association {
     double? cotisationAnnuelle,
     String? descriptionLongue,
     List<String>? beneficesMembers,
-    List<String>? membresActifs, // UI Design: Ajouter membresActifs
+    List<String>? membresActifs, 
   }) {
     return Association(
       id: id ?? this.id,
@@ -124,21 +112,18 @@ class Association {
       cotisationAnnuelle: cotisationAnnuelle ?? this.cotisationAnnuelle,
       descriptionLongue: descriptionLongue ?? this.descriptionLongue,
       beneficesMembers: beneficesMembers ?? this.beneficesMembers,
-      membresActifs: membresActifs ?? this.membresActifs, // UI Design: Copier membresActifs
+      membresActifs: membresActifs ?? this.membresActifs, 
     );
   }
-
   @override
   String toString() {
     return 'Association(id: $id, nom: $nom, type: $typeAssociation, membres: ${membresActifs.length}, active: $estActive)';
   }
-
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     return other is Association && other.id == id;
   }
-
   @override
   int get hashCode => id.hashCode;
 } 

@@ -1,11 +1,9 @@
-import '../../domain/entities/meteo.dart';
+﻿import '../../domain/entities/meteo.dart';
 import '../../domain/usercases/meteo_repository.dart';
 import '../datasources/external/meteo_datasource_remote.dart';
-
 class MeteoRepositoryImpl implements MeteoRepository {
   final MeteoDatasourceRemote _remote;
   MeteoRepositoryImpl(this._remote);
-
   @override
   Future<Meteo> obtenirTemperaturePour({
     required String ville,
@@ -19,5 +17,3 @@ class MeteoRepositoryImpl implements MeteoRepository {
     return Meteo(ville: ville, temperatureCelsius: temp, mesureA: DateTime.now());
   }
 }
-
-

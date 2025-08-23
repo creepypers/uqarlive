@@ -1,5 +1,4 @@
-// UI Design: Entité représentant l'adhésion d'un utilisateur à une association
-class MembreAssociation {
+﻿class MembreAssociation {
   final String id;
   final String utilisateurId;
   final String associationId;
@@ -9,7 +8,6 @@ class MembreAssociation {
   final double? cotisationPayee;
   final DateTime? dateFinAdhesion;
   final List<String> responsabilites;
-
   const MembreAssociation({
     required this.id,
     required this.utilisateurId,
@@ -21,15 +19,11 @@ class MembreAssociation {
     this.dateFinAdhesion,
     this.responsabilites = const [],
   });
-
-  // UI Design: Méthodes utilitaires
   bool get estMembreBureau => ['president', 'vice_president', 'tresorier', 'secretaire', 'membre_bureau'].contains(role);
   bool get estPresident => role == 'president';
   bool get estVicePresident => role == 'vice_president';
-  
   Duration get dureeAdhesion => DateTime.now().difference(dateAdhesion);
   int get dureeAdhesionEnMois => (dureeAdhesion.inDays / 30).round();
-
   String get roleFormate {
     final roleLower = role.toLowerCase();
     switch (roleLower) {
@@ -59,8 +53,6 @@ class MembreAssociation {
         return role.isEmpty ? 'Membre' : '${role[0].toUpperCase()}${role.substring(1)}';
     }
   }
-
-  // UI Design: Copie avec modifications
   MembreAssociation copyWith({
     String? id,
     String? utilisateurId,
@@ -84,18 +76,15 @@ class MembreAssociation {
       responsabilites: responsabilites ?? this.responsabilites,
     );
   }
-
   @override
   String toString() {
     return 'MembreAssociation(id: $id, utilisateurId: $utilisateurId, associationId: $associationId, role: $role, actif: $estActif)';
   }
-
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     return other is MembreAssociation && other.id == id;
   }
-
   @override
   int get hashCode => id.hashCode;
 }

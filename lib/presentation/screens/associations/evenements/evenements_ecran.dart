@@ -1,5 +1,4 @@
-// UI Design: Écran pour afficher tous les événements avec inscriptions
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../../../core/di/service_locator.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../domain/entities/evenement.dart';
@@ -8,14 +7,11 @@ import '../../../../domain/usercases/associations_repository.dart';
 import '../../../services/evenements_service.dart';
 import '../../../services/authentification_service.dart';
 import '../../../widgets/widget_barre_app_personnalisee.dart';
-
 class EvenementsEcran extends StatefulWidget {
   const EvenementsEcran({super.key});
-
   @override
   State<EvenementsEcran> createState() => _EvenementsEcranState();
 }
-
 class _EvenementsEcranState extends State<EvenementsEcran>
     with SingleTickerProviderStateMixin {
   late final EvenementsRepository _evenementsRepository;
@@ -23,7 +19,6 @@ class _EvenementsEcranState extends State<EvenementsEcran>
   late final EvenementsService _evenementsService;
   late final AuthentificationService _authentificationService;
   late TabController _tabController;
-
   List<Evenement> _tousEvenements = [];
   List<Evenement> _evenementsAVenir = [];
   List<Evenement> _evenementsEnCours = [];
@@ -31,7 +26,6 @@ class _EvenementsEcranState extends State<EvenementsEcran>
   String _filtreType = 'tous';
   final Map<String, String> _nomsAssociations = {}; // Cache des noms d'associations
   final Map<String, bool> _evenementsInscrits = {}; // Cache des inscriptions de l'utilisateur
-
   @override
   void initState() {
     super.initState();
@@ -39,40 +33,33 @@ class _EvenementsEcranState extends State<EvenementsEcran>
     _tabController = TabController(length: 3, vsync: this);
     _chargerEvenements();
   }
-
   @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
   }
-
   void _initialiserServices() {
     _evenementsRepository = ServiceLocator.obtenirService<EvenementsRepository>();
     _associationsRepository = ServiceLocator.obtenirService<AssociationsRepository>();
     _evenementsService = EvenementsService();
     _authentificationService = ServiceLocator.obtenirService<AuthentificationService>();
   }
-
   Future<void> _chargerEvenements() async {
     setState(() => _chargement = true);
-
     try {
       // Charger les événements et les associations en parallèle
       final futures = await Future.wait([
         _evenementsRepository.obtenirEvenements(),
         _associationsRepository.obtenirAssociationsPopulaires(limite: 50),
       ]);
-
       final evenements = futures[0] as List<Evenement>;
       final associations = futures[1] as List;
-
       // Construire le cache des noms d'associations
       _nomsAssociations.clear();
       _nomsAssociations['admin_general'] = 'UQAR - Administration';
       for (final association in associations) {
         _nomsAssociations[association.id] = association.nom;
       }
-
       setState(() {
         _tousEvenements = evenements;
         _evenementsAVenir = evenements.where((e) => e.estAVenir).toList();
@@ -91,12 +78,10 @@ class _EvenementsEcranState extends State<EvenementsEcran>
       }
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
-
     return Scaffold(
       backgroundColor: CouleursApp.fond,
       appBar: const WidgetBarreAppPersonnalisee(
@@ -174,12 +159,10 @@ class _EvenementsEcranState extends State<EvenementsEcran>
       ),
     );
   }
-
   Widget _construireBoutonFiltre(String valeur, String libelle) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final estSelectionne = _filtreType == valeur;
-
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -212,19 +195,16 @@ class _EvenementsEcranState extends State<EvenementsEcran>
       ),
     );
   }
-
   List<Evenement> _obtenirEvenementsFiltres(List<Evenement> evenements) {
     if (_filtreType == 'tous') {
       return evenements;
     }
     return evenements.where((e) => e.typeEvenement == _filtreType).toList();
   }
-
   Widget _construireListeEvenements(List<Evenement> evenements) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
-
     if (_chargement) {
       return const Center(
         child: CircularProgressIndicator(
@@ -232,7 +212,6 @@ class _EvenementsEcranState extends State<EvenementsEcran>
         ),
       );
     }
-
     if (evenements.isEmpty) {
       return Center(
         child: Column(
@@ -265,7 +244,6 @@ class _EvenementsEcranState extends State<EvenementsEcran>
         ),
       );
     }
-
     return RefreshIndicator(
       onRefresh: _chargerEvenements,
       color: CouleursApp.principal,
@@ -279,12 +257,10 @@ class _EvenementsEcranState extends State<EvenementsEcran>
       ),
     );
   }
-
   Widget _construireCarteEvenement(Evenement evenement) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
-
     return Container(
       margin: EdgeInsets.only(bottom: screenHeight * 0.02),
       decoration: BoxDecoration(
@@ -366,9 +342,7 @@ class _EvenementsEcranState extends State<EvenementsEcran>
                 ),
               ],
             ),
-            
             SizedBox(height: screenHeight * 0.015),
-            
             // Description
             if (evenement.description.isNotEmpty) ...[
               Text(
@@ -382,7 +356,6 @@ class _EvenementsEcranState extends State<EvenementsEcran>
               ),
               SizedBox(height: screenHeight * 0.015),
             ],
-            
             // Informations pratiques
             Row(
               children: [
@@ -421,9 +394,7 @@ class _EvenementsEcranState extends State<EvenementsEcran>
                 ],
               ],
             ),
-            
             SizedBox(height: screenHeight * 0.01),
-            
             // Association organisatrice
             Row(
               children: [
@@ -464,7 +435,6 @@ class _EvenementsEcranState extends State<EvenementsEcran>
                   ),
               ],
             ),
-            
             // Informations d'inscription
             if (evenement.inscriptionRequise) ...[
               SizedBox(height: screenHeight * 0.015),
@@ -507,7 +477,6 @@ class _EvenementsEcranState extends State<EvenementsEcran>
                 ],
               ),
             ],
-            
             // Bouton d'inscription
             if (evenement.inscriptionRequise) ...[
               SizedBox(height: screenHeight * 0.015),
@@ -547,12 +516,10 @@ class _EvenementsEcranState extends State<EvenementsEcran>
       ),
     );
   }
-
   // Vérifier si l'utilisateur est inscrit à un événement
   bool _estInscritEvenement(String evenementId) {
     return _evenementsInscrits[evenementId] ?? false;
   }
-
   // Gérer l'inscription/désinscription à un événement
   Future<void> _gererInscriptionEvenement(Evenement evenement) async {
     final utilisateur = _authentificationService.utilisateurActuel;
@@ -560,10 +527,8 @@ class _EvenementsEcranState extends State<EvenementsEcran>
       _afficherErreur('Vous devez être connecté pour vous inscrire aux événements');
       return;
     }
-
     try {
       final estInscrit = _estInscritEvenement(evenement.id);
-      
       bool success;
       if (estInscrit) {
         // Désinscription
@@ -582,7 +547,6 @@ class _EvenementsEcranState extends State<EvenementsEcran>
           _afficherErreur('Cet événement est complet');
           return;
         }
-        
         success = await _evenementsService.inscrireUtilisateur(evenement.id, utilisateur.id);
         if (success) {
           setState(() {
@@ -593,19 +557,16 @@ class _EvenementsEcranState extends State<EvenementsEcran>
           _afficherErreur('Erreur lors de l\'inscription');
         }
       }
-      
       // Recharger les données pour mettre à jour les compteurs
       await _chargerEvenements();
     } catch (e) {
       _afficherErreur('Erreur: $e');
     }
   }
-
   // Obtenir le nom de l'association
   String _obtenirNomAssociation(String associationId) {
     return _nomsAssociations[associationId] ?? 'Association';
   }
-
   // Obtenir la couleur selon le type d'événement
   Color _obtenirCouleurType(String type) {
     switch (type.toLowerCase()) {
@@ -625,7 +586,6 @@ class _EvenementsEcranState extends State<EvenementsEcran>
         return CouleursApp.principal;
     }
   }
-
   // Obtenir l'icône selon le type d'événement
   IconData _obtenirIconeType(String type) {
     switch (type.toLowerCase()) {
@@ -645,7 +605,6 @@ class _EvenementsEcranState extends State<EvenementsEcran>
         return Icons.event;
     }
   }
-
   // Obtenir la couleur selon le statut
   Color _obtenirCouleurStatut(String statut) {
     switch (statut) {
@@ -659,7 +618,6 @@ class _EvenementsEcranState extends State<EvenementsEcran>
         return CouleursApp.principal;
     }
   }
-
   // Méthodes utilitaires pour les messages
   void _afficherErreur(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -670,7 +628,6 @@ class _EvenementsEcranState extends State<EvenementsEcran>
       ),
     );
   }
-
   void _afficherSucces(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

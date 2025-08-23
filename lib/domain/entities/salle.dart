@@ -1,4 +1,4 @@
-// Entité représentant une salle de révision
+﻿// Entité représentant une salle de révision
 class Salle {
   final String id;
   final String nom;
@@ -13,7 +13,6 @@ class Salle {
   final DateTime? heureDebut;
   final DateTime? heureFin;
   final double tarifParHeure;
-
   const Salle({
     required this.id,
     required this.nom,

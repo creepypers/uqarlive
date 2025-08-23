@@ -1,13 +1,10 @@
-import '../../domain/entities/salle.dart';
+﻿import '../../domain/entities/salle.dart';
 import '../../domain/usercases/salles_repository.dart';
 import '../datasources/internal/salles_datasource_local.dart';
-
 // Implémentation du repository pour les salles de révision
 class SallesRepositoryImpl implements SallesRepository {
   final SallesDatasourceLocal _datasourceLocal;
-
   SallesRepositoryImpl(this._datasourceLocal);
-
   @override
   Future<List<Salle>> obtenirToutesLesSalles() async {
     try {
@@ -16,7 +13,6 @@ class SallesRepositoryImpl implements SallesRepository {
       throw Exception('Erreur lors de la récupération des salles: $e');
     }
   }
-
   @override
   Future<List<Salle>> obtenirSallesDisponibles() async {
     try {
@@ -25,7 +21,6 @@ class SallesRepositoryImpl implements SallesRepository {
       throw Exception('Erreur lors de la récupération des salles disponibles: $e');
     }
   }
-
   @override
   Future<Salle?> obtenirSalleParId(String id) async {
     try {
@@ -34,7 +29,6 @@ class SallesRepositoryImpl implements SallesRepository {
       throw Exception('Erreur lors de la récupération de la salle: $e');
     }
   }
-
   @override
   Future<bool> reserverSalle(
     String salleId, 
@@ -51,11 +45,9 @@ class SallesRepositoryImpl implements SallesRepository {
         heureDebut, 
         heureFin
       );
-      
       if (!estDisponible) {
         return false;
       }
-      
       return await _datasourceLocal.reserverSalle(
         salleId, 
         utilisateurId, 
@@ -67,7 +59,6 @@ class SallesRepositoryImpl implements SallesRepository {
       throw Exception('Erreur lors de la réservation: $e');
     }
   }
-
   @override
   Future<bool> annulerReservation(String salleId) async {
     try {
@@ -76,7 +67,6 @@ class SallesRepositoryImpl implements SallesRepository {
       throw Exception('Erreur lors de l\'annulation de la réservation: $e');
     }
   }
-
   @override
   Future<List<Salle>> obtenirReservationsUtilisateur(String utilisateurId) async {
     try {
@@ -85,7 +75,6 @@ class SallesRepositoryImpl implements SallesRepository {
       throw Exception('Erreur lors de la récupération des réservations: $e');
     }
   }
-
   @override
   Future<bool> verifierDisponibilite(
     String salleId,

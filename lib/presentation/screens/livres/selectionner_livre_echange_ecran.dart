@@ -1,19 +1,15 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../domain/entities/livre.dart';
 import '../../../presentation/widgets/widget_barre_app_personnalisee.dart';
-
-// UI Design: Écran complet dédié à la sélection des livres pour échange
 class SelectionnerLivreEchangeEcran extends StatelessWidget {
   final List<Livre> livres;
   final Livre livreACible; // Le livre que l'utilisateur veut obtenir
-
   const SelectionnerLivreEchangeEcran({
     super.key,
     required this.livres,
     required this.livreACible,
   });
-
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
@@ -21,7 +17,6 @@ class SelectionnerLivreEchangeEcran extends StatelessWidget {
     final screenHeight = mediaQuery.size.height;
     final padding = mediaQuery.padding;
     final viewInsets = mediaQuery.viewInsets;
-    
     return Scaffold(
       backgroundColor: CouleursApp.fond,
       resizeToAvoidBottomInset: true,
@@ -36,12 +31,10 @@ class SelectionnerLivreEchangeEcran extends StatelessWidget {
           children: [
             // En-tête avec informations sur l'échange
             _construireEnTeteEchange(screenWidth, screenHeight),
-            
             // Liste des livres disponibles
             Expanded(
               child: _construireListeLivres(screenWidth, screenHeight),
             ),
-            
             // Actions en bas
             _construireActionsFinales(context, screenWidth, screenHeight, viewInsets, padding),
           ],
@@ -49,8 +42,6 @@ class SelectionnerLivreEchangeEcran extends StatelessWidget {
       ),
     );
   }
-
-  // UI Design: En-tête simplifié avec informations sur l'échange
   Widget _construireEnTeteEchange(double screenWidth, double screenHeight) {
     return Container(
       margin: EdgeInsets.all(screenWidth * 0.04),
@@ -74,9 +65,7 @@ class SelectionnerLivreEchangeEcran extends StatelessWidget {
               size: 24,
             ),
           ),
-          
           SizedBox(width: screenWidth * 0.04),
-          
           // Informations échange simplifiées
           Expanded(
             child: Column(
@@ -108,10 +97,6 @@ class SelectionnerLivreEchangeEcran extends StatelessWidget {
       ),
     );
   }
-
-
-
-  // UI Design: Liste des livres disponibles avec cartes modernisées
   Widget _construireListeLivres(double screenWidth, double screenHeight) {
     if (livres.isEmpty) {
       return Center(
@@ -148,7 +133,6 @@ class SelectionnerLivreEchangeEcran extends StatelessWidget {
         ),
       );
     }
-
     return Padding(
       padding: EdgeInsets.all(screenWidth * 0.04),
       child: Column(
@@ -166,7 +150,6 @@ class SelectionnerLivreEchangeEcran extends StatelessWidget {
               ),
             ),
           ),
-          
           // Liste des livres
           Expanded(
             child: ListView.separated(
@@ -182,8 +165,6 @@ class SelectionnerLivreEchangeEcran extends StatelessWidget {
       ),
     );
   }
-
-  // UI Design: Carte simplifiée et lisible pour chaque livre
   Widget _construireCarteLivreSimple(Livre livre, double screenWidth, BuildContext context) {
     return Card(
       elevation: 1,
@@ -213,9 +194,7 @@ class SelectionnerLivreEchangeEcran extends StatelessWidget {
                   size: 28,
                 ),
               ),
-              
               SizedBox(width: screenWidth * 0.04),
-              
               // Informations essentielles du livre
               Expanded(
                 child: Column(
@@ -233,9 +212,7 @@ class SelectionnerLivreEchangeEcran extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    
                     SizedBox(height: screenWidth * 0.02),
-                    
                     // Auteur
                     Text(
                       livre.auteur,
@@ -247,9 +224,7 @@ class SelectionnerLivreEchangeEcran extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    
                     SizedBox(height: screenWidth * 0.02),
-                    
                     // Matière et état sur la même ligne
                     Row(
                       children: [
@@ -262,7 +237,6 @@ class SelectionnerLivreEchangeEcran extends StatelessWidget {
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        
                         Text(
                           ' • ',
                           style: TextStyle(
@@ -270,7 +244,6 @@ class SelectionnerLivreEchangeEcran extends StatelessWidget {
                             color: CouleursApp.gris,
                           ),
                         ),
-                        
                         // État
                         Text(
                           livre.etatLivre,
@@ -285,7 +258,6 @@ class SelectionnerLivreEchangeEcran extends StatelessWidget {
                   ],
                 ),
               ),
-              
               // Flèche simple
               const Icon(
                 Icons.arrow_forward_ios,
@@ -298,7 +270,6 @@ class SelectionnerLivreEchangeEcran extends StatelessWidget {
       ),
     );
   }
-  
   // Obtenir la couleur selon l'état du livre
   Color _obtenirCouleurEtat(String etat) {
     switch (etat.toLowerCase()) {
@@ -314,8 +285,6 @@ class SelectionnerLivreEchangeEcran extends StatelessWidget {
         return CouleursApp.gris;
     }
   }
-
-  // UI Design: Actions finales simplifiées en bas de la page
   Widget _construireActionsFinales(BuildContext context, double screenWidth, double screenHeight, EdgeInsets viewInsets, EdgeInsets padding) {
     return Container(
       padding: EdgeInsets.only(
@@ -338,9 +307,7 @@ class SelectionnerLivreEchangeEcran extends StatelessWidget {
               fontWeight: FontWeight.w400,
             ),
           ),
-          
           SizedBox(height: screenHeight * 0.02),
-          
           // Bouton annuler centré
           SizedBox(
             width: double.infinity,

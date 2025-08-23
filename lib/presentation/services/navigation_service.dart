@@ -1,13 +1,9 @@
-import 'package:flutter/material.dart';
-
+﻿import 'package:flutter/material.dart';
 import '../screens/accueil_ecran.dart';
 import '../screens/associations/associations_ecran.dart';
 import '../screens/cantine/cantine_ecran.dart';
 import '../screens/livres/marketplace_ecran.dart';
-
 import '../screens/salles_ecran.dart';
-
-// UI Design: Service de navigation centralisé pour éviter la duplication
 class NavigationService {
   /// Gérer la navigation de la NavBar
   static void gererNavigationNavBar(BuildContext context, int index) {
@@ -29,7 +25,6 @@ class NavigationService {
         break;
     }
   }
-
   /// Navigation vers une page avec remplacement (pour éviter accumulation)
   static void _naviguerVers(BuildContext context, Widget destination) {
     Navigator.of(context).pushReplacement(
@@ -39,7 +34,6 @@ class NavigationService {
       ),
     );
   }
-
   /// Navigation vers l'accueil
   static void _naviguerVersAccueil(BuildContext context) {
     // Si on est déjà sur l'accueil, ne rien faire
@@ -47,23 +41,16 @@ class NavigationService {
     if (currentWidget.runtimeType.toString() == 'AccueilEcran') {
       return;
     }
-
     // Sinon, naviguer vers l'accueil
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (context) => const AccueilEcran()),
       (route) => false, // Supprime toutes les routes précédentes
     );
   }
-
-
-
-
-
   /// Obtenir l'index de la NavBar selon la page courante
   static int obtenirIndexCourant(BuildContext context) {
     final currentWidget = context.widget;
     final widgetType = currentWidget.runtimeType.toString();
-
     switch (widgetType) {
       case 'CantineEcran':
         return 0;

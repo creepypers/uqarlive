@@ -1,5 +1,4 @@
-// UI Design: Entité Livre pour l'échange de livres universitaires entre étudiants UQAR
-class Livre {
+﻿class Livre {
   final String id;
   final String titre;
   final String auteur;
@@ -16,7 +15,6 @@ class Livre {
   final String? imageUrl;
   final List<String>? motsClefs;
   final double? prix;
-
   const Livre({
     required this.id,
     required this.titre,
@@ -35,10 +33,8 @@ class Livre {
     this.motsClefs,
     this.prix,
   });
-
   // Getter pour le code de cours (alias pour coursAssocies)
   String? get codeCours => coursAssocies;
-
   // Méthode pour copier avec modifications
   Livre copyWith({
     String? id,
@@ -77,18 +73,15 @@ class Livre {
       prix: prix ?? this.prix,
     );
   }
-
   @override
   String toString() {
     return 'Livre(id: $id, titre: $titre, auteur: $auteur, matiere: $matiere, anneeEtude: $anneeEtude, etatLivre: $etatLivre, proprietaire: $proprietaire, proprietaireId: $proprietaireId)';
   }
-
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     return other is Livre && other.id == id;
   }
-
   @override
   int get hashCode => id.hashCode;
 } 

@@ -1,5 +1,4 @@
-// UI Design: Entité représentant un utilisateur de l'application
-class Utilisateur {
+﻿class Utilisateur {
   final String id;
   final String nom;
   final String prenom;
@@ -14,8 +13,8 @@ class Utilisateur {
   final List<String> privileges;
   final DateTime? derniereConnexion;
   final String? photoUrl;
-  final List<String> associationsMembre; // UI Design: Liste des IDs des associations dont l'utilisateur est membre
-
+  final List<String> associationsMembre; 
+  final String motDePasse; 
   const Utilisateur({
     required this.id,
     required this.nom,
@@ -31,22 +30,13 @@ class Utilisateur {
     this.privileges = const [],
     this.derniereConnexion,
     this.photoUrl,
-    this.associationsMembre = const [], // UI Design: Initialiser avec une liste vide
+    this.associationsMembre = const [], 
+    required this.motDePasse, 
   });
-
-  // UI Design: Méthode utilitaire pour vérifier si l'utilisateur est admin
   bool get estAdmin => typeUtilisateur == TypeUtilisateur.administrateur;
-
-  // UI Design: Méthode utilitaire pour vérifier si l'utilisateur a un privilège spécifique
   bool aPrivilege(String privilege) => privileges.contains(privilege);
-
-  // UI Design: Getter pour vérifier si l'utilisateur est membre d'associations
   bool get estMembreAssociations => associationsMembre.isNotEmpty;
-
-  // UI Design: Getter pour le nombre d'associations dont l'utilisateur est membre
   int get nombreAssociations => associationsMembre.length;
-
-  // UI Design: Copie avec modifications
   Utilisateur copyWith({
     String? id,
     String? nom,
@@ -62,7 +52,8 @@ class Utilisateur {
     List<String>? privileges,
     DateTime? derniereConnexion,
     String? photoUrl,
-    List<String>? associationsMembre, // UI Design: Ajouter associationsMembre
+    List<String>? associationsMembre, 
+    String? motDePasse, 
   }) {
     return Utilisateur(
       id: id ?? this.id,
@@ -79,18 +70,15 @@ class Utilisateur {
       privileges: privileges ?? this.privileges,
       derniereConnexion: derniereConnexion ?? this.derniereConnexion,
       photoUrl: photoUrl ?? this.photoUrl,
-      associationsMembre: associationsMembre ?? this.associationsMembre, // UI Design: Copier associationsMembre
+      associationsMembre: associationsMembre ?? this.associationsMembre, 
+      motDePasse: motDePasse ?? this.motDePasse, 
     );
   }
 }
-
-// UI Design: Énumération des types d'utilisateurs
 enum TypeUtilisateur {
   etudiant,
   administrateur,
 }
-
-// UI Design: Constantes pour les privilèges
 class PrivilegesUtilisateur {
   static const String admin = 'admin';
   static const String gestionComptes = 'gestion_comptes';

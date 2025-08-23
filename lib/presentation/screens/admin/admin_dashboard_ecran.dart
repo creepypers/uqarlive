@@ -1,34 +1,26 @@
-// UI Design: Écran principal du dashboard administrateur avec statistiques dynamiques
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/di/service_locator.dart';
 import '../../../domain/entities/utilisateur.dart';
 import '../../widgets/widget_barre_app_navigation_admin.dart';
 import '../../widgets/widget_carte.dart';
-
 import '../../services/statistiques_service.dart';
 import '../../services/authentification_service.dart';
 import 'admin_gestion_comptes_ecran.dart';
 import 'admin_gestion_cantine_ecran.dart';
 import '../../../presentation/screens/admin/admin_gestion_associations_ecran.dart';
-
-
-
 class AdminDashboardEcran extends StatefulWidget {
   const AdminDashboardEcran({super.key});
-
   @override
   State<AdminDashboardEcran> createState() => _AdminDashboardEcranState();
 }
-
 class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
   late StatistiquesService _statistiquesService;
   late AuthentificationService _authentificationService;
   StatistiquesDashboard? _statistiquesDashboard;
   Utilisateur? _utilisateurActuel;
   bool _chargementEnCours = true;
-  bool _statistiquesVisibles = true; // UI Design: Contrôle visibilité des statistiques
-
+  bool _statistiquesVisibles = true; 
   @override
   void initState() {
     super.initState();
@@ -37,13 +29,10 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
     _utilisateurActuel = _authentificationService.utilisateurActuel;
     _chargerDonnees();
   }
-
   Future<void> _chargerDonnees() async {
     try {
       setState(() => _chargementEnCours = true);
-      
       final statistiquesDashboard = await _statistiquesService.obtenirStatistiquesDashboard();
-      
       setState(() {
         _statistiquesDashboard = statistiquesDashboard;
         _chargementEnCours = false;
@@ -60,19 +49,16 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
       }
     }
   }
-
   @override
   Widget build(BuildContext context) {
-    // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
     final mediaQuery = MediaQuery.of(context);
     final screenHeight = mediaQuery.size.height;
     final screenWidth = mediaQuery.size.width;
     final padding = mediaQuery.padding;
     final viewInsets = mediaQuery.viewInsets;
-    
     return Scaffold(
       backgroundColor: CouleursApp.fond,
-      resizeToAvoidBottomInset: true, // UI Design: Éviter les débordements avec le clavier
+      resizeToAvoidBottomInset: true, 
       appBar: WidgetBarreAppNavigationAdmin(
         titre: 'Dashboard Admin',
         sousTitre: _utilisateurActuel != null 
@@ -88,22 +74,22 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   padding: EdgeInsets.only(
-                    left: screenWidth * 0.04, // UI Design: Padding adaptatif
+                    left: screenWidth * 0.04, 
                     right: screenWidth * 0.04,
                     top: screenHeight * 0.02,
-                    bottom: viewInsets.bottom + padding.bottom + screenHeight * 0.025, // UI Design: Padding adaptatif pour éviter les débordements
+                    bottom: viewInsets.bottom + padding.bottom + screenHeight * 0.025, 
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _construireStatistiquesGenerales(),
-                      SizedBox(height: screenHeight * 0.025), // UI Design: Espacement adaptatif
+                      SizedBox(height: screenHeight * 0.025), 
                       _construireStatistiquesDetaillees(),
-                      SizedBox(height: screenHeight * 0.025), // UI Design: Espacement adaptatif
+                      SizedBox(height: screenHeight * 0.025), 
                       _construireSectionsGestion(),
-                      SizedBox(height: screenHeight * 0.025), // UI Design: Espacement adaptatif
+                      SizedBox(height: screenHeight * 0.025), 
                       _construireActiviteRecente(),
-                      SizedBox(height: screenHeight * 0.01), // UI Design: Padding final pour éviter overflow
+                      SizedBox(height: screenHeight * 0.01), 
                     ],
                   ),
                 ),
@@ -111,17 +97,12 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
       ),
     );
   }
-
-  // UI Design: Statistiques générales en cartes
   Widget _construireStatistiquesGenerales() {
     if (_statistiquesDashboard == null) return const SizedBox.shrink();
-    
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
-    
     final stats = _statistiquesDashboard!.statistiquesGlobales;
-    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -131,12 +112,11 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
             Text(
               'Vue d\'ensemble',
               style: StylesTexteApp.titrePage.copyWith(
-                fontSize: screenWidth * 0.055, // UI Design: Taille adaptative
+                fontSize: screenWidth * 0.055, 
               ),
-              overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+              overflow: TextOverflow.ellipsis, 
               maxLines: 1,
             ),
-            // UI Design: Bouton pour masquer/afficher les statistiques
             IconButton(
               onPressed: () {
                 setState(() {
@@ -146,21 +126,20 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
               icon: Icon(
                 _statistiquesVisibles ? Icons.visibility_off : Icons.visibility,
                 color: CouleursApp.principal,
-                size: screenWidth * 0.06, // UI Design: Taille adaptative
+                size: screenWidth * 0.06, 
               ),
               tooltip: _statistiquesVisibles ? 'Masquer les statistiques' : 'Afficher les statistiques',
             ),
           ],
         ),
-        SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
-        // UI Design: Affichage conditionnel des statistiques
+        SizedBox(height: screenHeight * 0.02), 
         _statistiquesVisibles
             ? GridView.count(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 crossAxisCount: 2,
-                mainAxisSpacing: screenWidth * 0.04, // UI Design: Espacement adaptatif
-                crossAxisSpacing: screenWidth * 0.04, // UI Design: Espacement adaptatif
+                mainAxisSpacing: screenWidth * 0.04, 
+                crossAxisSpacing: screenWidth * 0.04, 
                 childAspectRatio: 1.2,
                 children: [
                   _construireCarteStatistique(
@@ -193,17 +172,17 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
                   ),
                 ],
               )
-            : // UI Design: Message quand les statistiques sont masquées
+            : 
             Container(
-                padding: EdgeInsets.symmetric(vertical: screenHeight * 0.025), // UI Design: Padding adaptatif
+                padding: EdgeInsets.symmetric(vertical: screenHeight * 0.025), 
                 child: Center(
                   child: Text(
                     'Statistiques masquées - Cliquez sur l\'œil pour les afficher',
                     style: StylesTexteApp.corpsGris.copyWith(
-                      fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
+                      fontSize: screenWidth * 0.035, 
                     ),
                     textAlign: TextAlign.center,
-                    overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                    overflow: TextOverflow.ellipsis, 
                     maxLines: 2,
                   ),
                 ),
@@ -211,18 +190,15 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
       ],
     );
   }
-
-  // UI Design: Carte de statistique individuelle
   Widget _construireCarteStatistique(String titre, String valeur, IconData icone, Color couleur, String detail) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
-    
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
-        padding: EdgeInsets.all(screenWidth * 0.04), // UI Design: Padding adaptatif
+        padding: EdgeInsets.all(screenWidth * 0.04), 
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           gradient: LinearGradient(
@@ -240,36 +216,36 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Icon(icone, color: couleur, size: screenWidth * 0.075), // UI Design: Taille adaptative
+                Icon(icone, color: couleur, size: screenWidth * 0.075), 
                 Text(
                   valeur,
                   style: TextStyle(
-                    fontSize: screenWidth * 0.06, // UI Design: Taille adaptative
+                    fontSize: screenWidth * 0.06, 
                     fontWeight: FontWeight.bold,
                     color: couleur,
                   ),
-                  overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                  overflow: TextOverflow.ellipsis, 
                   maxLines: 1,
                 ),
               ],
             ),
-            SizedBox(height: screenHeight * 0.01), // UI Design: Espacement adaptatif
+            SizedBox(height: screenHeight * 0.01), 
             Text(
               titre,
               style: StylesTexteApp.moyenTitre.copyWith(
                 color: CouleursApp.texteFonce,
-                fontSize: screenWidth * 0.04, // UI Design: Taille adaptative
+                fontSize: screenWidth * 0.04, 
               ),
-              overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+              overflow: TextOverflow.ellipsis, 
               maxLines: 1,
             ),
-            SizedBox(height: screenHeight * 0.005), // UI Design: Espacement adaptatif
+            SizedBox(height: screenHeight * 0.005), 
             Text(
               detail,
               style: StylesTexteApp.petitGris.copyWith(
-                fontSize: screenWidth * 0.03, // UI Design: Taille adaptative
+                fontSize: screenWidth * 0.03, 
               ),
-              overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+              overflow: TextOverflow.ellipsis, 
               maxLines: 2,
             ),
           ],
@@ -277,34 +253,29 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
       ),
     );
   }
-
-  // UI Design: Statistiques détaillées en section
   Widget _construireStatistiquesDetaillees() {
     if (_statistiquesDashboard == null) return const SizedBox.shrink();
-    
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
-    
     final stats = _statistiquesDashboard!.statistiquesGlobales;
-    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Statistiques détaillées',
           style: StylesTexteApp.titrePage.copyWith(
-            fontSize: screenWidth * 0.055, // UI Design: Taille adaptative
+            fontSize: screenWidth * 0.055, 
           ),
-          overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+          overflow: TextOverflow.ellipsis, 
           maxLines: 1,
         ),
-        SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
+        SizedBox(height: screenHeight * 0.02), 
         Card(
           elevation: 2,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           child: Padding(
-            padding: EdgeInsets.all(screenWidth * 0.05), // UI Design: Padding adaptatif
+            padding: EdgeInsets.all(screenWidth * 0.05), 
             child: Column(
               children: [
                 _construireLigneStatistique('Livres disponibles', '${stats.livresDisponibles}/${stats.totalLivres}'),
@@ -321,25 +292,22 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
       ],
     );
   }
-
-  // UI Design: Ligne de statistique individuelle
   Widget _construireLigneStatistique(String libelle, String valeur) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
-    
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: screenHeight * 0.01), // UI Design: Padding adaptatif
+      padding: EdgeInsets.symmetric(vertical: screenHeight * 0.01), 
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded( // UI Design: Widget flexible pour éviter les débordements
+          Expanded( 
             child: Text(
               libelle, 
               style: StylesTexteApp.corpsNormal.copyWith(
-                fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
+                fontSize: screenWidth * 0.035, 
               ),
-              overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+              overflow: TextOverflow.ellipsis, 
               maxLines: 1,
             ),
           ),
@@ -348,39 +316,35 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
             style: StylesTexteApp.corpsNormal.copyWith(
               fontWeight: FontWeight.bold,
               color: CouleursApp.principal,
-              fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
+              fontSize: screenWidth * 0.035, 
             ),
-            overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+            overflow: TextOverflow.ellipsis, 
             maxLines: 1,
           ),
         ],
       ),
     );
   }
-
-  // UI Design: Sections de gestion avec navigation
   Widget _construireSectionsGestion() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
-    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Gestion du système',
           style: StylesTexteApp.titrePage.copyWith(
-            fontSize: screenWidth * 0.055, // UI Design: Taille adaptative
+            fontSize: screenWidth * 0.055, 
           ),
-          overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+          overflow: TextOverflow.ellipsis, 
           maxLines: 1,
         ),
-        SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
-        // UI Design: Utilisation du composant WidgetCarte existant pour éviter l'overflow
+        SizedBox(height: screenHeight * 0.02), 
         Center(
           child: Wrap(
-            spacing: screenWidth * 0.03, // UI Design: Espacement adaptatif
-            runSpacing: screenWidth * 0.03, // UI Design: Espacement adaptatif
+            spacing: screenWidth * 0.03, 
+            runSpacing: screenWidth * 0.03, 
             alignment: WrapAlignment.center,
             children: [
               WidgetCarte.association(
@@ -411,53 +375,46 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
                 couleurIcone: Colors.red,
                 onTap: () => _afficherGestionComptes(),
               ),
-             
             ],
           ),
         ),
       ],
     );
   }
-
-
-
-  // UI Design: Section d'activité récente
   Widget _construireActiviteRecente() {
     if (_statistiquesDashboard == null) return const SizedBox.shrink();
-    
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
-    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Activité récente',
           style: StylesTexteApp.titrePage.copyWith(
-            fontSize: screenWidth * 0.055, // UI Design: Taille adaptative
+            fontSize: screenWidth * 0.055, 
           ),
-          overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+          overflow: TextOverflow.ellipsis, 
           maxLines: 1,
         ),
-        SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
+        SizedBox(height: screenHeight * 0.02), 
         Card(
           elevation: 2,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           child: Padding(
-            padding: EdgeInsets.all(screenWidth * 0.05), // UI Design: Padding adaptatif
+            padding: EdgeInsets.all(screenWidth * 0.05), 
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'Derniers utilisateurs inscrits',
                   style: StylesTexteApp.moyenTitre.copyWith(
-                    fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
+                    fontSize: screenWidth * 0.045, 
                   ),
-                  overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                  overflow: TextOverflow.ellipsis, 
                   maxLines: 1,
                 ),
-                SizedBox(height: screenHeight * 0.015), // UI Design: Espacement adaptatif
+                SizedBox(height: screenHeight * 0.015), 
                 _statistiquesDashboard!.derniersUtilisateurs.isEmpty
                     ? _construireMessageVide()
                     : Column(
@@ -473,16 +430,13 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
       ],
     );
   }
-
-  // UI Design: Carte utilisateur compacte
   Widget _construireCarteUtilisateurCompacte(Utilisateur utilisateur) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
-    
     return Container(
-      margin: EdgeInsets.only(bottom: screenHeight * 0.01), // UI Design: Marge adaptative
-      padding: EdgeInsets.all(screenWidth * 0.03), // UI Design: Padding adaptatif
+      margin: EdgeInsets.only(bottom: screenHeight * 0.01), 
+      padding: EdgeInsets.all(screenWidth * 0.03), 
       decoration: BoxDecoration(
         color: CouleursApp.fond,
         borderRadius: BorderRadius.circular(12),
@@ -491,18 +445,18 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
       child: Row(
         children: [
           CircleAvatar(
-            radius: screenWidth * 0.05, // UI Design: Taille adaptative
+            radius: screenWidth * 0.05, 
             backgroundColor: CouleursApp.principal,
             child: Text(
               '${utilisateur.prenom[0]}${utilisateur.nom[0]}',
               style: TextStyle(
                 color: Colors.white, 
                 fontWeight: FontWeight.bold,
-                fontSize: screenWidth * 0.04, // UI Design: Taille adaptative
+                fontSize: screenWidth * 0.04, 
               ),
             ),
           ),
-          SizedBox(width: screenWidth * 0.03), // UI Design: Espacement adaptatif
+          SizedBox(width: screenWidth * 0.03), 
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -511,17 +465,17 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
                   '${utilisateur.prenom} ${utilisateur.nom}',
                   style: StylesTexteApp.corpsNormal.copyWith(
                     fontWeight: FontWeight.w600,
-                    fontSize: screenWidth * 0.04, // UI Design: Taille adaptative
+                    fontSize: screenWidth * 0.04, 
                   ),
-                  overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                  overflow: TextOverflow.ellipsis, 
                   maxLines: 1,
                 ),
                 Text(
                   utilisateur.email,
                   style: StylesTexteApp.petitGris.copyWith(
-                    fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
+                    fontSize: screenWidth * 0.035, 
                   ),
-                  overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+                  overflow: TextOverflow.ellipsis, 
                   maxLines: 1,
                 ),
               ],
@@ -529,7 +483,7 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
           ),
           Container(
             padding: EdgeInsets.symmetric(
-              horizontal: screenWidth * 0.02, // UI Design: Padding adaptatif
+              horizontal: screenWidth * 0.02, 
               vertical: screenWidth * 0.01,
             ),
             decoration: BoxDecoration(
@@ -540,10 +494,10 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
               _obtenirLibelleTypeUtilisateur(utilisateur.typeUtilisateur),
               style: TextStyle(
                 color: CouleursApp.principal,
-                fontSize: screenWidth * 0.03, // UI Design: Taille adaptative
+                fontSize: screenWidth * 0.03, 
                 fontWeight: FontWeight.w600,
               ),
-              overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+              overflow: TextOverflow.ellipsis, 
               maxLines: 1,
             ),
           ),
@@ -551,30 +505,27 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
       ),
     );
   }
-
-  // UI Design: Message vide
   Widget _construireMessageVide() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
-    
     return Center(
       child: Padding(
-        padding: EdgeInsets.all(screenWidth * 0.05), // UI Design: Padding adaptatif
+        padding: EdgeInsets.all(screenWidth * 0.05), 
         child: Column(
           children: [
             Icon(
               Icons.people_outline,
-              size: screenWidth * 0.15, // UI Design: Taille adaptative
+              size: screenWidth * 0.15, 
               color: CouleursApp.principal.withValues(alpha: 0.3),
             ),
-            SizedBox(height: screenHeight * 0.015), // UI Design: Espacement adaptatif
+            SizedBox(height: screenHeight * 0.015), 
             Text(
               'Aucune activité récente',
               style: StylesTexteApp.corpsGris.copyWith(
-                fontSize: screenWidth * 0.04, // UI Design: Taille adaptative
+                fontSize: screenWidth * 0.04, 
               ),
-              overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+              overflow: TextOverflow.ellipsis, 
               maxLines: 1,
             ),
           ],
@@ -582,55 +533,30 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
       ),
     );
   }
-
-  // UI Design: Méthodes de navigation
   void _naviguerVersGestionComptes() {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const AdminGestionComptesEcran()),
     );
   }
-
   void _naviguerVersGestionCantine() {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const AdminGestionCantineEcran()),
     );
   }
-
   void _naviguerVersGestionAssociations() {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const AdminGestionAssociationsEcran()),
     );
   }
-
-
-
-
-
-
-  
-
-
-
-
-
-
-
-  
-
-  
-
-  // UI Design: Méthode utilitaire pour les libellés des types d'utilisateur
   String _obtenirLibelleTypeUtilisateur(TypeUtilisateur type) {
     switch (type) {
       case TypeUtilisateur.administrateur: return 'Administrateur';
       case TypeUtilisateur.etudiant: return 'Étudiant';
     }
   }
-
-  // UI Design: Navigation vers la gestion des comptes
   void _afficherGestionComptes() {
     Navigator.push(
       context,
@@ -638,5 +564,3 @@ class _AdminDashboardEcranState extends State<AdminDashboardEcran> {
     );
   }
 }
-
- 

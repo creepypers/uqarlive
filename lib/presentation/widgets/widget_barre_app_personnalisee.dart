@@ -1,11 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/di/service_locator.dart';
 import '../../domain/entities/utilisateur.dart';
 import '../screens/utilisateur/profil_ecran.dart';
 import '../services/authentification_service.dart';
-
-// UI Design: Barre d'application personnalisée réutilisable avec design UQAR
 class WidgetBarreAppPersonnalisee extends StatelessWidget implements PreferredSizeWidget {
   final String titre;
   final String sousTitre;
@@ -16,7 +14,6 @@ class WidgetBarreAppPersonnalisee extends StatelessWidget implements PreferredSi
   final bool afficherProfil;
   final bool afficherBoutonRetour;
   final Utilisateur? utilisateurConnecte;
-
   const WidgetBarreAppPersonnalisee({
     super.key,
     required this.titre,
@@ -29,14 +26,10 @@ class WidgetBarreAppPersonnalisee extends StatelessWidget implements PreferredSi
     this.afficherBoutonRetour = false,
     this.utilisateurConnecte,
   });
-
   @override
   Widget build(BuildContext context) {
-    // UI Design: Obtenir l'utilisateur connecté pour afficher ses initiales
     final authentificationService = ServiceLocator.obtenirService<AuthentificationService>();
     final utilisateur = utilisateurConnecte ?? authentificationService.utilisateurActuel;
-    
-    // UI Design: AppBar UQAR modernisée avec hiérarchie visuelle, dégradé, ombre et bordure
     return Container(
       decoration: BoxDecoration(
         gradient: const LinearGradient(
@@ -183,10 +176,8 @@ class WidgetBarreAppPersonnalisee extends StatelessWidget implements PreferredSi
       ),
     );
   }
-
   @override
   Size get preferredSize => Size.fromHeight(hauteurBarre);
-
   // Navigation vers le profil
   void _ouvrirProfil(BuildContext context) {
     Navigator.push(

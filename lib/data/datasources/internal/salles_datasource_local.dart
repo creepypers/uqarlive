@@ -1,5 +1,4 @@
-import '../../models/salle_model.dart';
-
+﻿import '../../models/salle_model.dart';
 // Datasource locale pour les salles de révision
 class SallesDatasourceLocal {
   // Liste des 7 salles de révision
@@ -82,19 +81,16 @@ class SallesDatasourceLocal {
       tarifParHeure: 6.0,
     ),
   ];
-
   // Obtenir toutes les salles
   Future<List<SalleModel>> obtenirToutesLesSalles() async {
     await Future.delayed(const Duration(milliseconds: 500)); // Simulation réseau
     return List.from(_salles);
   }
-
   // Obtenir les salles disponibles
   Future<List<SalleModel>> obtenirSallesDisponibles() async {
     await Future.delayed(const Duration(milliseconds: 300));
     return _salles.where((salle) => salle.estDisponible).toList();
   }
-
   // Obtenir une salle par ID
   Future<SalleModel?> obtenirSalleParId(String id) async {
     await Future.delayed(const Duration(milliseconds: 200));
@@ -104,7 +100,6 @@ class SallesDatasourceLocal {
       return null;
     }
   }
-
   // Réserver une salle
   Future<bool> reserverSalle(
     String salleId,
@@ -114,10 +109,8 @@ class SallesDatasourceLocal {
     DateTime heureFin,
   ) async {
     await Future.delayed(const Duration(milliseconds: 400));
-    
     final index = _salles.indexWhere((salle) => salle.id == salleId);
     if (index == -1) return false;
-    
     // Mettre à jour la salle avec les informations de réservation
     _salles[index] = _salles[index].copyWith(
       estDisponible: false,
@@ -126,17 +119,13 @@ class SallesDatasourceLocal {
       heureDebut: heureDebut,
       heureFin: heureFin,
     );
-    
     return true;
   }
-
   // Annuler une réservation
   Future<bool> annulerReservation(String salleId) async {
     await Future.delayed(const Duration(milliseconds: 300));
-    
     final index = _salles.indexWhere((salle) => salle.id == salleId);
     if (index == -1) return false;
-    
     // Remettre la salle disponible
     _salles[index] = _salles[index].copyWith(
       estDisponible: true,
@@ -145,16 +134,13 @@ class SallesDatasourceLocal {
       heureDebut: null,
       heureFin: null,
     );
-    
     return true;
   }
-
   // Obtenir les réservations d'un utilisateur
   Future<List<SalleModel>> obtenirReservationsUtilisateur(String utilisateurId) async {
     await Future.delayed(const Duration(milliseconds: 250));
     return _salles.where((salle) => salle.reserveePar == utilisateurId).toList();
   }
-
   // Vérifier la disponibilité d'une salle
   Future<bool> verifierDisponibilite(
     String salleId,
@@ -163,21 +149,17 @@ class SallesDatasourceLocal {
     DateTime heureFin,
   ) async {
     await Future.delayed(const Duration(milliseconds: 150));
-    
     final salle = await obtenirSalleParId(salleId);
     if (salle == null) return false;
-    
     // Si la salle n'est pas disponible
     if (!salle.estDisponible) {
       // Vérifier si c'est pour la même date et s'il y a conflit d'horaires
       if (salle.dateReservation != null && 
           salle.heureDebut != null && 
           salle.heureFin != null) {
-        
         final memeJour = salle.dateReservation!.day == dateReservation.day &&
                         salle.dateReservation!.month == dateReservation.month &&
                         salle.dateReservation!.year == dateReservation.year;
-        
         if (memeJour) {
           // Vérifier le conflit d'horaires
           final conflitHoraire = (heureDebut.isBefore(salle.heureFin!) && 
@@ -187,7 +169,6 @@ class SallesDatasourceLocal {
       }
       return false;
     }
-    
     return true;
   }
 } 

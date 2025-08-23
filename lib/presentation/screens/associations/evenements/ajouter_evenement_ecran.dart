@@ -1,26 +1,21 @@
-// UI Design: Écran d'ajout/modification d'événements pour les chefs d'association
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../../widgets/widget_barre_app_personnalisee.dart';
 import '../../../../core/di/service_locator.dart';
 import '../../../../core/utils/evenement_types.dart';
 import '../../../../domain/entities/association.dart';
 import '../../../../domain/entities/evenement.dart';
 import '../../../../domain/usercases/evenements_repository.dart';
-
 class AjouterEvenementEcran extends StatefulWidget {
   final Association association;
-  final Evenement? evenementAModifier; // UI Design: Support de la modification
-
+  final Evenement? evenementAModifier; 
   const AjouterEvenementEcran({
     Key? key,
     required this.association,
     this.evenementAModifier,
   }) : super(key: key);
-
   @override
   State<AjouterEvenementEcran> createState() => _AjouterEvenementEcranState();
 }
-
 class _AjouterEvenementEcranState extends State<AjouterEvenementEcran> {
   final _formKey = GlobalKey<FormState>();
   final _titreController = TextEditingController();
@@ -28,7 +23,6 @@ class _AjouterEvenementEcranState extends State<AjouterEvenementEcran> {
   final _lieuController = TextEditingController();
   final _organisateurController = TextEditingController();
   final _prixController = TextEditingController();
-  
   DateTime _dateDebut = DateTime.now();
   DateTime _dateFin = DateTime.now().add(const Duration(hours: 2));
   String _typeEvenement = 'reunion';
@@ -38,20 +32,15 @@ class _AjouterEvenementEcranState extends State<AjouterEvenementEcran> {
   bool _chargement = false;
   bool _modeModification = false;
   late final EvenementsRepository _evenementsRepository;
-
-
-
   @override
   void initState() {
     super.initState();
     _evenementsRepository = ServiceLocator.obtenirService<EvenementsRepository>();
     _modeModification = widget.evenementAModifier != null;
-    
     if (_modeModification) {
       _remplirFormulaire(widget.evenementAModifier!);
     }
   }
-
   void _remplirFormulaire(Evenement evenement) {
     _titreController.text = evenement.titre;
     _descriptionController.text = evenement.description;
@@ -64,7 +53,6 @@ class _AjouterEvenementEcranState extends State<AjouterEvenementEcran> {
     _prix = evenement.prix ?? 0.0;
     _inscriptionRequise = evenement.inscriptionRequise;
   }
-
   @override
   void dispose() {
     _titreController.dispose();
@@ -74,7 +62,6 @@ class _AjouterEvenementEcranState extends State<AjouterEvenementEcran> {
     _prixController.dispose();
     super.dispose();
   }
-
   Future<void> _selectionnerDate(BuildContext context, bool estDateDebut) async {
     final DateTime? dateSelectionnee = await showDatePicker(
       context: context,
@@ -92,7 +79,6 @@ class _AjouterEvenementEcranState extends State<AjouterEvenementEcran> {
         );
       },
     );
-
     if (dateSelectionnee != null) {
       setState(() {
         if (estDateDebut) {
@@ -106,7 +92,6 @@ class _AjouterEvenementEcranState extends State<AjouterEvenementEcran> {
       });
     }
   }
-
   Future<void> _selectionnerHeure(BuildContext context, bool estDateDebut) async {
     final TimeOfDay? heureSelectionnee = await showTimePicker(
       context: context,
@@ -122,7 +107,6 @@ class _AjouterEvenementEcranState extends State<AjouterEvenementEcran> {
         );
       },
     );
-
     if (heureSelectionnee != null) {
       setState(() {
         if (estDateDebut) {
@@ -145,14 +129,11 @@ class _AjouterEvenementEcranState extends State<AjouterEvenementEcran> {
       });
     }
   }
-
   Future<void> _sauvegarderEvenement() async {
     if (!_formKey.currentState!.validate()) return;
-
     setState(() {
       _chargement = true;
     });
-
     try {
       final evenement = Evenement(
         id: _modeModification ? widget.evenementAModifier!.id : 'evt_${DateTime.now().millisecondsSinceEpoch}',
@@ -168,18 +149,15 @@ class _AjouterEvenementEcranState extends State<AjouterEvenementEcran> {
         prix: _prix,
         inscriptionRequise: _inscriptionRequise,
       );
-
       bool succes = false;
       if (_modeModification) {
         succes = await _evenementsRepository.mettreAJourEvenement(evenement);
       } else {
         succes = await _evenementsRepository.ajouterEvenement(evenement);
       }
-
       if (!succes) {
         throw Exception('Échec de l\'opération');
       }
-
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -228,15 +206,12 @@ class _AjouterEvenementEcranState extends State<AjouterEvenementEcran> {
       }
     }
   }
-
   String _formaterDate(DateTime date) {
     return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
   }
-
   String _formaterHeure(DateTime date) {
     return '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -253,7 +228,6 @@ class _AjouterEvenementEcranState extends State<AjouterEvenementEcran> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // UI Design: En-tête avec informations de l'association
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(20.0),
@@ -314,8 +288,6 @@ class _AjouterEvenementEcranState extends State<AjouterEvenementEcran> {
                   ),
                 ),
                 const SizedBox(height: 24),
-
-                // UI Design: Formulaire d'ajout d'événement
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(20.0),
@@ -342,7 +314,6 @@ class _AjouterEvenementEcranState extends State<AjouterEvenementEcran> {
                         ),
                       ),
                       const SizedBox(height: 20),
-
                       // Titre
                       TextFormField(
                         controller: _titreController,
@@ -369,7 +340,6 @@ class _AjouterEvenementEcranState extends State<AjouterEvenementEcran> {
                         },
                       ),
                       const SizedBox(height: 16),
-
                       // Type d'événement
                       DropdownButtonFormField<String>(
                         value: _typeEvenement,
@@ -402,7 +372,6 @@ class _AjouterEvenementEcranState extends State<AjouterEvenementEcran> {
                         },
                       ),
                       const SizedBox(height: 16),
-
                       // Description
                       TextFormField(
                         controller: _descriptionController,
@@ -430,7 +399,6 @@ class _AjouterEvenementEcranState extends State<AjouterEvenementEcran> {
                         },
                       ),
                       const SizedBox(height: 16),
-
                       // Lieu
                       TextFormField(
                         controller: _lieuController,
@@ -457,7 +425,6 @@ class _AjouterEvenementEcranState extends State<AjouterEvenementEcran> {
                         },
                       ),
                       const SizedBox(height: 16),
-
                       // Organisateur
                       TextFormField(
                         controller: _organisateurController,
@@ -484,7 +451,6 @@ class _AjouterEvenementEcranState extends State<AjouterEvenementEcran> {
                         },
                       ),
                       const SizedBox(height: 20),
-
                       // Date et heure de début
                       Row(
                         children: [
@@ -556,7 +522,6 @@ class _AjouterEvenementEcranState extends State<AjouterEvenementEcran> {
                         ],
                       ),
                       const SizedBox(height: 16),
-
                       // Date et heure de fin
                       Row(
                         children: [
@@ -628,7 +593,6 @@ class _AjouterEvenementEcranState extends State<AjouterEvenementEcran> {
                         ],
                       ),
                       const SizedBox(height: 16),
-
                       // Capacité maximale
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -679,8 +643,6 @@ class _AjouterEvenementEcranState extends State<AjouterEvenementEcran> {
                   ),
                 ),
                 const SizedBox(height: 24),
-
-                // UI Design: Bouton de sauvegarde
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(

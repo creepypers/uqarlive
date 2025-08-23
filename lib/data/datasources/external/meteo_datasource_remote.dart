@@ -1,7 +1,5 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:http/http.dart' as http;
-
-// UI Design: Datasource distant (Open-Meteo) sans clé pour récupérer la température actuelle
 class MeteoDatasourceRemote {
   // Retourne la température en °C pour des coordonnées
   Future<double> obtenirTemperatureCelsius({
@@ -11,7 +9,6 @@ class MeteoDatasourceRemote {
     final uri = Uri.parse(
       'https://api.open-meteo.com/v1/forecast?latitude=$latitude&longitude=$longitude&current_weather=true',
     );
-
     final resp = await http.get(uri);
     if (resp.statusCode != 200) {
       throw Exception('Erreur météo: ${resp.statusCode}');
@@ -24,5 +21,3 @@ class MeteoDatasourceRemote {
     return (current['temperature'] as num).toDouble();
   }
 }
-
-

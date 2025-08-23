@@ -1,6 +1,4 @@
-import '../../domain/entities/evenement.dart';
-
-// UI Design: Modèle pour mapper les données d'événement depuis/vers la source de données
+﻿import '../../domain/entities/evenement.dart';
 class EvenementModel {
   final String id;
   final String titre;
@@ -18,7 +16,6 @@ class EvenementModel {
   final int nombreInscrits;
   final bool estActif;
   final String dateCreation; // Format ISO String
-
   const EvenementModel({
     required this.id,
     required this.titre,
@@ -37,8 +34,6 @@ class EvenementModel {
     this.estActif = true,
     required this.dateCreation,
   });
-
-  // UI Design: Conversion depuis Map (JSON)
   factory EvenementModel.fromMap(Map<String, dynamic> map) {
     return EvenementModel(
       id: map['id'] ?? '',
@@ -59,8 +54,6 @@ class EvenementModel {
       dateCreation: map['dateCreation'] ?? '',
     );
   }
-
-  // UI Design: Conversion vers Map (JSON)
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -81,8 +74,6 @@ class EvenementModel {
       'dateCreation': dateCreation,
     };
   }
-
-  // UI Design: Conversion vers entité
   Evenement toEntity() {
     return Evenement(
       id: id,
@@ -103,8 +94,6 @@ class EvenementModel {
       dateCreation: DateTime.parse(dateCreation),
     );
   }
-
-  // UI Design: Création depuis entité
   factory EvenementModel.fromEntity(Evenement evenement) {
     return EvenementModel(
       id: evenement.id,
@@ -125,8 +114,6 @@ class EvenementModel {
       dateCreation: evenement.dateCreation.toIso8601String(),
     );
   }
-
-  // UI Design: Copie avec modifications
   EvenementModel copyWith({
     String? id,
     String? titre,

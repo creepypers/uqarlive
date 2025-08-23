@@ -1,10 +1,6 @@
-// UI Design: Datasource local pour la gestion des messages dans UqarLife
-import '../../models/message_model.dart';
-
+﻿import '../../models/message_model.dart';
 class MessagesDatasourceLocal {
-  // UI Design: Liste des messages en mémoire (simulation d'une base de données locale)
   static final List<MessageModel> _messages = [
-    // UI Design: Messages d'exemple pour les transactions de livres
     MessageModel(
       id: 'msg_001',
       expediteurId: 'etud_002',
@@ -45,7 +41,6 @@ class MessagesDatasourceLocal {
       typeMessage: 'transaction',
       referenceId: '3',
     ),
-    // UI Design: Messages généraux
     MessageModel(
       id: 'msg_005',
       expediteurId: 'admin_001',
@@ -101,14 +96,9 @@ class MessagesDatasourceLocal {
       typeMessage: 'general',
     ),
   ];
-
-  // UI Design: Méthode pour obtenir tous les messages d'un utilisateur
   Future<List<MessageModel>> obtenirMessagesUtilisateur(String utilisateurId) async {
     try {
-      // UI Design: Simuler un délai réseau
       await Future.delayed(const Duration(milliseconds: 300));
-      
-      // UI Design: Retourner les messages où l'utilisateur est expéditeur ou destinataire
       return _messages.where((message) => 
         (message.expediteurId == utilisateurId) || 
         (message.destinataireId == utilisateurId)
@@ -117,12 +107,9 @@ class MessagesDatasourceLocal {
       throw Exception('Erreur lors de la récupération des messages: $e');
     }
   }
-
-  // UI Design: Méthode pour obtenir la conversation entre deux utilisateurs
   Future<List<MessageModel>> obtenirConversation(String utilisateur1Id, String utilisateur2Id) async {
     try {
       await Future.delayed(const Duration(milliseconds: 200));
-      
       return _messages.where((message) => 
         (message.expediteurId == utilisateur1Id && message.destinataireId == utilisateur2Id) ||
         (message.expediteurId == utilisateur2Id && message.destinataireId == utilisateur1Id)
@@ -132,13 +119,9 @@ class MessagesDatasourceLocal {
       throw Exception('Erreur lors de la récupération de la conversation: $e');
     }
   }
-
-  // UI Design: Méthode pour envoyer un nouveau message
   Future<MessageModel> envoyerMessage(MessageModel message) async {
     try {
       await Future.delayed(const Duration(milliseconds: 500));
-      
-      // UI Design: Générer un ID unique pour le nouveau message
       final nouveauMessage = MessageModel(
         id: 'msg_${DateTime.now().millisecondsSinceEpoch}',
         expediteurId: message.expediteurId,
@@ -150,22 +133,16 @@ class MessagesDatasourceLocal {
         referenceId: message.referenceId,
         pieceJointe: message.pieceJointe,
       );
-      
-      // UI Design: Ajouter le message à la liste locale et le sauvegarder
       _messages.add(nouveauMessage);
       await _sauvegarderMessages();
-      
       return nouveauMessage;
     } catch (e) {
       throw Exception('Erreur lors de l\'envoi du message: $e');
     }
   }
-
-  // UI Design: Méthode pour marquer un message comme lu
   Future<void> marquerMessageCommeLu(String messageId) async {
     try {
       await Future.delayed(const Duration(milliseconds: 100));
-      
       final index = _messages.indexWhere((message) => message.id == messageId);
       if (index != -1) {
         final message = _messages[index];
@@ -185,12 +162,9 @@ class MessagesDatasourceLocal {
       throw Exception('Erreur lors du marquage du message: $e');
     }
   }
-
-  // UI Design: Méthode pour obtenir le nombre de messages non lus
   Future<int> obtenirNombreMessagesNonLus(String utilisateurId) async {
     try {
       await Future.delayed(const Duration(milliseconds: 100));
-      
       return _messages.where((message) => 
         message.destinataireId == utilisateurId && !message.estLu
       ).length;
@@ -198,26 +172,19 @@ class MessagesDatasourceLocal {
       throw Exception('Erreur lors du comptage des messages: $e');
     }
   }
-
-  // UI Design: Méthode pour supprimer un message
   Future<void> supprimerMessage(String messageId) async {
     try {
       await Future.delayed(const Duration(milliseconds: 200));
-      
       _messages.removeWhere((message) => message.id == messageId);
     } catch (e) {
       throw Exception('Erreur lors de la suppression du message: $e');
     }
   }
-
-  // UI Design: Méthode pour obtenir les messages récents (dernières 24h)
   Future<List<MessageModel>> obtenirMessagesRecents(String utilisateurId) async {
     try {
       await Future.delayed(const Duration(milliseconds: 150));
-      
       final maintenant = DateTime.now();
       final vingtQuatreHeures = maintenant.subtract(const Duration(hours: 24));
-      
       return _messages.where((message) => 
         (message.expediteurId == utilisateurId || message.destinataireId == utilisateurId) &&
         message.dateEnvoi.isAfter(vingtQuatreHeures)
@@ -227,11 +194,8 @@ class MessagesDatasourceLocal {
       throw Exception('Erreur lors de la récupération des messages récents: $e');
     }
   }
-
-  // UI Design: Méthode pour sauvegarder les messages (simulation de persistance)
   Future<void> _sauvegarderMessages() async {
     try {
-      // UI Design: Simuler la sauvegarde en base de données
       await Future.delayed(const Duration(milliseconds: 100));
       // En production, ici on sauvegarderait dans une vraie base de données
       // Pour l'instant, on garde en mémoire

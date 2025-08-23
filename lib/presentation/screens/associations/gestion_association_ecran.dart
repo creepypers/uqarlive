@@ -1,5 +1,4 @@
-// UI Design: Écran de gestion d'association pour les chefs - Design moderne premium
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../domain/entities/association.dart';
 import '../../../domain/entities/demande_adhesion.dart';
@@ -17,19 +16,15 @@ import '../../../presentation/widgets/widget_barre_app_personnalisee.dart';
 import '../../../core/di/service_locator.dart';
 import 'actualites/ajouter_actualite_ecran.dart';
 import 'evenements/ajouter_evenement_ecran.dart';
-
 class GestionAssociationEcran extends StatefulWidget {
   final Association association;
-
   const GestionAssociationEcran({
     Key? key,
     required this.association,
   }) : super(key: key);
-
   @override
   State<GestionAssociationEcran> createState() => _GestionAssociationEcranState();
 }
-
 class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
   late final AdhesionsService _adhesionsService;
   late final AuthentificationService _authentificationService;
@@ -41,13 +36,10 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
   List<DemandeAdhesion> _demandesAdhesion = [];
   List<Evenement> _evenementsAssociation = [];
   List<MembreAssociation> _membresAssociation = [];
-  // UI Design: Cache pour optimiser les performances
   final Map<String, Utilisateur> _utilisateursCache = {};
   final Map<String, bool> _evenementsInscrits = {}; // Cache des inscriptions
   bool _chargementEvenements = true;
   bool _chargementMembres = true;
-  
-
   @override
   void initState() {
     super.initState();
@@ -64,18 +56,14 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
     _chargerEvenementsAssociation();
     _chargerMembresAssociation();
   }
-
   @override
   void dispose() {
     super.dispose();
   }
-
   Future<void> _chargerDemandesAdhesion() async {
     setState(() {
     });
-
     try {
-      // UI Design: Récupérer les vraies demandes d'adhésion depuis le service
       final demandes = await _adhesionsService.obtenirDemandesEnAttente(widget.association.id);
       setState(() {
         _demandesAdhesion = demandes;
@@ -87,18 +75,14 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
       _afficherErreur('Erreur lors du chargement des demandes: ${e.toString()}');
     }
   }
-
   Future<void> _repondreDemande(DemandeAdhesion demande, bool accepter) async {
     try {
-      // UI Design: Implémenter l'acceptation/rejet des demandes via le service
       bool resultat;
-      
       final utilisateurConnecte = _authentificationService.utilisateurActuel;
       if (utilisateurConnecte == null) {
         _afficherErreur('Vous devez être connecté pour traiter les demandes');
         return;
       }
-
       if (accepter) {
         resultat = await _adhesionsService.accepterDemande(
           demandeId: demande.id,
@@ -112,7 +96,6 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
           messageReponse: 'Votre demande d\'adhésion a été refusée.',
         );
       }
-
       if (resultat) {
         if (accepter) {
           _afficherSucces('Demande acceptée avec succès !');
@@ -127,14 +110,11 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
       _afficherErreur('Erreur: $e');
     }
   }
-
   Future<void> _chargerEvenementsAssociation() async {
     setState(() {
       _chargementEvenements = true;
     });
-
     try {
-      // UI Design: Récupérer les événements de cette association
       final evenements = await _evenementsRepository.obtenirEvenementsParAssociation(widget.association.id);
       setState(() {
         _evenementsAssociation = evenements.where((e) => e.estAVenir).toList();
@@ -147,14 +127,11 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
       });
     }
   }
-
   Future<void> _chargerMembresAssociation() async {
     setState(() {
       _chargementMembres = true;
     });
-
     try {
-      // UI Design: Récupérer les vrais membres de l'association
       final membres = await _gestionMembresService.obtenirMembresAssociation(widget.association.id);
       setState(() {
         _membresAssociation = membres;
@@ -168,23 +145,17 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
       _afficherErreur('Erreur lors du chargement des membres: ${e.toString()}');
     }
   }
-
-  // UI Design: Nouvelle méthode pour retirer un membre de l'association// UI Design: Vérifier si l'utilisateur est inscrit à un événement
   bool _estInscritEvenement(String evenementId) {
     return _evenementsInscrits[evenementId] ?? false;
   }
-
-  // UI Design: Gérer l'inscription/désinscription à un événement
   Future<void> _gererInscriptionEvenement(Evenement evenement) async {
     final utilisateur = _authentificationService.utilisateurActuel;
     if (utilisateur == null) {
       _afficherErreur('Vous devez être connecté pour vous inscrire aux événements');
       return;
     }
-
     try {
       final estInscrit = _estInscritEvenement(evenement.id);
-      
       bool success;
       if (estInscrit) {
         // Désinscription
@@ -203,7 +174,6 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
           _afficherErreur('Cet événement est complet');
           return;
         }
-        
         success = await _evenementsService.inscrireUtilisateur(evenement.id, utilisateur.id);
         if (success) {
           setState(() {
@@ -214,14 +184,12 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
           _afficherErreur('Erreur lors de l\'inscription');
         }
       }
-      
       // Recharger les événements pour mettre à jour les compteurs
       await _chargerEvenementsAssociation();
     } catch (e) {
       _afficherErreur('Erreur: $e');
     }
   }
-
   void _ajouterActualite() async {
     final resultat = await Navigator.push(
       context,
@@ -235,7 +203,6 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
       _afficherSucces('Actualité ajoutée avec succès !');
     }
   }
-
   void _ajouterEvenement() async {
     final resultat = await Navigator.push(
       context,
@@ -249,13 +216,11 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
       _afficherSucces('Événement créé avec succès !');
     }
   }
-
   // Méthodes helper pour utilisateurs
   Future<Utilisateur?> _obtenirUtilisateur(String utilisateurId) async {
     if (_utilisateursCache.containsKey(utilisateurId)) {
       return _utilisateursCache[utilisateurId];
     }
-
     try {
       final utilisateur = await _utilisateursRepository.obtenirUtilisateurParId(utilisateurId);
       if (utilisateur != null) {
@@ -266,19 +231,16 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
       return null;
     }
   }
-
   String _obtenirInitiales(Utilisateur? utilisateur) {
     if (utilisateur == null) return 'U';
     final prenomInitiale = utilisateur.prenom.isNotEmpty ? utilisateur.prenom[0].toUpperCase() : 'U';
     final nomInitiale = utilisateur.nom.isNotEmpty ? utilisateur.nom[0].toUpperCase() : '';
     return prenomInitiale + nomInitiale;
   }
-
   String _obtenirNomComplet(Utilisateur? utilisateur) {
     if (utilisateur == null) return 'Utilisateur inconnu';
     return '${utilisateur.prenom} ${utilisateur.nom}';
   }
-
   void _afficherSucces(String message) {
       ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -295,7 +257,6 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
         ),
       );
     }
-
   void _afficherErreur(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -312,11 +273,9 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
       ),
     );
   }
-
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -361,7 +320,6 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
                 margin: EdgeInsets.all(screenWidth * 0.05),
                 child: _construireActionsRapides(),
               ),
-              
               // Onglets
               Container(
                 margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
@@ -397,7 +355,6 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
                   ],
                 ),
               ),
-              
               // Contenu des onglets avec hauteur fixe pour éviter le débordement
               SizedBox(
                 height: MediaQuery.of(context).size.height * 0.6, // Hauteur fixe pour éviter le débordement
@@ -408,13 +365,11 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
                       padding: EdgeInsets.all(screenWidth * 0.05),
                       child: _construireOngletDemandes(),
                     ),
-                    
                     // Onglet 2: Actualités et événements
                     SingleChildScrollView(
                       padding: EdgeInsets.all(screenWidth * 0.05),
                       child: _construireOngletActualitesEvenements(),
                     ),
-                    
                     // Onglet 3: Membres
                     SingleChildScrollView(
                       padding: EdgeInsets.all(screenWidth * 0.05),
@@ -429,11 +384,9 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
       ),
     );
   }
-
   Widget _construireActionsRapides() {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    
     return Container(
       padding: EdgeInsets.all(screenWidth * 0.05),
                 decoration: BoxDecoration(
@@ -499,11 +452,9 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
       ),
     );
   }
-
   Widget _construireBoutonAction(String titre, IconData icone, Color couleur, VoidCallback onTap) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    
     return Container(
                 decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
@@ -542,11 +493,9 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
       ),
     );
   }
-
   Widget _construireOngletDemandes() {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -587,7 +536,6 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
           ],
         ),
         SizedBox(height: screenHeight * 0.025),
-        
         // Liste des demandes
         if (_demandesAdhesion.isEmpty)
           _construireEtatVide()
@@ -598,11 +546,9 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
       ],
     );
   }
-
   Widget _construireOngletActualitesEvenements() {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -652,7 +598,6 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
           ],
         ),
         SizedBox(height: screenHeight * 0.025),
-        
         // Liste des événements
         if (_evenementsAssociation.isEmpty && !_chargementEvenements)
           _construireEtatVideEvenements()
@@ -663,11 +608,9 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
       ],
     );
   }
-
   Widget _construireOngletMembres() {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -717,7 +660,6 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
           ],
         ),
         SizedBox(height: screenHeight * 0.025),
-        
         // Liste des membres
         if (_membresAssociation.isEmpty && !_chargementMembres)
           _construireEtatVideMembres()
@@ -732,11 +674,9 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
       ],
     );
   }
-
   Widget _construireEtatVide() {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    
     return Container(
       padding: EdgeInsets.all(screenWidth * 0.08),
       child: Column(
@@ -766,11 +706,9 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
       ),
     );
   }
-
   Widget _construireEtatVideEvenements() {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    
     return Container(
       padding: EdgeInsets.all(screenWidth * 0.08),
       child: Column(
@@ -809,11 +747,9 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
       ),
     );
   }
-
   Widget _construireEtatVideMembres() {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    
     return Container(
       padding: EdgeInsets.all(screenWidth * 0.08),
       child: Column(
@@ -852,11 +788,9 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
       ),
     );
   }
-
   Widget _construireCarteDemande(DemandeAdhesion demande) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    
     return Container(
       margin: EdgeInsets.only(bottom: screenHeight * 0.015),
       padding: EdgeInsets.all(screenWidth * 0.04),
@@ -885,7 +819,6 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
                           ),
                         ),
               SizedBox(width: screenWidth * 0.04),
-              
               // Informations
               Expanded(
                 child: Column(
@@ -921,7 +854,6 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
                   ],
                 ),
               ),
-              
               // Boutons d'action
               Row(
                 mainAxisSize: MainAxisSize.min,
@@ -975,11 +907,9 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
       ),
     );
   }
-
   Widget _construireCarteEvenement(Evenement evenement) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    
     return Container(
       margin: EdgeInsets.only(bottom: screenHeight * 0.015),
       padding: EdgeInsets.all(screenWidth * 0.04),
@@ -1055,7 +985,6 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
             ],
           ),
           SizedBox(height: screenHeight * 0.012),
-          
           // Informations événement
           Row(
             children: [
@@ -1071,7 +1000,6 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
             ],
           ),
           SizedBox(height: screenHeight * 0.008),
-          
           if (evenement.inscriptionRequise) ...[
             Row(
               children: [
@@ -1087,7 +1015,6 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
               ],
             ),
             SizedBox(height: screenHeight * 0.015),
-            
             // Bouton d'inscription
             SizedBox(
               width: double.infinity,
@@ -1124,11 +1051,9 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
       ),
     );
   }
-
   Widget _construireCarteMembre(MembreAssociation membre) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    
     return GestureDetector(
       onLongPress: () => _afficherActionsMembre(membre),
       child: Container(
@@ -1169,7 +1094,6 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
                   ),
                 ),
                 SizedBox(width: screenWidth * 0.04),
-                
                 // Informations du membre
                 Expanded(
                   child: Column(
@@ -1213,8 +1137,6 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
                     ],
                   ),
                 ),
-                
-
               ],
             );
           },
@@ -1222,7 +1144,6 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
       ),
     );
   }
-
   // Méthodes helper pour les rôles
   Color _obtenirCouleurRole(String role) {
     final roleLower = role.toLowerCase();
@@ -1251,7 +1172,6 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
         return CouleursApp.gris;
     }
   }
-
   IconData _obtenirIconeRole(String role) {
     final roleLower = role.toLowerCase();
     switch (roleLower) {
@@ -1279,11 +1199,9 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
         return Icons.person_outline;
     }
   }
-
   String _formaterDate(DateTime date) {
     final maintenant = DateTime.now();
     final difference = maintenant.difference(date);
-    
     if (difference.inDays < 1) {
       return 'aujourd\'hui';
     } else if (difference.inDays < 7) {
@@ -1299,7 +1217,6 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
       return '$annees an${annees > 1 ? 's' : ''}';
     }
   }
-
   // Afficher les actions disponibles pour un membre
   void _afficherActionsMembre(MembreAssociation membre) {
     showModalBottomSheet(
@@ -1326,7 +1243,6 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            
             // En-tête
             Padding(
               padding: const EdgeInsets.all(20),
@@ -1379,7 +1295,6 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
                 },
               ),
             ),
-            
             // Actions disponibles
             if (!membre.estPresident) ...[
               ListTile(
@@ -1392,7 +1307,6 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
                 },
               ),
             ],
-            
             if (membre.estMembreBureau && !membre.estPresident) ...[
               ListTile(
                 leading: const Icon(Icons.arrow_downward, color: Colors.orange),
@@ -1404,7 +1318,6 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
                 },
               ),
             ],
-            
             ListTile(
               leading: const Icon(Icons.delete_outline, color: Colors.red),
               title: const Text('Retirer de l\'association'),
@@ -1414,14 +1327,12 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
                 _supprimerMembre(membre);
               },
             ),
-            
             const SizedBox(height: 20),
           ],
         ),
       ),
     );
   }
-
   // Méthodes helper pour les promotions/rétrogradations
   String _obtenirRolePrecedent(String roleActuel) {
     final roleLower = roleActuel.toLowerCase();
@@ -1447,11 +1358,9 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
         return 'Membre';
     }
   }
-
   // Afficher le modal de promotion avec dropdown
   void _afficherModalPromotion(MembreAssociation membre) {
     String? nouveauRoleSelectionne;
-    
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
@@ -1542,12 +1451,10 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
       ),
     );
   }
-
   // Obtenir la liste des rôles disponibles pour la promotion
   List<String> _obtenirRolesDisponibles(String roleActuel) {
     final roleLower = roleActuel.toLowerCase();
     final rolesDisponibles = <String>[];
-    
     // Ajouter les rôles selon le rôle actuel
     if (roleLower == 'membre' || roleLower == 'membre actif') {
       rolesDisponibles.addAll([
@@ -1580,10 +1487,8 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
         'Président',
       ]);
     }
-    
     return rolesDisponibles;
   }
-
   // Promouvoir un membre vers un rôle spécifique
   Future<void> _promouvoirMembreVersRole(MembreAssociation membre, String nouveauRole) async {
     final utilisateurConnecte = _authentificationService.utilisateurActuel;
@@ -1591,10 +1496,8 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
       _afficherErreur('Vous devez être connecté pour promouvoir un membre');
       return;
     }
-
     try {
       final resultat = await _membresRepository.changerRole(membre.id, nouveauRole);
-
       if (resultat) {
         _afficherSucces('Membre promu au rôle de $nouveauRole avec succès !');
         _chargerMembresAssociation();
@@ -1605,7 +1508,6 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
       _afficherErreur('Erreur: $e');
     }
   }
-
   // Méthodes d'action pour les membres
   Future<void> _retraderMembre(MembreAssociation membre) async {
     final utilisateurConnecte = _authentificationService.utilisateurActuel;
@@ -1613,11 +1515,9 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
       _afficherErreur('Vous devez être connecté pour rétrograder un membre');
       return;
     }
-
     try {
       final nouveauRole = _obtenirRolePrecedent(membre.role);
       final resultat = await _membresRepository.changerRole(membre.id, nouveauRole);
-
       if (resultat) {
         _afficherSucces('Membre rétrogradé au rôle de $nouveauRole avec succès !');
         _chargerMembresAssociation();
@@ -1628,17 +1528,14 @@ class _GestionAssociationEcranState extends State<GestionAssociationEcran> {
       _afficherErreur('Erreur: $e');
     }
   }
-
   Future<void> _supprimerMembre(MembreAssociation membre) async {
     final utilisateurConnecte = _authentificationService.utilisateurActuel;
     if (utilisateurConnecte == null) {
       _afficherErreur('Vous devez être connecté pour supprimer un membre');
       return;
     }
-
     try {
       final resultat = await _membresRepository.supprimerMembre(membre.id);
-
       if (resultat) {
         _afficherSucces('Membre supprimé avec succès !');
         _chargerMembresAssociation();

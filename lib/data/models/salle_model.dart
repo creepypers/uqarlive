@@ -1,5 +1,4 @@
-import '../../domain/entities/salle.dart';
-
+﻿import '../../domain/entities/salle.dart';
 // Modèle de données pour une salle de révision
 class SalleModel extends Salle {
   const SalleModel({
@@ -17,7 +16,6 @@ class SalleModel extends Salle {
     super.heureFin,
     required super.tarifParHeure,
   });
-
   // Conversion depuis JSON
   factory SalleModel.fromJson(Map<String, dynamic> json) {
     return SalleModel(
@@ -42,7 +40,6 @@ class SalleModel extends Salle {
       tarifParHeure: (json['tarifParHeure'] as num).toDouble(),
     );
   }
-
   // Conversion vers JSON
   Map<String, dynamic> toJson() {
     return {
@@ -61,7 +58,6 @@ class SalleModel extends Salle {
       'tarifParHeure': tarifParHeure,
     };
   }
-
   // Créer une copie avec des modifications
   SalleModel copyWith({
     String? id,

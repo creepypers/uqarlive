@@ -1,6 +1,4 @@
-import '../../domain/entities/menu.dart';
-
-// UI Design: Modèle de données pour convertir entre Map et entité Menu
+﻿import '../../domain/entities/menu.dart';
 class MenuModel extends Menu {
   const MenuModel({
     required super.id,
@@ -19,7 +17,6 @@ class MenuModel extends Menu {
     super.nutritionInfo,
     super.note,
   });
-
   /// Créer un MenuModel à partir d'un Map
   factory MenuModel.fromMap(Map<String, dynamic> map) {
     return MenuModel(
@@ -40,7 +37,6 @@ class MenuModel extends Menu {
       note: (map['note'] as num?)?.toDouble(),
     );
   }
-
   /// Convertir le MenuModel en Map
   Map<String, dynamic> toMap() {
     return {
@@ -61,7 +57,6 @@ class MenuModel extends Menu {
       'note': note,
     };
   }
-
   /// Créer un MenuModel à partir d'une entité Menu
   factory MenuModel.fromEntity(Menu menu) {
     return MenuModel(

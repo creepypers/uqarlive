@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/di/service_locator.dart';
 import '../services/authentification_service.dart';
@@ -10,15 +10,12 @@ import '../screens/admin/admin_ajouter_menu_ecran.dart';
 import '../screens/admin/admin_ajouter_association_ecran.dart';
 import '../screens/admin/admin_modifier_horaires_ecran.dart';
 import '../screens/utilisateur/connexion_ecran.dart';
-
-// UI Design: AppBar de navigation entre les différentes sections de gestion admin
 class WidgetBarreAppNavigationAdmin extends StatelessWidget implements PreferredSizeWidget {
   final String titre;
   final String? sousTitre;
   final String sectionActive; // 'dashboard', 'comptes', 'cantine', 'actualites'
   final List<Widget>? actions;
   final bool afficherBoutonRetour;
-
   const WidgetBarreAppNavigationAdmin({
     super.key,
     required this.titre,
@@ -27,7 +24,6 @@ class WidgetBarreAppNavigationAdmin extends StatelessWidget implements Preferred
     this.actions,
     this.afficherBoutonRetour = true,
   });
-
   @override
   Widget build(BuildContext context) {
     return AppBar(
@@ -131,7 +127,6 @@ class WidgetBarreAppNavigationAdmin extends StatelessWidget implements Preferred
       ),
     );
   }
-
   Widget _construireTitre() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -157,7 +152,6 @@ class WidgetBarreAppNavigationAdmin extends StatelessWidget implements Preferred
       ],
     );
   }
-
   Widget _construireOnglets(BuildContext context) {
     return Container(
       height: 48,
@@ -197,7 +191,6 @@ class WidgetBarreAppNavigationAdmin extends StatelessWidget implements Preferred
       ),
     );
   }
-
   Widget _construireOnglet(
     BuildContext context,
     String label,
@@ -206,7 +199,6 @@ class WidgetBarreAppNavigationAdmin extends StatelessWidget implements Preferred
     VoidCallback onTap,
   ) {
     final estActif = section == sectionActive;
-    
     return Expanded(
       child: GestureDetector(
         onTap: estActif ? null : onTap,
@@ -246,7 +238,6 @@ class WidgetBarreAppNavigationAdmin extends StatelessWidget implements Preferred
       ),
     );
   }
-
   void _naviguerVersDashboard(BuildContext context) {
     if (sectionActive != 'dashboard') {
       Navigator.pushReplacement(
@@ -255,7 +246,6 @@ class WidgetBarreAppNavigationAdmin extends StatelessWidget implements Preferred
       );
     }
   }
-
   void _naviguerVersComptes(BuildContext context) {
     if (sectionActive != 'comptes') {
       Navigator.pushReplacement(
@@ -264,7 +254,6 @@ class WidgetBarreAppNavigationAdmin extends StatelessWidget implements Preferred
       );
     }
   }
-
   void _naviguerVersCantine(BuildContext context) {
     if (sectionActive != 'cantine') {
       Navigator.pushReplacement(
@@ -273,7 +262,6 @@ class WidgetBarreAppNavigationAdmin extends StatelessWidget implements Preferred
       );
     }
   }
-
   void _naviguerVersAssociations(BuildContext context) {
     if (sectionActive != 'associations') {
       Navigator.pushReplacement(
@@ -282,7 +270,6 @@ class WidgetBarreAppNavigationAdmin extends StatelessWidget implements Preferred
       );
     }
   }
-
   void _gererAction(BuildContext context, String valeur) {
     switch (valeur) {
       case 'ajouter_menu':
@@ -340,9 +327,6 @@ class WidgetBarreAppNavigationAdmin extends StatelessWidget implements Preferred
         break;
     }
   }
-
-
-
   void _afficherModalAjouterActualite(BuildContext context) {
     showDialog(
       context: context,
@@ -395,7 +379,6 @@ class WidgetBarreAppNavigationAdmin extends StatelessWidget implements Preferred
       ),
     );
   }
-
   void _afficherModalNouvelleAssociation(BuildContext context) {
     Navigator.push(
       context,
@@ -404,7 +387,6 @@ class WidgetBarreAppNavigationAdmin extends StatelessWidget implements Preferred
       ),
     );
   }
-
   void _afficherModalModifierAssociation(BuildContext context) {
     Navigator.push(
       context,
@@ -413,7 +395,6 @@ class WidgetBarreAppNavigationAdmin extends StatelessWidget implements Preferred
       ),
     );
   }
-
   void _afficherDialogueDeconnexion(BuildContext context) {
     showDialog(
       context: context,
@@ -428,19 +409,14 @@ class WidgetBarreAppNavigationAdmin extends StatelessWidget implements Preferred
           ElevatedButton(
             onPressed: () async {
               Navigator.pop(context);
-              
               try {
-                // UI Design: Déconnexion via le service d'authentification
                 final authentificationService = ServiceLocator.obtenirService<AuthentificationService>();
                 await authentificationService.deconnecter();
-                
-                // UI Design: Navigation vers l'écran de connexion avec nettoyage complet des routes
                 if (context.mounted) {
                   Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(builder: (context) => const ConnexionEcran()),
                     (route) => false,
                   );
-                  
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: const Row(
@@ -486,7 +462,6 @@ class WidgetBarreAppNavigationAdmin extends StatelessWidget implements Preferred
       ),
     );
   }
-
   @override
   Size get preferredSize => const Size.fromHeight(168); // 120 + 48 pour les onglets
 } 

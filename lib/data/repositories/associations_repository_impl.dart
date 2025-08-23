@@ -1,14 +1,10 @@
-import '../../domain/entities/association.dart';
+﻿import '../../domain/entities/association.dart';
 import '../../domain/usercases/associations_repository.dart';
 import '../datasources/internal/associations_datasource_local.dart';
 import '../models/association_model.dart';
-
-// UI Design: Implémentation du repository des associations - couche data
 class AssociationsRepositoryImpl implements AssociationsRepository {
   final AssociationsDatasourceLocal _datasourceLocal;
-
   AssociationsRepositoryImpl(this._datasourceLocal);
-
   @override
   Future<List<Association>> obtenirToutesLesAssociations() async {
     try {
@@ -20,7 +16,6 @@ class AssociationsRepositoryImpl implements AssociationsRepository {
       return [];
     }
   }
-
   @override
   Future<Association?> obtenirAssociationParId(String id) async {
     try {
@@ -33,7 +28,6 @@ class AssociationsRepositoryImpl implements AssociationsRepository {
       return null;
     }
   }
-
   @override
   Future<List<Association>> obtenirAssociationsParType(String type) async {
     try {
@@ -45,7 +39,6 @@ class AssociationsRepositoryImpl implements AssociationsRepository {
       return [];
     }
   }
-
   @override
   Future<List<Association>> obtenirAssociationsActives() async {
     try {
@@ -57,7 +50,6 @@ class AssociationsRepositoryImpl implements AssociationsRepository {
       return [];
     }
   }
-
   @override
   Future<List<Association>> rechercherAssociations(String recherche) async {
     try {
@@ -69,7 +61,6 @@ class AssociationsRepositoryImpl implements AssociationsRepository {
       return [];
     }
   }
-
   @override
   Future<List<Association>> obtenirAssociationsPopulaires({int limite = 5}) async {
     try {
@@ -81,7 +72,6 @@ class AssociationsRepositoryImpl implements AssociationsRepository {
       return [];
     }
   }
-
   @override
   Future<List<String>> obtenirTypesAssociations() async {
     try {
@@ -90,7 +80,6 @@ class AssociationsRepositoryImpl implements AssociationsRepository {
       return ['toutes'];
     }
   }
-
   @override
   Future<bool> ajouterAssociation(Association association) async {
     try {
@@ -100,7 +89,6 @@ class AssociationsRepositoryImpl implements AssociationsRepository {
       return false;
     }
   }
-
   @override
   Future<bool> mettreAJourAssociation(Association association) async {
     try {
@@ -110,7 +98,6 @@ class AssociationsRepositoryImpl implements AssociationsRepository {
       return false;
     }
   }
-
   @override
   Future<bool> supprimerAssociation(String id) async {
     try {

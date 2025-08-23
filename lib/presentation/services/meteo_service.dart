@@ -1,14 +1,11 @@
-import '../../core/di/service_locator.dart';
+﻿import '../../core/di/service_locator.dart';
 import '../../domain/entities/meteo.dart';
 import '../../domain/usercases/meteo_repository.dart';
-
 class MeteoService {
   late final MeteoRepository _meteoRepository;
-
   MeteoService() {
     _meteoRepository = ServiceLocator.obtenirService<MeteoRepository>();
   }
-
   Future<Meteo> temperatureRimouski() {
     // Coordonnées Rimouski, QC
     return _meteoRepository.obtenirTemperaturePour(
@@ -17,7 +14,6 @@ class MeteoService {
       longitude: -68.5230,
     );
   }
-
   Future<Meteo> temperatureLevis() {
     // Coordonnées Lévis, QC
     return _meteoRepository.obtenirTemperaturePour(
@@ -27,5 +23,3 @@ class MeteoService {
     );
   }
 }
-
-

@@ -1,6 +1,4 @@
-// UI Design: Modèle de données pour les messages dans la couche Data
-import '../../domain/entities/message.dart';
-
+﻿import '../../domain/entities/message.dart';
 class MessageModel extends Message {
   const MessageModel({
     required super.id,
@@ -13,8 +11,6 @@ class MessageModel extends Message {
     super.referenceId,
     super.pieceJointe,
   });
-
-  // UI Design: Factory constructor pour créer un MessageModel depuis un Map
   factory MessageModel.fromMap(Map<String, dynamic> map) {
     return MessageModel(
       id: map['id'] ?? '',
@@ -28,8 +24,6 @@ class MessageModel extends Message {
       pieceJointe: map['pieceJointe'],
     );
   }
-
-  // UI Design: Méthode pour convertir le MessageModel en Map
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -43,8 +37,6 @@ class MessageModel extends Message {
       'pieceJointe': pieceJointe,
     };
   }
-
-  // UI Design: Factory constructor pour créer un MessageModel depuis l'entité Message
   factory MessageModel.fromEntity(Message message) {
     return MessageModel(
       id: message.id,
@@ -58,8 +50,6 @@ class MessageModel extends Message {
       pieceJointe: message.pieceJointe,
     );
   }
-
-  // UI Design: Méthode pour convertir le MessageModel en entité Message
   Message toEntity() {
     return Message(
       id: id,

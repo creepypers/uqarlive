@@ -1,5 +1,4 @@
-// UI Design: Entité représentant une transaction d'achat ou d'échange de livre
-class Transaction {
+﻿class Transaction {
   final String id;
   final String livreId;
   final String vendeurId; // Propriétaire du livre
@@ -15,7 +14,6 @@ class Transaction {
   final String? messageVendeur;
   final String? lieuRendezVous;
   final DateTime? dateRendezVous;
-
   const Transaction({
     required this.id,
     required this.livreId,
@@ -33,8 +31,6 @@ class Transaction {
     this.lieuRendezVous,
     this.dateRendezVous,
   });
-
-  // UI Design: Méthode de copie avec modifications
   Transaction copyWith({
     String? id,
     String? livreId,
@@ -70,18 +66,15 @@ class Transaction {
       dateRendezVous: dateRendezVous ?? this.dateRendezVous,
     );
   }
-
   @override
   String toString() {
     return 'Transaction(id: $id, livreId: $livreId, vendeurId: $vendeurId, acheteurId: $acheteurId, type: $type, montant: $montant, statut: $statut)';
   }
-
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     return other is Transaction && other.id == id;
   }
-
   @override
   int get hashCode => id.hashCode;
 }

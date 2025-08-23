@@ -1,7 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
-
-// UI Design: Widget Collection unifié avec gestion d'états intégrée
 class WidgetCollection<T> extends StatelessWidget {
   final List<T> elements;
   final bool enChargement;
@@ -11,22 +9,18 @@ class WidgetCollection<T> extends StatelessWidget {
   final String? messageEtatVide;
   final IconData? iconeEtatVide;
   final EdgeInsets padding;
-  
   // Propriétés pour liste horizontale
   final double? hauteur;
   final double espacementHorizontal;
-  
   // Propriétés pour grille
   final int nombreColonnes;
   final double espacementColonnes;
   final double espacementLignes;
   final double ratioAspect;
   final bool reduireHauteur;
-  
   // Propriétés pour liste verticale
   final double espacementVertical;
   final bool separerElements;
-
   const WidgetCollection({
     super.key,
     required this.elements,
@@ -37,23 +31,19 @@ class WidgetCollection<T> extends StatelessWidget {
     this.messageEtatVide,
     this.iconeEtatVide,
     this.padding = EdgeInsets.zero,
-    
     // Liste horizontale
     this.hauteur = 190,
     this.espacementHorizontal = 16,
-    
     // Grille
     this.nombreColonnes = 2,
     this.espacementColonnes = 16,
     this.espacementLignes = 16,
     this.ratioAspect = 0.8,
     this.reduireHauteur = true,
-    
     // Liste verticale
     this.espacementVertical = 12,
     this.separerElements = false,
   });
-
   // Factory constructor pour liste horizontale
   factory WidgetCollection.listeHorizontale({
     required List<T> elements,
@@ -79,7 +69,6 @@ class WidgetCollection<T> extends StatelessWidget {
       padding: padding,
     );
   }
-
   // Factory constructor pour grille
   factory WidgetCollection.grille({
     required List<T> elements,
@@ -111,7 +100,6 @@ class WidgetCollection<T> extends StatelessWidget {
       padding: padding,
     );
   }
-
   // Factory constructor pour liste verticale
   factory WidgetCollection.listeVerticale({
     required List<T> elements,
@@ -139,27 +127,19 @@ class WidgetCollection<T> extends StatelessWidget {
       padding: padding,
     );
   }
-
   @override
   Widget build(BuildContext context) {
-
-    
-
-    
     if (enChargement) {
       return const Center(child: CircularProgressIndicator());
     }
-
     if (elements.isEmpty) {
       return _construireEtatVide();
     }
-
     return Padding(
       padding: padding,
       child: _construireContenu(),
     );
   }
-
   Widget _construireContenu() {
     // État de chargement
     if (enChargement) {
@@ -172,12 +152,10 @@ class WidgetCollection<T> extends StatelessWidget {
         ),
       );
     }
-
     // État vide
     if (elements.isEmpty) {
       return _construireEtatVide();
     }
-
     // Contenu selon le type
     switch (type) {
       case TypeCollection.listeHorizontale:
@@ -188,10 +166,8 @@ class WidgetCollection<T> extends StatelessWidget {
         return _construireListeVerticale();
     }
   }
-
   Widget _construireEtatVide() {
     if (etatVide != null) return etatVide!;
-    
     return Center(
       child: _WidgetEtatVide(
         icone: iconeEtatVide ?? _obtenirIconeParDefaut(),
@@ -199,7 +175,6 @@ class WidgetCollection<T> extends StatelessWidget {
       ),
     );
   }
-
   Widget _construireListeHorizontale() {
     return SizedBox(
       height: hauteur,
@@ -213,7 +188,6 @@ class WidgetCollection<T> extends StatelessWidget {
       ),
     );
   }
-
   Widget _construireGrille() {
     return GridView.builder(
       shrinkWrap: reduireHauteur,
@@ -232,7 +206,6 @@ class WidgetCollection<T> extends StatelessWidget {
       },
     );
   }
-
   Widget _construireListeVerticale() {
     if (separerElements) {
       return ListView.separated(
@@ -265,7 +238,6 @@ class WidgetCollection<T> extends StatelessWidget {
       );
     }
   }
-
   IconData _obtenirIconeParDefaut() {
     switch (type) {
       case TypeCollection.listeHorizontale:
@@ -276,7 +248,6 @@ class WidgetCollection<T> extends StatelessWidget {
         return Icons.inbox_outlined;
     }
   }
-
   String _obtenirMessageParDefaut() {
     switch (type) {
       case TypeCollection.listeHorizontale:
@@ -287,7 +258,6 @@ class WidgetCollection<T> extends StatelessWidget {
         return 'Aucun élément disponible';
     }
   }
-
   // Factory constructors pour états vides spécifiques
   static Widget etatVideAucunLivre() {
     return const _WidgetEtatVide(
@@ -296,7 +266,6 @@ class WidgetCollection<T> extends StatelessWidget {
       sousTitre: 'Il n\'y a pas de livres à échanger pour le moment. Soyez le premier à en proposer un !',
     );
   }
-
   static Widget etatVideAucunMenu() {
     return const _WidgetEtatVide(
       icone: Icons.restaurant_outlined,
@@ -304,7 +273,6 @@ class WidgetCollection<T> extends StatelessWidget {
       sousTitre: 'La cantine n\'a pas encore publié ses menus pour aujourd\'hui.',
     );
   }
-
   static Widget etatVideAucunResultat() {
     return const _WidgetEtatVide(
       icone: Icons.search_off,
@@ -312,7 +280,6 @@ class WidgetCollection<T> extends StatelessWidget {
       sousTitre: 'Essayez de modifier vos critères de recherche.',
     );
   }
-
   static Widget etatVideAucuneConnexion() {
     return const _WidgetEtatVide(
       icone: Icons.wifi_off,
@@ -321,19 +288,16 @@ class WidgetCollection<T> extends StatelessWidget {
     );
   }
 }
-
 // Widget État Vide intégré dans Collection
 class _WidgetEtatVide extends StatelessWidget {
   final IconData icone;
   final String titre;
   final String? sousTitre;
-
   const _WidgetEtatVide({
     required this.icone,
     required this.titre,
     this.sousTitre,
   });
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -372,7 +336,6 @@ class _WidgetEtatVide extends StatelessWidget {
     );
   }
 }
-
 // Énumération des types de collection
 enum TypeCollection {
   listeHorizontale,

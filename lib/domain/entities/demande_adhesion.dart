@@ -1,5 +1,4 @@
-// UI Design: Entité représentant une demande d'adhésion à une association
-class DemandeAdhesion {
+﻿class DemandeAdhesion {
   final String id;
   final String utilisateurId;
   final String associationId;
@@ -10,7 +9,6 @@ class DemandeAdhesion {
   final String? messageReponse; // Réponse du chef d'association
   final String? chefId; // ID du chef qui a traité la demande
   final String roledemande; // Rôle demandé : 'membre', 'benevole', etc.
-
   const DemandeAdhesion({
     required this.id,
     required this.utilisateurId,
@@ -23,8 +21,6 @@ class DemandeAdhesion {
     this.chefId,
     this.roledemande = 'membre',
   });
-
-  // UI Design: Méthode de copie avec modifications
   DemandeAdhesion copyWith({
     String? id,
     String? utilisateurId,
@@ -50,18 +46,15 @@ class DemandeAdhesion {
       roledemande: roledemande ?? this.roledemande,
     );
   }
-
   @override
   String toString() {
     return 'DemandeAdhesion(id: $id, utilisateurId: $utilisateurId, associationId: $associationId, statut: $statut, roledemande: $roledemande)';
   }
-
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     return other is DemandeAdhesion && other.id == id;
   }
-
   @override
   int get hashCode => id.hashCode;
 }

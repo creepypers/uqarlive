@@ -1,6 +1,4 @@
-// UI Design: Datasource local pour les associations étudiantes UQAR
-class AssociationsDatasourceLocal {
-  
+﻿class AssociationsDatasourceLocal {
   // Liste mutable pour stocker les associations (simulation de base de données)
   static final List<Map<String, dynamic>> _associations = [
       {
@@ -316,12 +314,10 @@ class AssociationsDatasourceLocal {
         ],
       },
     ];
-
   // Méthode pour obtenir toutes les associations
   List<Map<String, dynamic>> obtenirToutesLesAssociations() {
     return _associations;
   }
-
   // Méthodes pour filtrer les associations
   List<Map<String, dynamic>> obtenirAssociationsParType(String type) {
     if (type == 'toutes') return obtenirToutesLesAssociations();
@@ -329,13 +325,11 @@ class AssociationsDatasourceLocal {
         .where((association) => association['typeAssociation'] == type)
         .toList();
   }
-
   List<Map<String, dynamic>> obtenirAssociationsActives() {
     return obtenirToutesLesAssociations()
         .where((association) => association['estActive'] == true)
         .toList();
   }
-
   // Méthode pour obtenir une association par ID
   Map<String, dynamic>? obtenirAssociationParId(String id) {
     try {
@@ -345,11 +339,9 @@ class AssociationsDatasourceLocal {
       return null;
     }
   }
-
   // Méthode pour rechercher par nom
   List<Map<String, dynamic>> rechercherAssociations(String recherche) {
     if (recherche.isEmpty) return obtenirToutesLesAssociations();
-    
     final rechercheLower = recherche.toLowerCase();
     return obtenirToutesLesAssociations()
         .where((association) => 
@@ -357,12 +349,10 @@ class AssociationsDatasourceLocal {
             association['description'].toString().toLowerCase().contains(rechercheLower))
         .toList();
   }
-
   // Obtenir les types d'associations disponibles
   List<String> obtenirTypesAssociations() {
     return ['toutes', 'etudiante', 'culturelle', 'sportive', 'academique'];
   }
-
   // Obtenir les associations populaires (plus de membres)
   List<Map<String, dynamic>> obtenirAssociationsPopulaires({int limite = 5}) {
     final associations = obtenirToutesLesAssociations();
@@ -370,45 +360,31 @@ class AssociationsDatasourceLocal {
         (b['membresActifs'] as List).length.compareTo((a['membresActifs'] as List).length));
     return associations.take(limite).toList();
   }
-
-  // UI Design: Ajouter une nouvelle association
   bool ajouterAssociation(Map<String, dynamic> association) {
     try {
-
       final associations = obtenirToutesLesAssociations();
-      
       // Ajouter la nouvelle association
       associations.add(association);
-      
-          
       return true;
     } catch (e) {
       return false;
     }
   }
-
-  // UI Design: Modifier une association existante
   bool mettreAJourAssociation(Map<String, dynamic> association) {
     try {
-
       final associations = obtenirToutesLesAssociations();
-      
       // Trouver l'index de l'association à modifier
       final index = associations.indexWhere((a) => a['id'] == association['id']);
-      
       if (index != -1) {
         // Mettre à jour l'association existante
         associations[index] = association;
         return true;
       }
-      
       return false;
     } catch (e) {
       return false;
     }
   }
-
-  // UI Design: Supprimer une association
   bool supprimerAssociation(String id) {
     try {
       final associations = obtenirToutesLesAssociations();

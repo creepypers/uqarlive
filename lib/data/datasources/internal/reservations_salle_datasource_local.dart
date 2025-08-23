@@ -1,5 +1,4 @@
-import '../../models/reservation_salle_model.dart';
-
+﻿import '../../models/reservation_salle_model.dart';
 class ReservationsSalleDatasourceLocal {
   // Simulation de données locales pour les réservations de salles
   // Chaque utilisateur ne peut avoir qu'une seule réservation active
@@ -22,7 +21,6 @@ class ReservationsSalleDatasourceLocal {
       participantsIds: ['etud_003', 'etud_004', 'etud_005'],
       notesSpeciales: 'Besoin d\'un tableau',
     ),
-    
     // Marie Dubois (etud_002) - Une seule réservation active pour aujourd'hui
     ReservationSalleModel(
       id: 'res_002',
@@ -39,7 +37,6 @@ class ReservationsSalleDatasourceLocal {
       dateCreation: DateTime.now().subtract(const Duration(hours: 6)),
       notesSpeciales: 'Présentation PowerPoint',
     ),
-    
     // Marc Lavoie (etud_003) - Une seule réservation active pour aujourd'hui
     ReservationSalleModel(
       id: 'res_003',
@@ -56,7 +53,6 @@ class ReservationsSalleDatasourceLocal {
       dateCreation: DateTime.now().subtract(const Duration(hours: 12)),
       participantsIds: ['etud_006'],
     ),
-    
     // Sophie Gagnon (etud_004) - Une seule réservation active pour aujourd'hui
     ReservationSalleModel(
       id: 'res_004',
@@ -72,7 +68,6 @@ class ReservationsSalleDatasourceLocal {
       coutTotal: 0.0,
       dateCreation: DateTime.now().subtract(const Duration(hours: 4)),
     ),
-    
     // Jean Tremblay (etud_005) - Une seule réservation active pour aujourd'hui
     ReservationSalleModel(
       id: 'res_005',
@@ -88,7 +83,6 @@ class ReservationsSalleDatasourceLocal {
       coutTotal: 6.0,
       dateCreation: DateTime.now().subtract(const Duration(hours: 3)),
     ),
-    
     // Marie-Claude Bouchard (etud_006) - Une seule réservation active pour aujourd'hui
     ReservationSalleModel(
       id: 'res_006',
@@ -106,7 +100,6 @@ class ReservationsSalleDatasourceLocal {
       participantsIds: ['etud_007', 'etud_008', 'etud_009'],
       notesSpeciales: 'Besoin d\'équipement de projection',
     ),
-    
     // Pierre Leblanc (etud_007) - Une seule réservation active pour aujourd'hui
     ReservationSalleModel(
       id: 'res_007',
@@ -123,7 +116,6 @@ class ReservationsSalleDatasourceLocal {
       dateCreation: DateTime.now().subtract(const Duration(hours: 8)),
     ),
   ];
-
   Future<List<ReservationSalleModel>> obtenirReservationsParUtilisateur(String utilisateurId) async {
     await Future.delayed(const Duration(milliseconds: 300)); // Simulation latence
     return _reservations
@@ -131,7 +123,6 @@ class ReservationsSalleDatasourceLocal {
         .toList()
         ..sort((a, b) => a.dateReservation.compareTo(b.dateReservation));
   }
-
   Future<List<ReservationSalleModel>> obtenirReservationsParSalle(String salleId) async {
     await Future.delayed(const Duration(milliseconds: 300));
     return _reservations
@@ -139,7 +130,6 @@ class ReservationsSalleDatasourceLocal {
         .toList()
         ..sort((a, b) => a.dateReservation.compareTo(b.dateReservation));
   }
-
   Future<ReservationSalleModel?> obtenirReservationParId(String reservationId) async {
     await Future.delayed(const Duration(milliseconds: 200));
     try {
@@ -148,7 +138,6 @@ class ReservationsSalleDatasourceLocal {
       return null;
     }
   }
-
   Future<List<ReservationSalleModel>> obtenirReservationsJour(String salleId, DateTime jour) async {
     await Future.delayed(const Duration(milliseconds: 300));
     return _reservations
@@ -160,12 +149,10 @@ class ReservationsSalleDatasourceLocal {
         .toList()
         ..sort((a, b) => a.dateReservation.compareTo(b.dateReservation));
   }
-
   Future<void> ajouterReservation(ReservationSalleModel reservation) async {
     await Future.delayed(const Duration(milliseconds: 200));
     _reservations.add(reservation);
   }
-
   Future<void> modifierReservation(ReservationSalleModel reservation) async {
     await Future.delayed(const Duration(milliseconds: 200));
     final index = _reservations.indexWhere((r) => r.id == reservation.id);
@@ -173,12 +160,10 @@ class ReservationsSalleDatasourceLocal {
       _reservations[index] = reservation;
     }
   }
-
   Future<void> supprimerReservation(String reservationId) async {
     await Future.delayed(const Duration(milliseconds: 200));
     _reservations.removeWhere((reservation) => reservation.id == reservationId);
   }
-
   Future<void> changerStatutReservation(String reservationId, String nouveauStatut) async {
     await Future.delayed(const Duration(milliseconds: 200));
     final index = _reservations.indexWhere((reservation) => reservation.id == reservationId);
@@ -186,10 +171,8 @@ class ReservationsSalleDatasourceLocal {
       _reservations[index] = _reservations[index].copyWith(statut: nouveauStatut);
     }
   }
-
   Future<bool> verifierDisponibiliteDateTime(String salleId, DateTime debut, DateTime fin) async {
     await Future.delayed(const Duration(milliseconds: 100));
-    
     // Vérifier s'il y a des conflits
     final conflits = _reservations.where((reservation) =>
         reservation.salleId == salleId &&
@@ -199,13 +182,10 @@ class ReservationsSalleDatasourceLocal {
         reservation.statut != 'annulee' &&
         _dateTimeSeChevanchent(reservation, debut, fin)
     );
-    
     return conflits.isEmpty;
   }
-
   Future<bool> verifierDisponibilite(String salleId, DateTime date, DateTime heureDebut, DateTime heureFin) async {
     await Future.delayed(const Duration(milliseconds: 100));
-    
     // Vérifier s'il y a des conflits
     final conflits = _reservations.where((reservation) =>
         reservation.salleId == salleId &&
@@ -215,14 +195,11 @@ class ReservationsSalleDatasourceLocal {
         reservation.statut != 'annulee' &&
         _heuresSeChevanchent(reservation.heureDebut, reservation.heureFin, heureDebut, heureFin)
     );
-    
     return conflits.isEmpty;
   }
-
   bool _heuresSeChevanchent(DateTime debut1, DateTime fin1, DateTime debut2, DateTime fin2) {
     return !(fin1.isBefore(debut2) || fin2.isBefore(debut1));
   }
-
   bool _dateTimeSeChevanchent(ReservationSalleModel reservation, DateTime debut, DateTime fin) {
     return !(reservation.heureFin.isBefore(debut) || reservation.heureDebut.isAfter(fin));
   }

@@ -1,11 +1,7 @@
-import '../../../domain/entities/evenement.dart';
-
+﻿import '../../../domain/entities/evenement.dart';
 class EvenementsDatasourceLocal {
-  // UI Design: Données dynamiques pour les événements (non-hardcodées)
   static final List<Evenement> _evenementsStockes = [];
   static bool _donneesSeedees = false;
-
-  // UI Design: Données de démarrage par défaut (utilisées seulement si aucun événement n'existe)
   static final List<Evenement> _evenementsParDefaut = [
     Evenement(
       id: '1',
@@ -55,8 +51,6 @@ class EvenementsDatasourceLocal {
       dateCreation: DateTime.now().subtract(const Duration(days: 10)),
     ),
   ];
-
-  // UI Design: Initialiser les données par défaut si nécessaire
   void _initialiserDonnees() {
     if (!_donneesSeedees && _evenementsStockes.isEmpty) {
       // Charger les données par défaut seulement si aucun événement n'existe
@@ -64,30 +58,22 @@ class EvenementsDatasourceLocal {
       _donneesSeedees = true;
     }
   }
-
-  // UI Design: Récupérer tous les événements
   Future<List<Evenement>> obtenirTousLesEvenements() async {
     _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 500)); // Simulation latence
     return List.from(_evenementsStockes);
   }
-
-  // UI Design: Récupérer les événements à venir
   Future<List<Evenement>> obtenirEvenementsAVenir() async {
     _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 300));
     final maintenant = DateTime.now();
     return _evenementsStockes.where((event) => event.dateDebut.isAfter(maintenant)).toList();
   }
-
-  // UI Design: Récupérer les événements par type
   Future<List<Evenement>> obtenirEvenementsParType(String type) async {
     _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 300));
     return _evenementsStockes.where((event) => event.typeEvenement == type).toList();
   }
-
-  // UI Design: Récupérer un événement par son ID
   Future<Evenement?> obtenirEvenementParId(String id) async {
     _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 200));
@@ -97,8 +83,6 @@ class EvenementsDatasourceLocal {
       return null;
     }
   }
-
-  // UI Design: Rechercher des événements
   Future<List<Evenement>> rechercherEvenements(String terme) async {
     _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 400));
@@ -109,24 +93,18 @@ class EvenementsDatasourceLocal {
       event.organisateur.toLowerCase().contains(termeMin)
     ).toList();
   }
-
-  // Clean Architecture: Récupérer par association
   Future<List<Evenement>> obtenirEvenementsParAssociation(String associationId) async {
     _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 300));
     // Utiliser le champ associationId pour filtrer
     return _evenementsStockes.where((e) => e.associationId == associationId).toList();
   }
-
-  // Clean Architecture: Ajouter un événement (dynamique)
   Future<Evenement> ajouterEvenement(Evenement evenement) async {
     _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 200));
     _evenementsStockes.add(evenement);
     return evenement;
   }
-
-  // Clean Architecture: Mettre à jour un événement (dynamique)
   Future<Evenement> mettreAJourEvenement(Evenement evenement) async {
     _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 200));
@@ -138,8 +116,6 @@ class EvenementsDatasourceLocal {
     }
     return evenement;
   }
-
-  // Clean Architecture: Supprimer un événement (dynamique)
   Future<bool> supprimerEvenement(String id) async {
     _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 150));
@@ -147,15 +123,11 @@ class EvenementsDatasourceLocal {
     _evenementsStockes.removeWhere((e) => e.id == id);
     return _evenementsStockes.length < before;
   }
-
-  // Clean Architecture: Récupérer par période (dynamique)
   Future<List<Evenement>> obtenirEvenementsParPeriode(DateTime debut, DateTime fin) async {
     _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 250));
     return _evenementsStockes.where((e) => !e.dateDebut.isAfter(fin) && !e.dateFin.isBefore(debut)).toList();
   }
-
-  // Clean Architecture: Gestion des inscriptions (dynamique)
   Future<bool> peutSInscrire(String evenementId, String utilisateurId) async {
     _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 120));
@@ -164,7 +136,6 @@ class EvenementsDatasourceLocal {
     if (ev.capaciteMaximale == null) return true;
     return ev.nombreInscrits < ev.capaciteMaximale!;
   }
-
   Future<bool> inscrireUtilisateur(String evenementId, String utilisateurId) async {
     _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 150));
@@ -175,7 +146,6 @@ class EvenementsDatasourceLocal {
     _evenementsStockes[index] = ev.copyWith(nombreInscrits: ev.nombreInscrits + 1);
     return true;
   }
-
   Future<bool> desinscrireUtilisateur(String evenementId, String utilisateurId) async {
     _initialiserDonnees();
     await Future.delayed(const Duration(milliseconds: 150));
@@ -186,17 +156,13 @@ class EvenementsDatasourceLocal {
     _evenementsStockes[index] = ev.copyWith(nombreInscrits: ev.nombreInscrits - 1);
     return true;
   }
-
-  // UI Design: Méthodes utilitaires pour la gestion dynamique
   static void effacerTousLesEvenements() {
     _evenementsStockes.clear();
     _donneesSeedees = false;
   }
-
   static void rechargerDonneesParDefaut() {
     _evenementsStockes.clear();
     _donneesSeedees = false;
   }
-
   static int get nombreEvenements => _evenementsStockes.length;
 } 

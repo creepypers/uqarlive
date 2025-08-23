@@ -1,8 +1,5 @@
-import 'package:flutter/material.dart';
-
+﻿import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-
-// UI Design: Utilitaires centralisés pour les associations UQAR
 class AssociationsUtils {
   /// Obtenir l'icône selon le type d'association
   static IconData obtenirIconeType(String type) {
@@ -19,7 +16,6 @@ class AssociationsUtils {
         return Icons.groups;
     }
   }
-
   /// Obtenir la couleur selon le type d'association
   static Color obtenirCouleurType(String type) {
     switch (type) {
@@ -35,7 +31,6 @@ class AssociationsUtils {
         return CouleursApp.principal;
     }
   }
-
   /// Obtenir le nom lisible du type d'association
   static String obtenirNomType(String type) {
     switch (type) {
@@ -52,8 +47,6 @@ class AssociationsUtils {
     }
   }
 }
-
-// UI Design: Utilitaires centralisés pour les livres UQAR
 class LivresUtils {
   /// Obtenir l'icône selon la matière du livre
   static IconData obtenirIconeMatiere(String matiere) {
@@ -81,7 +74,6 @@ class LivresUtils {
         return Icons.school;
     }
   }
-
   /// Obtenir la couleur selon la matière du livre
   static Color obtenirCouleurMatiere(String matiere) {
     switch (matiere.toLowerCase()) {
@@ -108,7 +100,6 @@ class LivresUtils {
         return CouleursApp.principal;
     }
   }
-
   /// Obtenir le nom lisible de la matière
   static String obtenirNomMatiere(String matiere) {
     switch (matiere.toLowerCase()) {
@@ -135,7 +126,6 @@ class LivresUtils {
         return matiere;
     }
   }
-
   /// Obtenir la couleur selon l'état du livre
   static Color obtenirCouleurEtat(String etat) {
     switch (etat.toLowerCase()) {
@@ -152,7 +142,6 @@ class LivresUtils {
         return Colors.grey;
     }
   }
-
   /// Obtenir l'icône selon l'état du livre
   static IconData obtenirIconeEtat(String etat) {
     switch (etat.toLowerCase()) {
@@ -169,7 +158,6 @@ class LivresUtils {
         return Icons.star_border;
     }
   }
-
   /// Liste complète des matières disponibles pour les livres
   static const List<String> matieresDisponibles = [
     'Mathématiques',
@@ -181,9 +169,9 @@ class LivresUtils {
     'Histoire',
     'Littérature',
     'Philosophie',
+    'Statistiques',
     'Autres'
   ];
-
   /// Liste complète des années d'étude disponibles
   static const List<String> anneesEtudeDisponibles = [
     '1ère année',
@@ -193,7 +181,6 @@ class LivresUtils {
     'Maîtrise',
     'Doctorat'
   ];
-
   /// Obtenir l'icône selon l'année d'étude
   static IconData obtenirIconeAnnee(String annee) {
     if (annee.contains('1ère') || annee.contains('1ere')) {
@@ -211,7 +198,6 @@ class LivresUtils {
     }
     return Icons.grade;
   }
-
   /// Obtenir la couleur selon l'année d'étude
   static Color obtenirCouleurAnnee(String annee) {
     if (annee.contains('1ère') || annee.contains('1ere')) {
@@ -230,8 +216,6 @@ class LivresUtils {
     return CouleursApp.accent;
   }
 }
-
-// UI Design: Utilitaires centralisés pour les transactions UQAR
 class TransactionsUtils {
   /// Obtenir la couleur selon le statut de la transaction
   static Color obtenirCouleurStatut(String statut) {
@@ -251,7 +235,6 @@ class TransactionsUtils {
         return Colors.grey;
     }
   }
-
   /// Obtenir le texte lisible du statut
   static String obtenirTexteStatut(String statut) {
     switch (statut.toLowerCase()) {
@@ -270,7 +253,6 @@ class TransactionsUtils {
         return statut;
     }
   }
-
   /// Obtenir l'icône selon le statut de la transaction
   static IconData obtenirIconeStatut(String statut) {
     switch (statut.toLowerCase()) {
@@ -289,12 +271,10 @@ class TransactionsUtils {
         return Icons.info;
     }
   }
-
   /// Formater une date pour l'affichage
   static String formaterDate(DateTime date) {
     final maintenant = DateTime.now();
     final difference = maintenant.difference(date);
-
     if (difference.inDays > 0) {
       return '${difference.inDays}j';
     } else if (difference.inHours > 0) {
@@ -305,16 +285,13 @@ class TransactionsUtils {
       return 'À l\'instant';
     }
   }
-
   /// Formater une date complète
   static String formaterDateComplete(DateTime date) {
     return '${date.day}/${date.month}/${date.year} à ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
   }
-
   /// Obtenir les initiales d'un utilisateur
   static String obtenirInitialesUtilisateur(String? utilisateurId) {
     if (utilisateurId == null) return '?';
-
     // IDs connus pour les tests
     final idsConnus = {
       'etud_001': 'AM', // Alexandre Martin
@@ -331,7 +308,6 @@ class TransactionsUtils {
       'admin_001': 'AD', // Admin
       'mod_001': 'MO', // Modérateur
     };
-
     return idsConnus[utilisateurId] ?? 
            (utilisateurId.length >= 2 ? utilisateurId.substring(0, 2).toUpperCase() : utilisateurId.toUpperCase());
   }

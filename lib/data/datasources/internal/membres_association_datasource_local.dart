@@ -1,5 +1,4 @@
-import '../../models/membre_association_model.dart';
-
+﻿import '../../models/membre_association_model.dart';
 class MembresAssociationDatasourceLocal {
   // Simulation de données locales pour les membres d'associations
   static final List<MembreAssociationModel> _membresAssociation = [
@@ -28,7 +27,6 @@ class MembresAssociationDatasourceLocal {
       dateAdhesion: DateTime.now().subtract(const Duration(days: 60)),
       estActif: true,
     ),
-    
     // Marie Dubois (etud_002) - Vice-présidente AEI
     MembreAssociationModel(
       id: 'membre_004',
@@ -54,7 +52,6 @@ class MembresAssociationDatasourceLocal {
       dateAdhesion: DateTime.now().subtract(const Duration(days: 150)),
       estActif: true,
     ),
-    
     // Maxime Leblanc (etud_003) - Président Sport UQAR
     MembreAssociationModel(
       id: 'membre_007',
@@ -72,7 +69,6 @@ class MembresAssociationDatasourceLocal {
       dateAdhesion: DateTime.now().subtract(const Duration(days: 120)),
       estActif: true,
     ),
-    
     // Autres membres de l'AEI
     MembreAssociationModel(
       id: 'membre_009',
@@ -90,7 +86,6 @@ class MembresAssociationDatasourceLocal {
       dateAdhesion: DateTime.now().subtract(const Duration(days: 80)),
       estActif: true,
     ),
-    
     // Membres du Club Photo UQAR
     MembreAssociationModel(
       id: 'membre_011',
@@ -116,7 +111,6 @@ class MembresAssociationDatasourceLocal {
       dateAdhesion: DateTime.now().subtract(const Duration(days: 120)),
       estActif: true,
     ),
-    
     // Membres de Sport UQAR
     MembreAssociationModel(
       id: 'membre_014',
@@ -150,7 +144,6 @@ class MembresAssociationDatasourceLocal {
       dateAdhesion: DateTime.now().subtract(const Duration(days: 50)),
       estActif: true,
     ),
-    
     // Membres de l'AGE
     MembreAssociationModel(
       id: 'membre_018',
@@ -208,7 +201,6 @@ class MembresAssociationDatasourceLocal {
       dateAdhesion: DateTime.now().subtract(const Duration(days: 25)),
       estActif: true,
     ),
-    
     // Membres du Théâtre UQAR
     MembreAssociationModel(
       id: 'membre_025',
@@ -226,7 +218,6 @@ class MembresAssociationDatasourceLocal {
       dateAdhesion: DateTime.now().subtract(const Duration(days: 160)),
       estActif: true,
     ),
-    
     // Membres d'Éco-UQAR
     MembreAssociationModel(
       id: 'membre_027',
@@ -260,7 +251,6 @@ class MembresAssociationDatasourceLocal {
       dateAdhesion: DateTime.now().subtract(const Duration(days: 80)),
       estActif: true,
     ),
-    
     // Membres des Étudiants Internationaux UQAR
     MembreAssociationModel(
       id: 'membre_031',
@@ -302,7 +292,6 @@ class MembresAssociationDatasourceLocal {
       dateAdhesion: DateTime.now().subtract(const Duration(days: 120)),
       estActif: true,
     ),
-    
     // Membres de l'AELIES
     MembreAssociationModel(
       id: 'membre_036',
@@ -345,31 +334,26 @@ class MembresAssociationDatasourceLocal {
       estActif: true,
     ),
   ];
-
   Future<List<MembreAssociationModel>> obtenirMembresParUtilisateur(String utilisateurId) async {
     await Future.delayed(const Duration(milliseconds: 300)); // Simulation latence
     return _membresAssociation
         .where((membre) => membre.utilisateurId == utilisateurId && membre.estActif)
         .toList();
   }
-
   Future<List<MembreAssociationModel>> obtenirMembresParAssociation(String associationId) async {
     await Future.delayed(const Duration(milliseconds: 300));
     return _membresAssociation
         .where((membre) => membre.associationId == associationId && membre.estActif)
         .toList();
   }
-
   Future<void> ajouterMembre(MembreAssociationModel membre) async {
     await Future.delayed(const Duration(milliseconds: 200));
     _membresAssociation.add(membre);
   }
-
   Future<void> supprimerMembre(String membreId) async {
     await Future.delayed(const Duration(milliseconds: 200));
     _membresAssociation.removeWhere((membre) => membre.id == membreId);
   }
-
   Future<void> modifierMembre(MembreAssociationModel membre) async {
     await Future.delayed(const Duration(milliseconds: 200));
     final index = _membresAssociation.indexWhere((m) => m.id == membre.id);
@@ -377,7 +361,6 @@ class MembresAssociationDatasourceLocal {
       _membresAssociation[index] = membre;
     }
   }
-
   Future<void> modifierRoleMembre(String membreId, String nouveauRole) async {
     await Future.delayed(const Duration(milliseconds: 200));
     final index = _membresAssociation.indexWhere((membre) => membre.id == membreId);
@@ -385,7 +368,6 @@ class MembresAssociationDatasourceLocal {
       _membresAssociation[index] = _membresAssociation[index].copyWith(role: nouveauRole);
     }
   }
-
   Future<bool> estMembreActif(String utilisateurId, String associationId) async {
     await Future.delayed(const Duration(milliseconds: 100));
     return _membresAssociation.any((membre) => 

@@ -1,7 +1,4 @@
-// UI Design: Écran de conversation pour UqarLife - Affichage des messages entre deux utilisateurs
-// ignore_for_file: prefer_const_constructors
-
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/di/service_locator.dart';
 import '../../../domain/entities/message.dart';
@@ -9,82 +6,60 @@ import '../../../domain/entities/utilisateur.dart';
 import '../../services/messagerie_service.dart';
 import '../../services/authentification_service.dart';
 import '../../widgets/widget_barre_app_personnalisee.dart';
-
 class ConversationEcran extends StatefulWidget {
   final String destinataireId;
   final String? destinataireNom;
   final String? destinatairePrenom;
-
   const ConversationEcran({
     super.key,
     required this.destinataireId,
     this.destinataireNom,
     this.destinatairePrenom,
   });
-
   @override
   State<ConversationEcran> createState() => _ConversationEcranState();
 }
-
 class _ConversationEcranState extends State<ConversationEcran> {
   late MessagerieService _messagerieService;
   late AuthentificationService _authentificationService;
-  
   List<Message> _messages = [];
   bool _isLoading = true;
   String? _utilisateurActuelId;
   Utilisateur? _destinataire;
-  
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-
   @override
   void initState() {
     super.initState();
     _initialiserServices();
     _chargerConversation();
   }
-
   @override
   void dispose() {
     _messageController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
-
-  // UI Design: Initialiser les services
   Future<void> _initialiserServices() async {
     try {
       _authentificationService = AuthentificationService.instance;
       _utilisateurActuelId = _authentificationService.utilisateurActuel?.id;
-      
-      // UI Design: Injecter le service de messagerie via le service locator
       _messagerieService = ServiceLocator.obtenirService<MessagerieService>();
-      
       setState(() {});
     } catch (e) {
       _afficherErreur('Erreur d\'initialisation: $e');
     }
   }
-
-  // UI Design: Charger la conversation
   Future<void> _chargerConversation() async {
     if (_utilisateurActuelId == null) return;
-    
     setState(() => _isLoading = true);
-    
     try {
-      // UI Design: Charger la conversation et les informations du destinataire
       _messages = await _messagerieService.obtenirConversation(
         _utilisateurActuelId!,
         widget.destinataireId,
       );
-      
       _destinataire = await _messagerieService.obtenirExpediteur(widget.destinataireId);
-      
       setState(() => _isLoading = false);
-      
-      // UI Design: Faire défiler vers le bas pour voir les derniers messages
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (_scrollController.hasClients && _messages.isNotEmpty) {
           _scrollController.animateTo(
@@ -99,11 +74,8 @@ class _ConversationEcranState extends State<ConversationEcran> {
       _afficherErreur('Erreur lors du chargement de la conversation: $e');
     }
   }
-
-  // UI Design: Envoyer un message
   Future<void> _envoyerMessage() async {
     if (_messageController.text.trim().isEmpty || _utilisateurActuelId == null) return;
-    
     try {
       final nouveauMessage = await _messagerieService.envoyerMessageGeneral(
         expediteurId: _utilisateurActuelId!,
@@ -111,18 +83,11 @@ class _ConversationEcranState extends State<ConversationEcran> {
         contenu: _messageController.text.trim(),
         typeMessage: 'general',
       );
-      
-      // UI Design: Ajouter le message à la liste locale pour l'affichage immédiat
       setState(() {
         _messages.add(nouveauMessage);
       });
-      
       _messageController.clear();
-      
-      // UI Design: Recharger les messages depuis le repository pour synchronisation
       await _chargerMessages();
-      
-      // UI Design: Faire défiler vers le bas pour voir le nouveau message
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (_scrollController.hasClients) {
           _scrollController.animateTo(
@@ -136,15 +101,12 @@ class _ConversationEcranState extends State<ConversationEcran> {
       _afficherErreur('Erreur lors de l\'envoi du message: $e');
     }
   }
-
-  // UI Design: Recharger les messages depuis le repository
   Future<void> _chargerMessages() async {
     try {
       final conversation = await _messagerieService.obtenirConversation(
         _utilisateurActuelId!,
         widget.destinataireId,
       );
-      
       setState(() {
         _messages = conversation;
       });
@@ -152,8 +114,6 @@ class _ConversationEcranState extends State<ConversationEcran> {
       _afficherErreur('Erreur lors du rechargement des messages: $e');
     }
   }
-
-  // UI Design: Afficher une erreur
   void _afficherErreur(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -163,7 +123,6 @@ class _ConversationEcranState extends State<ConversationEcran> {
       ),
     );
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -189,16 +148,10 @@ class _ConversationEcranState extends State<ConversationEcran> {
       ),
     );
   }
-
-  // UI Design: Construire l'AppBar personnalisé
-
-
-  // UI Design: Construire la liste des messages
   Widget _construireListeMessages() {
     if (_messages.isEmpty) {
       return _construireEtatVide();
     }
-
     return ListView.builder(
       controller: _scrollController,
       padding: const EdgeInsets.all(16),
@@ -210,8 +163,6 @@ class _ConversationEcranState extends State<ConversationEcran> {
       },
     );
   }
-
-  // UI Design: Construire une bulle de message
   Widget _construireBulleMessage(Message message, bool estMoi) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -224,7 +175,7 @@ class _ConversationEcranState extends State<ConversationEcran> {
               backgroundColor: CouleursApp.principal.withValues(alpha: 0.2),
               child: Text(
                 _obtenirInitiales(message.expediteurId),
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 12,
                   color: CouleursApp.principal,
                   fontWeight: FontWeight.bold,
@@ -280,7 +231,7 @@ class _ConversationEcranState extends State<ConversationEcran> {
               backgroundColor: CouleursApp.accent.withValues(alpha: 0.2),
               child: Text(
                 _obtenirInitiales(_utilisateurActuelId ?? ''),
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 12,
                   color: CouleursApp.accent,
                   fontWeight: FontWeight.bold,
@@ -292,8 +243,6 @@ class _ConversationEcranState extends State<ConversationEcran> {
       ),
     );
   }
-
-  // UI Design: Obtenir les initiales d'un utilisateur
   String _obtenirInitiales(String utilisateurId) {
     if (utilisateurId == _utilisateurActuelId) {
       final utilisateur = _authentificationService.utilisateurActuel;
@@ -305,8 +254,6 @@ class _ConversationEcranState extends State<ConversationEcran> {
     }
     return 'UQ';
   }
-
-  // UI Design: Construire l'état vide
   Widget _construireEtatVide() {
     return Center(
       child: Column(
@@ -344,8 +291,6 @@ class _ConversationEcranState extends State<ConversationEcran> {
       ),
     );
   }
-
-  // UI Design: Construire la barre de saisie
   Widget _construireBarreSaisie() {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -384,7 +329,7 @@ class _ConversationEcranState extends State<ConversationEcran> {
           ),
           const SizedBox(width: 12),
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: CouleursApp.principal,
               shape: BoxShape.circle,
             ),

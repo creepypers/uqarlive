@@ -1,5 +1,4 @@
-// UI Design: Entité représentant une réservation de salle par un utilisateur
-class ReservationSalle {
+﻿class ReservationSalle {
   final String id;
   final String utilisateurId;
   final String salleId;
@@ -14,7 +13,6 @@ class ReservationSalle {
   final DateTime dateCreation;
   final List<String> participantsIds; // IDs des autres participants
   final String? notesSpeciales;
-
   const ReservationSalle({
     required this.id,
     required this.utilisateurId,
@@ -31,24 +29,19 @@ class ReservationSalle {
     this.participantsIds = const [],
     this.notesSpeciales,
   });
-
-  // UI Design: Méthodes utilitaires
   Duration get duree => heureFin.difference(heureDebut);
   int get dureeEnHeures => duree.inHours;
   int get dureeEnMinutes => duree.inMinutes;
-
   bool get estEnAttente => statut == 'en_attente';
   bool get estConfirmee => statut == 'confirmee';
   bool get estAnnulee => statut == 'annulee';
   bool get estTerminee => statut == 'terminee';
-
   bool get estAVenir => heureDebut.isAfter(DateTime.now());
   bool get estEnCours {
     final maintenant = DateTime.now();
     return maintenant.isAfter(heureDebut) && maintenant.isBefore(heureFin);
   }
   bool get estPassee => heureFin.isBefore(DateTime.now());
-
   String get motifFormate {
     switch (motif) {
       case 'etude_groupe': return 'Étude en groupe';
@@ -58,7 +51,6 @@ class ReservationSalle {
       default: return 'Non spécifié';
     }
   }
-
   String get statutFormate {
     switch (statut) {
       case 'en_attente': return 'En attente';
@@ -68,8 +60,6 @@ class ReservationSalle {
       default: return 'Inconnu';
     }
   }
-
-  // UI Design: Copie avec modifications
   ReservationSalle copyWith({
     String? id,
     String? utilisateurId,
@@ -103,18 +93,15 @@ class ReservationSalle {
       notesSpeciales: notesSpeciales ?? this.notesSpeciales,
     );
   }
-
   @override
   String toString() {
     return 'ReservationSalle(id: $id, utilisateurId: $utilisateurId, salleId: $salleId, date: $dateReservation, statut: $statut)';
   }
-
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     return other is ReservationSalle && other.id == id;
   }
-
   @override
   int get hashCode => id.hashCode;
 }

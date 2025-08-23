@@ -1,17 +1,13 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
-
-// UI Design: NavBar réutilisable avec design UQAR et navigation centralisée
 class NavBarWidget extends StatelessWidget {
   final int indexSelectionne;
   final Function(int) onTap;
-
   const NavBarWidget({
     super.key,
     required this.indexSelectionne,
     required this.onTap,
   });
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -85,11 +81,8 @@ class NavBarWidget extends StatelessWidget {
       ),
     );
   }
-
-  // UI Design: Icône Accueil sans animation de focus
   Widget _construireIconeAccueil() {
     final estSelectionne = indexSelectionne == 2;
-    
     return Icon(
       Icons.home,
       size: estSelectionne ? 26 : 24,

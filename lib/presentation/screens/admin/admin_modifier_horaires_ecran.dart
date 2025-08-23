@@ -1,26 +1,20 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/di/service_locator.dart';
 import '../../../domain/usercases/horaires_repository.dart';
 import '../../../presentation/widgets/widget_barre_app_navigation_admin.dart';
-
 class AdminModifierHorairesEcran extends StatefulWidget {
-  final String? jourInitial; // UI Design: Jour à modifier directement
-  
+  final String? jourInitial; 
   const AdminModifierHorairesEcran({super.key, this.jourInitial});
-
   @override
   State<AdminModifierHorairesEcran> createState() => _AdminModifierHorairesEcranState();
 }
-
 class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran> with SingleTickerProviderStateMixin {
   late final HorairesRepository _horairesRepository;
   late TabController _tabController;
-  
   String _jourSelectionne = 'Lundi';
   bool _isLoading = false;
   late Map<String, TimeOfDay> _horairesJourSelectionne;
-
   @override
   void initState() {
     super.initState();
@@ -29,13 +23,11 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
     _jourSelectionne = widget.jourInitial ?? 'Lundi';
     _chargerDonnees();
   }
-
   @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
   }
-
   Future<void> _chargerDonnees() async {
     setState(() => _isLoading = true);
     try {
@@ -55,17 +47,14 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
       }
     }
   }
-
   Future<void> _sauvegarderHoraires() async {
     setState(() => _isLoading = true);
-
     try {
       await _horairesRepository.mettreAJourHorairesCantine(
         _jourSelectionne,
         _horairesJourSelectionne['ouverture']!,
         _horairesJourSelectionne['fermeture']!,
       );
-
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -81,7 +70,7 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           ),
         );
-        Navigator.pop(context, true); // UI Design: Retourner avec succès
+        Navigator.pop(context, true); 
       }
     } catch (e) {
       if (mounted) {
@@ -106,10 +95,8 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
       }
     }
   }
-
   Future<void> _selectionnerHeure(String type) async {
     final heureInitiale = _horairesJourSelectionne[type]!;
-    
     final heureSelectionnee = await showTimePicker(
       context: context,
       initialTime: heureInitiale,
@@ -132,7 +119,6 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
         );
       },
     );
-
     if (heureSelectionnee != null) {
       setState(() {
         _horairesJourSelectionne = {
@@ -142,19 +128,16 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
       });
     }
   }
-
   @override
   Widget build(BuildContext context) {
-    // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
     final mediaQuery = MediaQuery.of(context);
     final screenHeight = mediaQuery.size.height;
     final screenWidth = mediaQuery.size.width;
     final padding = mediaQuery.padding;
     final viewInsets = mediaQuery.viewInsets;
-    
     return Scaffold(
       backgroundColor: CouleursApp.fond,
-      resizeToAvoidBottomInset: true, // UI Design: Éviter les débordements avec le clavier
+      resizeToAvoidBottomInset: true, 
       appBar: const WidgetBarreAppNavigationAdmin(
         titre: 'Modifier Horaires',
         sousTitre: 'Gérer les horaires de la cantine',
@@ -165,18 +148,18 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               padding: EdgeInsets.only(
-                left: screenWidth * 0.04, // UI Design: Padding adaptatif
+                left: screenWidth * 0.04, 
                 right: screenWidth * 0.04,
                 top: screenHeight * 0.02,
-                bottom: viewInsets.bottom + padding.bottom + screenHeight * 0.025, // UI Design: Padding adaptatif pour éviter les débordements
+                bottom: viewInsets.bottom + padding.bottom + screenHeight * 0.025, 
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _construireSectionInformation(),
-                  SizedBox(height: screenHeight * 0.03), // UI Design: Espacement adaptatif
+                  SizedBox(height: screenHeight * 0.03), 
                   _construireSectionHoraires(),
-                  SizedBox(height: screenHeight * 0.04), // UI Design: Espacement adaptatif
+                  SizedBox(height: screenHeight * 0.04), 
                   _construireBoutonsSauvegarde(),
                 ],
               ),
@@ -184,7 +167,6 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
       ),
     );
   }
-
   Widget _construireSectionInformation() {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -233,7 +215,6 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
       ),
     );
   }
-
   Widget _construireSectionHoraires() {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -256,7 +237,6 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
             style: StylesTexteApp.petitTitre,
           ),
           const SizedBox(height: 16),
-          
           // Sélecteur de jour
           DropdownButtonFormField<String>(
             value: _jourSelectionne,
@@ -305,14 +285,12 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
             },
           ),
           const SizedBox(height: 24),
-          
           // Horaires
           const Text(
             'Horaires',
             style: StylesTexteApp.petitTitre,
           ),
           const SizedBox(height: 16),
-          
           // Heure d'ouverture
           ListTile(
             title: const Text('Heure d\'ouverture'),
@@ -329,7 +307,6 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
             onTap: () => _selectionnerHeure('ouverture'),
           ),
           const SizedBox(height: 12),
-          
           // Heure de fermeture
           ListTile(
             title: const Text('Heure de fermeture'),
@@ -349,7 +326,6 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
       ),
     );
   }
-
   Widget _construireBoutonsSauvegarde() {
     return Column(
       children: [
@@ -423,7 +399,6 @@ class _AdminModifierHorairesEcranState extends State<AdminModifierHorairesEcran>
       ],
     );
   }
-
   String _formatterHeure(TimeOfDay heure) {
     final minute = heure.minute.toString().padLeft(2, '0');
     return '${heure.hour}h$minute';

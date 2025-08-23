@@ -1,28 +1,22 @@
-// UI Design: Écran d'ajout d'association avec formulaire complet et validation
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/di/service_locator.dart';
 import '../../../core/utils/association_types.dart';
 import '../../../domain/entities/association.dart';
 import '../../../domain/usercases/associations_repository.dart';
 import '../../../presentation/widgets/widget_barre_app_navigation_admin.dart';
-
 class AdminAjouterAssociationEcran extends StatefulWidget {
   final Association? associationAModifier;
-
   const AdminAjouterAssociationEcran({
     super.key,
     this.associationAModifier,
   });
-
   @override
   State<AdminAjouterAssociationEcran> createState() => _AdminAjouterAssociationEcranState();
 }
-
 class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEcran> {
   final GlobalKey<FormState> _cleFormulaire = GlobalKey<FormState>();
   late AssociationsRepository _associationsRepository;
-  
   // Contrôleurs de texte
   final TextEditingController _controleurNom = TextEditingController();
   final TextEditingController _controleurDescription = TextEditingController();
@@ -30,16 +24,13 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
   final TextEditingController _controleurTelephone = TextEditingController();
   final TextEditingController _controleurSiteWeb = TextEditingController();
   final TextEditingController _controleurBudget = TextEditingController();
-  
   final TextEditingController _controleurLocalisation = TextEditingController();
   final TextEditingController _controleurHoraires = TextEditingController();
-  
   // Variables d'état
   bool _estActive = true;
   bool _enChargement = false;
   bool _modeModification = false;
-  final List<String> _activites = ['Activités à définir']; // UI Design: Liste des activités modifiable
-  
+  final List<String> _activites = ['Activités à définir']; 
   // Liste des utilisateurs disponibles pour être chef d'association
   final List<Map<String, String>> _utilisateursDisponibles = [
     {'id': 'etud_001', 'nom': 'Alexandre Martin'},
@@ -54,21 +45,17 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
     {'id': 'etud_011', 'nom': 'Isabelle Dufour (AELIES)'},
   ];
   String _chefSelectionne = 'etud_001'; // Alexandre Martin par défaut
-  
   // Catégories d'associations
   String _categorieSelectionnee = 'academique';
-
   @override
   void initState() {
     super.initState();
     _associationsRepository = ServiceLocator.obtenirService<AssociationsRepository>();
     _modeModification = widget.associationAModifier != null;
-    
     if (_modeModification) {
       _remplirFormulaire(widget.associationAModifier!);
     }
   }
-
   @override
   void dispose() {
     _controleurNom.dispose();
@@ -77,12 +64,10 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
     _controleurTelephone.dispose();
     _controleurSiteWeb.dispose();
     _controleurBudget.dispose();
-
     _controleurLocalisation.dispose();
     _controleurHoraires.dispose();
     super.dispose();
   }
-
   void _remplirFormulaire(Association association) {
     _controleurNom.text = association.nom;
     _controleurDescription.text = association.description;
@@ -94,24 +79,20 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
     _controleurLocalisation.text = association.localisation ?? '';
     _controleurHoraires.text = association.horairesBureau ?? '';
     _estActive = association.estActive;
-    
     // Vérifier si la catégorie existe
     final categorieExiste = AssociationTypes.typesCreation.contains(association.typeAssociation);
     _categorieSelectionnee = categorieExiste ? association.typeAssociation : 'academique';
   }
-
   @override
   Widget build(BuildContext context) {
-    // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
     final mediaQuery = MediaQuery.of(context);
     final screenHeight = mediaQuery.size.height;
     final screenWidth = mediaQuery.size.width;
     final padding = mediaQuery.padding;
     final viewInsets = mediaQuery.viewInsets;
-    
     return Scaffold(
       backgroundColor: CouleursApp.fond,
-      resizeToAvoidBottomInset: true, // UI Design: Éviter les débordements avec le clavier
+      resizeToAvoidBottomInset: true, 
       appBar: WidgetBarreAppNavigationAdmin(
         titre: _modeModification ? 'Modifier Association' : 'Ajouter Association',
         sousTitre: _modeModification 
@@ -124,10 +105,10 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               padding: EdgeInsets.only(
-                left: screenWidth * 0.04, // UI Design: Padding adaptatif
+                left: screenWidth * 0.04, 
                 right: screenWidth * 0.04,
                 top: screenHeight * 0.02,
-                bottom: viewInsets.bottom + padding.bottom + screenHeight * 0.025, // UI Design: Padding adaptatif pour éviter les débordements
+                bottom: viewInsets.bottom + padding.bottom + screenHeight * 0.025, 
               ),
             child: Form(
               key: _cleFormulaire,
@@ -148,8 +129,6 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
       ),
     );
   }
-
-  // UI Design: Section des informations générales
   Widget _construireSectionInformationsGenerales() {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -163,7 +142,6 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
               style: StylesTexteApp.grandTitre,
             ),
             const SizedBox(height: 16),
-            
             // Nom de l'association
             TextFormField(
               controller: _controleurNom,
@@ -190,7 +168,6 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
               },
             ),
             const SizedBox(height: 16),
-            
             // Catégorie
             DropdownButtonFormField<String>(
               value: _categorieSelectionnee,
@@ -222,11 +199,10 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
               },
             ),
             const SizedBox(height: 16),
-            
                         // Chef de l'association
             DropdownButtonFormField<String>(
               value: _chefSelectionne,
-              isExpanded: true, // UI Design: Utiliser toute la largeur disponible
+              isExpanded: true, 
               decoration: InputDecoration(
                 labelText: 'Chef de l\'association *',
                 prefixIcon: const Icon(Icons.person, color: CouleursApp.principal),
@@ -255,7 +231,6 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
               },
             ),
             const SizedBox(height: 16),
-            
             // Description
             TextFormField(
               controller: _controleurDescription,
@@ -287,8 +262,6 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
       ),
     );
   }
-
-  // UI Design: Section des informations de contact
   Widget _construireSectionContact() {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -302,7 +275,6 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
               style: StylesTexteApp.grandTitre,
             ),
             const SizedBox(height: 16),
-            
             // Email
             TextFormField(
               controller: _controleurEmail,
@@ -330,7 +302,6 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
               },
             ),
             const SizedBox(height: 16),
-            
             // Téléphone
             TextFormField(
               controller: _controleurTelephone,
@@ -355,7 +326,6 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
               },
             ),
             const SizedBox(height: 16),
-            
             // Localisation
             TextFormField(
               controller: _controleurLocalisation,
@@ -373,7 +343,6 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
               ),
             ),
             const SizedBox(height: 16),
-            
             // Horaires de bureau
             TextFormField(
               controller: _controleurHoraires,
@@ -391,7 +360,6 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
               ),
             ),
             const SizedBox(height: 16),
-            
             // Site web (optionnel)
             TextFormField(
               controller: _controleurSiteWeb,
@@ -414,8 +382,6 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
       ),
     );
   }
-
-  // UI Design: Section des paramètres
   Widget _construireSectionParametres() {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -429,7 +395,6 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
               style: StylesTexteApp.grandTitre,
             ),
             const SizedBox(height: 16),
-            
             // Budget (optionnel)
             TextFormField(
               controller: _controleurBudget,
@@ -458,7 +423,6 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
               },
             ),
             const SizedBox(height: 24),
-            
             // Section Activités
             const Text(
               'Activités de l\'association',
@@ -470,7 +434,6 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
               style: StylesTexteApp.corpsGris,
             ),
             const SizedBox(height: 16),
-            
             // Liste des activités
             Container(
               decoration: BoxDecoration(
@@ -545,7 +508,6 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
               ),
             ),
             const SizedBox(height: 24),
-            
             // Statut actif
             SwitchListTile(
               title: const Text(
@@ -571,8 +533,6 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
       ),
     );
   }
-
-  // UI Design: Boutons d'action avec design UQAR
   Widget _construireBoutonsAction() {
     return Row(
       children: [
@@ -613,46 +573,39 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
       ],
     );
   }
-
   // Méthodes de gestion
   Future<void> _enregistrerAssociation() async {
     if (!_cleFormulaire.currentState!.validate()) {
       return;
     }
-
     setState(() => _enChargement = true);
-
     try {
       final association = Association(
         id: _modeModification ? widget.associationAModifier!.id : DateTime.now().millisecondsSinceEpoch.toString(),
         nom: _controleurNom.text.trim(),
         description: _controleurDescription.text.trim(),
         typeAssociation: _categorieSelectionnee,
-        chefId: _chefSelectionne, // UI Design: Chef obligatoire
+        chefId: _chefSelectionne, 
         email: _controleurEmail.text.trim().isEmpty ? null : _controleurEmail.text.trim(),
         telephone: _controleurTelephone.text.trim().isEmpty ? null : _controleurTelephone.text.trim(),
         siteWeb: _controleurSiteWeb.text.trim().isEmpty ? null : _controleurSiteWeb.text.trim(),
         localisation: _controleurLocalisation.text.trim().isEmpty ? null : _controleurLocalisation.text.trim(),
         horairesBureau: _controleurHoraires.text.trim().isEmpty ? null : _controleurHoraires.text.trim(),
         cotisationAnnuelle: _controleurBudget.text.trim().isEmpty ? null : double.parse(_controleurBudget.text.trim()),
-        activites: _activites, // UI Design: Activités saisies par l'utilisateur
+        activites: _activites, 
         estActive: _estActive,
         dateCreation: _modeModification ? widget.associationAModifier!.dateCreation : DateTime.now(),
         membresActifs: _modeModification ? widget.associationAModifier!.membresActifs : [],
       );
-
-      // UI Design: Appeler les méthodes du repository selon le mode
       bool succes = false;
       if (_modeModification) {
         succes = await _associationsRepository.mettreAJourAssociation(association);
       } else {
         succes = await _associationsRepository.ajouterAssociation(association);
       }
-
       if (!succes) {
         throw Exception('Échec de l\'opération');
       }
-
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -681,8 +634,6 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
       }
     }
   }
-
-  // UI Design: Ajouter une nouvelle activité
   void _ajouterActivite() {
     showDialog(
       context: context,
@@ -737,8 +688,6 @@ class _AdminAjouterAssociationEcranState extends State<AdminAjouterAssociationEc
       },
     );
   }
-
-  // UI Design: Supprimer une activité
   void _supprimerActivite(int index) {
     if (index >= 0 && index < _activites.length) {
       final activite = _activites[index];

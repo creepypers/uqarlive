@@ -1,9 +1,5 @@
-import 'package:flutter/material.dart';
-
-// UI Design: Centralisation du thème UQAR (redondance supprimée)
-
+﻿import 'package:flutter/material.dart';
 class StylesTexteApp {
-  // UI Design: Styles de base existants
   static const TextStyle titre = TextStyle(
     fontSize: 32,
     fontWeight: FontWeight.bold,
@@ -23,8 +19,6 @@ class StylesTexteApp {
     color: CouleursApp.accent,
     decoration: TextDecoration.underline,
   );
-
-  // UI Design: Styles étendus pour tous les widgets
   static const TextStyle titrePage = TextStyle(
     fontSize: 28,
     fontWeight: FontWeight.bold,
@@ -45,7 +39,6 @@ class StylesTexteApp {
     fontWeight: FontWeight.w600,
     color: CouleursApp.texteFonce,
   );
-  
   // Styles de texte blanc
   static const TextStyle titrePageBlanc = TextStyle(
     fontSize: 28,
@@ -67,7 +60,6 @@ class StylesTexteApp {
     fontWeight: FontWeight.normal,
     color: CouleursApp.blanc,
   );
-  
   // Styles de corps de texte
   static const TextStyle corpsNormal = TextStyle(
     fontSize: 16,
@@ -89,7 +81,6 @@ class StylesTexteApp {
     fontWeight: FontWeight.normal,
     color: Colors.grey,
   );
-  
   // Styles de liens
   static const TextStyle lienPrincipal = TextStyle(
     fontSize: 16,
@@ -102,17 +93,14 @@ class StylesTexteApp {
     color: CouleursApp.accent,
   );
 }
-
-// UI Design: Centralisation du thème UQAR complet
 class CouleursApp {
   static const Color principal = Color(0xFF005499); // Bleu foncé UQAR
   static const Color accent = Color(0xFF00A1E4); // Bleu ciel UQAR
   static const Color fond = Color(0xFFF8F9FA); // Gris très clair
   static const Color texteFonce = Color(0xFF2C2C2C); // Texte foncé
   static const Color blanc = Colors.white;
-  static const Color gris = Colors.grey; // UI Design: Ajouté pour compatibilité
+  static const Color gris = Colors.grey; 
 }
-
 class DecorationsApp {
   static BoxDecoration champTexte = BoxDecoration(
     color: CouleursApp.blanc,

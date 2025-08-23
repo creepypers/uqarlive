@@ -1,5 +1,4 @@
-// UI Design: Écran de gestion des comptes utilisateurs avec design moderne et épuré
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/di/service_locator.dart';
 import '../../../domain/entities/utilisateur.dart';
@@ -7,31 +6,24 @@ import '../../../domain/usercases/utilisateurs_repository.dart';
     import '../../../presentation/widgets/widget_barre_app_navigation_admin.dart';
 import '../../../presentation/services/statistiques_service.dart';
 import '../../../presentation/screens/utilisateur/modifier_profil_ecran.dart';
-
-
 class AdminGestionComptesEcran extends StatefulWidget {
   const AdminGestionComptesEcran({super.key});
-
   @override
   State<AdminGestionComptesEcran> createState() => _AdminGestionComptesEcranState();
 }
-
 class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late UtilisateursRepository _utilisateursRepository;
   late StatistiquesService _statistiquesService;
   bool _statistiquesVisibles = false;
-  
   List<Utilisateur> _utilisateurs = [];
   List<Utilisateur> _utilisateursFiltres = [];
   StatistiquesGlobales? _statistiques;
   bool _chargementEnCours = true;
   String _filtreRecherche = '';
   String _ongletActif = 'tous';
-
   final TextEditingController _controleurRecherche = TextEditingController();
-
   @override
   void initState() {
     super.initState();
@@ -40,23 +32,19 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
     _statistiquesService = StatistiquesService();
     _chargerDonnees();
   }
-
   @override
   void dispose() {
     _tabController.dispose();
     _controleurRecherche.dispose();
     super.dispose();
   }
-
   Future<void> _chargerDonnees() async {
     try {
       setState(() => _chargementEnCours = true);
-      
       final results = await Future.wait([
         _utilisateursRepository.obtenirTousLesUtilisateurs(),
         _statistiquesService.obtenirStatistiquesGlobales(),
       ]);
-
       setState(() {
         _utilisateurs = results[0] as List<Utilisateur>;
         _statistiques = results[1] as StatistiquesGlobales;
@@ -75,7 +63,6 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
       }
     }
   }
-
   void _appliquerFiltres() {
     _utilisateursFiltres = _utilisateurs.where((utilisateur) {
       // Filtre par recherche
@@ -84,7 +71,6 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
           utilisateur.prenom.toLowerCase().contains(_filtreRecherche.toLowerCase()) ||
           utilisateur.email.toLowerCase().contains(_filtreRecherche.toLowerCase()) ||
           utilisateur.codeEtudiant.toLowerCase().contains(_filtreRecherche.toLowerCase());
-
       // Filtre par onglet
       final ongletOk = switch (_ongletActif) {
         'tous' => true,
@@ -92,17 +78,13 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
         'admins' => utilisateur.typeUtilisateur == TypeUtilisateur.administrateur,
         _ => true,
       };
-
       return rechercheOk && ongletOk;
     }).toList();
   }
-
   @override
   Widget build(BuildContext context) {
-    // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
-    
     return Scaffold(
       backgroundColor: CouleursApp.fond,
       resizeToAvoidBottomInset: true,
@@ -148,15 +130,11 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
       ),
     );
   }
-
-  // UI Design: Section des statistiques avec design moderne
   Widget _construireStatistiquesModernes() {
     if (_statistiques == null) return const SizedBox.shrink();
-    
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
-    
     return Container(
       margin: EdgeInsets.all(screenWidth * 0.04),
       padding: EdgeInsets.all(screenWidth * 0.05),
@@ -255,12 +233,9 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
       ),
     );
   }
-
-  // UI Design: Carte statistique moderne
   Widget _construireCarteStatistique(String titre, String valeur, IconData icone, Color couleur) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
-    
     return Container(
       padding: EdgeInsets.all(screenWidth * 0.04),
       decoration: BoxDecoration(
@@ -301,13 +276,10 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
       ),
     );
   }
-
-  // UI Design: Barre de recherche moderne
   Widget _construireBarreRechercheModerne() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
-    
     return Container(
       margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
       padding: EdgeInsets.all(screenWidth * 0.04),
@@ -397,12 +369,9 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
       ),
     );
   }
-
-  // UI Design: Onglets modernes
   Widget _construireOngletsModernes() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
-    
     return Container(
       margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.04, vertical: screenWidth * 0.02),
       decoration: BoxDecoration(
@@ -453,30 +422,23 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
       ),
     );
   }
-
-  // UI Design: Liste des utilisateurs avec design moderne
   Widget _construireListeUtilisateurs(String typeFiltre) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
-    
     final utilisateursFiltres = _utilisateurs.where((u) {
       final rechercheOk = _filtreRecherche.isEmpty ||
           u.nom.toLowerCase().contains(_filtreRecherche.toLowerCase()) ||
           u.prenom.toLowerCase().contains(_filtreRecherche.toLowerCase()) ||
           u.email.toLowerCase().contains(_filtreRecherche.toLowerCase()) ||
           u.codeEtudiant.toLowerCase().contains(_filtreRecherche.toLowerCase());
-
       final typeOk = typeFiltre == 'tous' || 
           (typeFiltre == 'etudiants' && u.typeUtilisateur == TypeUtilisateur.etudiant) ||
           (typeFiltre == 'admins' && u.typeUtilisateur == TypeUtilisateur.administrateur);
-      
       return rechercheOk && typeOk;
     }).toList();
-
     if (utilisateursFiltres.isEmpty) {
       return _construireMessageVideModerne();
     }
-
     return ListView.builder(
       padding: EdgeInsets.all(screenWidth * 0.04),
       itemCount: utilisateursFiltres.length,
@@ -486,13 +448,10 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
       },
     );
   }
-
-  // UI Design: Carte utilisateur moderne et épurée
   Widget _construireCarteUtilisateurModerne(Utilisateur utilisateur) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
-    
     return Container(
       margin: EdgeInsets.only(bottom: screenHeight * 0.015),
       decoration: BoxDecoration(
@@ -624,7 +583,6 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
                     ],
                   ),
                 ),
-                // UI Design: Appui long pour les actions (invisible)
                 const SizedBox.shrink(),
               ],
             ),
@@ -633,14 +591,9 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
       ),
     );
   }
-
-
-
-  // UI Design: Badge de statut moderne
   Widget _construireBadgeStatutModerne(Utilisateur utilisateur) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
-    
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: screenWidth * 0.02,
@@ -667,13 +620,10 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
       ),
     );
   }
-
-  // UI Design: Message vide moderne
   Widget _construireMessageVideModerne() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
-    
     return Center(
       child: Padding(
         padding: EdgeInsets.all(screenWidth * 0.1),
@@ -738,30 +688,25 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
       ),
     );
   }
-
-  // UI Design: Méthodes utilitaires
   Color _obtenirCouleurTypeUtilisateur(TypeUtilisateur type) {
     switch (type) {
       case TypeUtilisateur.administrateur: return CouleursApp.accent;
       case TypeUtilisateur.etudiant: return CouleursApp.principal;
     }
   }
-
   String _obtenirLibelleTypeUtilisateur(TypeUtilisateur type) {
     switch (type) {
       case TypeUtilisateur.administrateur: return 'Admin';
       case TypeUtilisateur.etudiant: return 'Étudiant';
     }
   }
-
-  // UI Design: Méthodes d'interaction
   void _afficherDetailsUtilisateur(Utilisateur utilisateur) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => ModifierProfilEcran(
           utilisateur: utilisateur, 
-          modeAdmin: true, // UI Design: Mode admin permet de modifier le code permanent
+          modeAdmin: true, 
         ),
       ),
     ).then((resultat) {
@@ -770,11 +715,9 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
       }
     });
   }
-
   void _afficherMenuUtilisateur(Utilisateur utilisateur) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
-    
     showModalBottomSheet(
       context: context,
       shape:const RoundedRectangleBorder(
@@ -849,7 +792,6 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
       ),
     );
   }
-
   void _gererActionUtilisateur(Utilisateur utilisateur, String action) {
     switch (action) {
       case 'modifier':
@@ -870,7 +812,6 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
         break;
     }
   }
-
   void _toggleStatutUtilisateur(Utilisateur utilisateur) {
     setState(() {
       final index = _utilisateurs.indexWhere((u) => u.id == utilisateur.id);
@@ -879,7 +820,6 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
         _appliquerFiltres();
       }
     });
-    
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -892,7 +832,6 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
       ),
     );
   }
-
   void _confirmerSuppressionUtilisateur(Utilisateur utilisateur) {
     showDialog(
       context: context,
@@ -931,13 +870,11 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
       }),
     );
   }
-
   void _supprimerUtilisateur(Utilisateur utilisateur) {
     setState(() {
       _utilisateurs.removeWhere((u) => u.id == utilisateur.id);
       _appliquerFiltres();
     });
-    
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Utilisateur "${utilisateur.prenom} ${utilisateur.nom}" supprimé'),
@@ -946,7 +883,6 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
       ),
     );
   }
-
   void _confirmerPromotionAdmin(Utilisateur utilisateur) {
     showDialog(
       context: context,
@@ -1010,7 +946,6 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
       }),
     );
   }
-
   Future<void> _promouvoirEnAdmin(Utilisateur utilisateur) async {
     try {
       final utilisateurAdmin = utilisateur.copyWith(
@@ -1026,9 +961,7 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
           PrivilegesUtilisateur.statistiques,
         ],
       );
-
       final succes = await _utilisateursRepository.modifierUtilisateur(utilisateurAdmin);
-      
       if (succes) {
         await _chargerDonnees();
         if (mounted) {
@@ -1074,7 +1007,6 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
       }
     }
   }
-
   void _afficherGestionPrivileges(Utilisateur utilisateur) {
     Navigator.push(
       context,
@@ -1087,13 +1019,12 @@ class _AdminGestionComptesEcranState extends State<AdminGestionComptesEcran>
       }
     });
   }
-
   void _afficherModalNouvelUtilisateur() {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => const ModifierProfilEcran(
-          modeAdmin: true, // UI Design: Mode admin pour créer un utilisateur complet
+          modeAdmin: true, 
         ),
       ),
     ).then((resultat) {

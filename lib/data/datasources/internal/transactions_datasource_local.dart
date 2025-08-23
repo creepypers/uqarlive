@@ -1,5 +1,4 @@
-import '../../models/transaction_model.dart';
-
+﻿import '../../models/transaction_model.dart';
 class TransactionsDatasourceLocal {
   // Simulation de données locales pour les transactions
   static final List<TransactionModel> _transactions = [
@@ -89,7 +88,6 @@ class TransactionsDatasourceLocal {
       dateRendezVous: DateTime.now().subtract(const Duration(days: 3, hours: 16)),
     ),
   ];
-
   Future<List<TransactionModel>> obtenirTransactionsParAcheteur(String acheteurId) async {
     await Future.delayed(const Duration(milliseconds: 300));
     return _transactions
@@ -97,7 +95,6 @@ class TransactionsDatasourceLocal {
         .toList()
         ..sort((a, b) => b.dateCreation.compareTo(a.dateCreation));
   }
-
   Future<List<TransactionModel>> obtenirTransactionsParVendeur(String vendeurId) async {
     await Future.delayed(const Duration(milliseconds: 300));
     return _transactions
@@ -105,7 +102,6 @@ class TransactionsDatasourceLocal {
         .toList()
         ..sort((a, b) => b.dateCreation.compareTo(a.dateCreation));
   }
-
   Future<List<TransactionModel>> obtenirTransactionsParLivre(String livreId) async {
     await Future.delayed(const Duration(milliseconds: 300));
     return _transactions
@@ -113,7 +109,6 @@ class TransactionsDatasourceLocal {
         .toList()
         ..sort((a, b) => b.dateCreation.compareTo(a.dateCreation));
   }
-
   Future<TransactionModel?> obtenirTransactionParId(String transactionId) async {
     await Future.delayed(const Duration(milliseconds: 200));
     try {
@@ -122,12 +117,10 @@ class TransactionsDatasourceLocal {
       return null;
     }
   }
-
   Future<void> creerTransaction(TransactionModel transaction) async {
     await Future.delayed(const Duration(milliseconds: 200));
     _transactions.add(transaction);
   }
-
   Future<void> modifierTransaction(TransactionModel transaction) async {
     await Future.delayed(const Duration(milliseconds: 200));
     final index = _transactions.indexWhere((t) => t.id == transaction.id);
@@ -135,7 +128,6 @@ class TransactionsDatasourceLocal {
       _transactions[index] = transaction;
     }
   }
-
   Future<void> changerStatutTransaction(String transactionId, String nouveauStatut) async {
     await Future.delayed(const Duration(milliseconds: 200));
     final index = _transactions.indexWhere((t) => t.id == transactionId);
@@ -147,33 +139,26 @@ class TransactionsDatasourceLocal {
       );
     }
   }
-
   Future<bool> peutAcheterLivre(String utilisateurId, String livreId, String proprietaireId) async {
     await Future.delayed(const Duration(milliseconds: 100));
-    
     // Vérifier que l'utilisateur n'est pas le propriétaire
     if (utilisateurId == proprietaireId) {
       return false;
     }
-    
     // Vérifier qu'il n'y a pas déjà une transaction en cours pour ce livre
     final transactionEnCours = _transactions.any((transaction) =>
         transaction.livreId == livreId &&
         (transaction.statut == 'en_attente' || transaction.statut == 'confirmee'));
-    
     return !transactionEnCours;
   }
-
   Future<bool> aTransactionEnCours(String livreId) async {
     await Future.delayed(const Duration(milliseconds: 100));
     return _transactions.any((transaction) =>
         transaction.livreId == livreId &&
         (transaction.statut == 'en_attente' || transaction.statut == 'confirmee'));
   }
-
   Future<Map<String, int>> obtenirStatistiquesTransactions(String utilisateurId) async {
     await Future.delayed(const Duration(milliseconds: 200));
-    
     final ventesTerminees = _transactions.where((t) => 
         t.vendeurId == utilisateurId && t.statut == 'completee').length;
     final achatsTermines = _transactions.where((t) => 
@@ -181,7 +166,6 @@ class TransactionsDatasourceLocal {
     final enCours = _transactions.where((t) => 
         (t.vendeurId == utilisateurId || t.acheteurId == utilisateurId) && 
         (t.statut == 'en_attente' || t.statut == 'confirmee')).length;
-    
     return {
       'ventesTerminees': ventesTerminees,
       'achatsTermines': achatsTermines,

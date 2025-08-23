@@ -1,7 +1,4 @@
-// ignore_for_file: unused_import
-
-import 'package:flutter/material.dart';
-
+﻿import 'package:flutter/material.dart';
 import '../../../core/di/service_locator.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../domain/entities/livre.dart';
@@ -9,30 +6,23 @@ import '../../../domain/entities/utilisateur.dart';
 import '../../../domain/usercases/livres_repository.dart';
 import '../../../presentation/services/authentification_service.dart';
 import '../../../presentation/services/transactions_service.dart';
-import '../../../presentation/services/messagerie_service.dart';
 import 'selectionner_livre_echange_ecran.dart';
 import '../messagerie/conversation_ecran.dart';
-
-// UI Design: Page de détails d'un livre avec design UQAR et informations complètes
 class DetailsLivreEcran extends StatefulWidget {
   final Livre livre;
-
   const DetailsLivreEcran({
     super.key,
     required this.livre,
   });
-
   @override
   State<DetailsLivreEcran> createState() => _DetailsLivreEcranState();
 }
-
 class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
   bool _isFavoris = false;
   late final AuthentificationService _authentificationService;
   late final TransactionsService _transactionsService;
   late final LivresRepository _livresRepository;
   Utilisateur? _utilisateurActuel;
-
   @override
   void initState() {
     super.initState();
@@ -43,23 +33,19 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
     _transactionsService.initialiser();
     _chargerUtilisateur();
   }
-
   Future<void> _chargerUtilisateur() async {
     _utilisateurActuel = _authentificationService.utilisateurActuel;
     if (mounted) setState(() {});
   }
-
   @override
   Widget build(BuildContext context) {
-    // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
     final mediaQuery = MediaQuery.of(context);
     final screenHeight = mediaQuery.size.height;
     final screenWidth = mediaQuery.size.width;
-
     return Scaffold(
       backgroundColor: CouleursApp.fond,
       resizeToAvoidBottomInset:
-          true, // UI Design: Éviter les débordements avec le clavier
+          true, 
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
@@ -67,44 +53,44 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
             SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.all(
-                    screenWidth * 0.05), // UI Design: Padding adaptatif
+                    screenWidth * 0.05), 
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _construireInformationsPrincipales(),
                     SizedBox(
                         height: screenHeight *
-                            0.03), // UI Design: Espacement adaptatif
+                            0.03), 
                     _construireInformationsAcademiques(),
                     SizedBox(
                         height: screenHeight *
-                            0.03), // UI Design: Espacement adaptatif
+                            0.03), 
                     _construireInformationsProprietaire(),
                     SizedBox(
                         height: screenHeight *
-                            0.03), // UI Design: Espacement adaptatif
+                            0.03), 
                     if (widget.livre.description != null) ...[
                       _construireDescription(),
                       SizedBox(
                           height: screenHeight *
-                              0.03), // UI Design: Espacement adaptatif
+                              0.03), 
                     ],
                     if (widget.livre.edition != null) ...[
                       _construireInformationsTechniques(),
                       SizedBox(
                           height: screenHeight *
-                              0.04), // UI Design: Espacement adaptatif
+                              0.04), 
                     ],
                     _construireBoutonEchange(),
                     if (widget.livre.prix != null) ...[
                       SizedBox(
                           height: screenHeight *
-                              0.02), // UI Design: Espacement adaptatif
+                              0.02), 
                       _construireBoutonAcheter(),
                     ],
                     SizedBox(
                         height: screenHeight *
-                            0.025), // UI Design: Espacement adaptatif
+                            0.025), 
                   ],
                 ),
               ),
@@ -114,21 +100,18 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
       ),
     );
   }
-
-  // UI Design: SliverAppBar avec image du livre et actions
   Widget _construireSliverAppBar() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
-
     return SliverAppBar(
-      expandedHeight: screenHeight * 0.35, // UI Design: Hauteur adaptative
+      expandedHeight: screenHeight * 0.35, 
       pinned: true,
       backgroundColor: CouleursApp.principal,
       leading: IconButton(
         icon: Container(
           padding: EdgeInsets.all(
-              screenWidth * 0.02), // UI Design: Padding adaptatif
+              screenWidth * 0.02), 
           decoration: BoxDecoration(
             color: CouleursApp.blanc.withValues(alpha: 0.9),
             borderRadius: BorderRadius.circular(12),
@@ -136,7 +119,7 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
           child: Icon(
             Icons.arrow_back,
             color: CouleursApp.principal,
-            size: screenWidth * 0.05, // UI Design: Taille adaptative
+            size: screenWidth * 0.05, 
           ),
         ),
         onPressed: () => Navigator.of(context).pop(),
@@ -145,7 +128,7 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
         IconButton(
           icon: Container(
             padding: EdgeInsets.all(
-                screenWidth * 0.02), // UI Design: Padding adaptatif
+                screenWidth * 0.02), 
             decoration: BoxDecoration(
               color: CouleursApp.blanc.withValues(alpha: 0.9),
               borderRadius: BorderRadius.circular(12),
@@ -153,7 +136,7 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
             child: Icon(
               _isFavoris ? Icons.favorite : Icons.favorite_border,
               color: _isFavoris ? Colors.red : CouleursApp.principal,
-              size: screenWidth * 0.05, // UI Design: Taille adaptative
+              size: screenWidth * 0.05, 
             ),
           ),
           onPressed: () {
@@ -162,7 +145,7 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
             });
           },
         ),
-        SizedBox(width: screenWidth * 0.04), // UI Design: Espacement adaptatif
+        SizedBox(width: screenWidth * 0.04), 
       ],
       flexibleSpace: FlexibleSpaceBar(
         background: Container(
@@ -181,10 +164,10 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
               // Image du livre ou placeholder
               Center(
                 child: Container(
-                  width: screenWidth * 0.45, // UI Design: Largeur adaptative
-                  height: screenHeight * 0.28, // UI Design: Hauteur adaptative
+                  width: screenWidth * 0.45, 
+                  height: screenHeight * 0.28, 
                   margin: EdgeInsets.only(
-                    top: screenHeight * 0.07, // UI Design: Marge adaptative
+                    top: screenHeight * 0.07, 
                     bottom: screenHeight * 0.025,
                   ),
                   decoration: BoxDecoration(
@@ -203,21 +186,21 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
                     children: [
                       Icon(
                         Icons.menu_book,
-                        size: screenWidth * 0.2, // UI Design: Taille adaptative
+                        size: screenWidth * 0.2, 
                         color: CouleursApp.accent,
                       ),
                       SizedBox(
                           height: screenHeight *
-                              0.02), // UI Design: Espacement adaptatif
+                              0.02), 
                       Padding(
                         padding: EdgeInsets.symmetric(
                             horizontal: screenWidth *
-                                0.04), // UI Design: Padding adaptatif
+                                0.04), 
                         child: Text(
                           widget.livre.titre,
                           style: TextStyle(
                             fontSize: screenWidth *
-                                0.04, // UI Design: Taille adaptative
+                                0.04, 
                             fontWeight: FontWeight.bold,
                             color: CouleursApp.texteFonce,
                           ),
@@ -232,12 +215,12 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
               ),
               // Badge échange
               Positioned(
-                top: screenHeight * 0.12, // UI Design: Position adaptative
-                right: screenWidth * 0.1, // UI Design: Position adaptative
+                top: screenHeight * 0.12, 
+                right: screenWidth * 0.1, 
                 child: Container(
                   padding: EdgeInsets.symmetric(
                     horizontal:
-                        screenWidth * 0.03, // UI Design: Padding adaptatif
+                        screenWidth * 0.03, 
                     vertical: screenHeight * 0.008,
                   ),
                   decoration: BoxDecoration(
@@ -255,12 +238,12 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
                     'ÉCHANGE',
                     style: TextStyle(
                       fontSize:
-                          screenWidth * 0.03, // UI Design: Taille adaptative
+                          screenWidth * 0.03, 
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
                     overflow: TextOverflow
-                        .ellipsis, // UI Design: Éviter le débordement de texte
+                        .ellipsis, 
                     maxLines: 1,
                   ),
                 ),
@@ -271,16 +254,13 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
       ),
     );
   }
-
-  // UI Design: Informations principales du livre
   Widget _construireInformationsPrincipales() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
-
     return Container(
       padding:
-          EdgeInsets.all(screenWidth * 0.05), // UI Design: Padding adaptatif
+          EdgeInsets.all(screenWidth * 0.05), 
       decoration: BoxDecoration(
         color: CouleursApp.blanc,
         borderRadius: BorderRadius.circular(16),
@@ -298,27 +278,27 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
           Text(
             widget.livre.titre,
             style: StylesTexteApp.titre.copyWith(
-              fontSize: screenWidth * 0.06, // UI Design: Taille adaptative
+              fontSize: screenWidth * 0.06, 
             ),
             overflow: TextOverflow
-                .ellipsis, // UI Design: Éviter le débordement de texte
+                .ellipsis, 
             maxLines: 2,
           ),
           SizedBox(
-              height: screenHeight * 0.01), // UI Design: Espacement adaptatif
+              height: screenHeight * 0.01), 
           Text(
             'Par ${widget.livre.auteur}',
             style: TextStyle(
-              fontSize: screenWidth * 0.04, // UI Design: Taille adaptative
+              fontSize: screenWidth * 0.04, 
               color: CouleursApp.texteFonce.withValues(alpha: 0.7),
               fontStyle: FontStyle.italic,
             ),
             overflow: TextOverflow
-                .ellipsis, // UI Design: Éviter le débordement de texte
+                .ellipsis, 
             maxLines: 1,
           ),
           SizedBox(
-              height: screenHeight * 0.02), // UI Design: Espacement adaptatif
+              height: screenHeight * 0.02), 
           Row(
             children: [
               _construireChipInfo(
@@ -327,7 +307,7 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
                 couleur: CouleursApp.principal,
               ),
               SizedBox(
-                  width: screenWidth * 0.03), // UI Design: Espacement adaptatif
+                  width: screenWidth * 0.03), 
               _construireChipInfo(
                 icone: Icons.calendar_today,
                 texte: widget.livre.anneeEtude,
@@ -339,16 +319,13 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
       ),
     );
   }
-
-  // UI Design: Informations académiques
   Widget _construireInformationsAcademiques() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
-
     return Container(
       padding:
-          EdgeInsets.all(screenWidth * 0.05), // UI Design: Padding adaptatif
+          EdgeInsets.all(screenWidth * 0.05), 
       decoration: BoxDecoration(
         color: CouleursApp.blanc,
         borderRadius: BorderRadius.circular(16),
@@ -368,23 +345,23 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
               Icon(
                 Icons.school,
                 color: CouleursApp.principal,
-                size: screenWidth * 0.06, // UI Design: Taille adaptative
+                size: screenWidth * 0.06, 
               ),
               SizedBox(
-                  width: screenWidth * 0.02), // UI Design: Espacement adaptatif
+                  width: screenWidth * 0.02), 
               Text(
                 'Informations Académiques',
                 style: StylesTexteApp.titre.copyWith(
-                  fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
+                  fontSize: screenWidth * 0.045, 
                 ),
                 overflow: TextOverflow
-                    .ellipsis, // UI Design: Éviter le débordement de texte
+                    .ellipsis, 
                 maxLines: 1,
               ),
             ],
           ),
           SizedBox(
-              height: screenHeight * 0.02), // UI Design: Espacement adaptatif
+              height: screenHeight * 0.02), 
           _construireLigneInfo('Matière', widget.livre.matiere),
           _construireLigneInfo('Année d\'études', widget.livre.anneeEtude),
           _construireLigneInfo('État du livre', widget.livre.etatLivre),
@@ -394,16 +371,13 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
       ),
     );
   }
-
-  // UI Design: Informations du propriétaire
   Widget _construireInformationsProprietaire() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
-
     return Container(
       padding:
-          EdgeInsets.all(screenWidth * 0.05), // UI Design: Padding adaptatif
+          EdgeInsets.all(screenWidth * 0.05), 
       decoration: BoxDecoration(
         color: CouleursApp.blanc,
         borderRadius: BorderRadius.circular(16),
@@ -423,27 +397,27 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
               Icon(
                 Icons.person,
                 color: CouleursApp.principal,
-                size: screenWidth * 0.06, // UI Design: Taille adaptative
+                size: screenWidth * 0.06, 
               ),
               SizedBox(
-                  width: screenWidth * 0.02), // UI Design: Espacement adaptatif
+                  width: screenWidth * 0.02), 
               Text(
                 'Propriétaire',
                 style: StylesTexteApp.titre.copyWith(
-                  fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
+                  fontSize: screenWidth * 0.045, 
                 ),
                 overflow: TextOverflow
-                    .ellipsis, // UI Design: Éviter le débordement de texte
+                    .ellipsis, 
                 maxLines: 1,
               ),
             ],
           ),
           SizedBox(
-              height: screenHeight * 0.02), // UI Design: Espacement adaptatif
+              height: screenHeight * 0.02), 
           Row(
             children: [
               CircleAvatar(
-                radius: screenWidth * 0.06, // UI Design: Rayon adaptatif
+                radius: screenWidth * 0.06, 
                 backgroundColor: CouleursApp.accent.withValues(alpha: 0.2),
                 child: Text(
                   widget.livre.proprietaire.split(' ').map((n) => n[0]).join(),
@@ -451,12 +425,12 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
                     color: CouleursApp.principal,
                     fontWeight: FontWeight.bold,
                     fontSize:
-                        screenWidth * 0.04, // UI Design: Taille adaptative
+                        screenWidth * 0.04, 
                   ),
                 ),
               ),
               SizedBox(
-                  width: screenWidth * 0.04), // UI Design: Espacement adaptatif
+                  width: screenWidth * 0.04), 
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -465,38 +439,38 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
                       widget.livre.proprietaire,
                       style: TextStyle(
                         fontSize:
-                            screenWidth * 0.04, // UI Design: Taille adaptative
+                            screenWidth * 0.04, 
                         fontWeight: FontWeight.w600,
                         color: CouleursApp.texteFonce,
                       ),
                       overflow: TextOverflow
-                          .ellipsis, // UI Design: Éviter le débordement de texte
+                          .ellipsis, 
                       maxLines: 1,
                     ),
                     SizedBox(
                         height: screenHeight *
-                            0.005), // UI Design: Espacement adaptatif
+                            0.005), 
                     Row(
                       children: [
                         Icon(
                           Icons.star,
                           color: Colors.amber,
                           size: screenWidth *
-                              0.04, // UI Design: Taille adaptative
+                              0.04, 
                         ),
                         SizedBox(
                             width: screenWidth *
-                                0.01), // UI Design: Espacement adaptatif
+                                0.01), 
                         Text(
                           '4.8 (12 échanges)',
                           style: TextStyle(
                             fontSize: screenWidth *
-                                0.035, // UI Design: Taille adaptative
+                                0.035, 
                             color:
                                 CouleursApp.texteFonce.withValues(alpha: 0.6),
                           ),
                           overflow: TextOverflow
-                              .ellipsis, // UI Design: Éviter le débordement de texte
+                              .ellipsis, 
                           maxLines: 1,
                         ),
                       ],
@@ -509,7 +483,7 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
                 icon: Icon(
                   Icons.message,
                   color: CouleursApp.accent,
-                  size: screenWidth * 0.06, // UI Design: Taille adaptative
+                  size: screenWidth * 0.06, 
                 ),
               ),
             ],
@@ -518,16 +492,13 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
       ),
     );
   }
-
-  // UI Design: Description du livre
   Widget _construireDescription() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
-
     return Container(
       padding:
-          EdgeInsets.all(screenWidth * 0.05), // UI Design: Padding adaptatif
+          EdgeInsets.all(screenWidth * 0.05), 
       decoration: BoxDecoration(
         color: CouleursApp.blanc,
         borderRadius: BorderRadius.circular(16),
@@ -547,48 +518,45 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
               Icon(
                 Icons.description,
                 color: CouleursApp.principal,
-                size: screenWidth * 0.06, // UI Design: Taille adaptative
+                size: screenWidth * 0.06, 
               ),
               SizedBox(
-                  width: screenWidth * 0.02), // UI Design: Espacement adaptatif
+                  width: screenWidth * 0.02), 
               Text(
                 'Description',
                 style: StylesTexteApp.titre.copyWith(
-                  fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
+                  fontSize: screenWidth * 0.045, 
                 ),
                 overflow: TextOverflow
-                    .ellipsis, // UI Design: Éviter le débordement de texte
+                    .ellipsis, 
                 maxLines: 1,
               ),
             ],
           ),
           SizedBox(
-              height: screenHeight * 0.02), // UI Design: Espacement adaptatif
+              height: screenHeight * 0.02), 
           Text(
             widget.livre.description!,
             style: TextStyle(
-              fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
+              fontSize: screenWidth * 0.035, 
               color: CouleursApp.texteFonce,
               height: 1.5,
             ),
             overflow: TextOverflow
-                .ellipsis, // UI Design: Éviter le débordement de texte
+                .ellipsis, 
             maxLines: 6,
           ),
         ],
       ),
     );
   }
-
-  // UI Design: Informations techniques (ISBN, édition)
   Widget _construireInformationsTechniques() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
-
     return Container(
       padding:
-          EdgeInsets.all(screenWidth * 0.05), // UI Design: Padding adaptatif
+          EdgeInsets.all(screenWidth * 0.05), 
       decoration: BoxDecoration(
         color: CouleursApp.blanc,
         borderRadius: BorderRadius.circular(16),
@@ -608,36 +576,33 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
               Icon(
                 Icons.info_outline,
                 color: CouleursApp.principal,
-                size: screenWidth * 0.06, // UI Design: Taille adaptative
+                size: screenWidth * 0.06, 
               ),
               SizedBox(
-                  width: screenWidth * 0.02), // UI Design: Espacement adaptatif
+                  width: screenWidth * 0.02), 
               Text(
                 'Informations Techniques',
                 style: StylesTexteApp.titre.copyWith(
-                  fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
+                  fontSize: screenWidth * 0.045, 
                 ),
                 overflow: TextOverflow
-                    .ellipsis, // UI Design: Éviter le débordement de texte
+                    .ellipsis, 
                 maxLines: 1,
               ),
             ],
           ),
           SizedBox(
-              height: screenHeight * 0.02), // UI Design: Espacement adaptatif
+              height: screenHeight * 0.02), 
           if (widget.livre.edition != null)
             _construireLigneInfo('Édition', widget.livre.edition!),
         ],
       ),
     );
   }
-
-  // UI Design: Bouton d'échange principal
   Widget _construireBoutonEchange() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
-
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
@@ -646,7 +611,7 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
           backgroundColor: CouleursApp.principal,
           foregroundColor: Colors.white,
           padding: EdgeInsets.symmetric(
-              vertical: screenHeight * 0.02), // UI Design: Padding adaptatif
+              vertical: screenHeight * 0.02), 
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -656,17 +621,17 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.contact_support,
-                size: screenWidth * 0.06), // UI Design: Taille adaptative
+                size: screenWidth * 0.06), 
             SizedBox(
-                width: screenWidth * 0.02), // UI Design: Espacement adaptatif
+                width: screenWidth * 0.02), 
             Text(
               'Contacter le propriétaire',
               style: TextStyle(
-                fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
+                fontSize: screenWidth * 0.045, 
                 fontWeight: FontWeight.bold,
               ),
               overflow: TextOverflow
-                  .ellipsis, // UI Design: Éviter le débordement de texte
+                  .ellipsis, 
               maxLines: 1,
             ),
           ],
@@ -674,7 +639,6 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
       ),
     );
   }
-
   // Widgets utilitaires
   Widget _construireChipInfo({
     required IconData icone,
@@ -683,10 +647,9 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
   }) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
-
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: screenWidth * 0.03, // UI Design: Padding adaptatif
+        horizontal: screenWidth * 0.03, 
         vertical: screenWidth * 0.015,
       ),
       decoration: BoxDecoration(
@@ -702,47 +665,45 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
         children: [
           Icon(icone,
               size: screenWidth * 0.04,
-              color: couleur), // UI Design: Taille adaptative
+              color: couleur), 
           SizedBox(
-              width: screenWidth * 0.015), // UI Design: Espacement adaptatif
+              width: screenWidth * 0.015), 
           Text(
             texte,
             style: TextStyle(
-              fontSize: screenWidth * 0.03, // UI Design: Taille adaptative
+              fontSize: screenWidth * 0.03, 
               color: couleur,
               fontWeight: FontWeight.w600,
             ),
             overflow: TextOverflow
-                .ellipsis, // UI Design: Éviter le débordement de texte
+                .ellipsis, 
             maxLines: 1,
           ),
         ],
       ),
     );
   }
-
   Widget _construireLigneInfo(String label, String valeur) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
-
     return Padding(
       padding: EdgeInsets.only(
-          bottom: screenHeight * 0.015), // UI Design: Espacement adaptatif
+          bottom: screenHeight * 0.015), 
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: screenWidth * 0.3, // UI Design: Largeur adaptative
+            width: screenWidth * 0.3, 
             child: Text(
               '$label:',
               style: TextStyle(
-                fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
+                fontSize: screenWidth * 0.035, 
                 color: CouleursApp.texteFonce.withValues(alpha: 0.6),
                 fontWeight: FontWeight.w500,
               ),
               overflow: TextOverflow
-                  .ellipsis, // UI Design: Éviter le débordement de texte
+                  .ellipsis, 
               maxLines: 1,
             ),
           ),
@@ -750,12 +711,12 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
             child: Text(
               valeur,
               style: TextStyle(
-                fontSize: screenWidth * 0.035, // UI Design: Taille adaptative
+                fontSize: screenWidth * 0.035, 
                 color: CouleursApp.texteFonce,
                 fontWeight: FontWeight.w600,
               ),
               overflow: TextOverflow
-                  .ellipsis, // UI Design: Éviter le débordement de texte
+                  .ellipsis, 
               maxLines: 2,
             ),
           ),
@@ -763,39 +724,30 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
       ),
     );
   }
-
   // Actions
   Future<void> _proposerEchange() async {
     if (_utilisateurActuel == null) {
       _afficherErreur('Vous devez être connecté pour proposer un échange');
       return;
     }
-
     // Vérifier si l'échange est possible
     final verification = await _transactionsService.peutAcheterLivre(
         _utilisateurActuel!, widget.livre);
-
     if (!verification['peut']) {
       _afficherErreur(verification['raison']);
       return;
     }
-
-    // UI Design: Implémenter la sélection du livre à échanger
     await _ouvrirSelectionLivreEchange();
   }
-
-  // UI Design: Afficher les options de contact (échange ou message général)
   Future<void> _afficherOptionsContact() async {
     if (_utilisateurActuel == null) {
       _afficherErreur('Vous devez être connecté pour contacter le propriétaire');
       return;
     }
-
     // Vérifier si l'utilisateur a des livres pour l'échange
     final mesLivres = await _livresRepository.obtenirLivresParProprietaire(_utilisateurActuel!.id);
     final livresDisponibles = mesLivres.where((livre) => livre.estDisponible && livre.id != widget.livre.id).toList();
     final peutEchanger = livresDisponibles.isNotEmpty;
-
     if (mounted) {
       showModalBottomSheet(
         context: context,
@@ -805,16 +757,11 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
       );
     }
   }
-
   void _contacterProprietaire() {
-    // UI Design: Implémenter la messagerie
     _ouvrirMessagerieContact();
   }
-
-  // UI Design: Construire le modal des options de contact
   Widget _construireModalOptionsContact(bool peutEchanger) {
     MediaQuery.of(context);
-
     return Container(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -842,7 +789,6 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
             ),
           ),
           const SizedBox(height: 20),
-          
           // Titre
           Text(
             'Contacter le propriétaire',
@@ -856,7 +802,6 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
             ),
           ),
           const SizedBox(height: 24),
-          
           // Option 1: Message général
           SizedBox(
             width: double.infinity,
@@ -876,7 +821,6 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
             ),
           ),
           const SizedBox(height: 12),
-          
           // Option 2: Proposer un échange (si possible)
           if (peutEchanger) ...[
             SizedBox(
@@ -898,7 +842,6 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
             ),
             const SizedBox(height: 12),
           ],
-          
           // Bouton Annuler
           SizedBox(
             width: double.infinity,
@@ -916,23 +859,21 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
       ),
     );
   }
-
   Widget _construireBoutonAcheter() {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
-
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton.icon(
         onPressed: () => _acheterLivre(),
         icon: Icon(Icons.shopping_cart,
-            size: screenWidth * 0.055), // UI Design: Taille adaptative
+            size: screenWidth * 0.055), 
         style: ElevatedButton.styleFrom(
           backgroundColor: CouleursApp.accent,
           foregroundColor: Colors.white,
           padding: EdgeInsets.symmetric(
-              vertical: screenHeight * 0.02), // UI Design: Padding adaptatif
+              vertical: screenHeight * 0.02), 
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -941,36 +882,31 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
         label: Text(
           'Acheter - \$${widget.livre.prix?.toStringAsFixed(2) ?? ''}',
           style: TextStyle(
-            fontSize: screenWidth * 0.045, // UI Design: Taille adaptative
+            fontSize: screenWidth * 0.045, 
             fontWeight: FontWeight.bold,
           ),
           overflow: TextOverflow
-              .ellipsis, // UI Design: Éviter le débordement de texte
+              .ellipsis, 
           maxLines: 1,
         ),
       ),
     );
   }
-
   Future<void> _acheterLivre() async {
     if (_utilisateurActuel == null) {
       _afficherErreur('Vous devez être connecté pour acheter un livre');
       return;
     }
-
     // Vérifier si l'achat est possible
     final verification = await _transactionsService.peutAcheterLivre(
         _utilisateurActuel!, widget.livre);
-
     if (!verification['peut']) {
       _afficherErreur(verification['raison']);
       return;
     }
-
     // Afficher dialogue de confirmation
     final confirme = await _afficherDialogueConfirmationAchat();
     if (confirme != true) return;
-
     // Créer la transaction
     final success = await _transactionsService.creerTransactionAchat(
       livreId: widget.livre.id,
@@ -979,7 +915,6 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
       montant: widget.livre.prix!,
       messageAcheteur: 'Demande d\'achat via l\'application',
     );
-
     if (success) {
       if (mounted) {
       _afficherSucces(
@@ -992,8 +927,6 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
       }
     }
   }
-
-  // UI Design: Méthodes utilitaires pour les messages
   void _afficherErreur(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -1006,7 +939,6 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
       ),
     );
   }
-
   void _afficherSucces(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -1019,7 +951,6 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
       ),
     );
   }
-
   void _afficherInfo(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -1032,8 +963,6 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
       ),
     );
   }
-
-  // UI Design: Dialogue de confirmation d'achat
   Future<bool?> _afficherDialogueConfirmationAchat() async {
     return showDialog<bool>(
       context: context,
@@ -1076,26 +1005,21 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
       ),
     );
   }
-
-  // UI Design: Ouvrir la sélection du livre à échanger
   Future<void> _ouvrirSelectionLivreEchange() async {
     if (_utilisateurActuel == null) {
       _afficherErreur('Vous devez être connecté pour effectuer un échange');
       return;
     }
-
     try {
       // Récupérer les livres de l'utilisateur
       final mesLivres = await _livresRepository.obtenirLivresParProprietaire(_utilisateurActuel!.id);
       final livresDisponibles = mesLivres.where((livre) => livre.estDisponible && livre.id != widget.livre.id).toList();
-
       if (livresDisponibles.isEmpty) {
         if (mounted) {
         _afficherInfo('Vous n\'avez pas de livres disponibles pour l\'échange. Ajoutez-en dans votre collection !');
         }
         return;
       }
-
       if (mounted) {
       final livreSelectionne = await Navigator.of(context).push<Livre>(
         MaterialPageRoute(
@@ -1105,7 +1029,6 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
           ),
         ),
       );
-
       if (livreSelectionne != null) {
         // Proposer l'échange
         await _proposerEchangeAvecLivre(livreSelectionne);
@@ -1115,10 +1038,6 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
       _afficherErreur('Erreur lors du chargement de vos livres: ${e.toString()}');
     }
   }
-
-
-
-  // UI Design: Proposer l'échange avec un livre spécifique
   Future<void> _proposerEchangeAvecLivre(Livre monLivre) async {
     try {
       final resultat = await _transactionsService.proposerEchange(
@@ -1127,7 +1046,6 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
         widget.livre.id,
         'Échange proposé via UqarLive',
       );
-
       if (resultat) {
         _afficherInfo('Échange proposé avec succès ! Le propriétaire sera notifié.');
       } else {
@@ -1137,15 +1055,11 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
       _afficherErreur('Erreur technique: ${e.toString()}');
     }
   }
-
-  // UI Design: Ouvrir la messagerie de contact
   void _ouvrirMessagerieContact() {
     if (_utilisateurActuel == null) {
       _afficherErreur('Vous devez être connecté pour contacter le propriétaire');
       return;
     }
-
-    // UI Design: Ouvrir l'écran de messagerie avec le propriétaire du livre
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -1157,6 +1071,4 @@ class _DetailsLivreEcranState extends State<DetailsLivreEcran> {
       ),
     );
   }
-
-
 }

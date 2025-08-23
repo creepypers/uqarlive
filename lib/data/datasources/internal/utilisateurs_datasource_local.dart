@@ -1,14 +1,8 @@
-// UI Design: Source de données locale pour les utilisateurs (simulation)
-import '../../models/utilisateur_model.dart';
+﻿import '../../models/utilisateur_model.dart';
 import '../../../domain/entities/utilisateur.dart';
-
 class UtilisateursDatasourceLocal {
-  // UI Design: Utilisateur actuellement connecté
   UtilisateurModel? _utilisateurActuel;
-
-  // UI Design: Données simulées des utilisateurs
   final List<UtilisateurModel> _utilisateurs = [
-    // UI Design: Administrateur principal
     UtilisateurModel(
       id: 'admin_001',
       nom: 'Tremblay',
@@ -32,10 +26,9 @@ class UtilisateursDatasourceLocal {
         PrivilegesUtilisateur.statistiques,
       ],
       derniereConnexion: DateTime.now().subtract(const Duration(hours: 2)),
-      associationsMembre: [], // UI Design: Admin n'est membre d'aucune association
+      associationsMembre: [], 
+      motDePasse: 'admin123', 
     ),
-
-    // UI Design: Modérateur
     UtilisateurModel(
       id: 'mod_001',
       nom: 'Leblanc',
@@ -53,10 +46,9 @@ class UtilisateursDatasourceLocal {
         PrivilegesUtilisateur.moderationContenu,
       ],
       derniereConnexion: DateTime.now().subtract(const Duration(hours: 1)),
-      associationsMembre: [], // UI Design: Modérateur n'est membre d'aucune association
+      associationsMembre: [], 
+      motDePasse: 'mod123', 
     ),
-
-    // UI Design: Étudiant normal (celui actuellement connecté)
     UtilisateurModel(
       id: 'etud_001',
       nom: 'Martin',
@@ -71,10 +63,9 @@ class UtilisateursDatasourceLocal {
       typeUtilisateur: TypeUtilisateur.etudiant,
       privileges: [],
       derniereConnexion: DateTime.now().subtract(const Duration(minutes: 30)),
-      associationsMembre: ['asso_001', 'asso_004', '5'], // UI Design: AEI, AGE, Théâtre UQAR
+      associationsMembre: ['asso_001', 'asso_004', '5'], 
+      motDePasse: 'alex123', 
     ),
-
-    // UI Design: Autres étudiants pour les tests
     UtilisateurModel(
       id: 'etud_002',
       nom: 'Gagnon',
@@ -89,9 +80,9 @@ class UtilisateursDatasourceLocal {
       typeUtilisateur: TypeUtilisateur.etudiant,
       privileges: [],
       derniereConnexion: DateTime.now().subtract(const Duration(days: 2)),
-      associationsMembre: ['asso_001', 'asso_002', 'asso_004', '6'], // UI Design: AEI, Club Photo, AGE, Éco-UQAR
+      associationsMembre: ['asso_001', 'asso_002', 'asso_004', '6'], 
+      motDePasse: 'sophie123', 
     ),
-
     UtilisateurModel(
       id: 'etud_003',
       nom: 'Lavoie',
@@ -106,9 +97,9 @@ class UtilisateursDatasourceLocal {
       typeUtilisateur: TypeUtilisateur.etudiant,
       privileges: [],
       derniereConnexion: DateTime.now().subtract(const Duration(days: 1)),
-      associationsMembre: ['asso_001', 'asso_003', 'asso_004'], // UI Design: AEI, Sport UQAR, AGE
+      associationsMembre: ['asso_001', 'asso_003', 'asso_004'], 
+      motDePasse: 'marc123', 
     ),
-
     UtilisateurModel(
       id: 'etud_004',
       nom: 'Dubois',
@@ -123,9 +114,9 @@ class UtilisateursDatasourceLocal {
       typeUtilisateur: TypeUtilisateur.etudiant,
       privileges: [],
       derniereConnexion: DateTime.now().subtract(const Duration(days: 3)),
-      associationsMembre: ['asso_001', 'asso_004'], // UI Design: AEI, AGE
+      associationsMembre: ['asso_001', 'asso_004'], 
+      motDePasse: 'marie123', 
     ),
-
     UtilisateurModel(
       id: 'etud_005',
       nom: 'Roy',
@@ -140,9 +131,9 @@ class UtilisateursDatasourceLocal {
       typeUtilisateur: TypeUtilisateur.etudiant,
       privileges: [],
       derniereConnexion: DateTime.now().subtract(const Duration(days: 5)),
-      associationsMembre: ['asso_001', 'asso_004'], // UI Design: AEI, AGE
+      associationsMembre: ['asso_001', 'asso_004'], 
+      motDePasse: 'catherine123', 
     ),
-
     UtilisateurModel(
       id: 'etud_006',
       nom: 'Côté',
@@ -157,9 +148,9 @@ class UtilisateursDatasourceLocal {
       typeUtilisateur: TypeUtilisateur.etudiant,
       privileges: [],
       derniereConnexion: DateTime.now().subtract(const Duration(days: 2)),
-      associationsMembre: ['asso_002', 'asso_004'], // UI Design: Club Photo, AGE
+      associationsMembre: ['asso_002', 'asso_004'], 
+      motDePasse: 'martin123', 
     ),
-
     UtilisateurModel(
       id: 'etud_007',
       nom: 'Bouchard',
@@ -174,9 +165,9 @@ class UtilisateursDatasourceLocal {
       typeUtilisateur: TypeUtilisateur.etudiant,
       privileges: [],
       derniereConnexion: DateTime.now().subtract(const Duration(days: 1)),
-      associationsMembre: ['asso_002', 'asso_004'], // UI Design: Club Photo, AGE
+      associationsMembre: ['asso_002', 'asso_004'], 
+      motDePasse: 'julie123', 
     ),
-
     UtilisateurModel(
       id: 'etud_008',
       nom: 'Morin',
@@ -191,9 +182,9 @@ class UtilisateursDatasourceLocal {
       typeUtilisateur: TypeUtilisateur.etudiant,
       privileges: [],
       derniereConnexion: DateTime.now().subtract(const Duration(hours: 12)),
-      associationsMembre: ['asso_002', 'asso_004'], // UI Design: Club Photo, AGE
+      associationsMembre: ['asso_002', 'asso_004'], 
+      motDePasse: 'gabriel123', 
     ),
-
     UtilisateurModel(
       id: 'etud_009',
       nom: 'Beaulieu',
@@ -208,9 +199,9 @@ class UtilisateursDatasourceLocal {
       typeUtilisateur: TypeUtilisateur.etudiant,
       privileges: [],
       derniereConnexion: DateTime.now().subtract(const Duration(days: 4)),
-      associationsMembre: ['asso_003'], // UI Design: Sport UQAR
+      associationsMembre: ['asso_003'], 
+      motDePasse: 'juliette123', 
     ),
-
     UtilisateurModel(
       id: 'etud_010',
       nom: 'Santos',
@@ -225,9 +216,9 @@ class UtilisateursDatasourceLocal {
       typeUtilisateur: TypeUtilisateur.etudiant,
       privileges: [],
       derniereConnexion: DateTime.now().subtract(const Duration(days: 2)),
-      associationsMembre: ['asso_003', '7'], // UI Design: Sport UQAR, Étudiants Internationaux
+      associationsMembre: ['asso_003', '7'], 
+      motDePasse: 'maria123', 
     ),
-
     UtilisateurModel(
       id: 'etud_011',
       nom: 'Dufour',
@@ -242,10 +233,9 @@ class UtilisateursDatasourceLocal {
       typeUtilisateur: TypeUtilisateur.etudiant,
       privileges: [],
       derniereConnexion: DateTime.now().subtract(const Duration(days: 3)),
-      associationsMembre: ['asso_003', '8'], // UI Design: Sport UQAR, AELIES
+      associationsMembre: ['asso_003', '8'], 
+      motDePasse: 'isabelle123', 
     ),
-
-    // UI Design: Ajouter d'autres étudiants pour compléter les associations
     UtilisateurModel(
       id: 'etud_012',
       nom: 'Giguère',
@@ -260,9 +250,9 @@ class UtilisateursDatasourceLocal {
       typeUtilisateur: TypeUtilisateur.etudiant,
       privileges: [],
       derniereConnexion: DateTime.now().subtract(const Duration(days: 1)),
-      associationsMembre: ['asso_003'], // UI Design: Sport UQAR
+      associationsMembre: ['asso_003'], 
+      motDePasse: 'laurence123', 
     ),
-
     UtilisateurModel(
       id: 'etud_013',
       nom: 'Michaud',
@@ -277,9 +267,9 @@ class UtilisateursDatasourceLocal {
       typeUtilisateur: TypeUtilisateur.etudiant,
       privileges: [],
       derniereConnexion: DateTime.now().subtract(const Duration(days: 2)),
-      associationsMembre: ['5'], // UI Design: Théâtre UQAR
+      associationsMembre: ['5'], 
+      motDePasse: 'vincent123', 
     ),
-
     UtilisateurModel(
       id: 'etud_014',
       nom: 'Côté',
@@ -294,9 +284,9 @@ class UtilisateursDatasourceLocal {
       typeUtilisateur: TypeUtilisateur.etudiant,
       privileges: [],
       derniereConnexion: DateTime.now().subtract(const Duration(days: 1)),
-      associationsMembre: ['5'], // UI Design: Théâtre UQAR
+      associationsMembre: ['5'], 
+      motDePasse: 'thomas123', 
     ),
-
     UtilisateurModel(
       id: 'etud_015',
       nom: 'Morin',
@@ -311,9 +301,9 @@ class UtilisateursDatasourceLocal {
       typeUtilisateur: TypeUtilisateur.etudiant,
       privileges: [],
       derniereConnexion: DateTime.now().subtract(const Duration(days: 2)),
-      associationsMembre: ['6'], // UI Design: Éco-UQAR
+      associationsMembre: ['6'], 
+      motDePasse: 'gabriel2_123', 
     ),
-
     UtilisateurModel(
       id: 'etud_016',
       nom: 'Giguère',
@@ -328,9 +318,9 @@ class UtilisateursDatasourceLocal {
       typeUtilisateur: TypeUtilisateur.etudiant,
       privileges: [],
       derniereConnexion: DateTime.now().subtract(const Duration(days: 1)),
-      associationsMembre: ['6'], // UI Design: Éco-UQAR
+      associationsMembre: ['6'], 
+      motDePasse: 'laurence2_123', 
     ),
-
     UtilisateurModel(
       id: 'etud_017',
       nom: 'Bouchard',
@@ -345,9 +335,9 @@ class UtilisateursDatasourceLocal {
       typeUtilisateur: TypeUtilisateur.etudiant,
       privileges: [],
       derniereConnexion: DateTime.now().subtract(const Duration(days: 1)),
-      associationsMembre: ['6'], // UI Design: Éco-UQAR
+      associationsMembre: ['6'], 
+      motDePasse: 'marcandre123', 
     ),
-
     UtilisateurModel(
       id: 'etud_018',
       nom: 'Michaud',
@@ -362,10 +352,9 @@ class UtilisateursDatasourceLocal {
       typeUtilisateur: TypeUtilisateur.etudiant,
       privileges: [],
       derniereConnexion: DateTime.now().subtract(const Duration(hours: 6)),
-      associationsMembre: ['6'], // UI Design: Éco-UQAR
+      associationsMembre: ['6'], 
+      motDePasse: 'vincent2_123', 
     ),
-
-    // UI Design: Étudiants internationaux
     UtilisateurModel(
       id: 'etud_019',
       nom: 'Ben Ali',
@@ -380,9 +369,9 @@ class UtilisateursDatasourceLocal {
       typeUtilisateur: TypeUtilisateur.etudiant,
       privileges: [],
       derniereConnexion: DateTime.now().subtract(const Duration(days: 3)),
-      associationsMembre: ['7'], // UI Design: Étudiants Internationaux
+      associationsMembre: ['7'], 
+      motDePasse: 'ahmed123', 
     ),
-
     UtilisateurModel(
       id: 'etud_020',
       nom: 'Santos',
@@ -397,9 +386,9 @@ class UtilisateursDatasourceLocal {
       typeUtilisateur: TypeUtilisateur.etudiant,
       privileges: [],
       derniereConnexion: DateTime.now().subtract(const Duration(days: 2)),
-      associationsMembre: ['7'], // UI Design: Étudiants Internationaux
+      associationsMembre: ['7'], 
+      motDePasse: 'maria2_123', 
     ),
-
     UtilisateurModel(
       id: 'etud_021',
       nom: 'Garcia',
@@ -414,9 +403,9 @@ class UtilisateursDatasourceLocal {
       typeUtilisateur: TypeUtilisateur.etudiant,
       privileges: [],
       derniereConnexion: DateTime.now().subtract(const Duration(days: 1)),
-      associationsMembre: ['7'], // UI Design: Étudiants Internationaux
+      associationsMembre: ['7'], 
+      motDePasse: 'carlos123', 
     ),
-
     UtilisateurModel(
       id: 'etud_022',
       nom: 'Kim',
@@ -431,9 +420,9 @@ class UtilisateursDatasourceLocal {
       typeUtilisateur: TypeUtilisateur.etudiant,
       privileges: [],
       derniereConnexion: DateTime.now().subtract(const Duration(days: 1)),
-      associationsMembre: ['7'], // UI Design: Étudiants Internationaux
+      associationsMembre: ['7'], 
+      motDePasse: 'jiyeon123', 
     ),
-
     UtilisateurModel(
       id: 'etud_023',
       nom: 'Patel',
@@ -448,10 +437,9 @@ class UtilisateursDatasourceLocal {
       typeUtilisateur: TypeUtilisateur.etudiant,
       privileges: [],
       derniereConnexion: DateTime.now().subtract(const Duration(days: 2)),
-      associationsMembre: ['7'], // UI Design: Étudiants Internationaux
+      associationsMembre: ['7'], 
+      motDePasse: 'priya123', 
     ),
-
-    // UI Design: Membres de l'AELIES
     UtilisateurModel(
       id: 'etud_024',
       nom: 'Dufour',
@@ -466,9 +454,9 @@ class UtilisateursDatasourceLocal {
       typeUtilisateur: TypeUtilisateur.etudiant,
       privileges: [],
       derniereConnexion: DateTime.now().subtract(const Duration(days: 4)),
-      associationsMembre: ['8'], // UI Design: AELIES
+      associationsMembre: ['8'], 
+      motDePasse: 'isabelle2_123', 
     ),
-
     UtilisateurModel(
       id: 'etud_025',
       nom: 'Bouchard',
@@ -483,9 +471,9 @@ class UtilisateursDatasourceLocal {
       typeUtilisateur: TypeUtilisateur.etudiant,
       privileges: [],
       derniereConnexion: DateTime.now().subtract(const Duration(days: 3)),
-      associationsMembre: ['8'], // UI Design: AELIES
+      associationsMembre: ['8'], 
+      motDePasse: 'marcandre2_123', 
     ),
-
     UtilisateurModel(
       id: 'etud_026',
       nom: 'Lavoie',
@@ -500,9 +488,9 @@ class UtilisateursDatasourceLocal {
       typeUtilisateur: TypeUtilisateur.etudiant,
       privileges: [],
       derniereConnexion: DateTime.now().subtract(const Duration(days: 2)),
-      associationsMembre: ['8'], // UI Design: AELIES
+      associationsMembre: ['8'], 
+      motDePasse: 'marie2_123', 
     ),
-
     UtilisateurModel(
       id: 'etud_027',
       nom: 'Gagnon',
@@ -517,9 +505,9 @@ class UtilisateursDatasourceLocal {
       typeUtilisateur: TypeUtilisateur.etudiant,
       privileges: [],
       derniereConnexion: DateTime.now().subtract(const Duration(days: 1)),
-      associationsMembre: ['8'], // UI Design: AELIES
+      associationsMembre: ['8'], 
+      motDePasse: 'sophie2_123', 
     ),
-
     UtilisateurModel(
       id: 'etud_028',
       nom: 'Roy',
@@ -534,61 +522,38 @@ class UtilisateursDatasourceLocal {
       typeUtilisateur: TypeUtilisateur.etudiant,
       privileges: [],
       derniereConnexion: DateTime.now().subtract(const Duration(hours: 8)),
-      associationsMembre: ['8'], // UI Design: AELIES
+      associationsMembre: ['8'], 
+      motDePasse: 'catherine2_123', 
     ),
   ];
-
-  // UI Design: Mots de passe simulés (en production, utiliser un système sécurisé)
-  final Map<String, String> _motsDePasse = {
-    'admin@uqar.ca': 'admin123',
-    'moderateur@uqar.ca': 'mod123',
-    'alexandre.martin@uqar.ca': 'alex123',
-    'sophie.gagnon@uqar.ca': 'sophie123',
-    'marc.lavoie@uqar.ca': 'marc123',
-  };
-
-  // UI Design: Authentification
   Future<UtilisateurModel?> authentifierUtilisateur(String email, String motDePasse) async {
     await Future.delayed(const Duration(milliseconds: 500)); // Simulation délai réseau
-    
-    if (_motsDePasse[email] == motDePasse) {
+    try {
       final utilisateur = _utilisateurs.firstWhere(
         (u) => u.email == email,
         orElse: () => throw Exception('Utilisateur non trouvé'),
       );
-      
-      if (utilisateur.estActif) {
+      if (utilisateur.motDePasse == motDePasse && utilisateur.estActif) {
         _utilisateurActuel = utilisateur;
         await mettreAJourDerniereConnexion(utilisateur.id);
         return utilisateur;
       }
+    } catch (e) {
+      // Utilisateur non trouvé ou mot de passe incorrect
     }
     return null;
   }
-
   Future<UtilisateurModel?> obtenirUtilisateurActuel() async {
-    // Pour les tests, charger automatiquement Alexandre Martin
-    if (_utilisateurActuel == null) {
-      try {
-        _utilisateurActuel = _utilisateurs.firstWhere((u) => u.id == 'etud_001');
-              // Utilisateur automatiquement chargé
-    } catch (e) {
-      // Erreur lors du chargement automatique
-      }
-    }
+    // Retourner l'utilisateur actuellement connecté (null si personne n'est connecté)
     return _utilisateurActuel;
   }
-
   Future<void> deconnecterUtilisateur() async {
     _utilisateurActuel = null;
   }
-
-  // UI Design: Gestion des utilisateurs
   Future<List<UtilisateurModel>> obtenirTousLesUtilisateurs() async {
     await Future.delayed(const Duration(milliseconds: 300));
     return List.from(_utilisateurs);
   }
-
   Future<List<UtilisateurModel>> rechercherUtilisateurs(String terme) async {
     await Future.delayed(const Duration(milliseconds: 200));
     final termeLower = terme.toLowerCase();
@@ -600,7 +565,6 @@ class UtilisateursDatasourceLocal {
       u.programme.toLowerCase().contains(termeLower)
     ).toList();
   }
-
   Future<UtilisateurModel?> obtenirUtilisateurParId(String id) async {
     await Future.delayed(const Duration(milliseconds: 200));
     try {
@@ -609,7 +573,6 @@ class UtilisateursDatasourceLocal {
       return null;
     }
   }
-
   Future<UtilisateurModel?> obtenirUtilisateurParCodeEtudiant(String codeEtudiant) async {
     await Future.delayed(const Duration(milliseconds: 200));
     try {
@@ -618,7 +581,6 @@ class UtilisateursDatasourceLocal {
       return null;
     }
   }
-
   Future<bool> modifierUtilisateur(UtilisateurModel utilisateur) async {
     await Future.delayed(const Duration(milliseconds: 300));
     final index = _utilisateurs.indexWhere((u) => u.id == utilisateur.id);
@@ -628,7 +590,6 @@ class UtilisateursDatasourceLocal {
     }
     return false;
   }
-
   Future<bool> changerStatutUtilisateur(String id, bool estActif) async {
     await Future.delayed(const Duration(milliseconds: 300));
     final index = _utilisateurs.indexWhere((u) => u.id == id);
@@ -638,7 +599,6 @@ class UtilisateursDatasourceLocal {
     }
     return false;
   }
-
   Future<bool> attribuerPrivileges(String id, List<String> privileges) async {
     await Future.delayed(const Duration(milliseconds: 300));
     final index = _utilisateurs.indexWhere((u) => u.id == id);
@@ -648,7 +608,6 @@ class UtilisateursDatasourceLocal {
     }
     return false;
   }
-
   Future<bool> supprimerUtilisateur(String id) async {
     await Future.delayed(const Duration(milliseconds: 300));
     final index = _utilisateurs.indexWhere((u) => u.id == id);
@@ -658,15 +617,12 @@ class UtilisateursDatasourceLocal {
     }
     return false;
   }
-
   Future<bool> creerUtilisateur(UtilisateurModel utilisateur, String motDePasse) async {
     await Future.delayed(const Duration(milliseconds: 400));
     _utilisateurs.add(utilisateur);
-    _motsDePasse[utilisateur.email] = motDePasse;
+    // _motsDePasse[utilisateur.email] = motDePasse; // This line is removed as per the new_code
     return true;
   }
-
-  // UI Design: Statistiques
   Future<Map<String, int>> obtenirStatistiquesUtilisateurs() async {
     await Future.delayed(const Duration(milliseconds: 200));
     return {
@@ -677,19 +633,16 @@ class UtilisateursDatasourceLocal {
       'etudiants': _utilisateurs.where((u) => u.typeUtilisateur == TypeUtilisateur.etudiant).length,
     };
   }
-
   Future<List<UtilisateurModel>> obtenirUtilisateursRecents(int limite) async {
     await Future.delayed(const Duration(milliseconds: 200));
     final utilisateursTries = List<UtilisateurModel>.from(_utilisateurs);
     utilisateursTries.sort((a, b) => b.dateInscription.compareTo(a.dateInscription));
     return utilisateursTries.take(limite).toList();
   }
-
   Future<List<UtilisateurModel>> obtenirUtilisateursActifs() async {
     await Future.delayed(const Duration(milliseconds: 200));
     return _utilisateurs.where((u) => u.estActif).toList();
   }
-
   Future<void> mettreAJourDerniereConnexion(String id) async {
     final index = _utilisateurs.indexWhere((u) => u.id == id);
     if (index != -1) {
@@ -698,12 +651,10 @@ class UtilisateursDatasourceLocal {
       );
     }
   }
-
   Future<List<UtilisateurModel>> obtenirUtilisateursConnectes() async {
     await Future.delayed(const Duration(milliseconds: 200));
     final maintenant = DateTime.now();
     final seuilConnexion = maintenant.subtract(const Duration(hours: 24));
-    
     return _utilisateurs.where((u) => 
       u.derniereConnexion != null && 
       u.derniereConnexion!.isAfter(seuilConnexion)

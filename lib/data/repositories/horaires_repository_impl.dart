@@ -1,13 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../domain/usercases/horaires_repository.dart';
 import '../datasources/internal/horaires_datasource_local.dart';
-
-// UI Design: Implémentation du repository pour les horaires de cantine
 class HorairesRepositoryImpl implements HorairesRepository {
   final HorairesDatasourceLocal _datasourceLocal;
-
   HorairesRepositoryImpl(this._datasourceLocal);
-
   @override
   Future<Map<String, TimeOfDay>> obtenirHorairesCantine(String jour) async {
     try {
@@ -16,7 +12,6 @@ class HorairesRepositoryImpl implements HorairesRepository {
       throw Exception('Erreur lors du chargement des horaires pour $jour: $e');
     }
   }
-
   @override
   Future<Map<String, Map<String, TimeOfDay>>> obtenirTousLesHorairesCantine() async {
     try {
@@ -25,7 +20,6 @@ class HorairesRepositoryImpl implements HorairesRepository {
       throw Exception('Erreur lors du chargement de tous les horaires: $e');
     }
   }
-
   @override
   Future<bool> mettreAJourHorairesCantine(String jour, TimeOfDay ouverture, TimeOfDay fermeture) async {
     try {
@@ -35,7 +29,6 @@ class HorairesRepositoryImpl implements HorairesRepository {
       throw Exception('Erreur lors de la mise à jour des horaires pour $jour: $e');
     }
   }
-
   @override
   Future<bool> mettreAJourTousLesHoraires(Map<String, Map<String, TimeOfDay>> horaires) async {
     try {
@@ -53,7 +46,6 @@ class HorairesRepositoryImpl implements HorairesRepository {
       throw Exception('Erreur lors de la mise à jour de tous les horaires: $e');
     }
   }
-
   @override
   Future<bool> definirHorairesUniformes(TimeOfDay ouverture, TimeOfDay fermeture) async {
     try {
@@ -66,7 +58,6 @@ class HorairesRepositoryImpl implements HorairesRepository {
       throw Exception('Erreur lors de la définition des horaires uniformes: $e');
     }
   }
-
   @override
   Future<bool> definirHorairesJoursSemaine(TimeOfDay ouverture, TimeOfDay fermeture) async {
     try {
@@ -79,11 +70,9 @@ class HorairesRepositoryImpl implements HorairesRepository {
       throw Exception('Erreur lors de la définition des horaires des jours de semaine: $e');
     }
   }
-
   @override
   Future<bool> fermerCantine(String jour) async {
     try {
-      // UI Design: Définir des horaires spéciaux pour indiquer la fermeture
       await _datasourceLocal.mettreAJourHorairesCantine(
         jour,
         const TimeOfDay(hour: 0, minute: 0),
@@ -94,7 +83,6 @@ class HorairesRepositoryImpl implements HorairesRepository {
       throw Exception('Erreur lors de la fermeture de la cantine pour $jour: $e');
     }
   }
-
   @override
   Future<bool> reouvrir(String jour, TimeOfDay ouverture, TimeOfDay fermeture) async {
     try {

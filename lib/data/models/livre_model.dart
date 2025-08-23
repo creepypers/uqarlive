@@ -1,6 +1,4 @@
-import '../../domain/entities/livre.dart';
-
-// UI Design: Modèle Livre pour la conversion entre Map et entité Livre
+﻿import '../../domain/entities/livre.dart';
 class LivreModel extends Livre {
   const LivreModel({
     required super.id,
@@ -20,7 +18,6 @@ class LivreModel extends Livre {
     super.motsClefs,
     super.prix,
   });
-
   // Conversion depuis Map vers LivreModel
   factory LivreModel.fromMap(Map<String, dynamic> map) {
     return LivreModel(
@@ -46,7 +43,6 @@ class LivreModel extends Livre {
       prix: map['prix'] != null ? (map['prix'] as num).toDouble() : null,
     );
   }
-
   // Conversion depuis LivreModel vers Map
   Map<String, dynamic> toMap() {
     return {
@@ -68,7 +64,6 @@ class LivreModel extends Livre {
       'prix': prix,
     };
   }
-
   // Conversion depuis entité Livre vers LivreModel
   factory LivreModel.fromEntity(Livre livre) {
     return LivreModel(
@@ -90,7 +85,6 @@ class LivreModel extends Livre {
       prix: livre.prix,
     );
   }
-
   // Conversion vers entité Livre
   Livre toEntity() {
     return Livre(
@@ -112,7 +106,6 @@ class LivreModel extends Livre {
       prix: prix,
     );
   }
-
   // Méthode copyWith pour LivreModel
   @override
   LivreModel copyWith({

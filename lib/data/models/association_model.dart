@@ -1,6 +1,4 @@
-import '../../domain/entities/association.dart';
-
-// UI Design: Modèle Association pour la conversion entre Map et entité Association
+﻿import '../../domain/entities/association.dart';
 class AssociationModel extends Association {
   const AssociationModel({
     required super.id,
@@ -27,7 +25,6 @@ class AssociationModel extends Association {
     super.beneficesMembers,
     super.membresActifs,
   });
-
   // Conversion depuis Map vers AssociationModel
   factory AssociationModel.fromMap(Map<String, dynamic> map) {
     return AssociationModel(
@@ -66,7 +63,6 @@ class AssociationModel extends Association {
           : null,
     );
   }
-
   // Conversion depuis AssociationModel vers Map
   Map<String, dynamic> toMap() {
     return {
@@ -95,7 +91,6 @@ class AssociationModel extends Association {
       'beneficesMembers': beneficesMembers,
     };
   }
-
   // Conversion depuis entité Association vers AssociationModel
   factory AssociationModel.fromEntity(Association association) {
     return AssociationModel(
@@ -124,7 +119,6 @@ class AssociationModel extends Association {
       beneficesMembers: association.beneficesMembers,
     );
   }
-
   // Conversion vers entité Association
   Association toEntity() {
     return Association(
@@ -153,7 +147,6 @@ class AssociationModel extends Association {
       beneficesMembers: beneficesMembers,
     );
   }
-
   // Méthode copyWith pour AssociationModel
   @override
   AssociationModel copyWith({

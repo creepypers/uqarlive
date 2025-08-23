@@ -1,13 +1,11 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
-
 // Classe pour représenter une statistique individuelle
 class ElementStatistique {
   final String valeur;
   final String label;
   final IconData? icone;
   final Color? couleurIcone;
-
   const ElementStatistique({
     required this.valeur,
     required this.label,
@@ -15,8 +13,6 @@ class ElementStatistique {
     this.couleurIcone,
   });
 }
-
-// UI Design: Widget ultra-polyvalent pour toutes les sections statistiques/infos
 class WidgetSectionStatistiques extends StatelessWidget {
   final String? titre;
   final IconData? iconeTitre;
@@ -24,7 +20,6 @@ class WidgetSectionStatistiques extends StatelessWidget {
   final TypeSectionStatistiques typeStyling;
   final EdgeInsets? margin;
   final EdgeInsets? padding;
-
   const WidgetSectionStatistiques({
     super.key,
     this.titre,
@@ -34,7 +29,6 @@ class WidgetSectionStatistiques extends StatelessWidget {
     this.margin,
     this.padding,
   });
-
   // Factory constructor pour le style Associations (gradient bleu foncé)
   const WidgetSectionStatistiques.associations({
     Key? key,
@@ -50,7 +44,6 @@ class WidgetSectionStatistiques extends StatelessWidget {
           margin: margin,
           padding: padding,
         );
-
   // Factory constructor pour le style Marketplace (gradient clair avec icônes)
   const WidgetSectionStatistiques.marketplace({
     Key? key,
@@ -64,7 +57,6 @@ class WidgetSectionStatistiques extends StatelessWidget {
           margin: margin,
           padding: padding,
         );
-
   // Factory constructor pour le style Cantine (infos pratiques en grille)
   const WidgetSectionStatistiques.cantine({
     Key? key,
@@ -82,31 +74,27 @@ class WidgetSectionStatistiques extends StatelessWidget {
           margin: margin,
           padding: padding,
         );
-
   @override
   Widget build(BuildContext context) {
-    // UI Design: Obtenir les dimensions de l'écran pour l'adaptabilité
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
-    
     return Container(
-      margin: margin ?? EdgeInsets.all(screenWidth * 0.04), // UI Design: Marge adaptative
-      padding: padding ?? EdgeInsets.all(screenWidth * 0.05), // UI Design: Padding adaptatif
+      margin: margin ?? EdgeInsets.all(screenWidth * 0.04), 
+      padding: padding ?? EdgeInsets.all(screenWidth * 0.05), 
       decoration: _obtenirDecoration(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (titre != null) ...[
             _construireTitre(context),
-            SizedBox(height: screenHeight * 0.02), // UI Design: Espacement adaptatif
+            SizedBox(height: screenHeight * 0.02), 
           ],
           _construireContenuStatistiques(context),
         ],
       ),
     );
   }
-
   BoxDecoration _obtenirDecoration() {
     switch (typeStyling) {
       case TypeSectionStatistiques.associationsStyle:
@@ -158,7 +146,6 @@ class WidgetSectionStatistiques extends StatelessWidget {
         );
     }
   }
-
   Widget _construireTitre(BuildContext context) {
     switch (typeStyling) {
       case TypeSectionStatistiques.associationsStyle:
@@ -193,7 +180,6 @@ class WidgetSectionStatistiques extends StatelessWidget {
         );
     }
   }
-
   Widget _construireContenuStatistiques(BuildContext context) {
     switch (typeStyling) {
       case TypeSectionStatistiques.associationsStyle:
@@ -204,8 +190,6 @@ class WidgetSectionStatistiques extends StatelessWidget {
         return _construireStyleCantine();
     }
   }
-
-  // UI Design: Méthode utilitaire pour extraire les données de statistique
   ElementStatistique _extraireStatistique(dynamic stat) {
     if (stat is ElementStatistique) {
       return stat;
@@ -224,67 +208,60 @@ class WidgetSectionStatistiques extends StatelessWidget {
       );
     }
   }
-
   // Style Associations : 3 colonnes de chiffres simples (corrigé overflow)
   Widget _construireStyleAssociations(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
-    
     return Wrap(
-      spacing: screenWidth * 0.02, // UI Design: Espacement adaptatif
-      runSpacing: screenHeight * 0.01, // UI Design: Espacement adaptatif
+      spacing: screenWidth * 0.02, 
+      runSpacing: screenHeight * 0.01, 
       alignment: WrapAlignment.spaceEvenly,
       children: statistiques.map((stat) => _construireStatistiqueAssociation(_extraireStatistique(stat), context)).toList(),
     );
   }
-
   Widget _construireStatistiqueAssociation(ElementStatistique statistique, BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
-    
     return Column(
       children: [
         Text(
           statistique.valeur,
           style: TextStyle(
-            fontSize: screenWidth * 0.06, // UI Design: Taille adaptative
+            fontSize: screenWidth * 0.06, 
             fontWeight: FontWeight.bold,
             color: CouleursApp.blanc,
           ),
-          overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+          overflow: TextOverflow.ellipsis, 
           maxLines: 1,
         ),
-        SizedBox(height: screenHeight * 0.005), // UI Design: Espacement adaptatif
+        SizedBox(height: screenHeight * 0.005), 
         Text(
           statistique.label,
           style: TextStyle(
-            fontSize: screenWidth * 0.03, // UI Design: Taille adaptative
+            fontSize: screenWidth * 0.03, 
             color: CouleursApp.blanc.withValues(alpha: 0.9),
           ),
           textAlign: TextAlign.center,
           maxLines: 2,
-          overflow: TextOverflow.ellipsis, // UI Design: Éviter le débordement de texte
+          overflow: TextOverflow.ellipsis, 
         ),
       ],
     );
   }
-
   // Style Marketplace : 3 colonnes avec icônes et séparateurs (corrigé overflow)
   Widget _construireStyleMarketplace(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
-    
     return Wrap(
-      spacing: screenWidth * 0.02, // UI Design: Espacement adaptatif
-      runSpacing: screenHeight * 0.01, // UI Design: Espacement adaptatif
+      spacing: screenWidth * 0.02, 
+      runSpacing: screenHeight * 0.01, 
       alignment: WrapAlignment.spaceEvenly,
       children: statistiques.asMap().entries.map((entry) {
         final index = entry.key;
         final stat = entry.value;
-        
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -295,14 +272,13 @@ class WidgetSectionStatistiques extends StatelessWidget {
                 height: 40,
                 width: 1,
                 color: CouleursApp.principal.withValues(alpha: 0.3),
-                margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.02), // UI Design: Marge adaptative
+                margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.02), 
               ),
           ],
         );
       }).toList(),
     );
   }
-
   Widget _construireStatistiqueMarketplace(ElementStatistique statistique) {
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -321,9 +297,9 @@ class WidgetSectionStatistiques extends StatelessWidget {
             fontWeight: FontWeight.bold,
             color: CouleursApp.principal,
           ),
-          textAlign: TextAlign.center, // UI Design: Centrer le texte
-          maxLines: 1, // UI Design: Limiter à une ligne
-          overflow: TextOverflow.ellipsis, // UI Design: Gérer le débordement
+          textAlign: TextAlign.center, 
+          maxLines: 1, 
+          overflow: TextOverflow.ellipsis, 
         ),
         const SizedBox(height: 4),
         Text(
@@ -339,41 +315,31 @@ class WidgetSectionStatistiques extends StatelessWidget {
       ],
     );
   }
-
   // Style Cantine : Grille 2x2 d'infos pratiques
   Widget _construireStyleCantine() {
     final widgets = <Widget>[];
-    
     for (int i = 0; i < statistiques.length; i += 2) {
       final row = <Widget>[];
-      
-      // UI Design: Utiliser Expanded pour s'assurer que chaque élément prend la moitié de l'espace
       row.add(Expanded(child: _construireInfoCantine(_extraireStatistique(statistiques[i]))));
-      
       if (i + 1 < statistiques.length) {
         row.add(Expanded(child: _construireInfoCantine(_extraireStatistique(statistiques[i + 1]))));
       }
-      
-      // UI Design: Utiliser SizedBox pour contraindre la largeur de la Row
       widgets.add(
         SizedBox(
-          width: double.infinity, // UI Design: Prendre toute la largeur disponible
+          width: double.infinity, 
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: row, // UI Design: Espacer les éléments
+            children: row, 
           ),
         ),
       );
-      
       // Ajouter espacement sauf pour la dernière ligne
       if (i + 2 < statistiques.length) {
         widgets.add(const SizedBox(height: 12));
       }
     }
-    
     return Column(children: widgets);
   }
-
   Widget _construireInfoCantine(ElementStatistique statistique) {
     return Row(
       children: [
@@ -385,7 +351,7 @@ class WidgetSectionStatistiques extends StatelessWidget {
           ),
           const SizedBox(width: 8),
         ],
-        Expanded( // UI Design: Utiliser Expanded pour éviter le débordement
+        Expanded( 
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -395,8 +361,8 @@ class WidgetSectionStatistiques extends StatelessWidget {
                   fontSize: 12,
                   color: CouleursApp.texteFonce.withValues(alpha: 0.6),
                 ),
-                maxLines: 2, // UI Design: Limiter le nombre de lignes
-                overflow: TextOverflow.ellipsis, // UI Design: Gérer le débordement
+                maxLines: 2, 
+                overflow: TextOverflow.ellipsis, 
               ),
               const SizedBox(height: 2),
               Text(
@@ -406,8 +372,8 @@ class WidgetSectionStatistiques extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                   color: CouleursApp.texteFonce,
                 ),
-                maxLines: 1, // UI Design: Limiter à une ligne
-                overflow: TextOverflow.ellipsis, // UI Design: Gérer le débordement
+                maxLines: 1, 
+                overflow: TextOverflow.ellipsis, 
               ),
             ],
           ),
@@ -416,7 +382,6 @@ class WidgetSectionStatistiques extends StatelessWidget {
     );
   }
 }
-
 // Énumération pour les différents types de styling
 enum TypeSectionStatistiques {
   associationsStyle,

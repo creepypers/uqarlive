@@ -1,4 +1,4 @@
-import 'package:get_it/get_it.dart';
+﻿import 'package:get_it/get_it.dart';
 import '../../data/datasources/internal/actualites_datasource_local.dart';
 import '../../data/datasources/internal/associations_datasource_local.dart';
 import '../../data/datasources/internal/evenements_datasource_local.dart';
@@ -26,7 +26,6 @@ import '../../data/datasources/external/meteo_datasource_remote.dart';
 import '../../domain/usercases/meteo_repository.dart';
 import '../../data/repositories/meteo_repository_impl.dart';
 import '../../presentation/services/meteo_service.dart';
-
 import '../../data/repositories/livres_repository_impl.dart';
 import '../../data/repositories/menus_repository_impl.dart';
 import '../../data/repositories/salles_repository_impl.dart';
@@ -49,10 +48,7 @@ import '../../domain/usercases/reservations_salle_repository.dart';
 import '../../domain/usercases/transactions_repository.dart';
 import '../../domain/usercases/demandes_adhesion_repository.dart';
 import '../../domain/usercases/messages_repository.dart';
-
 final getIt = GetIt.instance;
-
-// UI Design: Service Locator pour l'injection de dépendances - Clean Architecture
 class ServiceLocator {
   static void configurerDependances() {
     // Data Sources
@@ -92,7 +88,6 @@ class ServiceLocator {
     getIt.registerLazySingleton<MessagesDatasourceLocal>(
       () => MessagesDatasourceLocal(),
     );
-
     // Repositories
     getIt.registerLazySingleton<ActualitesRepository>(
       () => ActualitesRepositoryImpl(getIt<ActualitesDatasourceLocal>()),
@@ -139,12 +134,10 @@ class ServiceLocator {
     getIt.registerLazySingleton<EvenementsRepository>(
       () => EvenementsRepositoryImpl(getIt<EvenementsDatasourceLocal>()),
     );
-    
     // Services
     getIt.registerLazySingleton<StatistiquesService>(
       () => StatistiquesService(),
     );
-    
     // Services
     getIt.registerLazySingleton<AuthentificationService>(
       () => AuthentificationService.instance,
@@ -167,15 +160,12 @@ class ServiceLocator {
         getIt<UtilisateursRepository>(),
       ),
     );
-
   }
-
   // Méthode pour obtenir un service
   static T obtenirService<T extends Object>() {
     return getIt<T>();
   }
 }
-
 // Fonction de configuration pour compatibilité
 void configureDependencies() {
   ServiceLocator.configurerDependances();

@@ -1,6 +1,4 @@
-// UI Design: Modèle de données pour Transaction
-import '../../domain/entities/transaction.dart';
-
+﻿import '../../domain/entities/transaction.dart';
 class TransactionModel extends Transaction {
   const TransactionModel({
     required super.id,
@@ -19,8 +17,6 @@ class TransactionModel extends Transaction {
     super.lieuRendezVous,
     super.dateRendezVous,
   });
-
-  // UI Design: Conversion depuis l'entité
   factory TransactionModel.fromEntity(Transaction entity) {
     return TransactionModel(
       id: entity.id,
@@ -40,8 +36,6 @@ class TransactionModel extends Transaction {
       dateRendezVous: entity.dateRendezVous,
     );
   }
-
-  // UI Design: Conversion vers l'entité
   Transaction toEntity() {
     return Transaction(
       id: id,
@@ -61,8 +55,6 @@ class TransactionModel extends Transaction {
       dateRendezVous: dateRendezVous,
     );
   }
-
-  // UI Design: Conversion depuis Map
   factory TransactionModel.fromMap(Map<String, dynamic> map) {
     return TransactionModel(
       id: map['id'] as String,
@@ -88,8 +80,6 @@ class TransactionModel extends Transaction {
           : null,
     );
   }
-
-  // UI Design: Conversion vers Map
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -109,8 +99,6 @@ class TransactionModel extends Transaction {
       'dateRendezVous': dateRendezVous?.toIso8601String(),
     };
   }
-
-  // UI Design: Méthode copyWith
   @override
   TransactionModel copyWith({
     String? id,

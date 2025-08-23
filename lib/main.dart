@@ -1,19 +1,14 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'core/theme/app_theme.dart';
 import 'core/di/service_locator.dart';
 import 'presentation/screens/utilisateur/connexion_ecran.dart';
-// UI Design: Point d'entrée de l'application UqarLive avec thème UQAR et Clean Architecture
 void main() {
-  // Configuration des dépendances selon Clean Architecture
   ServiceLocator.configurerDependances();
-  
   runApp(const UqarLiveApp());
 }
-
 class UqarLiveApp extends StatelessWidget {
   const UqarLiveApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

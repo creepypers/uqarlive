@@ -1,5 +1,4 @@
-import '../../domain/entities/horaire.dart';
-
+﻿import '../../domain/entities/horaire.dart';
 class HoraireModel extends Horaire {
   HoraireModel({
     required String jour,
@@ -10,7 +9,6 @@ class HoraireModel extends Horaire {
           periodes: periodes,
           estOuvert: estOuvert,
         );
-
   // Depuis Map
   factory HoraireModel.fromMap(Map<String, dynamic> map) {
     return HoraireModel(
@@ -24,7 +22,6 @@ class HoraireModel extends Horaire {
       estOuvert: map['estOuvert'] as bool,
     );
   }
-
   // Vers Map
   Map<String, dynamic> toMap() {
     return {
@@ -39,7 +36,6 @@ class HoraireModel extends Horaire {
     };
   }
 }
-
 class PlageHoraireModel extends PlageHoraire {
   PlageHoraireModel({
     required String debut,
@@ -48,7 +44,6 @@ class PlageHoraireModel extends PlageHoraire {
           debut: debut,
           fin: fin,
         );
-
   // Depuis Map
   factory PlageHoraireModel.fromMap(Map<String, dynamic> map) {
     return PlageHoraireModel(
@@ -56,7 +51,6 @@ class PlageHoraireModel extends PlageHoraire {
       fin: map['fin'] as String,
     );
   }
-
   // Vers Map
   Map<String, dynamic> toMap() {
     return {

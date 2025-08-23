@@ -1,15 +1,13 @@
-// Entité représentant les horaires d'ouverture
+﻿// Entité représentant les horaires d'ouverture
 class Horaire {
   final String jour;
   final Map<String, PlageHoraire> periodes;
   final bool estOuvert;
-
   const Horaire({
     required this.jour,
     required this.periodes,
     required this.estOuvert,
   });
-
   // Copier avec modifications
   Horaire copyWith({
     String? jour,
@@ -23,17 +21,14 @@ class Horaire {
     );
   }
 }
-
 // Value object pour une plage horaire
 class PlageHoraire {
   final String debut;
   final String fin;
-
   const PlageHoraire({
     required this.debut,
     required this.fin,
   });
-
   // Copier avec modifications
   PlageHoraire copyWith({
     String? debut,

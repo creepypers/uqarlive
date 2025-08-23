@@ -1,6 +1,4 @@
-// UI Design: Modèle de données pour ReservationSalle
-import '../../domain/entities/reservation_salle.dart';
-
+﻿import '../../domain/entities/reservation_salle.dart';
 class ReservationSalleModel extends ReservationSalle {
   const ReservationSalleModel({
     required super.id,
@@ -18,8 +16,6 @@ class ReservationSalleModel extends ReservationSalle {
     super.participantsIds,
     super.notesSpeciales,
   });
-
-  // UI Design: Conversion depuis l'entité
   factory ReservationSalleModel.fromEntity(ReservationSalle entity) {
     return ReservationSalleModel(
       id: entity.id,
@@ -38,8 +34,6 @@ class ReservationSalleModel extends ReservationSalle {
       notesSpeciales: entity.notesSpeciales,
     );
   }
-
-  // UI Design: Conversion vers l'entité
   ReservationSalle toEntity() {
     return ReservationSalle(
       id: id,
@@ -58,8 +52,6 @@ class ReservationSalleModel extends ReservationSalle {
       notesSpeciales: notesSpeciales,
     );
   }
-
-  // UI Design: Conversion depuis JSON
   factory ReservationSalleModel.fromJson(Map<String, dynamic> json) {
     return ReservationSalleModel(
       id: json['id'],
@@ -78,8 +70,6 @@ class ReservationSalleModel extends ReservationSalle {
       notesSpeciales: json['notesSpeciales'],
     );
   }
-
-  // UI Design: Conversion vers JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -98,8 +88,6 @@ class ReservationSalleModel extends ReservationSalle {
       'notesSpeciales': notesSpeciales,
     };
   }
-
-  // UI Design: Méthode copyWith
   @override
   ReservationSalleModel copyWith({
     String? id,

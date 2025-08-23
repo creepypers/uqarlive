@@ -1,6 +1,4 @@
-// UI Design: Modèle de données pour DemandeAdhesion
-import '../../domain/entities/demande_adhesion.dart';
-
+﻿import '../../domain/entities/demande_adhesion.dart';
 class DemandeAdhesionModel extends DemandeAdhesion {
   const DemandeAdhesionModel({
     required super.id,
@@ -14,8 +12,6 @@ class DemandeAdhesionModel extends DemandeAdhesion {
     super.chefId,
     super.roledemande = 'membre',
   });
-
-  // UI Design: Conversion depuis l'entité
   factory DemandeAdhesionModel.fromEntity(DemandeAdhesion entity) {
     return DemandeAdhesionModel(
       id: entity.id,
@@ -30,8 +26,6 @@ class DemandeAdhesionModel extends DemandeAdhesion {
       roledemande: entity.roledemande,
     );
   }
-
-  // UI Design: Conversion vers l'entité
   DemandeAdhesion toEntity() {
     return DemandeAdhesion(
       id: id,
@@ -46,8 +40,6 @@ class DemandeAdhesionModel extends DemandeAdhesion {
       roledemande: roledemande,
     );
   }
-
-  // UI Design: Conversion depuis Map
   factory DemandeAdhesionModel.fromMap(Map<String, dynamic> map) {
     return DemandeAdhesionModel(
       id: map['id'] as String,
@@ -64,8 +56,6 @@ class DemandeAdhesionModel extends DemandeAdhesion {
       roledemande: map['roledemande'] as String? ?? 'membre',
     );
   }
-
-  // UI Design: Conversion vers Map
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -80,8 +70,6 @@ class DemandeAdhesionModel extends DemandeAdhesion {
       'roledemande': roledemande,
     };
   }
-
-  // UI Design: Méthode copyWith
   @override
   DemandeAdhesionModel copyWith({
     String? id,

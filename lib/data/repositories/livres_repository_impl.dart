@@ -1,14 +1,10 @@
-import '../../domain/entities/livre.dart';
+﻿import '../../domain/entities/livre.dart';
 import '../../domain/usercases/livres_repository.dart';
 import '../datasources/internal/livres_datasource_local.dart';
 import '../models/livre_model.dart';
-
-// UI Design: Implémentation du repository des livres - couche data
 class LivresRepositoryImpl implements LivresRepository {
   final LivresDatasourceLocal _datasourceLocal;
-
   LivresRepositoryImpl(this._datasourceLocal);
-
   @override
   Future<List<Livre>> obtenirTousLesLivres() async {
     try {
@@ -18,7 +14,6 @@ class LivresRepositoryImpl implements LivresRepository {
       return [];
     }
   }
-
   @override
   Future<Livre?> obtenirLivreParId(String id) async {
     try {
@@ -28,7 +23,6 @@ class LivresRepositoryImpl implements LivresRepository {
       return null;
     }
   }
-
   @override
   Future<List<Livre>> obtenirLivresParMatiere(String matiere) async {
     try {
@@ -38,7 +32,6 @@ class LivresRepositoryImpl implements LivresRepository {
       return [];
     }
   }
-
   @override
   Future<List<Livre>> obtenirLivresParEtat(String etat) async {
     try {
@@ -48,7 +41,6 @@ class LivresRepositoryImpl implements LivresRepository {
       return [];
     }
   }
-
   @override
   Future<List<Livre>> obtenirLivresParAnnee(String annee) async {
     try {
@@ -58,7 +50,6 @@ class LivresRepositoryImpl implements LivresRepository {
       return [];
     }
   }
-
   @override
   Future<List<Livre>> rechercherLivres(String recherche) async {
     try {
@@ -68,7 +59,6 @@ class LivresRepositoryImpl implements LivresRepository {
       return [];
     }
   }
-
   @override
   Future<List<Livre>> filtrerLivres({
     String? matiere,
@@ -78,22 +68,18 @@ class LivresRepositoryImpl implements LivresRepository {
   }) async {
     try {
       List<LivreModel> livresModels = await _datasourceLocal.obtenirTousLesLivres();
-
       // Filtrer par matière
       if (matiere != null && matiere != 'Toutes') {
         livresModels = livresModels.where((livre) => livre.matiere == matiere).toList();
       }
-
       // Filtrer par état
       if (etat != null && etat != 'Tous') {
         livresModels = livresModels.where((livre) => livre.etatLivre == etat).toList();
       }
-
       // Filtrer par année
       if (annee != null && annee != 'Toutes') {
         livresModels = livresModels.where((livre) => livre.anneeEtude == annee).toList();
       }
-
       // Filtrer par recherche
       if (recherche != null && recherche.isNotEmpty) {
         final rechercheLowerCase = recherche.toLowerCase();
@@ -104,13 +90,11 @@ class LivresRepositoryImpl implements LivresRepository {
               (livre.coursAssocies?.toLowerCase().contains(rechercheLowerCase) ?? false);
         }).toList();
       }
-
       return livresModels.map((model) => model.toEntity()).toList();
     } catch (e) {
       return [];
     }
   }
-
   @override
   Future<bool> ajouterLivre(Livre livre) async {
     try {
@@ -120,7 +104,6 @@ class LivresRepositoryImpl implements LivresRepository {
       return false;
     }
   }
-
   @override
   Future<bool> modifierLivre(Livre livre) async {
     try {
@@ -130,7 +113,6 @@ class LivresRepositoryImpl implements LivresRepository {
       return false;
     }
   }
-
   @override
   Future<bool> supprimerLivre(String id) async {
     try {
@@ -139,7 +121,6 @@ class LivresRepositoryImpl implements LivresRepository {
       return false;
     }
   }
-
   @override
   Future<bool> marquerLivreEchange(String id) async {
     try {
@@ -153,7 +134,6 @@ class LivresRepositoryImpl implements LivresRepository {
       return false;
     }
   }
-
   @override
   Future<bool> marquerLivreDisponible(String id) async {
     try {
@@ -167,18 +147,15 @@ class LivresRepositoryImpl implements LivresRepository {
       return false;
     }
   }
-
   @override
   Future<List<Livre>> obtenirLivresParProprietaire(String proprietaire) async {
     try {
-      // UI Design: Utiliser la nouvelle méthode qui filtre par ID
       final livresModels = await _datasourceLocal.obtenirLivresParProprietaire(proprietaire);
       return livresModels.map((model) => model.toEntity()).toList();
     } catch (e) {
       return [];
     }
   }
-
   @override
   Future<List<Livre>> obtenirLivresDisponibles() async {
     try {
@@ -188,7 +165,6 @@ class LivresRepositoryImpl implements LivresRepository {
       return [];
     }
   }
-
   @override
   Future<List<Livre>> obtenirLivresParCours(String cours) async {
     try {

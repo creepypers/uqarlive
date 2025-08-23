@@ -1,6 +1,4 @@
-// UI Design: Modèle de données pour MembreAssociation
-import '../../domain/entities/membre_association.dart';
-
+﻿import '../../domain/entities/membre_association.dart';
 class MembreAssociationModel extends MembreAssociation {
   const MembreAssociationModel({
     required super.id,
@@ -13,8 +11,6 @@ class MembreAssociationModel extends MembreAssociation {
     super.dateFinAdhesion,
     super.responsabilites,
   });
-
-  // UI Design: Conversion depuis l'entité
   factory MembreAssociationModel.fromEntity(MembreAssociation entity) {
     return MembreAssociationModel(
       id: entity.id,
@@ -28,8 +24,6 @@ class MembreAssociationModel extends MembreAssociation {
       responsabilites: entity.responsabilites,
     );
   }
-
-  // UI Design: Conversion vers l'entité
   MembreAssociation toEntity() {
     return MembreAssociation(
       id: id,
@@ -43,8 +37,6 @@ class MembreAssociationModel extends MembreAssociation {
       responsabilites: responsabilites,
     );
   }
-
-  // UI Design: Conversion depuis JSON
   factory MembreAssociationModel.fromJson(Map<String, dynamic> json) {
     return MembreAssociationModel(
       id: json['id'],
@@ -60,8 +52,6 @@ class MembreAssociationModel extends MembreAssociation {
       responsabilites: List<String>.from(json['responsabilites'] ?? []),
     );
   }
-
-  // UI Design: Conversion vers JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -75,8 +65,6 @@ class MembreAssociationModel extends MembreAssociation {
       'responsabilites': responsabilites,
     };
   }
-
-  // UI Design: Méthode copyWith
   @override
   MembreAssociationModel copyWith({
     String? id,

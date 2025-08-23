@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/di/service_locator.dart';
 import '../../../core/utils/associations_utils.dart';
@@ -9,19 +9,14 @@ import '../../services/authentification_service.dart';
 import '../../widgets/widget_barre_app_personnalisee.dart';
 import 'conversation_ecran.dart';
 import 'ajouter_contact_ecran.dart';
-
-// UI Design: Page dédiée aux conversations avec design moderne
 class ConversationsEcran extends StatefulWidget {
   const ConversationsEcran({super.key});
-
   @override
   State<ConversationsEcran> createState() => _ConversationsEcranState();
 }
-
 class _ConversationsEcranState extends State<ConversationsEcran> {
   late MessagerieService _messagerieService;
   late AuthentificationService _authentificationService;
-  
   List<Message> _messages = [];
   List<Message> _conversations = [];
   List<Message> _messagesFiltres = [];
@@ -30,37 +25,29 @@ class _ConversationsEcranState extends State<ConversationsEcran> {
   bool _isLoading = true;
   String _recherche = '';
   final TextEditingController _rechercheController = TextEditingController();
-  
-  // UI Design: Cache pour les noms et initiales des utilisateurs
   final Map<String, String> _nomsUtilisateurs = {};
   final Map<String, String> _initialesUtilisateurs = {};
-
   @override
   void initState() {
     super.initState();
     _initialiserServices();
     _chargerDonnees();
   }
-
   @override
   void dispose() {
     _rechercheController.dispose();
     super.dispose();
   }
-
   void _initialiserServices() {
     _messagerieService = ServiceLocator.obtenirService<MessagerieService>();
     _authentificationService = ServiceLocator.obtenirService<AuthentificationService>();
   }
-
   Future<void> _chargerDonnees() async {
     setState(() => _isLoading = true);
-    
     try {
       await _authentificationService.chargerUtilisateurActuel();
       _utilisateurActuel = _authentificationService.utilisateurActuel;
       _utilisateurActuelId = _utilisateurActuel?.id;
-      
       if (_utilisateurActuelId != null) {
         await _chargerMessages();
       }
@@ -70,33 +57,23 @@ class _ConversationsEcranState extends State<ConversationsEcran> {
       setState(() => _isLoading = false);
     }
   }
-
   Future<void> _chargerMessages() async {
     try {
       final messages = await _messagerieService.obtenirMessagesUtilisateur(_utilisateurActuelId!);
-      
-      // UI Design: Grouper les messages par conversation (par destinataire/expéditeur)
       final Map<String, Message> conversationsMap = {};
-      
       for (final message in messages) {
         final autreUtilisateurId = message.expediteurId == _utilisateurActuelId 
             ? message.destinataireId 
             : message.expediteurId;
-        
         // Garder le message le plus récent pour chaque conversation
         if (!conversationsMap.containsKey(autreUtilisateurId) || 
             message.dateEnvoi.isAfter(conversationsMap[autreUtilisateurId]!.dateEnvoi)) {
           conversationsMap[autreUtilisateurId] = message;
         }
       }
-      
       final conversations = conversationsMap.values.toList();
-      // UI Design: Trier par date de message le plus récent
       conversations.sort((a, b) => b.dateEnvoi.compareTo(a.dateEnvoi));
-      
-      // UI Design: Charger les informations des utilisateurs pour les conversations
       await _chargerInformationsUtilisateurs(conversations);
-      
       setState(() {
         _messages = messages;
         _conversations = conversations;
@@ -106,35 +83,28 @@ class _ConversationsEcranState extends State<ConversationsEcran> {
       _afficherErreur('Erreur lors du chargement des messages: $e');
     }
   }
-
-  // UI Design: Charger les informations des utilisateurs pour les conversations
   Future<void> _chargerInformationsUtilisateurs(List<Message> conversations) async {
     try {
       for (final message in conversations) {
         final autreUtilisateurId = message.expediteurId == _utilisateurActuelId 
             ? message.destinataireId 
             : message.expediteurId;
-        
-        // UI Design: Charger les informations de l'utilisateur si pas encore en cache
         if (!_nomsUtilisateurs.containsKey(autreUtilisateurId)) {
           final utilisateur = await _authentificationService.obtenirUtilisateurParId(autreUtilisateurId);
           if (utilisateur != null) {
             _nomsUtilisateurs[autreUtilisateurId] = '${utilisateur.prenom} ${utilisateur.nom}';
             _initialesUtilisateurs[autreUtilisateurId] = '${utilisateur.prenom[0]}${utilisateur.nom[0]}';
           } else {
-            // UI Design: Fallback si l'utilisateur n'est pas trouvé
             _nomsUtilisateurs[autreUtilisateurId] = _genererNomFallback(autreUtilisateurId);
             _initialesUtilisateurs[autreUtilisateurId] = _genererInitialesFallback(autreUtilisateurId);
           }
         }
       }
     } catch (e) {
-      // UI Design: En cas d'erreur, utiliser les noms fallback
       for (final message in conversations) {
         final autreUtilisateurId = message.expediteurId == _utilisateurActuelId 
             ? message.destinataireId 
             : message.expediteurId;
-        
         if (!_nomsUtilisateurs.containsKey(autreUtilisateurId)) {
           _nomsUtilisateurs[autreUtilisateurId] = _genererNomFallback(autreUtilisateurId);
           _initialesUtilisateurs[autreUtilisateurId] = _genererInitialesFallback(autreUtilisateurId);
@@ -142,8 +112,6 @@ class _ConversationsEcranState extends State<ConversationsEcran> {
       }
     }
   }
-
-  // UI Design: Générer un nom fallback basé sur l'ID
   String _genererNomFallback(String utilisateurId) {
     if (utilisateurId.startsWith('etud_')) {
       return 'Étudiant ${utilisateurId.substring(5, 8)}';
@@ -154,8 +122,6 @@ class _ConversationsEcranState extends State<ConversationsEcran> {
     }
     return 'Utilisateur ${utilisateurId.substring(0, 3)}';
   }
-
-  // UI Design: Générer des initiales fallback basées sur l'ID
   String _genererInitialesFallback(String utilisateurId) {
     if (utilisateurId.startsWith('etud_')) {
       return 'É${utilisateurId.substring(5, 6)}';
@@ -166,7 +132,6 @@ class _ConversationsEcranState extends State<ConversationsEcran> {
     }
     return 'UQ';
   }
-
   void _rechercherMessages(String terme) {
     setState(() {
       _recherche = terme.toLowerCase().trim();
@@ -177,7 +142,6 @@ class _ConversationsEcranState extends State<ConversationsEcran> {
           final expediteurNom = _obtenirNomUtilisateur(msg.expediteurId);
           final destinataireNom = _obtenirNomUtilisateur(msg.destinataireId);
           final contenu = msg.contenu.toLowerCase();
-          
           return expediteurNom.toLowerCase().contains(_recherche) ||
                  destinataireNom.toLowerCase().contains(_recherche) ||
                  contenu.contains(_recherche);
@@ -185,7 +149,6 @@ class _ConversationsEcranState extends State<ConversationsEcran> {
       }
     });
   }
-
   void _ouvrirConversation(String destinataireId) {
     _conversations.firstWhere(
       (msg) => msg.expediteurId == destinataireId || msg.destinataireId == destinataireId,
@@ -193,9 +156,7 @@ class _ConversationsEcranState extends State<ConversationsEcran> {
         (msg) => msg.expediteurId == destinataireId || msg.destinataireId == destinataireId,
       ),
     );
-    
     final destinataireNom = _obtenirNomUtilisateur(destinataireId);
-    
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -207,7 +168,6 @@ class _ConversationsEcranState extends State<ConversationsEcran> {
       ),
     );
   }
-
   void _ouvrirAjouterContact() {
     Navigator.push(
       context,
@@ -216,26 +176,19 @@ class _ConversationsEcranState extends State<ConversationsEcran> {
       ),
     );
   }
-
   String _obtenirNomUtilisateur(String utilisateurId) {
     if (utilisateurId == _utilisateurActuelId) {
       return 'Moi';
     }
-    
-    // UI Design: Utiliser le nom depuis le cache ou générer un fallback
     return _nomsUtilisateurs[utilisateurId] ?? _genererNomFallback(utilisateurId);
   }
-
   String _obtenirInitialesUtilisateur(String utilisateurId) {
     if (utilisateurId == _utilisateurActuelId) {
       return 'M';
     }
-    
-    // UI Design: Utiliser les initiales depuis le cache ou les utilitaires centralisés
     return _initialesUtilisateurs[utilisateurId] ?? 
            TransactionsUtils.obtenirInitialesUtilisateur(utilisateurId);
   }
-
   void _afficherErreur(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -245,7 +198,6 @@ class _ConversationsEcranState extends State<ConversationsEcran> {
       ),
     );
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -303,7 +255,6 @@ class _ConversationsEcranState extends State<ConversationsEcran> {
                 ),
               ),
             ),
-            
             // Liste des conversations
             Expanded(
               child: _isLoading
@@ -322,7 +273,6 @@ class _ConversationsEcranState extends State<ConversationsEcran> {
                             final destinataireId = message.expediteurId == _utilisateurActuelId
                                 ? message.destinataireId
                                 : message.expediteurId;
-                            
                             return _construireCarteConversation(message, destinataireId);
                           },
                         ),
@@ -332,7 +282,6 @@ class _ConversationsEcranState extends State<ConversationsEcran> {
       ),
     );
   }
-
   Widget _construireEtatVide() {
     return Center(
       child: Column(
@@ -383,12 +332,10 @@ class _ConversationsEcranState extends State<ConversationsEcran> {
       ),
     );
   }
-
   Widget _construireCarteConversation(Message message, String destinataireId) {
     final estExpediteur = message.expediteurId == _utilisateurActuelId;
     final destinataireNom = _obtenirNomUtilisateur(destinataireId);
     final initiales = _obtenirInitialesUtilisateur(destinataireId);
-    
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -443,9 +390,7 @@ class _ConversationsEcranState extends State<ConversationsEcran> {
                     ),
                   ],
                 ),
-                
                 const SizedBox(width: 16),
-                
                 // Informations de la conversation
                 Expanded(
                   child: Column(
@@ -483,9 +428,7 @@ class _ConversationsEcranState extends State<ConversationsEcran> {
                           ),
                         ],
                       ),
-                      
                       const SizedBox(height: 6),
-                      
                       // Contenu du message
                       Text(
                         message.contenu,
@@ -497,9 +440,7 @@ class _ConversationsEcranState extends State<ConversationsEcran> {
                           height: 1.3,
                         ),
                       ),
-                      
                       const SizedBox(height: 8),
-                      
                       // Indicateur de statut du message
                       Row(
                         children: [
@@ -531,9 +472,7 @@ class _ConversationsEcranState extends State<ConversationsEcran> {
                               ],
                             ),
                           ),
-                          
                           const Spacer(),
-                          
                           // Indicateur de type de message
                           if (message.typeMessage == 'general')
                             Container(
@@ -563,11 +502,9 @@ class _ConversationsEcranState extends State<ConversationsEcran> {
       ),
     );
   }
-
   String _formatterDate(DateTime date) {
     final maintenant = DateTime.now();
     final difference = maintenant.difference(date);
-    
     if (difference.inDays > 0) {
       return '${difference.inDays}j';
     } else if (difference.inHours > 0) {

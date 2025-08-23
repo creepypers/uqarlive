@@ -1,8 +1,5 @@
- // UI Design: Datasource local pour les livres universitaires disponibles à l'échange
-import '../../models/livre_model.dart';
-
+﻿import '../../models/livre_model.dart';
 class LivresDatasourceLocal {
-  // UI Design: Liste interne des livres avec gestion dynamique
   final List<LivreModel> _livres = [
     // Quelques livres d'exemple avec différents propriétaires
     LivreModel(
@@ -314,25 +311,20 @@ class LivresDatasourceLocal {
       prix: 38.75,
     ),
   ];
-
-  // UI Design: Méthodes pour la gestion des livres
   Future<List<LivreModel>> obtenirTousLesLivres() async {
     // Simuler un délai réseau
     await Future.delayed(const Duration(milliseconds: 300));
     return List.from(_livres);
   }
-
   Future<List<LivreModel>> obtenirLivresParProprietaire(String proprietaireId) async {
     await Future.delayed(const Duration(milliseconds: 200));
     return _livres.where((livre) => livre.proprietaireId == proprietaireId).toList();
   }
-
   Future<bool> ajouterLivre(LivreModel livre) async {
     await Future.delayed(const Duration(milliseconds: 400));
     _livres.add(livre);
     return true;
   }
-
   Future<bool> modifierLivre(LivreModel livre) async {
     await Future.delayed(const Duration(milliseconds: 300));
     final index = _livres.indexWhere((l) => l.id == livre.id);
@@ -342,7 +334,6 @@ class LivresDatasourceLocal {
     }
     return false;
   }
-
   Future<bool> supprimerLivre(String livreId) async {
     await Future.delayed(const Duration(milliseconds: 300));
     final index = _livres.indexWhere((l) => l.id == livreId);
@@ -352,7 +343,6 @@ class LivresDatasourceLocal {
     }
     return false;
   }
-
   Future<LivreModel?> obtenirLivreParId(String id) async {
     await Future.delayed(const Duration(milliseconds: 200));
     try {
@@ -361,7 +351,6 @@ class LivresDatasourceLocal {
       return null;
     }
   }
-
   Future<List<LivreModel>> rechercherLivres(String terme) async {
     await Future.delayed(const Duration(milliseconds: 250));
     final termeLower = terme.toLowerCase();
@@ -372,33 +361,26 @@ class LivresDatasourceLocal {
       (livre.coursAssocies?.toLowerCase().contains(termeLower) ?? false)
     ).toList();
   }
-
   Future<List<LivreModel>> obtenirLivresParMatiere(String matiere) async {
     await Future.delayed(const Duration(milliseconds: 200));
     return _livres.where((livre) => livre.matiere == matiere).toList();
   }
-
   Future<List<LivreModel>> obtenirLivresParEtat(String etat) async {
     await Future.delayed(const Duration(milliseconds: 200));
     return _livres.where((livre) => livre.etatLivre == etat).toList();
   }
-
   Future<List<LivreModel>> obtenirLivresParAnnee(String annee) async {
     await Future.delayed(const Duration(milliseconds: 200));
     return _livres.where((livre) => livre.anneeEtude == annee).toList();
   }
-
   Future<List<LivreModel>> obtenirLivresDisponibles() async {
     await Future.delayed(const Duration(milliseconds: 200));
     return _livres.where((livre) => livre.estDisponible).toList();
   }
-
   Future<List<LivreModel>> obtenirLivresParCours(String cours) async {
     await Future.delayed(const Duration(milliseconds: 200));
     return _livres.where((livre) => livre.coursAssocies == cours).toList();
   }
-
-  // UI Design: Générer un nouvel ID unique pour les livres
   String genererIdLivre() {
     final timestamp = DateTime.now().millisecondsSinceEpoch;
     return 'livre_$timestamp';

@@ -1,6 +1,4 @@
-import '../../domain/entities/actualite.dart';
-
-// UI Design: Modèle pour mapper les données d'actualité depuis/vers la source de données
+﻿import '../../domain/entities/actualite.dart';
 class ActualiteModel {
   final String id;
   final String titre;
@@ -16,7 +14,6 @@ class ActualiteModel {
   final bool estEpinglee;
   final int nombreVues;
   final int nombreLikes;
-
   const ActualiteModel({
     required this.id,
     required this.titre,
@@ -33,8 +30,6 @@ class ActualiteModel {
     required this.nombreVues,
     required this.nombreLikes,
   });
-
-  // UI Design: Conversion depuis Map (JSON)
   factory ActualiteModel.fromMap(Map<String, dynamic> map) {
     return ActualiteModel(
       id: map['id'] ?? '',
@@ -53,8 +48,6 @@ class ActualiteModel {
       nombreLikes: map['nombreLikes'] ?? 0,
     );
   }
-
-  // UI Design: Conversion vers Map (JSON)
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -73,8 +66,6 @@ class ActualiteModel {
       'nombreLikes': nombreLikes,
     };
   }
-
-  // UI Design: Conversion vers entité
   Actualite toEntity() {
     return Actualite(
       id: id,
@@ -93,8 +84,6 @@ class ActualiteModel {
       nombreLikes: nombreLikes,
     );
   }
-
-  // UI Design: Création depuis entité
   factory ActualiteModel.fromEntity(Actualite actualite) {
     return ActualiteModel(
       id: actualite.id,
@@ -113,8 +102,6 @@ class ActualiteModel {
       nombreLikes: actualite.nombreLikes,
     );
   }
-
-  // UI Design: Copie avec modifications
   ActualiteModel copyWith({
     String? id,
     String? titre,

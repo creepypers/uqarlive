@@ -1,5 +1,4 @@
-// UI Design: Entité représentant un événement d'association
-class Evenement {
+﻿class Evenement {
   final String id;
   final String titre;
   final String description;
@@ -16,7 +15,6 @@ class Evenement {
   final int nombreInscrits;
   final bool estActif;
   final DateTime dateCreation;
-
   const Evenement({
     required this.id,
     required this.titre,
@@ -35,8 +33,6 @@ class Evenement {
     this.estActif = true,
     required this.dateCreation,
   });
-
-  // UI Design: Méthodes utilitaires
   bool get estAVenir => dateDebut.isAfter(DateTime.now());
   bool get estEnCours {
     final maintenant = DateTime.now();
@@ -44,17 +40,13 @@ class Evenement {
   }
   bool get estTermine => dateFin.isBefore(DateTime.now());
   bool get estComplet => inscriptionRequise && capaciteMaximale != null && nombreInscrits >= capaciteMaximale!;
-
   Duration get duree => dateFin.difference(dateDebut);
-
   String get statutEvenement {
     if (estTermine) return 'Terminé';
     if (estEnCours) return 'En cours';
     if (estAVenir) return 'À venir';
     return 'Inconnu';
   }
-
-  // UI Design: Copie avec modifications
   Evenement copyWith({
     String? id,
     String? titre,

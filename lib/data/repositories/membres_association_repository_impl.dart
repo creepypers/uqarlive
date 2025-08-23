@@ -1,25 +1,20 @@
-import '../../domain/entities/membre_association.dart';
+﻿import '../../domain/entities/membre_association.dart';
 import '../../domain/usercases/membres_association_repository.dart';
 import '../datasources/internal/membres_association_datasource_local.dart';
 import '../models/membre_association_model.dart';
-
 class MembresAssociationRepositoryImpl implements MembresAssociationRepository {
   final MembresAssociationDatasourceLocal _datasourceLocal;
-
   const MembresAssociationRepositoryImpl(this._datasourceLocal);
-
   @override
   Future<List<MembreAssociation>> obtenirMembresParUtilisateur(String utilisateurId) async {
     final models = await _datasourceLocal.obtenirMembresParUtilisateur(utilisateurId);
     return models.map((model) => model.toEntity()).toList();
   }
-
   @override
   Future<List<MembreAssociation>> obtenirMembresParAssociation(String associationId) async {
     final models = await _datasourceLocal.obtenirMembresParAssociation(associationId);
     return models.map((model) => model.toEntity()).toList();
   }
-
   @override
   Future<MembreAssociation?> obtenirAdhesion(String utilisateurId, String associationId) async {
     final models = await _datasourceLocal.obtenirMembresParUtilisateur(utilisateurId);
@@ -30,7 +25,6 @@ class MembresAssociationRepositoryImpl implements MembresAssociationRepository {
       return null;
     }
   }
-
   @override
   Future<bool> ajouterMembre(MembreAssociation membre) async {
     try {
@@ -41,7 +35,6 @@ class MembresAssociationRepositoryImpl implements MembresAssociationRepository {
       return false;
     }
   }
-
   @override
   Future<bool> modifierMembre(MembreAssociation membre) async {
     try {
@@ -52,7 +45,6 @@ class MembresAssociationRepositoryImpl implements MembresAssociationRepository {
       return false;
     }
   }
-
   @override
   Future<bool> supprimerMembre(String membreId) async {
     try {
@@ -62,7 +54,6 @@ class MembresAssociationRepositoryImpl implements MembresAssociationRepository {
       return false;
     }
   }
-
   @override
   Future<bool> changerRole(String membreId, String nouveauRole) async {
     try {
@@ -72,27 +63,23 @@ class MembresAssociationRepositoryImpl implements MembresAssociationRepository {
       return false;
     }
   }
-
   @override
   Future<List<MembreAssociation>> obtenirMembresBureau(String associationId) async {
     final models = await _datasourceLocal.obtenirMembresParAssociation(associationId);
     final bureau = models.where((m) => ['Président', 'Vice-président', 'Secrétaire', 'Trésorier'].contains(m.role));
     return bureau.map((model) => model.toEntity()).toList();
   }
-
   @override
   Future<bool> estMembreActif(String utilisateurId, String associationId) async {
     final models = await _datasourceLocal.obtenirMembresParUtilisateur(utilisateurId);
     return models.any((membre) => 
         membre.associationId == associationId && membre.estActif);
   }
-
   @override
   Future<int> compterMembresActifs(String associationId) async {
     final models = await _datasourceLocal.obtenirMembresParAssociation(associationId);
     return models.length;
   }
-
   @override
   Future<Map<String, int>> obtenirStatistiquesAdhesions(String utilisateurId) async {
     final models = await _datasourceLocal.obtenirMembresParUtilisateur(utilisateurId);

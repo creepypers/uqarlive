@@ -1,9 +1,5 @@
-// UI Design: Source de données locale pour les menus de la cantine UQAR
-class MenusDatasourceLocal {
-  
-  // UI Design: Variable statique pour stocker l'ID du menu du jour actuel
+﻿class MenusDatasourceLocal {
   static String? _menuDuJourActuel;
-  
   // Liste statique mutable pour stocker les menus (simulation de base de données)
   static final List<Map<String, dynamic>> _menus = [
     // Menus du jour
@@ -111,12 +107,10 @@ class MenusDatasourceLocal {
       'note': 4.8,
     },
   ];
-
   /// Méthode pour obtenir tous les menus
   List<Map<String, dynamic>> obtenirTousLesMenus() {
     return _menus;
   }
-
   /// Obtenir les menus par catégorie
   List<Map<String, dynamic>> obtenirMenusParCategorie(String categorie) {
     if (categorie == 'toutes') return obtenirTousLesMenus();
@@ -124,14 +118,12 @@ class MenusDatasourceLocal {
         .where((menu) => menu['categorie'] == categorie)
         .toList();
   }
-
   /// Obtenir les menus disponibles
   List<Map<String, dynamic>> obtenirMenusDisponibles() {
     return obtenirTousLesMenus()
         .where((menu) => menu['estDisponible'] == true)
         .toList();
   }
-
   /// Obtenir les menus populaires (note >= 4.5)
   List<Map<String, dynamic>> obtenirMenusPopulaires() {
     return obtenirTousLesMenus()
@@ -141,14 +133,12 @@ class MenusDatasourceLocal {
             menu['note'] >= 4.5)
         .toList();
   }
-
   /// Obtenir les menus du jour
   List<Map<String, dynamic>> obtenirMenusDuJour() {
     return obtenirTousLesMenus()
         .where((menu) => menu['categorie'] == 'menu_jour')
         .toList();
   }
-
   /// Obtenir les menus végétariens
   List<Map<String, dynamic>> obtenirMenusVegetariens({bool veganUniquement = false}) {
     return obtenirTousLesMenus()
@@ -157,7 +147,6 @@ class MenusDatasourceLocal {
             (!veganUniquement || menu['estVegan'] == true))
         .toList();
   }
-
   /// Méthode pour obtenir un menu par ID
   Map<String, dynamic>? obtenirMenuParId(String id) {
     try {
@@ -166,7 +155,6 @@ class MenusDatasourceLocal {
       return null;
     }
   }
-
   /// Méthode pour rechercher des menus
   List<Map<String, dynamic>> rechercherMenus(String recherche) {
     final rechercheLowerCase = recherche.toLowerCase();
@@ -177,38 +165,29 @@ class MenusDatasourceLocal {
               ingredient.toLowerCase().contains(rechercheLowerCase));
     }).toList();
   }
-
   /// Méthode pour obtenir les catégories
   List<String> obtenirCategories() {
     return ['menu_jour', 'plat', 'snack', 'dessert', 'boisson'];
   }
-
   /// Ajouter un nouveau menu
   Future<Map<String, dynamic>> ajouterMenu(Map<String, dynamic> menuData) async {
-    // UI Design: Ajouter le menu à la liste statique
     _menus.add(menuData);
     return menuData;
   }
-
   /// Mettre à jour un menu existant
   Future<Map<String, dynamic>> mettreAJourMenu(String menuId, Map<String, dynamic> menuData) async {
-    // UI Design: Trouver et mettre à jour le menu dans la liste statique
     final index = _menus.indexWhere((m) => m['id'] == menuId);
-    
     if (index == -1) {
       throw Exception('Menu avec l\'ID $menuId introuvable');
     }
     _menus[index] = menuData;
     return menuData;
   }
-
   /// Supprimer un menu
   Future<bool> supprimerMenu(String menuId) async {
-    // UI Design: Supprimer le menu de la liste statique
     final index = _menus.indexWhere((m) => m['id'] == menuId);
     if (index != -1) {
       _menus.removeAt(index);
-      
       // Si on supprime le menu du jour actuel, le retirer
       if (_menuDuJourActuel == menuId) {
         _menuDuJourActuel = null;
@@ -217,7 +196,6 @@ class MenusDatasourceLocal {
     }
     return false;
   }
-
   /// Définir un menu comme menu du jour
   Future<void> definirMenuDuJour(String menuId) async {
     // Si ID vide, retirer le menu du jour
@@ -225,17 +203,14 @@ class MenusDatasourceLocal {
       _menuDuJourActuel = null;
       return;
     }
-    
     // Vérifier que le menu existe
     final menu = obtenirMenuParId(menuId);
     if (menu == null) {
       throw Exception('Menu avec l\'ID $menuId non trouvé');
     }
-    
     // Définir le menu du jour
     _menuDuJourActuel = menuId;
   }
-
   /// Obtenir l'ID du menu du jour actuel
   Future<String?> obtenirMenuDuJourActuel() async {
     return _menuDuJourActuel;

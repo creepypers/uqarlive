@@ -1,7 +1,4 @@
-// ignore_for_file: unused_field, unused_element
-
-import 'package:flutter/material.dart';
-
+﻿import 'package:flutter/material.dart';
 import '../../../core/di/service_locator.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/associations_utils.dart';
@@ -17,168 +14,112 @@ import '../../../presentation/widgets/widget_barre_app_personnalisee.dart';
 import '../../../presentation/widgets/widget_bouton_conversations.dart';
 import '../../../presentation/widgets/widget_carte.dart';
 import '../../../presentation/widgets/widget_collection.dart';
-
-// UI Design: Écran de gestion des livres personnels de l'utilisateur
-
 class GererLivresEcran extends StatefulWidget {
   const GererLivresEcran({super.key});
-
   @override
   State<GererLivresEcran> createState() => _GererLivresEcranState();
 }
-
 class _GererLivresEcranState extends State<GererLivresEcran>
     with SingleTickerProviderStateMixin {
   late LivresRepository _livresRepository;
-
   late AuthentificationService _authentificationService;
-
   late TransactionsService _transactionsService;
-
   Utilisateur? _utilisateurActuel;
-
   List<Livre> _mesLivres = [];
-
   List<Transaction> _mesTransactions = [];
-
   bool _isLoading = true;
-
   bool _isLoadingTransactions = true;
-
   String _filtreActuel =
       'tous'; // 'tous', 'disponibles', 'en_cours', 'echanges'
-
   late TabController _tabController;
-
-  int _sectionActuelle = 0; // UI Design: Variable pour suivre la section active
-
-  // Variables pour les filtres avancés
-
   String? _matiereSelectionnee;
-
   String? _anneeSelectionnee;
-
   // Listes pour les filtres - Utilisation des utilitaires centralisés LivresUtils
   List<String> get _matieres => LivresUtils.matieresDisponibles;
   List<String> get _anneesEtude => LivresUtils.anneesEtudeDisponibles;
-
   @override
   void initState() {
     super.initState();
-
     _livresRepository = ServiceLocator.obtenirService<LivresRepository>();
-
     _authentificationService =
         ServiceLocator.obtenirService<AuthentificationService>();
-
     _transactionsService = ServiceLocator.obtenirService<TransactionsService>();
-
     _utilisateurActuel = _authentificationService.utilisateurActuel;
-
     _tabController = TabController(
-        length: 2, vsync: this); // UI Design: Corrigé pour 2 onglets
-
+        length: 2, vsync: this); 
     _tabController.addListener(() {
       setState(() {
-        _sectionActuelle =
-            _tabController.index; // UI Design: Mettre à jour la section active
       });
     });
-
     _chargerMesLivres();
-
     _chargerMesTransactions();
   }
-
   @override
   void dispose() {
     _tabController.dispose();
-
     super.dispose();
   }
-
   Future<void> _chargerMesTransactions() async {
     setState(() => _isLoadingTransactions = true);
-
     try {
       if (_utilisateurActuel != null) {
         final anciennesTransactions =
             List<String>.from(_mesTransactions.map((t) => t.id));
         _mesTransactions = await _transactionsService
             .obtenirMesTransactions(_utilisateurActuel!.id);
-
-        // UI Design: Charger tous les livres manquants des transactions
-        await _chargerLivresManquants();
-
-        // UI Design: Détecter les nouveaux messages reçus
+        // Ne pas charger les livres manquants ici - ils appartiennent à d'autres utilisateurs
+        // await _chargerLivresManquants();
         final nouvellesTransactions = _mesTransactions
             .where((t) =>
                 t.vendeurId == _utilisateurActuel?.id &&
                 t.statut == 'en_attente' &&
                 !anciennesTransactions.contains(t.id))
             .toList();
-
         if (nouvellesTransactions.isNotEmpty && mounted) {}
       } else {
         _mesTransactions = [];
       }
-
       setState(() => _isLoadingTransactions = false);
     } catch (e) {
       setState(() => _isLoadingTransactions = false);
-
       _afficherErreur('Erreur lors du chargement des transactions: $e');
     }
   }
-
   Future<void> _chargerMesLivres() async {
     setState(() => _isLoading = true);
-
     try {
       if (_utilisateurActuel == null) {
-        // UI Design: Essayer de recharger l'utilisateur depuis le service
-
         await _authentificationService.chargerUtilisateurActuel();
-
         _utilisateurActuel = _authentificationService.utilisateurActuel;
-
-        // UI Design: Si toujours null, simuler la connexion d'Alexandre Martin pour les tests
-
         if (_utilisateurActuel == null) {
-          final utilisateurConnecte = await _authentificationService
-              .authentifier('alexandre.martin@uqar.ca', 'alex123');
-
-          _utilisateurActuel = utilisateurConnecte;
+          // Aucun utilisateur connecté - rediriger vers l'écran de connexion
+          if (mounted) {
+            Navigator.of(context).pushReplacementNamed('/connexion');
+          }
+          return;
         }
       }
-
       if (_utilisateurActuel != null) {
-        // UI Design: Charger les livres de l'utilisateur
+        // Debug: Afficher l'utilisateur connecté
+        // Charger uniquement les livres qui appartiennent à l'utilisateur actuel
         _mesLivres = await _livresRepository
             .obtenirLivresParProprietaire(_utilisateurActuel!.id);
-        
-        // UI Design: Charger aussi les livres des transactions pour éviter "Livre #103"
-        await _chargerLivresManquants();
+        // Debug: Afficher le nombre de livres chargés
+        // Ne pas charger les livres manquants ici car ils appartiennent à d'autres utilisateurs
+        // _chargerLivresManquants() est utile pour les transactions, mais pas pour "Mes livres"
       } else {
         _mesLivres = [];
-
         _afficherErreur(
             'Impossible de charger l\'utilisateur. Veuillez vous reconnecter.');
       }
-
       setState(() => _isLoading = false);
     } catch (e) {
       setState(() => _isLoading = false);
-
       _afficherErreur('Erreur lors du chargement des livres: $e');
     }
   }
-
-  // UI Design: Méthode pour filtrer les livres selon les critères sélectionnés
-
   List<Livre> get _livresFiltres {
     List<Livre> resultat = _mesLivres;
-
     // Filtrage par statut
     switch (_filtreActuel) {
       case 'disponibles':
@@ -199,29 +140,24 @@ class _GererLivresEcranState extends State<GererLivresEcran>
         // 'tous' - pas de filtrage par statut
         break;
     }
-
     // Filtrage par matière si sélectionnée
     if (_matiereSelectionnee != null && _matiereSelectionnee!.isNotEmpty) {
       resultat = resultat.where((livre) => 
         livre.matiere.toLowerCase() == _matiereSelectionnee!.toLowerCase()
       ).toList();
     }
-
     // Filtrage par année d'étude si sélectionnée
     if (_anneeSelectionnee != null && _anneeSelectionnee!.isNotEmpty) {
       resultat = resultat.where((livre) => 
         livre.anneeEtude == _anneeSelectionnee
       ).toList();
     }
-
     return resultat;
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: CouleursApp.fond,
-
       appBar: WidgetBarreAppPersonnalisee(
         titre: 'Gérer mes livres',
         sousTitre: _utilisateurActuel != null
@@ -242,11 +178,9 @@ class _GererLivresEcranState extends State<GererLivresEcran>
           ],
         ),
       ),
-
       body: Column(
         children: [
           // Tabs pour naviguer entre les sections
-
           Container(
             color: CouleursApp.blanc,
             child: TabBar(
@@ -261,15 +195,12 @@ class _GererLivresEcranState extends State<GererLivresEcran>
               ],
             ),
           ),
-
           // Contenu des tabs
-
           Expanded(
             child: TabBarView(
               controller: _tabController,
               children: [
                 // Tab 1: Mes Livres
-
                 SingleChildScrollView(
                   child: Column(
                     children: [
@@ -282,28 +213,21 @@ class _GererLivresEcranState extends State<GererLivresEcran>
                     ],
                   ),
                 ),
-
                 // Tab 2: Échanges
-
                 _construireSectionEchanges(),
               ],
             ),
           ),
         ],
       ),
-
-      // UI Design: Widget réutilisable pour accéder aux conversations
       floatingActionButton: const WidgetBoutonConversations(),
-
       bottomNavigationBar: NavBarWidget(
         indexSelectionne: 1, // Livres
-
         onTap: (index) =>
             NavigationService.gererNavigationNavBar(context, index),
       ),
     );
   }
-
   Widget _construireFiltres() {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -341,7 +265,6 @@ class _GererLivresEcranState extends State<GererLivresEcran>
               ],
             ),
           ),
-          
           // Filtres horizontaux
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -361,10 +284,8 @@ class _GererLivresEcranState extends State<GererLivresEcran>
       ),
     );
   }
-
   Widget _construireFiltreChip(String label, String valeur, IconData icone) {
     final estSelectionne = _filtreActuel == valeur;
-
     return FilterChip(
       label: Text(
         label,
@@ -395,12 +316,9 @@ class _GererLivresEcranState extends State<GererLivresEcran>
       ),
     );
   }
-
-  // UI Design: Filtre spécialisé pour les matières avec couleurs
   Widget _construireFiltreChipMatiere(String matiere) {
     final estSelectionne = _filtreActuel == 'tous' && matiere == _matiereSelectionnee;
     final couleur = LivresUtils.obtenirCouleurMatiere(matiere);
-
     return FilterChip(
       label: Text(
         LivresUtils.obtenirNomMatiere(matiere),
@@ -430,12 +348,9 @@ class _GererLivresEcranState extends State<GererLivresEcran>
       ),
     );
   }
-
-  // UI Design: Filtre spécialisé pour les années d'étude avec couleurs dynamiques
   Widget _construireFiltreChipAnnee(String annee) {
     final estSelectionne = _filtreActuel == 'tous' && annee == _anneeSelectionnee;
     final couleur = LivresUtils.obtenirCouleurAnnee(annee);
-
     return FilterChip(
       label: Text(
         annee,
@@ -465,43 +380,28 @@ class _GererLivresEcranState extends State<GererLivresEcran>
       ),
     );
   }
-
   Widget _construireGrilleLivres() {
     final mediaQuery = MediaQuery.of(context);
-
     final screenWidth = mediaQuery.size.width;
-
     final screenHeight = mediaQuery.size.height;
-
     return WidgetCollection<Livre>.grille(
       elements: _livresFiltres,
-
       enChargement: false,
-
       ratioAspect: 0.75,
-      // UI Design: Même ratio que marketplace pour éviter l'overflow
-
       nombreColonnes: 2,
-
       espacementColonnes: screenWidth * 0.04,
-
       espacementLignes: screenHeight * 0.02,
-
       constructeurElement: (context, livre, index) {
         return WidgetCarte.livre(
           livre: livre,
           onTap: () => _afficherOptionsLivre(livre),
         );
       },
-
       messageEtatVide: 'Aucun livre trouvé',
-
       iconeEtatVide: Icons.menu_book_outlined,
-
       padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
     );
   }
-
   Widget _construireEtatVide() {
     return Center(
       child: Column(
@@ -521,70 +421,6 @@ class _GererLivresEcranState extends State<GererLivresEcran>
       ),
     );
   }
-
-  // UI Design: Section Messages simplifiée et roundy
-  Widget _construireSectionMessages() {
-    final transactionsRecues = _mesTransactions
-        .where((t) =>
-            t.vendeurId == _utilisateurActuel?.id && t.statut == 'en_attente')
-        .toList();
-
-    if (_isLoadingTransactions) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (transactionsRecues.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                color: CouleursApp.principal.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.message_outlined,
-                  size: 60, color: CouleursApp.principal),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Aucun message reçu',
-              style: StylesTexteApp.titre.copyWith(fontSize: 24),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Vous recevrez des messages quand des étudiants\nsouhaiteront échanger avec vous',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                color: CouleursApp.texteFonce.withValues(alpha: 0.6),
-                height: 1.5,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return Column(
-      children: [
-        // Liste des messages
-        Expanded(
-          child: SingleChildScrollView(
-            child: Column(
-              children: transactionsRecues
-                  .map((transaction) => _construireCarteMessage(transaction))
-                  .toList(),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // UI Design: Section Échanges style Facebook moderne
   Widget _construireSectionEchanges() {
     if (_isLoadingTransactions) {
       return const Center(
@@ -593,7 +429,6 @@ class _GererLivresEcranState extends State<GererLivresEcran>
         ),
       );
     }
-
     if (_mesTransactions.isEmpty) {
       return Center(
         child: Column(
@@ -643,7 +478,6 @@ class _GererLivresEcranState extends State<GererLivresEcran>
         ),
       );
     }
-
     // Grouper les transactions par statut
     final transactionsEnAttente =
         _mesTransactions.where((t) => t.statut == 'en_attente').toList();
@@ -651,7 +485,6 @@ class _GererLivresEcranState extends State<GererLivresEcran>
         _mesTransactions.where((t) => t.statut == 'en_cours').toList();
     final transactionsTerminees =
         _mesTransactions.where((t) => t.statut == 'terminee').toList();
-
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -710,23 +543,19 @@ class _GererLivresEcranState extends State<GererLivresEcran>
               ],
             ),
           ),
-
           const SizedBox(height: 20),
-
           // Section En Attente
           if (transactionsEnAttente.isNotEmpty) ...[
             _construireSectionStatut('En Attente', transactionsEnAttente,
                 Icons.schedule, Colors.orange),
             const SizedBox(height: 20),
           ],
-
           // Section En Cours
           if (transactionsEnCours.isNotEmpty) ...[
             _construireSectionStatut('En Cours', transactionsEnCours,
                 Icons.sync, CouleursApp.principal),
             const SizedBox(height: 20),
           ],
-
           // Section Terminées
           if (transactionsTerminees.isNotEmpty) ...[
             _construireSectionStatut('Terminées', transactionsTerminees,
@@ -736,8 +565,6 @@ class _GererLivresEcranState extends State<GererLivresEcran>
       ),
     );
   }
-
-  // UI Design: Section par statut style Facebook
   Widget _construireSectionStatut(String titre, List<Transaction> transactions,
       IconData icone, Color couleur) {
     return Column(
@@ -777,20 +604,16 @@ class _GererLivresEcranState extends State<GererLivresEcran>
             ],
           ),
         ),
-
         // Cartes des transactions
         ...transactions.map((transaction) =>
             _construireCarteTransactionFacebook(transaction, couleur)),
       ],
     );
   }
-
-  // UI Design: Carte de transaction style Facebook moderne
   Widget _construireCarteTransactionFacebook(
       Transaction transaction, Color couleurSection) {
     final estVendeur = transaction.vendeurId == _utilisateurActuel?.id;
     final estAcheteur = transaction.acheteurId == _utilisateurActuel?.id;
-
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -881,7 +704,6 @@ class _GererLivresEcranState extends State<GererLivresEcran>
               ],
             ),
           ),
-
           // Contenu de la transaction
           Padding(
             padding: const EdgeInsets.all(16),
@@ -941,7 +763,6 @@ class _GererLivresEcranState extends State<GererLivresEcran>
                         ),
                       ),
                     ),
-
                     // Flèche d'échange
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -951,7 +772,6 @@ class _GererLivresEcranState extends State<GererLivresEcran>
                         size: 24,
                       ),
                     ),
-
                     // Livre de l'autre utilisateur
                     Expanded(
                       child: Container(
@@ -1004,7 +824,6 @@ class _GererLivresEcranState extends State<GererLivresEcran>
                     ),
                   ],
                 ),
-
                 // Message de l'acheteur (si présent)
                 if (transaction.messageAcheteur != null &&
                     transaction.messageAcheteur!.isNotEmpty) ...[
@@ -1042,7 +861,6 @@ class _GererLivresEcranState extends State<GererLivresEcran>
                     ),
                   ),
                 ],
-
                 // Date et actions
                 const SizedBox(height: 16),
                 Row(
@@ -1057,7 +875,6 @@ class _GererLivresEcranState extends State<GererLivresEcran>
                         ),
                       ),
                     ),
-
                     // Actions selon le statut
                     if (transaction.statut == 'en_attente' && estVendeur) ...[
                       // Boutons Accepter/Refuser pour le vendeur
@@ -1141,209 +958,9 @@ class _GererLivresEcranState extends State<GererLivresEcran>
       ),
     );
   }
-
-  // UI Design: Carte pour afficher un message de demande d'échange style Messenger
-  Widget _construireCarteMessage(Transaction transaction) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12, left: 16, right: 16),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Avatar de l'utilisateur
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: CouleursApp.principal.withValues(alpha: 0.2),
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: CouleursApp.principal.withValues(alpha: 0.3),
-                width: 1,
-              ),
-            ),
-            child: Center(
-              child: Text(
-                _obtenirInitialesUtilisateur(transaction.acheteurId),
-                style: const TextStyle(
-                  color: CouleursApp.principal,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-
-          // Contenu du message
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // En-tête avec nom et heure
-                Row(
-                  children: [
-                    const Text(
-                      'Demande d\'échange',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                        color: CouleursApp.texteFonce,
-                      ),
-                    ),
-                    const Spacer(),
-                    Text(
-                      _formaterHeure(transaction.dateCreation),
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: CouleursApp.texteFonce.withValues(alpha: 0.6),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-
-                // Livre demandé
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: CouleursApp.principal.withValues(alpha: 0.05),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: CouleursApp.principal.withValues(alpha: 0.1),
-                      width: 1,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.book,
-                        color: CouleursApp.principal,
-                        size: 16,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          _obtenirNomLivre(transaction.livreId),
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                            color: CouleursApp.texteFonce,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Message de l'acheteur
-
-                if (transaction.messageAcheteur != null) ...[
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: CouleursApp.fond,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: CouleursApp.texteFonce.withValues(alpha: 0.1),
-                        width: 1,
-                      ),
-                    ),
-                    child: Text(
-                      transaction.messageAcheteur!,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        height: 1.3,
-                        color: CouleursApp.texteFonce,
-                      ),
-                    ),
-                  ),
-                ],
-
-                // Actions
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => _refuserTransaction(transaction.id),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.red,
-                          side: const BorderSide(color: Colors.red, width: 1),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16)),
-                          minimumSize: const Size(0, 32),
-                        ),
-                        child: const Text(
-                          'Refuser',
-                          style: TextStyle(
-                              fontSize: 12, fontWeight: FontWeight.w500),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () => _confirmerTransaction(transaction.id),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: CouleursApp.accent,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16)),
-                          elevation: 1,
-                          minimumSize: const Size(0, 32),
-                        ),
-                        child: const Text(
-                          'Accepter',
-                          style: TextStyle(
-                              fontSize: 12, fontWeight: FontWeight.w500),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                // Bouton pour répondre
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    onPressed: () => _afficherModalReponse(transaction),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: CouleursApp.principal,
-                      side: BorderSide(
-                        color: CouleursApp.principal.withValues(alpha: 0.3),
-                        width: 1,
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16)),
-                    ),
-                    icon: const Icon(Icons.reply, size: 16),
-                    label: Text(
-                      'Répondre à ${_obtenirInitialesUtilisateur(transaction.acheteurId)}',
-                      style: const TextStyle(
-                          fontSize: 12, fontWeight: FontWeight.w500),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // UI Design: Carte pour afficher une transaction complète roundy
+  // ignore: unused_element
   Widget _construireCarteTransaction(Transaction transaction) {
     final estVendeur = transaction.vendeurId == _utilisateurActuel?.id;
-
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 3,
@@ -1416,7 +1033,6 @@ class _GererLivresEcranState extends State<GererLivresEcran>
               ],
             ),
           ),
-
           // Contenu de la transaction
           Padding(
             padding: const EdgeInsets.all(20),
@@ -1430,7 +1046,6 @@ class _GererLivresEcranState extends State<GererLivresEcran>
                   Icons.book,
                   CouleursApp.principal,
                 ),
-
                 // Pour les échanges, afficher le livre proposé
                 if (transaction.type == 'echange' &&
                     transaction.livreEchangeId != null) ...[
@@ -1442,7 +1057,6 @@ class _GererLivresEcranState extends State<GererLivresEcran>
                     CouleursApp.accent,
                   ),
                 ],
-
                 // Date et actions
                 const SizedBox(height: 20),
                 Row(
@@ -1548,10 +1162,6 @@ class _GererLivresEcranState extends State<GererLivresEcran>
       ),
     );
   }
-
-  // UI Design: Widget helper pour afficher les informations d'un livre
-
-  // UI Design: Widget helper roundy pour afficher les informations d'un livre
   Widget _construireInfoLivreRoundy(
       String titre, String valeur, IconData icone, Color couleur) {
     return Container(
@@ -1609,8 +1219,6 @@ class _GererLivresEcranState extends State<GererLivresEcran>
       ),
     );
   }
-
-  // UI Design: Méthode pour obtenir le nom d'un livre à partir de son ID
   String _obtenirNomLivre(String livreId) {
     try {
       // Chercher d'abord dans les livres locaux
@@ -1622,8 +1230,6 @@ class _GererLivresEcranState extends State<GererLivresEcran>
       return 'Chargement...';
     }
   }
-
-  // UI Design: Charger un livre manquant depuis le repository
   Future<void> _chargerLivreManquant(String livreId) async {
     try {
       final livre = await _livresRepository.obtenirLivreParId(livreId);
@@ -1638,13 +1244,13 @@ class _GererLivresEcranState extends State<GererLivresEcran>
       // Ignorer les erreurs de chargement
     }
   }
-
-  // UI Design: Méthode pour charger tous les livres manquants des transactions
+  // SUPPRIMÉ: _chargerLivresManquants() causait l'affichage des livres des autres utilisateurs
+  // Cette méthode ajoutait des livres qui ne sont pas la propriété de l'utilisateur actuel
+  // Elle était utile pour les transactions, mais pas appropriée pour la section "Mes livres"
+  /*
   Future<void> _chargerLivresManquants() async {
     if (_mesTransactions.isEmpty) return;
-
     final idsLivresManquants = <String>{};
-
     // Collecter tous les IDs de livres qui ne sont pas dans la liste locale
     for (final transaction in _mesTransactions) {
       if (!_mesLivres.any((l) => l.id == transaction.livreId)) {
@@ -1655,8 +1261,6 @@ class _GererLivresEcranState extends State<GererLivresEcran>
         idsLivresManquants.add(transaction.livreEchangeId!);
       }
     }
-
-    // UI Design: Charger tous les livres manquants (pas seulement ceux de l'utilisateur)
     for (final livreId in idsLivresManquants) {
       try {
         final livre = await _livresRepository.obtenirLivreParId(livreId);
@@ -1672,7 +1276,7 @@ class _GererLivresEcranState extends State<GererLivresEcran>
       }
     }
   }
-
+  */
   void _afficherErreur(String message) {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1684,60 +1288,24 @@ class _GererLivresEcranState extends State<GererLivresEcran>
       );
     }
   }
-
-  // UI Design: Méthodes utilitaires pour les transactions
-
   String _formaterDate(DateTime date) {
     return TransactionsUtils.formaterDateComplete(date);
   }
-
-  // UI Design: Méthode pour formater l'heure style Messenger
-  String _formaterHeure(DateTime date) {
-    return TransactionsUtils.formaterDate(date);
-  }
-
-  // UI Design: Méthode pour obtenir les initiales d'un utilisateur
   String _obtenirInitialesUtilisateur(String? utilisateurId) {
     return TransactionsUtils.obtenirInitialesUtilisateur(utilisateurId);
   }
-
-  // UI Design: Méthode asynchrone pour obtenir les initiales depuis le service utilisateur
-  Future<String> _obtenirInitialesUtilisateurDepuisService(
-      String? utilisateurId) async {
-    if (utilisateurId == null) return '?';
-
-    try {
-      // UI Design: Utiliser le service d'authentification pour récupérer les informations utilisateur
-      final utilisateur =
-          await _authentificationService.obtenirUtilisateurParId(utilisateurId);
-      if (utilisateur != null) {
-        return '${utilisateur.prenom[0]}${utilisateur.nom[0]}';
-      }
-
-      // UI Design: Fallback vers la méthode locale si l'utilisateur n'est pas trouvé
-      return _obtenirInitialesUtilisateur(utilisateurId);
-    } catch (e) {
-      // UI Design: En cas d'erreur, utiliser la méthode locale comme fallback
-      return _obtenirInitialesUtilisateur(utilisateurId);
-    }
-  }
-
   Color _obtenirCouleurStatut(String statut) {
     return TransactionsUtils.obtenirCouleurStatut(statut);
   }
-
   String _obtenirTexteStatut(String statut) {
     return TransactionsUtils.obtenirTexteStatut(statut);
   }
-
   Future<void> _confirmerTransaction(String transactionId) async {
     try {
       final succes =
           await _transactionsService.confirmerTransaction(transactionId);
-
       if (succes) {
         _chargerMesTransactions();
-
         _afficherSucces('Transaction confirmée avec succès !');
       } else {
         _afficherErreur('Erreur lors de la confirmation');
@@ -1746,15 +1314,12 @@ class _GererLivresEcranState extends State<GererLivresEcran>
       _afficherErreur('Erreur inattendue: $e');
     }
   }
-
   Future<void> _refuserTransaction(String transactionId) async {
     try {
       final succes =
           await _transactionsService.annulerTransaction(transactionId);
-
       if (succes) {
         _chargerMesTransactions();
-
         _afficherSucces('Transaction refusée');
       } else {
         _afficherErreur('Erreur lors du refus');
@@ -1763,15 +1328,12 @@ class _GererLivresEcranState extends State<GererLivresEcran>
       _afficherErreur('Erreur inattendue: $e');
     }
   }
-
   Future<void> _completerTransaction(String transactionId) async {
     try {
       final succes =
           await _transactionsService.completerTransaction(transactionId);
-
       if (succes) {
         _chargerMesTransactions();
-
         _afficherSucces('Transaction marquée comme terminée !');
       } else {
         _afficherErreur('Erreur lors de la finalisation');
@@ -1780,7 +1342,6 @@ class _GererLivresEcranState extends State<GererLivresEcran>
       _afficherErreur('Erreur inattendue: $e');
     }
   }
-
   void _ajouterNouveauLivre() {
     showModalBottomSheet(
       context: context,
@@ -1789,7 +1350,6 @@ class _GererLivresEcranState extends State<GererLivresEcran>
       builder: (context) => _construireModalAjoutLivre(),
     );
   }
-
   Widget _construireModalAjoutLivre() {
     return _ModalAjoutLivre(
       utilisateurActuel: _utilisateurActuel,
@@ -1797,9 +1357,7 @@ class _GererLivresEcranState extends State<GererLivresEcran>
         setState(() {
           _mesLivres.add(livre);
         });
-
         // Afficher message de succès
-
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Livre "${livre.titre}" ajouté avec succès !'),
@@ -1819,7 +1377,6 @@ class _GererLivresEcranState extends State<GererLivresEcran>
       },
     );
   }
-
   void _afficherOptionsLivre(Livre livre) {
     showModalBottomSheet(
       context: context,
@@ -1828,7 +1385,6 @@ class _GererLivresEcranState extends State<GererLivresEcran>
       builder: (context) => _construireModalOptionsLivre(livre),
     );
   }
-
   Widget _construireModalOptionsLivre(Livre livre) {
     return Container(
       decoration: const BoxDecoration(
@@ -1844,7 +1400,6 @@ class _GererLivresEcranState extends State<GererLivresEcran>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Handle
-
           Container(
             margin: const EdgeInsets.only(bottom: 16),
             width: 40,
@@ -1854,14 +1409,11 @@ class _GererLivresEcranState extends State<GererLivresEcran>
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-
           Text(
             livre.titre,
             style: StylesTexteApp.titre.copyWith(fontSize: 18),
           ),
-
           const SizedBox(height: 8),
-
           Text(
             'Par ${livre.auteur}',
             style: TextStyle(
@@ -1869,19 +1421,15 @@ class _GererLivresEcranState extends State<GererLivresEcran>
               color: CouleursApp.texteFonce.withValues(alpha: 0.7),
             ),
           ),
-
           const SizedBox(height: 20),
-
           ListTile(
             leading: const Icon(Icons.edit, color: CouleursApp.principal),
             title: const Text('Modifier les détails'),
             onTap: () {
               Navigator.pop(context);
-
               _modifierLivre(livre);
             },
           ),
-
           ListTile(
             leading: Icon(
               livre.estDisponible ? Icons.pause : Icons.play_arrow,
@@ -1892,17 +1440,14 @@ class _GererLivresEcranState extends State<GererLivresEcran>
                 : 'Remettre en échange'),
             onTap: () {
               Navigator.pop(context);
-
               _basculerDisponibilite(livre);
             },
           ),
-
           ListTile(
             leading: const Icon(Icons.delete, color: Colors.red),
             title: const Text('Supprimer le livre'),
             onTap: () {
               Navigator.pop(context);
-
               _supprimerLivre(livre);
             },
           ),
@@ -1910,7 +1455,6 @@ class _GererLivresEcranState extends State<GererLivresEcran>
       ),
     );
   }
-
   void _modifierLivre(Livre livre) {
     showModalBottomSheet(
       context: context,
@@ -1919,7 +1463,6 @@ class _GererLivresEcranState extends State<GererLivresEcran>
       builder: (context) => _construireModalModificationLivre(livre),
     );
   }
-
   Widget _construireModalModificationLivre(Livre livre) {
     return _ModalModificationLivre(
       livre: livre,
@@ -1927,12 +1470,10 @@ class _GererLivresEcranState extends State<GererLivresEcran>
       onLivreModifie: (livreModifie) {
         setState(() {
           final index = _mesLivres.indexWhere((l) => l.id == livre.id);
-
           if (index != -1) {
             _mesLivres[index] = livreModifie;
           }
         });
-
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content:
@@ -1944,24 +1485,20 @@ class _GererLivresEcranState extends State<GererLivresEcran>
       },
     );
   }
-
   Future<void> _basculerDisponibilite(Livre livre) async {
     try {
       final succes = livre.estDisponible
           ? await _livresRepository.marquerLivreEchange(livre.id)
           : await _livresRepository.marquerLivreDisponible(livre.id);
-
       if (succes) {
         if (mounted) {
           setState(() {
             final index = _mesLivres.indexWhere((l) => l.id == livre.id);
-
             if (index != -1) {
               _mesLivres[index] =
                   livre.copyWith(estDisponible: !livre.estDisponible);
             }
           });
-
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(livre.estDisponible
@@ -1980,7 +1517,6 @@ class _GererLivresEcranState extends State<GererLivresEcran>
       _afficherErreur('Erreur inattendue: $e');
     }
   }
-
   void _supprimerLivre(Livre livre) {
     showDialog(
       context: context,
@@ -1996,16 +1532,13 @@ class _GererLivresEcranState extends State<GererLivresEcran>
           ElevatedButton(
             onPressed: () async {
               Navigator.pop(context);
-
               try {
                 final succes = await _livresRepository.supprimerLivre(livre.id);
-
                 if (succes) {
                   if (mounted) {
                     setState(() {
                       _mesLivres.removeWhere((l) => l.id == livre.id);
                     });
-
                     _afficherSucces('"${livre.titre}" supprimé avec succès');
                   }
                 } else {
@@ -2025,7 +1558,6 @@ class _GererLivresEcranState extends State<GererLivresEcran>
       ),
     );
   }
-
   void _afficherSucces(String message) {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -2037,165 +1569,6 @@ class _GererLivresEcranState extends State<GererLivresEcran>
       );
     }
   }
-
-  // UI Design: Méthode pour envoyer un message de réponse
-  Future<void> _envoyerMessageReponse(
-      Transaction transaction, String message) async {
-    try {
-      // UI Design: Créer une nouvelle transaction de réponse
-      final transactionReponse = Transaction(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        livreId: transaction.livreEchangeId ?? transaction.livreId,
-        livreEchangeId: transaction.livreId,
-        acheteurId: _utilisateurActuel!.id,
-        vendeurId: transaction.acheteurId,
-        type: 'echange',
-        statut: 'en_attente',
-        dateCreation: DateTime.now(),
-        messageAcheteur: message,
-      );
-
-      // UI Design: Ajouter la transaction à la liste locale
-      setState(() {
-        _mesTransactions.add(transactionReponse);
-      });
-
-      // UI Design: Afficher un message de succès
-      _afficherSucces('Message envoyé avec succès !');
-
-      // UI Design: Basculer vers l'onglet Échanges pour voir la réponse
-      _tabController
-          .animateTo(1); // UI Design: Corrigé pour 1 onglet (Échanges)
-    } catch (e) {
-      _afficherErreur('Erreur lors de l\'envoi du message: $e');
-    }
-  }
-
-  // UI Design: Méthode pour afficher le modal de réponse
-  void _afficherModalReponse(Transaction transaction) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => _construireModalReponse(transaction),
-    );
-  }
-
-  // UI Design: Méthode pour construire le modal de réponse
-  Widget _construireModalReponse(Transaction transaction) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
-        ),
-      ),
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Handle
-          Container(
-            margin: const EdgeInsets.only(bottom: 16),
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: Colors.grey.shade300,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-
-          // Titre
-          Row(
-            children: [
-              const Icon(Icons.reply, color: CouleursApp.principal, size: 24),
-              const SizedBox(width: 12),
-              Text(
-                'Répondre à ${_obtenirInitialesUtilisateur(transaction.acheteurId)}',
-                style: StylesTexteApp.titre.copyWith(fontSize: 18),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-
-          // Livre concerné
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: CouleursApp.principal.withValues(alpha: 0.05),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: CouleursApp.principal.withValues(alpha: 0.2),
-                width: 1,
-              ),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.book, color: CouleursApp.principal, size: 20),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    _obtenirNomLivre(transaction.livreId),
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: CouleursApp.texteFonce,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-
-          // Boutons d'action
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.grey),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: const Text('Annuler'),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {
-                    _envoyerMessageReponse(
-                        transaction, 'Réponse automatique via l\'application');
-                    Navigator.pop(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: CouleursApp.principal,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: const Text(
-                    'Envoyer',
-                    style: TextStyle(
-                      color: CouleursApp.blanc,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-        ],
-      ),
-    );
-  }
-
   void _afficherFiltres() {
     showModalBottomSheet(
       context: context,
@@ -2204,7 +1577,6 @@ class _GererLivresEcranState extends State<GererLivresEcran>
       builder: (context) => _construireModalFiltres(),
     );
   }
-
   Widget _construireModalFiltres() {
     return Container(
       height: MediaQuery.of(context).size.height * 0.7,
@@ -2218,7 +1590,6 @@ class _GererLivresEcranState extends State<GererLivresEcran>
       child: Column(
         children: [
           // Handle
-
           Container(
             margin: const EdgeInsets.only(top: 12),
             width: 40,
@@ -2228,9 +1599,7 @@ class _GererLivresEcranState extends State<GererLivresEcran>
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-
           // Contenu scrollable
-
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
@@ -2238,7 +1607,6 @@ class _GererLivresEcranState extends State<GererLivresEcran>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Titre
-
                   Row(
                     children: [
                       const Icon(Icons.filter_list,
@@ -2250,20 +1618,15 @@ class _GererLivresEcranState extends State<GererLivresEcran>
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 24),
-
                   // Filtres de matière
-
                   Text(
                     'Matière',
                     style: StylesTexteApp.petitTitre.copyWith(
                       color: CouleursApp.texteFonce,
                     ),
                   ),
-
                   const SizedBox(height: 12),
-
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
@@ -2271,20 +1634,15 @@ class _GererLivresEcranState extends State<GererLivresEcran>
                         .map((matiere) => _construireFiltreChipMatiere(matiere))
                         .toList(),
                   ),
-
                   const SizedBox(height: 24),
-
                   // Filtres d'année d'étude
-
                   Text(
                     'Année d\'étude',
                     style: StylesTexteApp.petitTitre.copyWith(
                       color: CouleursApp.texteFonce,
                     ),
                   ),
-
                   const SizedBox(height: 12),
-
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
@@ -2292,11 +1650,8 @@ class _GererLivresEcranState extends State<GererLivresEcran>
                         .map((annee) => _construireFiltreChipAnnee(annee))
                         .toList(),
                   ),
-
                   const SizedBox(height: 24),
-
                   // Boutons
-
                   Row(
                     children: [
                       Expanded(
@@ -2317,10 +1672,8 @@ class _GererLivresEcranState extends State<GererLivresEcran>
                           onPressed: () {
                             setState(() {
                               _filtreActuel = _matiereSelectionnee!;
-
                               _anneeSelectionnee = _anneeSelectionnee!;
                             });
-
                             Navigator.pop(context);
                           },
                           style: ElevatedButton.styleFrom(
@@ -2340,7 +1693,6 @@ class _GererLivresEcranState extends State<GererLivresEcran>
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 20),
                 ],
               ),
@@ -2351,82 +1703,50 @@ class _GererLivresEcranState extends State<GererLivresEcran>
     );
   }
 }
-
-// UI Design: Widget modal séparé pour éviter le problème de clavier qui se ferme
-
 class _ModalAjoutLivre extends StatefulWidget {
   final Function(Livre) onLivreAjoute;
-
   final Utilisateur? utilisateurActuel;
-
   const _ModalAjoutLivre({
     required this.onLivreAjoute,
     required this.utilisateurActuel,
   });
-
   @override
   State<_ModalAjoutLivre> createState() => _ModalAjoutLivreState();
 }
-
 class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
   final _formKey = GlobalKey<FormState>();
-
   final _titreController = TextEditingController();
-
   final _auteurController = TextEditingController();
-
   final _descriptionController = TextEditingController();
-
   final _editionController = TextEditingController();
-
   final _coursController = TextEditingController();
-
   final _prixController = TextEditingController();
-
   late LivresRepository _livresRepository;
-
   String? _matiereSelectionnee;
-
   String? _anneeSelectionnee;
-
   String _etatSelectionne = 'Excellent';
-
   bool _enVente = false;
-
   bool _sauvegardeEnCours = false;
-
   @override
   void initState() {
     super.initState();
-
     _livresRepository = ServiceLocator.obtenirService<LivresRepository>();
   }
-
   @override
   void dispose() {
     _titreController.dispose();
-
     _auteurController.dispose();
-
     _descriptionController.dispose();
-
     _editionController.dispose();
-
     _coursController.dispose();
-
     _prixController.dispose();
-
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
-
     final screenHeight = mediaQuery.size.height;
-
     final screenWidth = mediaQuery.size.width;
-
     return Container(
       height: screenHeight * 0.95,
       decoration: const BoxDecoration(
@@ -2439,7 +1759,6 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
       child: Column(
         children: [
           // Handle
-
           Container(
             margin: const EdgeInsets.only(top: 12),
             width: 40,
@@ -2449,9 +1768,7 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-
           // Contenu scrollable
-
           Expanded(
             child: SingleChildScrollView(
               padding: EdgeInsets.all(screenWidth * 0.05),
@@ -2461,7 +1778,6 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Titre
-
                     Row(
                       children: [
                         const Icon(Icons.add_circle,
@@ -2473,11 +1789,8 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
                         ),
                       ],
                     ),
-
                     SizedBox(height: screenHeight * 0.03),
-
                     // Champ Titre (requis)
-
                     TextFormField(
                       controller: _titreController,
                       decoration: InputDecoration(
@@ -2494,15 +1807,11 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
                         if (value?.isEmpty ?? true) {
                           return 'Le titre est requis';
                         }
-
                         return null;
                       },
                     ),
-
                     SizedBox(height: screenHeight * 0.02),
-
                     // Champ Auteur (requis)
-
                     TextFormField(
                       controller: _auteurController,
                       decoration: InputDecoration(
@@ -2519,15 +1828,11 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
                         if (value?.isEmpty ?? true) {
                           return 'L\'auteur est requis';
                         }
-
                         return null;
                       },
                     ),
-
                     SizedBox(height: screenHeight * 0.02),
-
                     // Dropdown Matière (requis)
-
                     DropdownButtonFormField<String>(
                       value: _matiereSelectionnee,
                       decoration: InputDecoration(
@@ -2550,15 +1855,11 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
                           setState(() => _matiereSelectionnee = value),
                       validator: (value) {
                         if (value == null) return 'La matière est requise';
-
                         return null;
                       },
                     ),
-
                     SizedBox(height: screenHeight * 0.02),
-
                     // Dropdown Année d'étude (requis)
-
                     DropdownButtonFormField<String>(
                       value: _anneeSelectionnee,
                       decoration: InputDecoration(
@@ -2583,15 +1884,11 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
                         if (value == null) {
                           return 'L\'année d\'étude est requise';
                         }
-
                         return null;
                       },
                     ),
-
                     SizedBox(height: screenHeight * 0.02),
-
                     // Dropdown État (requis)
-
                     DropdownButtonFormField<String>(
                       value: _etatSelectionne,
                       decoration: InputDecoration(
@@ -2612,11 +1909,8 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
                       onChanged: (value) =>
                           setState(() => _etatSelectionne = value!),
                     ),
-
                     SizedBox(height: screenHeight * 0.02),
-
                     // Champ Description (optionnel)
-
                     TextFormField(
                       controller: _descriptionController,
                       maxLines: 3,
@@ -2632,11 +1926,8 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
                             horizontal: 16, vertical: 16),
                       ),
                     ),
-
                     SizedBox(height: screenHeight * 0.02),
-
                     // Champ Édition (optionnel)
-
                     TextFormField(
                       controller: _editionController,
                       decoration: InputDecoration(
@@ -2650,11 +1941,8 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
                             horizontal: 16, vertical: 16),
                       ),
                     ),
-
                     SizedBox(height: screenHeight * 0.02),
-
                     // Champ Cours associé (optionnel)
-
                     TextFormField(
                       controller: _coursController,
                       decoration: InputDecoration(
@@ -2668,11 +1956,8 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
                             horizontal: 16, vertical: 16),
                       ),
                     ),
-
                     SizedBox(height: screenHeight * 0.03),
-
                     // Option Mettre en vente
-
                     Row(
                       children: [
                         Switch(
@@ -2685,7 +1970,6 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
                             style: TextStyle(fontWeight: FontWeight.w600)),
                       ],
                     ),
-
                     if (_enVente) ...[
                       SizedBox(height: screenHeight * 0.01),
                       TextFormField(
@@ -2704,27 +1988,20 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
                         ),
                         validator: (value) {
                           if (!_enVente) return null;
-
                           if (value == null || value.isEmpty) {
                             return 'Le prix est requis';
                           }
-
                           final parsed =
                               double.tryParse(value.replaceAll(',', '.'));
-
                           if (parsed == null || parsed < 0.01) {
                             return 'Prix invalide';
                           }
-
                           return null;
                         },
                       ),
                     ],
-
                     SizedBox(height: screenHeight * 0.02),
-
                     // Note informative
-
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
@@ -2751,11 +2028,8 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
                         ],
                       ),
                     ),
-
                     SizedBox(height: screenHeight * 0.03),
-
                     // Boutons
-
                     Row(
                       children: [
                         Expanded(
@@ -2802,7 +2076,6 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
                         ),
                       ],
                     ),
-
                     SizedBox(height: screenHeight * 0.025),
                   ],
                 ),
@@ -2813,7 +2086,6 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
       ),
     );
   }
-
   void _afficherErreur(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -2823,16 +2095,13 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
       ),
     );
   }
-
   Future<void> _sauvegarderLivre() async {
     if (_formKey.currentState!.validate() && widget.utilisateurActuel != null) {
       setState(() => _sauvegardeEnCours = true);
-
       try {
         final prix = _enVente && _prixController.text.isNotEmpty
             ? double.tryParse(_prixController.text.replaceAll(',', '.'))
             : null;
-
         final nouveauLivre = Livre(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           titre: _titreController.text,
@@ -2855,154 +2124,85 @@ class _ModalAjoutLivreState extends State<_ModalAjoutLivre> {
           dateAjout: DateTime.now(),
           prix: prix,
         );
-
         final succes = await _livresRepository.ajouterLivre(nouveauLivre);
-
         if (succes) {
           if (mounted) {
             widget.onLivreAjoute(nouveauLivre);
-
             Navigator.pop(context);
           }
         } else {
           if (mounted) {
             setState(() => _sauvegardeEnCours = false);
-
             _afficherErreur('Erreur lors de l\'ajout du livre');
           }
         }
       } catch (e) {
         setState(() => _sauvegardeEnCours = false);
-
         _afficherErreur('Erreur inattendue: $e');
       }
     }
   }
 }
-
-// UI Design: Widget modal pour modifier un livre existant
-
 class _ModalModificationLivre extends StatefulWidget {
   final Livre livre;
-
   final Function(Livre) onLivreModifie;
-
   final Utilisateur? utilisateurActuel;
-
   const _ModalModificationLivre({
     required this.livre,
     required this.onLivreModifie,
     required this.utilisateurActuel,
   });
-
   @override
   State<_ModalModificationLivre> createState() =>
       _ModalModificationLivreState();
 }
-
 class _ModalModificationLivreState extends State<_ModalModificationLivre> {
   final _formKey = GlobalKey<FormState>();
-
   late final TextEditingController _titreController;
-
   late final TextEditingController _auteurController;
-
   late final TextEditingController _descriptionController;
-
   late final TextEditingController _editionController;
-
   late final TextEditingController _coursController;
-
   late final TextEditingController _prixController;
-
   late LivresRepository _livresRepository;
-
   late String? _matiereSelectionnee;
-
   late String? _anneeSelectionnee;
-
   late String _etatSelectionne;
-
   late bool _enVente;
-
   bool _sauvegardeEnCours = false;
-
-  static const List<String> _matieres = [
-    'Mathématiques',
-    'Informatique',
-    'Physique',
-    'Chimie',
-    'Biologie',
-    'Histoire',
-    'Géographie',
-    'Français',
-    'Anglais',
-    'Philosophie',
-    'Économie',
-    'Gestion',
-    'Droit',
-    'Psychologie',
-    'Sociologie'
-  ];
-
-  static const List<String> _anneesEtude = [
-    '1ère année',
-    '2ème année',
-    '3ème année',
-    '4ème année',
-    '5ème année'
-  ];
-
+  // Utiliser la liste centralisée des matières disponibles
+  static const List<String> _matieres = LivresUtils.matieresDisponibles;
+  // Utiliser la liste centralisée des années d'étude disponibles
+  static const List<String> _anneesEtude = LivresUtils.anneesEtudeDisponibles;
   @override
   void initState() {
     super.initState();
-
     _livresRepository = ServiceLocator.obtenirService<LivresRepository>();
-
-    // UI Design: Pré-remplir les champs avec les données du livre existant
-
     _titreController = TextEditingController(text: widget.livre.titre);
-
     _auteurController = TextEditingController(text: widget.livre.auteur);
-
     _descriptionController =
         TextEditingController(text: widget.livre.description ?? '');
-
     _editionController =
         TextEditingController(text: widget.livre.edition ?? '');
-
     _coursController =
         TextEditingController(text: widget.livre.coursAssocies ?? '');
-
     _prixController =
         TextEditingController(text: widget.livre.prix?.toString() ?? '');
-
     _matiereSelectionnee = widget.livre.matiere;
-
     _anneeSelectionnee = widget.livre.anneeEtude;
-
     _etatSelectionne = widget.livre.etatLivre;
-
     _enVente = widget.livre.prix != null;
   }
-
   @override
   void dispose() {
     _titreController.dispose();
-
     _auteurController.dispose();
-
     _descriptionController.dispose();
-
     _editionController.dispose();
-
     _coursController.dispose();
-
     _prixController.dispose();
-
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -3031,7 +2231,6 @@ class _ModalModificationLivreState extends State<_ModalModificationLivre> {
               controller: scrollController,
               children: [
                 // En-tête
-
                 Row(
                   children: [
                     const Icon(Icons.edit,
@@ -3043,18 +2242,13 @@ class _ModalModificationLivreState extends State<_ModalModificationLivre> {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 24),
-
                 // Champs obligatoires
-
                 Text(
                   'Informations de base',
                   style: StylesTexteApp.titre.copyWith(fontSize: 16),
                 ),
-
                 const SizedBox(height: 12),
-
                 TextFormField(
                   controller: _titreController,
                   decoration: InputDecoration(
@@ -3069,13 +2263,10 @@ class _ModalModificationLivreState extends State<_ModalModificationLivre> {
                     if (value == null || value.isEmpty) {
                       return 'Le titre est obligatoire';
                     }
-
                     return null;
                   },
                 ),
-
                 const SizedBox(height: 16),
-
                 TextFormField(
                   controller: _auteurController,
                   decoration: InputDecoration(
@@ -3090,13 +2281,10 @@ class _ModalModificationLivreState extends State<_ModalModificationLivre> {
                     if (value == null || value.isEmpty) {
                       return 'L\'auteur est obligatoire';
                     }
-
                     return null;
                   },
                 ),
-
                 const SizedBox(height: 16),
-
                 DropdownButtonFormField<String>(
                   value: _matiereSelectionnee,
                   decoration: InputDecoration(
@@ -3119,13 +2307,10 @@ class _ModalModificationLivreState extends State<_ModalModificationLivre> {
                     if (value == null || value.isEmpty) {
                       return 'La matière est obligatoire';
                     }
-
                     return null;
                   },
                 ),
-
                 const SizedBox(height: 16),
-
                 DropdownButtonFormField<String>(
                   value: _anneeSelectionnee,
                   decoration: InputDecoration(
@@ -3148,13 +2333,10 @@ class _ModalModificationLivreState extends State<_ModalModificationLivre> {
                     if (value == null || value.isEmpty) {
                       return 'L\'année d\'étude est obligatoire';
                     }
-
                     return null;
                   },
                 ),
-
                 const SizedBox(height: 16),
-
                 DropdownButtonFormField<String>(
                   value: _etatSelectionne,
                   decoration: InputDecoration(
@@ -3173,18 +2355,13 @@ class _ModalModificationLivreState extends State<_ModalModificationLivre> {
                   onChanged: (value) =>
                       setState(() => _etatSelectionne = value!),
                 ),
-
                 const SizedBox(height: 24),
-
                 // Champs optionnels
-
                 Text(
                   'Informations supplémentaires',
                   style: StylesTexteApp.titre.copyWith(fontSize: 16),
                 ),
-
                 const SizedBox(height: 12),
-
                 TextFormField(
                   controller: _descriptionController,
                   maxLines: 3,
@@ -3198,9 +2375,7 @@ class _ModalModificationLivreState extends State<_ModalModificationLivre> {
                     alignLabelWithHint: true,
                   ),
                 ),
-
                 const SizedBox(height: 16),
-
                 TextFormField(
                   controller: _editionController,
                   decoration: InputDecoration(
@@ -3212,9 +2387,7 @@ class _ModalModificationLivreState extends State<_ModalModificationLivre> {
                         const Icon(Icons.edit, color: CouleursApp.principal),
                   ),
                 ),
-
                 const SizedBox(height: 16),
-
                 TextFormField(
                   controller: _coursController,
                   decoration: InputDecoration(
@@ -3226,18 +2399,14 @@ class _ModalModificationLivreState extends State<_ModalModificationLivre> {
                         const Icon(Icons.class_, color: CouleursApp.principal),
                   ),
                 ),
-
                 const SizedBox(height: 20),
-
                 // Option vente
-
                 Row(
                   children: [
                     Checkbox(
                       value: _enVente,
                       onChanged: (value) => setState(() {
                         _enVente = value ?? false;
-
                         if (!_enVente) _prixController.clear();
                       }),
                     ),
@@ -3246,7 +2415,6 @@ class _ModalModificationLivreState extends State<_ModalModificationLivre> {
                         style: TextStyle(fontWeight: FontWeight.w600)),
                   ],
                 ),
-
                 if (_enVente) ...[
                   const SizedBox(height: 12),
                   TextFormField(
@@ -3265,22 +2433,17 @@ class _ModalModificationLivreState extends State<_ModalModificationLivre> {
                       if (_enVente && (value == null || value.isEmpty)) {
                         return 'Le prix est obligatoire si le livre est en vente';
                       }
-
                       if (_enVente &&
                           double.tryParse(value!.replaceAll(',', '.')) ==
                               null) {
                         return 'Le prix doit être un nombre valide';
                       }
-
                       return null;
                     },
                   ),
                 ],
-
                 const SizedBox(height: 20),
-
                 // Conseil
-
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -3302,11 +2465,8 @@ class _ModalModificationLivreState extends State<_ModalModificationLivre> {
                     ],
                   ),
                 ),
-
                 const SizedBox(height: 24),
-
                 // Boutons d'action
-
                 Row(
                   children: [
                     Expanded(
@@ -3354,7 +2514,6 @@ class _ModalModificationLivreState extends State<_ModalModificationLivre> {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 20),
               ],
             ),
@@ -3363,7 +2522,6 @@ class _ModalModificationLivreState extends State<_ModalModificationLivre> {
       ),
     );
   }
-
   void _afficherErreur(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -3373,16 +2531,13 @@ class _ModalModificationLivreState extends State<_ModalModificationLivre> {
       ),
     );
   }
-
   Future<void> _sauvegarderModifications() async {
     if (_formKey.currentState!.validate() && widget.utilisateurActuel != null) {
       setState(() => _sauvegardeEnCours = true);
-
       try {
         final prix = _enVente && _prixController.text.isNotEmpty
             ? double.tryParse(_prixController.text.replaceAll(',', '.'))
             : null;
-
         final livreModifie = widget.livre.copyWith(
           titre: _titreController.text,
           auteur: _auteurController.text,
@@ -3399,25 +2554,20 @@ class _ModalModificationLivreState extends State<_ModalModificationLivre> {
               _coursController.text.isNotEmpty ? _coursController.text : null,
           prix: prix,
         );
-
         final succes = await _livresRepository.modifierLivre(livreModifie);
-
         if (succes) {
           if (mounted) {
             widget.onLivreModifie(livreModifie);
-
             Navigator.pop(context);
           }
         } else {
           if (mounted) {
             setState(() => _sauvegardeEnCours = false);
-
             _afficherErreur('Erreur lors de la modification du livre');
           }
         }
       } catch (e) {
         setState(() => _sauvegardeEnCours = false);
-
         _afficherErreur('Erreur inattendue: $e');
       }
     }
